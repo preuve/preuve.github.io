@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!-- KaTeX requires the use of the HTML5 doctype. Without it, KaTeX may not render properly -->
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Formulas</title> 
+    <link rel="stylesheet" type="text/css" href="../katex/katex.min.css">
+
+    <script src="../katex/katex.min.js"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="../katex/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    
+    <style>
+      body{
+        display: block;
+        text-align: center;
+      }
+      div{
+        margin-bottom: 20px
+      }
+    </style>
+  </head>
+  
+  <body>
+    
+    <div id="normalpdf"></div>
+    <div id="algebraicsqrt"></div>
+    <div id="identity1"></div>
+    <div id="primitive1"></div>
+    <div id="primitive2"></div>
+    
+           
+    <script>
+      function get(str){
+        return document.querySelector(str);
+      }
+           
+    	katex.render('\\displaystyle{\\frac{1}{\\sigma\\sqrt{2\\pi}}\\mathrm{e}^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}}', get('#normalpdf'));
+    	katex.render('\\displaystyle{\\left(\\frac{b}{\\sqrt{2}\\sqrt{\\sqrt{a^2+b^2}-a}}+i\\frac{\\sqrt{\\sqrt{a^2+b^2}-a}}{\\sqrt{2}}\\right)^2=\\left(\\frac{\\sqrt{\\sqrt{a^2+b^2}+a}}{\\sqrt{2}}+i\\frac{b}{\\sqrt{2}\\sqrt{\\sqrt{a^2+b^2}+a}}\\right)^2=a+ib}', get('#algebraicsqrt'));
+    	katex.render('\\displaystyle{\\ln(x+iy)=\\frac{1}{2}\\ln(x^2+y^2)+i\\arctan\\frac{y}{x}}', get('#identity1'));
+    	katex.render('\\displaystyle{\\frac{\\mathrm{d}}{\\mathrm{d}x}\\left(\\frac{1}{a}\\arctan{\\frac{x}{a}}\\right)=\\frac{1}{x^2+a^2}}', get('#primitive1'));
+    	katex.render('\\displaystyle{\\frac{\\mathrm{d}}{\\mathrm{d}x}\\left(\\frac{1}{2a}\\ln{\\frac{x-a}{x+a}}\\right)=\\frac{1}{x^2-a^2}}', get('#primitive2'));
+  </script>
+   
+  </body>
+</html>

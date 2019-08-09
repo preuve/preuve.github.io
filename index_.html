@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8"/>
+    <title>Preuve en construction</title> 
+
+    <style>
+    </style>
+  </head>
+
+  <body>
+    <canvas></canvas>
+    
+    <script>
+      const canvas = document.querySelector('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const context = canvas.getContext('2d');
+      context.fillStyle = 'black';
+      context.fillRect(0,0,canvas.width, canvas.height);
+    </script>
+  </body>
+</html>
