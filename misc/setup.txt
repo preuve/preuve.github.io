@@ -1,0 +1,17 @@
+Page Setup for coursX
+---------------------
+
+Create directory cours/courX
+pulp init
+bower install purescript-canvas-geometry --save
+Copy data/template/Main.purs in cours/coursX/src
+Copy data/template/template.html in cours
+Change its name to coursX.html
+Fill its src field to "coursX.js"
+cd to cours/courX/src
+Add a symbolic link to data/common/KaTeX.purs and KaTeX.js:
+ln -s ../../../data/common/KaTeX.purs KaTeX.purs
+ln -s ../../../data/common/KaTeX.js KaTeX.js
+cd ..
+pulp build --to ../courX.js
+add "https://preuve.github.io/cours/courX.html" in the list of index.html
