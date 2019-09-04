@@ -1,4 +1,4 @@
-function mandelbraut_wasm(){
+function mandelbraut(){
       function hsv2rgb(h,s,v) {
 	      
 	      if (h >= 360)	h = 0;

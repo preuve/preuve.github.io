@@ -3625,12 +3625,12 @@ var PS = {};
   };
   var drawableCircle = new DrawableSet(function (v) {
       return function (v1) {
-          return Graphics_Drawing.render(v.context2D)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.circle(abs(basedPoint)(v1.center))(ord(basedPoint)(v1.center))(v1.radius)));
+          return Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.circle(abs(basedPoint)(v1.center))(ord(basedPoint)(v1.center))(v1.radius));
       };
   });
   var drawablePoint = new DrawableSet(function (v) {
       return function (v1) {
-          return Graphics_Drawing.render(v.context2D)(Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.path(Data_Foldable.foldableArray)([ {
+          return Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.path(Data_Foldable.foldableArray)([ {
               x: abs(basedPoint)(v1) - 5.0,
               y: ord(basedPoint)(v1) - 5.0
           }, {
@@ -3642,7 +3642,7 @@ var PS = {};
           }, {
               x: abs(basedPoint)(v1) + 5.0,
               y: ord(basedPoint)(v1) - 5.0
-          } ])))(Graphics_Drawing.text(Graphics_Drawing_Font.font(Graphics_Drawing_Font.fantasy)(25)(Data_Monoid.mempty(Graphics_Drawing_Font.monoidFontOptions)))(abs(basedPoint)(v1) + 10.0)(ord(basedPoint)(v1) - 10.0)(Graphics_Drawing.fillColor(v.color))(v1.name))));
+          } ])))(Graphics_Drawing.text(Graphics_Drawing_Font.font(Graphics_Drawing_Font.fantasy)(25)(Data_Monoid.mempty(Graphics_Drawing_Font.monoidFontOptions)))(abs(basedPoint)(v1) + 10.0)(ord(basedPoint)(v1) - 10.0)(Graphics_Drawing.fillColor(v.color))(v1.name)));
       };
   });
   var measurableVector = new Measurable(function (v) {
@@ -3656,7 +3656,7 @@ var PS = {};
           var o = plus(summublePointVector)(v1.center)(w);
           var n = plus(summublePointVector)(v1.center)(v2);
           var m = plus(summublePointVector)(v1.center)(u);
-          return Graphics_Drawing.render(v.context2D)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.path(Data_Foldable.foldableArray)([ {
+          return Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.path(Data_Foldable.foldableArray)([ {
               x: abs(basedPoint)(o),
               y: ord(basedPoint)(o)
           }, {
@@ -3665,7 +3665,7 @@ var PS = {};
           }, {
               x: abs(basedPoint)(n),
               y: ord(basedPoint)(n)
-          } ])));
+          } ]));
       };
   });
   var projection = function (direction) {
@@ -3705,7 +3705,7 @@ var PS = {};
               };
               return $$Math.atan2(ord(basedVector)(v1.extremity))(abs(basedVector)(v1.extremity));
           })();
-          return Graphics_Drawing.render(v.context2D)(Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.arc(abs(basedPoint)(v1.center))(ord(basedPoint)(v1.center))(start)(end)(v1.radius)))((function () {
+          return Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.arc(abs(basedPoint)(v1.center))(ord(basedPoint)(v1.center))(start)(end)(v1.radius)))((function () {
               var v2 = scale(v1.radius / length(measurableVector)(v1.extremity))(v1.extremity);
               var m = plus(summublePointVector)(v1.center)(v2);
               var d = 0.8 - 4.0e-3 * v1.radius;
@@ -3741,12 +3741,12 @@ var PS = {};
                       return Graphics_Drawing.text(Graphics_Drawing_Font.font(Graphics_Drawing_Font.fantasy)(25)(Data_Monoid.mempty(Graphics_Drawing_Font.monoidFontOptions)))(abs(basedPoint)(i))(ord(basedPoint)(i))(Graphics_Drawing.fillColor(v.color))(str);
                   })(v1.asOriented);
               })());
-          })()));
+          })());
       };
   });
   var drawableSegment = new DrawableSet(function (v) {
       return function (v1) {
-          return Graphics_Drawing.render(v.context2D)(Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.path(Data_Foldable.foldableArray)([ {
+          return Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.outlined(Data_Semigroup.append(Graphics_Drawing.semigroupOutlineStyle)(Graphics_Drawing.outlineColor(v.color))(Graphics_Drawing.lineWidth(v.lineWidth)))(Graphics_Drawing.path(Data_Foldable.foldableArray)([ {
               x: abs(basedPoint)(v1.origin),
               y: ord(basedPoint)(v1.origin)
           }, {
@@ -3768,14 +3768,14 @@ var PS = {};
               var m = middle("")(v1);
               return Data_Maybe.maybe(Data_Monoid.mempty(Graphics_Drawing.monoidDrawing))(function (str) {
                   return Data_Semigroup.append(Graphics_Drawing.semigroupDrawing)(Graphics_Drawing.text(Graphics_Drawing_Font.font(Graphics_Drawing_Font.fantasy)(25)(Data_Monoid.mempty(Graphics_Drawing_Font.monoidFontOptions)))(abs(basedPoint)(m) + 10.0)(ord(basedPoint)(m) - 10.0)(Graphics_Drawing.fillColor(v.color))(str))(Graphics_Drawing.text(Graphics_Drawing_Font.font(Graphics_Drawing_Font.fantasy)(25)(Data_Monoid.mempty(Graphics_Drawing_Font.monoidFontOptions)))(abs(basedPoint)(m) + 10.0)(ord(basedPoint)(m) - 23.0)(Graphics_Drawing.fillColor(v.color))((function () {
-                      var $161 = str === "";
-                      if ($161) {
+                      var $156 = str === "";
+                      if ($156) {
                           return "";
                       };
                       return "\ud83e\udc16";
                   })()));
               })(v1.asOriented);
-          })())));
+          })()));
       };
   });
   exports["Point"] = Point;
@@ -3945,22 +3945,26 @@ var PS = {};
   var Effect = $PS["Effect"];
   var Graphics_Canvas = $PS["Graphics.Canvas"];
   var Graphics_Canvas_Geometry = $PS["Graphics.Canvas.Geometry"];
+  var Graphics_Drawing = $PS["Graphics.Drawing"];
   var KaTeX = $PS["KaTeX"];
   var $$Math = $PS["Math"];                
   var main = Data_Functor["void"](Effect.functorEffect)(function __do() {
-      var v = KaTeX.setBodyBackground("#635351")();
+      var v = KaTeX.setBodyBackground("#ffffff")();
       var v1 = Graphics_Canvas.getCanvasElementById("canvas")();
       if (v1 instanceof Data_Maybe.Just) {
           var v2 = KaTeX.setAttribute("width")("400")(v1.value0)();
           var v3 = KaTeX.setAttribute("height")("600")(v1.value0)();
           var v4 = Graphics_Canvas.getContext2D(v1.value0)();
           var ctx = {
-              context2D: v4,
-              color: Color.rgb(195)(194)(199),
+              color: Color.rgb(0)(0)(0),
               lineWidth: 1.5
           };
           var draw = function (dictDrawableSet) {
-              return Graphics_Canvas_Geometry.drawIn(dictDrawableSet)(ctx);
+              var $13 = Graphics_Drawing.render(v4);
+              var $14 = Graphics_Canvas_Geometry.drawIn(dictDrawableSet)(ctx);
+              return function ($15) {
+                  return $13($14($15));
+              };
           };
           KaTeX.setTitle("Formules d'addition du sinus et du cosinus")();
           KaTeX.raw("Sur le cercle trigonom\xe9trique du rep\xe8re ")();
@@ -4030,7 +4034,7 @@ var PS = {};
           KaTeX.equation("\\bigg\\{\\begin{array}{l}\\cos(a+b)=\\cos(a)\\cos(b)-\\sin(a)\\sin(b)\\\\ \\sin(a+b)=\\sin(a)\\cos(b)+\\sin(b)\\cos(a) \\end{array}")();
           return Data_Unit.unit;
       };
-      throw new Error("Failed pattern match at Main (line 16, column 3 - line 16, column 47): " + [ v1.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 17, column 3 - line 17, column 47): " + [ v1.constructor.name ]);
   });
   exports["main"] = main;
 })(PS);

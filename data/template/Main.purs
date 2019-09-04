@@ -3,8 +3,9 @@ module Main where
 import Prelude
 import Effect (Effect)
 import Data.Maybe(Maybe(..))
+import Graphics.Drawing(render) as Canvas
 import Partial.Unsafe(unsafePartial)
-import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D)
+import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Color (rgb)
 import Graphics.Canvas.Geometry
 import KaTeX
@@ -17,11 +18,10 @@ main = void $ unsafePartial do
   _ <- setAttribute "height" "600" canvas
   context2D <- getContext2D canvas
   
-  let ctx = { context2D
-            , color: rgb 195 194 199
+  let ctx = { color: rgb 195 194 199
             , lineWidth: 1.50}
   let draw :: forall a. DrawableSet a => a -> Effect Unit
-      draw = drawIn ctx 
+      draw = Canvas.render context2D <<< drawIn ctx 
   
   pure unit
   

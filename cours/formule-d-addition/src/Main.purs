@@ -4,7 +4,8 @@ import Prelude
 import Effect (Effect)
 import Data.Maybe(Maybe(..))
 import Partial.Unsafe(unsafePartial)
-import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D)
+import Graphics.Drawing(render) as Canvas
+import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Color (rgb)
 import Graphics.Canvas.Geometry
 import KaTeX
@@ -12,17 +13,16 @@ import Math as Math
 
 main :: Effect Unit
 main = void $ unsafePartial do
-  _ <- setBodyBackground "#635351"
+  _ <- setBodyBackground "#ffffff" --"#635351"
   Just canvas <- getCanvasElementById "canvas"
   _ <- setAttribute "width" "400" canvas
   _ <- setAttribute "height" "600" canvas
   context2D <- getContext2D canvas
   
-  let ctx = { context2D
-            , color: rgb 195 194 199
+  let ctx = { color: rgb 0 0 0 -- 195 194 199
             , lineWidth: 1.50}
   let draw :: forall a. DrawableSet a => a -> Effect Unit
-      draw = drawIn ctx 
+      draw = Canvas.render context2D <<< drawIn ctx 
   
   setTitle "Formules d'addition du sinus et du cosinus"
   
