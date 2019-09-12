@@ -1,0 +1,51 @@
+{
+  "name": "purescript-behaviors",
+  "description": "A simple implementation of FRP which separates events and behaviors",
+  "keywords": [
+    "purescript"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "js",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/paf31/purescript-behaviors.git"
+  },
+  "dependencies": {
+    "purescript-prelude": "^4.0.0",
+    "purescript-effect": "^2.0.0",
+    "purescript-ordered-collections": "^1.0.0",
+    "purescript-filterable": "^3.0.0",
+    "purescript-nullable": "^4.0.0",
+    "purescript-event": "^1.2.4",
+    "purescript-web-html": "^1.0.0",
+    "purescript-web-events": "^1.0.0",
+    "purescript-web-uievents": "^1.0.0"
+  },
+  "devDependencies": {
+    "purescript-math": "^2.1.1",
+    "purescript-integers": "^4.0.0",
+    "purescript-drawing": "^4.0.0"
+  },
+  "homepage": "https://github.com/paf31/purescript-behaviors",
+  "version": "7.0.0",
+  "_release": "7.0.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v7.0.0",
+    "commit": "f55fd957500e9a70d21e1f20e95f8dc0696724ef"
+  },
+  "_source": "https://github.com/paf31/purescript-behaviors.git",
+  "_target": "^7.0.0",
+  "_originalSource": "purescript-behaviors"
+}

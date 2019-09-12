@@ -1,0 +1,35 @@
+{
+  "name": "purescript-canvas-geometry",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ebmtranceboy/purescript-canvas-geometry.git"
+  },
+  "dependencies": {
+    "purescript-prelude": "^4.1.1",
+    "purescript-console": "^4.2.0",
+    "purescript-effect": "^2.0.1",
+    "purescript-sparse-polynomials": "^1.0.3",
+    "purescript-drawing": "^4.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^4.0.0"
+  },
+  "homepage": "https://github.com/Ebmtranceboy/purescript-canvas-geometry",
+  "version": "2.0.0",
+  "_release": "2.0.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v2.0.0",
+    "commit": "42e3c671b0dd65abb5e2dc82504ff9bbb7c16dce"
+  },
+  "_source": "https://github.com/Ebmtranceboy/purescript-canvas-geometry.git",
+  "_target": "^2.0.0",
+  "_originalSource": "purescript-canvas-geometry"
+}

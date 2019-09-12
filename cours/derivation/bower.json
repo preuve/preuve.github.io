@@ -1,0 +1,21 @@
+{
+  "name": "purescript-canvas-plots",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^4.1.1",
+    "purescript-console": "^4.2.0",
+    "purescript-effect": "^2.0.1",
+    "purescript-behaviors": "^7.0.0",
+    "purescript-canvas-geometry": "^2.0.0",
+    "purescript-control": "^4.1.0",
+    "purescript-sparse-polynomials": "^1.0.3"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^4.0.0"
+  }
+}

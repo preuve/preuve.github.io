@@ -1,0 +1,35 @@
+{
+  "name": "purescript-cartesian",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output",
+    ".DS_Store"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ebmtranceboy/purescript-cartesian.git"
+  },
+  "dependencies": {
+    "purescript-prelude": "^4.1.1",
+    "purescript-console": "^4.2.0",
+    "purescript-effect": "^2.0.1",
+    "purescript-integers": "^4.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^4.0.0"
+  },
+  "homepage": "https://github.com/Ebmtranceboy/purescript-cartesian",
+  "version": "1.0.4",
+  "_release": "1.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.4",
+    "commit": "1173ed3d1cead681be1700ded71aaac9a737c9b0"
+  },
+  "_source": "https://github.com/Ebmtranceboy/purescript-cartesian.git",
+  "_target": "^1.0.4",
+  "_originalSource": "purescript-cartesian"
+}
