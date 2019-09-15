@@ -27,7 +27,6 @@ import Data.Int(toNumber, floor, ceil, round)
 import Prim hiding(Function)
 import Graphics.Drawing.Font (font, serif, bold, italic)
 
-
 width = 800.0 :: Number
 height = 600.0 :: Number
 density = 200 :: Int
@@ -386,6 +385,11 @@ cb :: forall a. String -> ButtonEvent -> a -> Effect Unit
 cb msg {event, push} ev = do
   push {value: msg, pos: {x: 0.0, y: 0.0}}
 
+cbOption :: ButtonEvent -> DOM.Event -> Effect Unit
+cbOption {event, push} = unsafePartial \ ev -> do
+  msg <- DOM.selectedValueFromEvent ev
+  push {value: msg, pos: {x: 0.0, y: 0.0}}
+
 mkButtonEvent :: forall r. {body :: DOM.Node, document :: DOM.Document | r} 
   -> String 
   -> Effect ButtonEvent
@@ -400,14 +404,12 @@ mkButtonEvent setup msg = do
 mkOptionEvent :: forall r. {body :: DOM.Node, document :: DOM.Document | r} 
   -> DOM.Node
   -> String 
-  -> Effect ButtonEvent
+  -> Effect Unit
 mkOptionEvent setup select msg = do
   o <- DOM.createElement "option" setup.document
   _ <- DOM.setTextContent msg o
   _ <- DOM.appendChild o select
-  ev <- create
-  _ <- DOM.addEventListener (cb msg ev) DOM.click o
-  pure ev
+  pure unit
 
 curryBox :: forall a. (Number -> Number -> Number -> Number -> a) 
                       ->  Box -> a
@@ -443,13 +445,16 @@ main = do
   markCoef <- mkButtonEvent setup "mark Coefficient"
 
   list <- DOM.createElement "select" setup.document
-  finv <- mkOptionEvent setup list "inverse"
-  fsqu <- mkOptionEvent setup list "square"
-  arbi <- mkOptionEvent setup list "arbitrary"
+  _ <- mkOptionEvent setup list "inverse"
+  _ <- mkOptionEvent setup list "square"
+  _ <- mkOptionEvent setup list "arbitrary"
+  ev <- create
+  _ <- DOM.addEventListener (cbOption ev) DOM.change list
+
   _ <- DOM.appendChild list setup.body
 
   page <- ePage [showDiff,hideDiff,showTan,hideTan,markCoef
-                ,zox,zix,zody,zidy,zofy,zify,finv,fsqu,arbi] $ 
+                ,zox,zix,zody,zidy,zofy,zify,ev] $ 
            (drawIn ctx :: forall a. DrawableSet a => a -> Drawing)
   _ <- animate (
          pure background 

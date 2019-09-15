@@ -2,18 +2,19 @@ module DOM.Editor(module DOM.Editor) where
 
 import Prelude
 import Data.Traversable(traverse)
-import Web.DOM.Element (Element, setAttribute, setId, toEventTarget, toNode, fromNode) as DOM
+import Web.DOM.Element (Element, setAttribute, setId, toEventTarget, toNode, fromNode,fromEventTarget) as DOM
 import Web.DOM.Node (Node, appendChild, parentNode, removeChild, setTextContent) as DOM
 import Web.DOM.NonElementParentNode (getElementById) as DOM
-import Web.Event.Event (Event,EventType) as Event
+import Web.Event.Event (Event,EventType,target) as Event
 import Web.Event.EventTarget (addEventListener, eventListener) as Event
-import Web.HTML.Event.EventTypes (click) as Event
+import Web.HTML.Event.EventTypes (click,change) as Event
 import Web.HTML (Window, window) as HTML
 import Web.HTML.Window (document) as HTML
 import Web.HTML.HTMLDocument (body, toDocument) as HTML
 import Web.DOM.Document (Document, createElement, toNonElementParentNode) as DOM
 import Web.HTML.HTMLElement (toNode) as HTML
 import Web.HTML.HTMLInputElement (fromElement, value) as HTMLInput
+import Web.HTML.HTMLSelectElement (HTMLSelectElement, value,selectedIndex,fromElement) as HTMLSelect
 import Data.Maybe (fromJust)
 import Partial.Unsafe (unsafePartial)
 import Effect(Effect)
@@ -27,6 +28,13 @@ foreign import putImageData ::
 
 type Document = DOM.Document
 type Node = DOM.Node
+type Event = Event.Event
+
+selectedValueFromEvent :: Event.Event -> Effect String
+selectedValueFromEvent = unsafePartial \ev ->
+  HTMLSelect.value $ fromJust $ HTMLSelect.fromElement 
+                   $ fromJust $ DOM.fromEventTarget 
+                   $ fromJust $ Event.target ev
 
 setup :: Effect {window :: HTML.Window, document :: DOM.Document, body :: DOM.Node}
 setup = do
@@ -78,3 +86,6 @@ addEventListener cb ev node = do
 
 click :: Event.EventType
 click = Event.click
+
+change :: Event.EventType
+change = Event.change
