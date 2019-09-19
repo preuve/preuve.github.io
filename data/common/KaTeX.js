@@ -36,6 +36,16 @@ exports.render = function (content){
     };
 };
 
+exports.renderIn = function(location){
+   return function (content){
+    return function(){
+      let node = document.createElement("label");
+      location.appendChild(node);
+      katex.render(content,node);
+    };
+};
+};
+
 exports.equation = function (content){
     return function(){
       let node = document.createElement("label");
@@ -54,6 +64,15 @@ exports.raw = function (content){
     };
 };
 
+exports.rawIn = function(location){
+    return function (content){
+    return function(){
+      let node = document.createTextNode(content);
+      location.appendChild(node);
+    };
+};
+};
+
 exports.newLine = function (){
   return function (){
   let node = document.createElement("br");
@@ -61,6 +80,15 @@ exports.newLine = function (){
           .appendChild(node);
           };
 };
+
+exports.newLineIn = function(location){
+  return function (){
+  return function (){
+  let node = document.createElement("br");
+  location.appendChild(node);
+          };
+};};
+
 
 exports.list = function(xs){
   return function(){
