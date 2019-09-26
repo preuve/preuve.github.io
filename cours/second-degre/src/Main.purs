@@ -8,8 +8,12 @@ import Data.Array( filter, length, (..), uncons, dropWhile
 import Data.Foldable (foldr)
 import Control.Alt(alt)
 import Color (Color, rgb)
-import Graphics.Drawing (Drawing, FillStyle, fillColor, filled, rectangle, render)
-import Graphics.Canvas.Geometry (class DrawableSet, Circle(..), HalfLine(..), Line, Point, Segment(..), aPointOnLine, aVectorOfLine, abs, circle, drawIn, line, meets, ord, point, scale, segment, vector, (<+|))
+import Graphics.Drawing (Drawing, FillStyle
+                        , fillColor, filled, rectangle, render)
+import Graphics.Canvas.Geometry (
+  class DrawableSet, Circle(..), HalfLine(..), Line, Point, Segment(..)
+  , aPointOnLine, aVectorOfLine, abs, circle, drawIn
+  , line, meets, ord, point, scale, segment, vector, (<+|))
 import Graphics.Canvas.Geometry(length) as Geo
 import DOM.Editor as DOM
 import FRP.Behavior (Behavior, animate, unfold)
@@ -21,7 +25,7 @@ import Partial.Unsafe(unsafePartial)
 import Data.Int(toNumber, floor, ceil, round)
 import Prim hiding(Function)
 import Math(sqrt)
-import Data.String(stripPrefix, Pattern(..))
+import Data.String(stripPrefix, drop, Pattern(..))
 
 foreign import fromString :: String -> Number
 
@@ -48,14 +52,16 @@ newtype Factorized = Factorized {a :: Number, x1 :: Number, x2 :: Number}
 class Convertible a b where
   convert :: a -> b
 
-instance convCanonicalFactorized :: Convertible Canonical (Maybe Factorized) where
+instance convCanonicalFactorized :: 
+  Convertible Canonical (Maybe Factorized) where
   convert can@(Canonical {a, alpha, beta}) = 
     let Reduced {a,b,c} = convert can
         delta = b*b - 4.0 * a * c
      in if delta < 0.0 
           then Nothing
-          else Just $ Factorized {a, x1: (-b+sqrt delta)/2.0/a, x2: (-b-sqrt delta)/2.0/a}
-
+          else Just $ Factorized {a
+                                 , x1: (-b+sqrt delta)/2.0/a
+                                 , x2: (-b-sqrt delta)/2.0/a}
 
 instance convReducedCanonical :: Convertible Reduced Canonical where
   convert r@(Reduced {a, b, c}) = 
@@ -74,7 +80,8 @@ instance convCanonicalReduced :: Convertible Canonical Reduced where
 
 instance convReducedFunction :: Convertible Reduced Function where
   convert (Reduced {a, b, c}) = 
-    Function {domain: const true, expression: \x -> a*x*x+b*x+c*1.0} {-WTF : javascript!-}
+    Function {domain: const true
+             , expression: \x -> a*x*x+b*x+c*1.0} {-WTF : javascript!-}
 
 instance convFunctionReduced :: Convertible Function Reduced where
   convert (Function {domain, expression}) = 
@@ -106,9 +113,15 @@ instance convTripletReduced :: Convertible Triplet Reduced where
     let den =  c0.x*c0.x*(c1.x-c2.x)
              + c1.x*c1.x*(c2.x-c0.x)
              + c2.x*c2.x*(c0.x-c1.x)
-        in Reduced { a: (c0.x - c1.x) * c2.y / den
-                   , b: (c1.x*c1.x-c0.x*c0.x)*c2.y / den
-                   , c: c0.x*c1.x*(c0.x-c1.x) * c2.y / den}
+        in Reduced { a: (  (c1.x - c2.x) * c0.y 
+                         + (c2.x - c0.x) * c1.y
+                         + (c0.x - c1.x) * c2.y) / den
+                   , b: (  (c2.x*c2.x - c1.x*c1.x) * c0.y
+                         + (c0.x*c0.x - c2.x*c2.x) * c1.y
+                         + (c1.x*c1.x - c0.x*c0.x) * c2.y) / den
+                   , c: (  c1.x * c2.x * (c1.x - c2.x) * c0.y
+                        +  c0.x * c2.x * (c2.x - c0.x) * c1.y
+                        +  c0.x * c1.x * (c0.x - c1.x) * c2.y) / den}
 
 instance convReducedTriple :: Convertible Reduced Triplet where
   convert r =
@@ -246,7 +259,7 @@ instance drawableFinal :: DrawableSet Final where
                          , asOriented}
   drawIn ctx (FA arr) = drawIn ctx arr
 
-type State = { parabola :: Function
+type State = { parabola :: Triplet 
              , fromF :: Box
              , toF :: Box
              , previousX :: Number
@@ -277,7 +290,7 @@ grid from to =
 
 initialState :: State
 initialState = 
-  { parabola: Function {domain: const true, expression: \x -> x*x}
+  { parabola: convert $ Function {domain: const true, expression: \x -> x*x}
   , fromF:  local
   , toF: window
   , previousX: 0.0
@@ -291,7 +304,7 @@ reframe draw { parabola
              , fromF, toF
              , previousX, previousY} =
   grid fromF toF 
-    <> plot draw fromF toF parabola
+    <> plot draw fromF toF (convert parabola)
     <> (let Reduced {a,b,c} = convert parabola
             delta = b*b-4.0*a*c
          in if delta >= 0.0
@@ -317,6 +330,33 @@ ePage events draw = liftA1 (reframe draw) <$>
                                    in convert $ Reduced {a,b: x,c})}
         "ABCc" -> st{ parabola = (let Reduced {a,b,c} = convert st.parabola
                                    in convert $ Reduced {a,b,c: x})}
+        "CANa" -> st{ parabola = (
+                    let Canonical {a,alpha,beta} = convert st.parabola
+                    in convert $ Canonical {a: x,alpha,beta})}
+        "CANα" -> st{ parabola = (
+                    let Canonical {a,alpha,beta} = convert st.parabola
+                     in convert $ Canonical {a,alpha: x,beta})}
+        "CANβ" -> st{ parabola = (
+                    let Canonical {a,alpha,beta} = convert st.parabola
+                     in convert $ Canonical {a,alpha,beta: x})}
+        "PTSx0" -> st{ parabola = (
+                     let Triplet t = st.parabola
+                      in Triplet t{c0{x=x}})}
+        "PTSy0" -> st{ parabola = (
+                     let Triplet t = st.parabola
+                      in Triplet t{c0{y=x}})}
+        "PTSx1" -> st{ parabola = (
+                     let Triplet t = st.parabola
+                      in Triplet t{c1{x=x}})}
+        "PTSy1" -> st{ parabola = (
+                     let Triplet t = st.parabola
+                      in Triplet t{c1{y=x}})}
+        "PTSx2" -> st{ parabola = (
+                     let Triplet t = st.parabola
+                      in Triplet t{c2{x=x}})}
+        "PTSy2" -> st{ parabola = (
+                     let Triplet t = st.parabola
+                      in Triplet t{c2{y=x}})}
         "zoomOutX" -> st{ fromF{halfWidth = st.fromF.halfWidth*1.1}}
         "zoomInX" -> st{ fromF{halfWidth = st.fromF.halfWidth/1.1 }}
         "zoomOutY" -> st{ fromF{halfHeight = st.fromF.halfHeight*1.1}}
@@ -375,9 +415,18 @@ lineInBox b l =
 type ButtonEvent = { event :: Event StringPos
                    , push :: StringPos -> Effect Unit}
 
-cb :: forall a. String -> ButtonEvent -> a -> Effect Unit
-cb msg {event, push} ev = do
+cbButton :: forall a. String -> ButtonEvent -> a -> Effect Unit
+cbButton msg {event, push} ev = do
   push {value: msg, pos: {x: 0.0, y: 0.0}}
+
+mkButtonEvent :: DOM.Node -> String -> DOM.Document -> Effect ButtonEvent
+mkButtonEvent node msg doc = do
+  b <- DOM.createElement "button" doc
+  _ <- DOM.setTextContent msg b
+  _ <- DOM.appendChild b node
+  ev <- create
+  _ <- DOM.addEventListener (cbButton msg ev) DOM.click b 
+  pure ev
 
 cbInput :: String -> ButtonEvent -> DOM.Document -> DOM.Event -> Effect Unit
 cbInput msg {event, push} doc ev = do
@@ -386,119 +435,178 @@ cbInput msg {event, push} doc ev = do
   canonical <- DOM.getElementById "canonical" doc 
   factorized <- DOM.getElementById "factorized" doc 
   push {value: msg, pos: {x: fromString val, y: 0.0}}
+  inA <- DOM.getElementById "ABCa" doc
+  inB <- DOM.getElementById "ABCb" doc
+  inC <- DOM.getElementById "ABCc" doc
+  incA <- DOM.getElementById "CANa" doc
+  inAlpha <- DOM.getElementById "CANα" doc
+  inBeta <- DOM.getElementById "CANβ" doc
+  inX0 <- DOM.getElementById "PTSx0" doc
+  inY0 <- DOM.getElementById "PTSy0" doc
+  inX1 <- DOM.getElementById "PTSx1" doc
+  inY1 <- DOM.getElementById "PTSy1" doc
+  inX2 <- DOM.getElementById "PTSx2" doc
+  inY2 <- DOM.getElementById "PTSy2" doc
+  
   _ <- case stripPrefix (Pattern "ABC") msg of
          Just _ -> do 
-            inA <- DOM.getElementById "ABCa" doc
-            inB <- DOM.getElementById "ABCb" doc
-            inC <- DOM.getElementById "ABCc" doc
-            a <- DOM.inputedValue inA
-            b <- DOM.inputedValue inB
-            c <- DOM.inputedValue inC
-            _ <- DOM.setTextContent 
-                   ("f(x) = " <> a <> "x^2 + (" 
-                              <> b <> ")x + (" 
-                              <> c <> ")") reduced
-            let can@(Canonical {a,alpha,beta}) = convert $ 
-                                           Reduced { a: fromString a
-                                                   , b: fromString b
-                                                   , c: fromString c}
-            _ <- DOM.setTextContent
-                  ("f(x) = " <> show a 
-                             <> "(x - (" <> show alpha 
-                             <> "))^2 + (" <> show beta <> ")") canonical
-            _ <- case (convert can :: Maybe Factorized) of
-                   Just (Factorized {a,x1,x2}) -> DOM.setTextContent
-                                     ("f(x) = " <> show a <> "(x - (" <> show x1
-                                                     <> ")) (x - (" <> show x2
-                                                     <> "))") factorized
-                   _ -> DOM.setTextContent "" factorized
-            pure unit
-         Nothing -> pure unit
+            vala <- DOM.inputedValue inA
+            valb <- DOM.inputedValue inB
+            valc <- DOM.inputedValue inC
+            let red = Reduced { a: fromString vala
+                              , b: fromString valb
+                              , c: fromString valc}
+            let can@(Canonical {a, alpha, beta}) = convert red
+            _ <- DOM.setInputValue (show a) incA
+            _ <- DOM.setInputValue (show alpha) inAlpha
+            _ <- DOM.setInputValue (show beta) inBeta
+            let pts@(Triplet{ c0, c1, c2}) = convert red
+            _ <- DOM.setInputValue (show $ c0.x) inX0
+            _ <- DOM.setInputValue (show $ c0.y) inY0
+            _ <- DOM.setInputValue (show $ c1.x) inX1
+            _ <- DOM.setInputValue (show $ c1.y) inY1
+            _ <- DOM.setInputValue (show $ c2.x) inX2
+            _ <- DOM.setInputValue (show $ c2.y) inY2
+            let mFact = convert can :: Maybe Factorized
+            expressions red reduced can canonical mFact factorized
+         _ -> pure unit
+
+  _ <- case stripPrefix (Pattern "CAN") msg of
+         Just _ -> do
+            coefa <- DOM.inputedValue incA
+            coefalpha <- DOM.inputedValue inAlpha
+            coefbeta <- DOM.inputedValue inBeta
+            let can = Canonical { a: fromString coefa
+                                , alpha: fromString coefalpha
+                                , beta: fromString coefbeta}
+            let red@(Reduced {a,b,c}) = convert can
+            _ <- DOM.setInputValue (show a) inA
+            _ <- DOM.setInputValue (show b) inB
+            _ <- DOM.setInputValue (show c) inC
+            let pts@(Triplet{ c0, c1, c2}) = convert red
+            _ <- DOM.setInputValue (show $ c0.x) inX0
+            _ <- DOM.setInputValue (show $ c0.y) inY0
+            _ <- DOM.setInputValue (show $ c1.x) inX1
+            _ <- DOM.setInputValue (show $ c1.y) inY1
+            _ <- DOM.setInputValue (show $ c2.x) inX2
+            _ <- DOM.setInputValue (show $ c2.y) inY2
+            let mFact = convert can :: Maybe Factorized
+            expressions red reduced can canonical mFact factorized
+         _ -> pure unit
+
+  _ <- case stripPrefix (Pattern "PTS") msg of
+         Just _ -> do
+            x0 <- DOM.inputedValue inX0
+            y0 <- DOM.inputedValue inY0
+            x1 <- DOM.inputedValue inX1
+            y1 <- DOM.inputedValue inY1
+            x2 <- DOM.inputedValue inX2
+            y2 <- DOM.inputedValue inY2
+            let tri = Triplet { c0: {x: fromString x0, y: fromString y0}
+                              , c1: {x: fromString x1, y: fromString y1}
+                              , c2: {x: fromString x2, y: fromString y2}}
+            let red@(Reduced {a,b,c}) = convert tri
+            _ <- DOM.setInputValue (show a) inA
+            _ <- DOM.setInputValue (show b) inB
+            _ <- DOM.setInputValue (show c) inC
+            let can@(Canonical {a, alpha, beta}) = convert red
+            _ <- DOM.setInputValue (show a) incA
+            _ <- DOM.setInputValue (show alpha) inAlpha
+            _ <- DOM.setInputValue (show beta) inBeta
+            let mFact = convert can :: Maybe Factorized
+            expressions red reduced can canonical mFact factorized
+         _ -> pure unit
+
+  pure unit
+
+expressions :: Reduced -> DOM.Node
+        -> Canonical -> DOM.Node
+        -> Maybe Factorized -> DOM.Node -> Effect Unit
+expressions (Reduced {a,b,c}) reduced 
+        (Canonical {a: ca,alpha,beta}) canonical
+        mFact factorized = do
+  _ <- DOM.setTextContent 
+         ("f(x) = " <> show a <> "x^2 + (" 
+                    <> show b <> ")x + (" 
+                    <> show c <> ")") reduced
+  _ <- DOM.setTextContent
+         ("f(x) = " <> show ca 
+                    <> "(x - (" <> show alpha 
+                    <> "))^2 + (" <> show beta <> ")") canonical
+  _ <- case mFact of
+          Just (Factorized {a: fa,x1,x2}) -> 
+            DOM.setTextContent
+              ("f(x) = " <> show fa <> "(x - (" <> show x1
+                         <> ")) (x - (" <> show x2
+                         <> "))") factorized
+          _ -> DOM.setTextContent "" factorized
+  pure unit
+
+input :: String -> String -> ButtonEvent 
+      -> DOM.Node -> DOM.Document -> Effect Unit
+input id ini bev div doc = do
+  label <- DOM.createElement "label" doc
+  let str = drop 3 id
+  _ <- DOM.setTextContent (str <> ": ") label
+  _ <- DOM.appendChild label div
+  node <- DOM.createElement "input" doc
+  _ <- DOM.setId id node
+  _ <- DOM.setInputValue ini node
+  _ <- DOM.addEventListener (cbInput id bev doc) DOM.change node
+  _ <- DOM.appendChild node div
+  br <- DOM.createElement "br" doc
+  _ <- DOM.appendChild br div
   pure unit
 
 inputABC :: ButtonEvent -> DOM.Node -> DOM.Document -> Effect Unit
 inputABC bevent div doc = do 
-  inA <- DOM.createElement "input" doc
-  _ <- DOM.setId "ABCa" inA
-  _ <- DOM.setAttribute "value" "1.0" inA
-  _ <- DOM.addEventListener (cbInput "ABCa" bevent doc) DOM.change inA 
-  _ <- DOM.appendChild inA div
-  inB <- DOM.createElement "input" doc
-  _ <- DOM.setId "ABCb" inB
-  _ <- DOM.setAttribute "value" "0.0" inB
-  _ <- DOM.addEventListener (cbInput "ABCb" bevent doc) DOM.change inB 
-  _ <- DOM.appendChild inB div
-  inC <- DOM.createElement "input" doc
-  _ <- DOM.setId "ABCc" inC
-  _ <- DOM.setAttribute "value" "0.0" inC
-  _ <- DOM.addEventListener (cbInput "ABCc" bevent doc) DOM.change inC
-  _ <- DOM.appendChild inC div
+  _ <- input "ABCa" "1.0" bevent div doc
+  _ <- input "ABCb" "0.0" bevent div doc
+  _ <- input "ABCc" "0.0" bevent div doc
   pure unit
 
 inputCanonical :: ButtonEvent -> DOM.Node -> DOM.Document -> Effect Unit
-inputCanonical {event, push} div doc = do 
-  inA <- DOM.createElement "input" doc
-  _ <- DOM.setId "CANa" inA
-  _ <- DOM.appendChild inA div
-  inAlpha <- DOM.createElement "input" doc
-  _ <- DOM.setId "CANalpha" inAlpha
-  _ <- DOM.appendChild inAlpha div
-  inBeta <- DOM.createElement "input" doc
-  _ <- DOM.setId "CANbeta" inBeta
-  _ <- DOM.appendChild inBeta div
+inputCanonical bevent div doc = do
+  _ <- input "CANa" "1.0" bevent div doc
+  _ <- input "CANα" "0.0" bevent div doc
+  _ <- input "CANβ" "0.0" bevent div doc
   pure unit
 
-input3Points :: ButtonEvent -> DOM.Node -> DOM.Document -> Effect Unit
-input3Points {event, push} div doc = do 
-  x0 <- DOM.createElement "input" doc
-  _ <- DOM.appendChild x0 div
-  y0 <- DOM.createElement "input" doc
-  _ <- DOM.appendChild y0 div
-  x1 <- DOM.createElement "input" doc
-  _ <- DOM.appendChild x1 div
-  y1 <- DOM.createElement "input" doc
-  _ <- DOM.appendChild y1 div
-  x2 <- DOM.createElement "input" doc
-  _ <- DOM.appendChild x2 div
-  y2 <- DOM.createElement "input" doc
-  _ <- DOM.appendChild y2 div
+inputThreePoints :: ButtonEvent -> DOM.Node -> DOM.Document -> Effect Unit
+inputThreePoints bevent div doc = do
+  _ <- input "PTSx0" "-1.0" bevent div doc
+  _ <- input "PTSy0" "1.0" bevent div doc
+  _ <- input "PTSx1" "0.0" bevent div doc
+  _ <- input "PTSy1" "0.0" bevent div doc
+  _ <- input "PTSx2" "1.0" bevent div doc
+  _ <- input "PTSy2" "1.0" bevent div doc
   pure unit
 
 cbOption :: DOM.Document -> DOM.Event -> Effect Unit
 cbOption doc = unsafePartial \ ev -> do
-  mntr <- DOM.getElementById "monitor" doc
   memo <- DOM.getElementById "memo" doc
   label <- DOM.textContent memo
-  current <- DOM.getElementById label doc
+  currentNode <- DOM.getElementById label doc
   msg <- DOM.selectedValueFromEvent ev
-  new <- case msg of
+  newNode <- case msg of
         "fromABC" -> do
-           _ <- DOM.setTextContent "ABC" memo
-           DOM.getElementById "ABC" doc
+           _ <- DOM.setTextContent "Reduced" memo
+           DOM.getElementById "Reduced" doc
         "fromCanonical" -> do
            _ <- DOM.setTextContent "Canonical" memo
            DOM.getElementById "Canonical" doc
-        "from3Points" -> do
-          _ <- DOM.setTextContent "3Points" memo
-          DOM.getElementById "3Points" doc 
-  _ <- DOM.setAttribute "style" "display: none;" current
-  _ <- DOM.setAttribute "style" "display: inline;" new
+        "fromThreePoints" -> do
+          _ <- DOM.setTextContent "ThreePoints" memo
+          DOM.getElementById "ThreePoints" doc 
+  _ <- DOM.setAttribute "style" "display: none;" currentNode
+  _ <- DOM.setAttribute "style" "display: inline;" newNode
   pure unit
 
-mkButtonEvent :: DOM.Node -> String -> DOM.Document -> Effect ButtonEvent
-mkButtonEvent node msg doc = do
-  b <- DOM.createElement "button" doc
-  _ <- DOM.setTextContent msg b
-  _ <- DOM.appendChild b node
-  ev <- create
-  _ <- DOM.addEventListener (cb msg ev) DOM.click b 
-  pure ev
-
-mkOptionEvent :: forall r. {body :: DOM.Node, document :: DOM.Document | r}
+mkOption :: forall r. {body :: DOM.Node, document :: DOM.Document | r}
   -> DOM.Node
   -> String
   -> Effect Unit
-mkOptionEvent setup select msg = do
+mkOption setup select msg = do
   o <- DOM.createElement "option" setup.document
   _ <- DOM.setTextContent msg o
   _ <- DOM.appendChild o select
@@ -525,7 +633,6 @@ main = do
   let functionBkg = filled beige (curryBox rectangle window)
 
   mntr <- DOM.createElement "div" setup.document
-  _ <- DOM.setId "monitor" mntr
   zox <- mkButtonEvent mntr "zoomOutX" setup.document
   zix <- mkButtonEvent mntr "zoomInX" setup.document
   zofy <- mkButtonEvent mntr "zoomOutY" setup.document
@@ -535,13 +642,13 @@ main = do
   
   divABC <- DOM.createElement "div" setup.document
   _ <- inputABC ev divABC setup.document
-  _ <- DOM.setId "ABC" divABC
+  _ <- DOM.setId "Reduced" divABC
   _ <- DOM.setAttribute "style" "display: inline;" divABC
 
-  div3Points <- DOM.createElement "div" setup.document
-  _ <- input3Points ev div3Points setup.document
-  _ <- DOM.setId "3Points" div3Points
-  _ <- DOM.setAttribute "style" "display: none;" div3Points
+  divThreePoints <- DOM.createElement "div" setup.document
+  _ <- inputThreePoints ev divThreePoints setup.document
+  _ <- DOM.setId "ThreePoints" divThreePoints
+  _ <- DOM.setAttribute "style" "display: none;" divThreePoints
 
   divCanonical <- DOM.createElement "div" setup.document
   _ <- inputCanonical ev divCanonical setup.document
@@ -549,47 +656,43 @@ main = do
   _ <- DOM.setAttribute "style" "display: none;" divCanonical
 
   list <- DOM.createElement "select" setup.document
-  _ <- mkOptionEvent setup list "fromABC"
-  _ <- mkOptionEvent setup list "fromCanonical"
-  _ <- mkOptionEvent setup list "from3Points"
+  _ <- mkOption setup list "fromABC"
+  _ <- mkOption setup list "fromCanonical"
+  _ <- mkOption setup list "fromThreePoints"
   _ <- DOM.addEventListener (cbOption setup.document) DOM.change list
   _ <- DOM.appendChild list mntr
 
-  br <- DOM.createElement "br" setup.document
-  _ <- DOM.appendChild br mntr
+  _ <- DOM.createElement "br" setup.document >>= flip DOM.appendChild mntr 
   
   _ <- DOM.appendChild divABC mntr
-  _ <- DOM.appendChild div3Points mntr
+  _ <- DOM.appendChild divThreePoints mntr
   _ <- DOM.appendChild divCanonical mntr
 
-  br <- DOM.createElement "br" setup.document
-  _ <- DOM.appendChild br mntr
+  _ <- DOM.createElement "br" setup.document >>= flip DOM.appendChild mntr 
   
   reduced <- DOM.createElement "label" setup.document
   _ <- DOM.setId "reduced" reduced
   _ <- DOM.appendChild reduced mntr
 
-  br <- DOM.createElement "br" setup.document
-  _ <- DOM.appendChild br mntr
+  _ <- DOM.createElement "br" setup.document >>= flip DOM.appendChild mntr 
   
   canonical <- DOM.createElement "label" setup.document
   _ <- DOM.setId "canonical" canonical
   _ <- DOM.appendChild canonical mntr
 
-  br <- DOM.createElement "br" setup.document
-  _ <- DOM.appendChild br mntr
+  _ <- DOM.createElement "br" setup.document >>= flip DOM.appendChild mntr 
   
   factorized <- DOM.createElement "label" setup.document
   _ <- DOM.setId "factorized" factorized
   _ <- DOM.appendChild factorized mntr
 
-  br <- DOM.createElement "br" setup.document
-  _ <- DOM.appendChild br mntr
+  _ <- DOM.createElement "br" setup.document >>= flip DOM.appendChild mntr 
   
   memo <- DOM.createElement "label" setup.document
   _ <- DOM.setId "memo" memo
-  _ <- DOM.setTextContent "ABC" memo
-  --_ <- DOM.appendChild memo mntr
+  _ <- DOM.setAttribute "style" "display: none;" memo
+  _ <- DOM.setTextContent "Reduced" memo
+  _ <- DOM.appendChild memo mntr
 
   _ <- DOM.appendChild mntr setup.body
   _ <- DOM.setAttribute "style" 

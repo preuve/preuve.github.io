@@ -13,7 +13,7 @@ import Web.HTML.Window (document) as HTML
 import Web.HTML.HTMLDocument (body, toDocument) as HTML
 import Web.DOM.Document (Document, createElement, toNonElementParentNode) as DOM
 import Web.HTML.HTMLElement (toNode) as HTML
-import Web.HTML.HTMLInputElement (fromElement, fromNode, value) as HTMLInput
+import Web.HTML.HTMLInputElement (fromElement, fromNode, value, setValue) as HTMLInput
 import Web.HTML.HTMLSelectElement (fromElement, value) as HTMLSelect
 import Data.Maybe (fromJust)
 import Partial.Unsafe (unsafePartial)
@@ -44,6 +44,18 @@ inputedValueFromEvent = unsafePartial \ev ->
 
 inputedValue :: DOM.Node -> Effect String
 inputedValue = unsafePartial \node -> HTMLInput.value $ fromJust $ HTMLInput.fromNode node
+
+inputValue :: DOM.Node  -> Effect String 
+inputValue input = do
+  val <- traverse HTMLInput.value (HTMLInput.fromElement $ unsafePartial $ fromJust $ DOM.fromNode input)
+  pure $ unsafePartial $ fromJust val
+
+setInputValue :: String -> DOM.Node -> Effect Unit
+setInputValue str = unsafePartial $ \ input -> 
+  HTMLInput.setValue str $ fromJust
+                         $ HTMLInput.fromElement 
+                         $ fromJust 
+                         $ DOM.fromNode input
 
 setup :: Effect {window :: HTML.Window, document :: DOM.Document, body :: DOM.Node}
 setup = do
@@ -78,11 +90,6 @@ setTextContent = DOM.setTextContent
 
 textContent :: DOM.Node -> Effect String
 textContent = DOM.textContent
-
-inputValue :: DOM.Node  -> Effect String 
-inputValue input = do
-  val <- traverse HTMLInput.value (HTMLInput.fromElement $ unsafePartial $ fromJust $ DOM.fromNode input)
-  pure $ unsafePartial $ fromJust val
 
 setAttribute :: String -> String -> DOM.Node -> Effect Unit
 setAttribute key val node = DOM.setAttribute key val (unsafePartial $ fromJust $ DOM.fromNode node)
