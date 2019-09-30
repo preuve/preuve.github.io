@@ -2,12 +2,7 @@ module KaTeX(module KaTeX) where
 
 import Prelude
 import Effect (Effect)
-import Graphics.Canvas (CanvasElement)
 
-foreign import setAttribute :: 
-  String -> String -> CanvasElement -> Effect Unit
-
-foreign import setBodyBackground :: String -> Effect Unit
 foreign import setTitle :: String -> Effect Unit
 foreign import render :: String -> Effect Unit
 foreign import renderIn :: forall location. location -> String -> Effect Unit

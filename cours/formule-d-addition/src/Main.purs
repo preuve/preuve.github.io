@@ -5,19 +5,20 @@ import Effect (Effect)
 import Data.Maybe(Maybe(..))
 import Partial.Unsafe(unsafePartial)
 import Graphics.Drawing(render) as Canvas
-import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Color (rgb)
-import Graphics.Canvas.Geometry
-import KaTeX
+import Graphics.Canvas.Geometry (class DrawableSet, arc, circle, drawIn, length, point, rename, rightangle, rotated, segment, vector, (<+|))
+import DOM.Editor as DOM
+import KaTeX (cat, equation, list, newline, raw, render, setTitle, subraw, subrender)
 import Math as Math
 
 main :: Effect Unit
 main = void $ unsafePartial do
-  _ <- setBodyBackground "#ffffff" --"#635351"
-  Just canvas <- getCanvasElementById "canvas"
-  _ <- setAttribute "width" "400" canvas
-  _ <- setAttribute "height" "600" canvas
-  context2D <- getContext2D canvas
+  setup <- DOM.setup
+  _ <- DOM.setAttribute "style" "background: #ffffff" setup.body --"#635351"
+  canvas <- DOM.getElementById "canvas" setup.document
+  _ <- DOM.setAttribute "width" "400" canvas
+  _ <- DOM.setAttribute "height" "600" canvas
+  context2D <- DOM.getContext2D canvas
   
   let ctx = { color: rgb 0 0 0 -- 195 194 199
             , lineWidth: 1.50}

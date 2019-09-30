@@ -4184,8 +4184,7 @@ var PS = {};
   exports["drawableSequence"] = drawableSequence;
 })(PS);
 (function(exports) {
-    
-
+  
   exports.setTitle = function (name){
     return function(){
       document.querySelector("h1")
