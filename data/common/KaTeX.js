@@ -6,6 +6,30 @@ exports.setTitle = function (name){
   };
 };
 
+exports.section = function (name){
+  return function(){
+     let node = document.createElement("h2");
+      node.textContent = name;
+      document.querySelector("#description").appendChild(node);
+  };
+};
+
+exports.subsection = function (name){
+  return function(){
+     let node = document.createElement("h3");
+      node.textContent = name;
+      document.querySelector("#description").appendChild(node);
+  };
+};
+
+exports.subsubsection = function (name){
+  return function(){
+     let node = document.createElement("h4");
+      node.textContent = name;
+      document.querySelector("#description").appendChild(node);
+  };
+};
+
 exports.render = function (content){
     return function(){
       let node = document.createElement("label");
@@ -14,6 +38,24 @@ exports.render = function (content){
       katex.render(content,node);
     };
 };
+
+exports.line = function (x1){
+  return function(y1){
+  return function(x2){
+  return function(y2){
+  return function(){
+    let node = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    node.setAttribute("style","position: absolute; width:100%; height:100%; ");
+    let l = document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttributeNS(null,"x1",x1);
+    l.setAttributeNS(null,"y1",y1);
+    l.setAttributeNS(null,"x2",x2);
+    l.setAttributeNS(null,"y2",y2);
+    l.setAttributeNS(null,"style", "stroke:#000; stroke-width:1px;");
+    node.appendChild(l);
+    document.querySelector("#description").appendChild(node);
+    };};};};
+ };
 
 exports.renderIn = function(location){
    return function (content){
