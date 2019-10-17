@@ -18,36 +18,6 @@ import Math(pi)
 
 foreign import fromString :: String -> Int 
 
-primes :: Array Int
-primes = [2,2,2,2,2,2,3,3,3,3,3,5,5,5,5]
-
-avgNbFactors = 2 :: Int
-
-randFraction :: Rand -> {fraction :: Fraction, nextRand :: Rand}
-randFraction = unsafePartial \ r -> 
-  let r0 = rand r
-      nbNumFactors = 1 + (r0.val `mod` avgNbFactors)
-      r1 = rand r0
-      nbDenFactors = 1 + (r1.val `mod` avgNbFactors)
-      nrands = (\f -> f r1) <$> (scanl (<<<) identity 
-                             $ replicate nbNumFactors rand)
-      Just r2 = last nrands
-      drands = (\f -> f r2) <$> (scanl (<<<) identity 
-                             $ replicate nbDenFactors rand)
-      Just r3 = last drands
-      nextRand = rand r3
-      
-      prime = unsafePartial $ \ ix -> fromJust $ primes !! ix 
-      nums = prime <$> (\rnd -> rnd.val `mod` (Array.length primes)) 
-                   <$> nrands
-      dens = prime <$> (\rnd -> rnd.val `mod` (Array.length primes)) 
-                   <$> drands
-      num = foldr (*) 1 $ nums \\ dens
-      den = foldr (*) 1 $ dens \\ nums
-   in if num < den 
-        then {fraction: Fraction {num, den}, nextRand}
-        else {fraction: Fraction {num: den, den: num}, nextRand}
-
 type Experience = { pA :: Fraction, pnA :: Fraction
                   , pgAB :: Fraction, pgAnB :: Fraction
                   , pgnAB :: Fraction, pgnAnB :: Fraction
@@ -59,7 +29,6 @@ empty :: Experience
 empty = {pA: zero, pgAB: zero, pgnAB: zero, pnA: zero, pAB: zero, pnAB: zero, pB: zero, pnB:
   zero, pgAnB: zero, pgnAnB: zero, pAnB: zero, pnAnB: zero}  
 
---complete :: forall hyp. hyp -> Experience
 complete0 {pA, pgAB, pgnAB} =
   let pnA = fromInt 1 - pA
       pgAnB = fromInt 1 - pgAB
@@ -133,35 +102,48 @@ complete9 {pgAnB, pnAB, pnB} =
       pAB = pB - pnAB
   in complete4 {pgAnB, pAB, pnAB}
 
-fractions :: Array Fraction
-fractions = [ Fraction {num: 1, den: 24}, Fraction {num: 1, den: 12}
-            , Fraction {num: 1, den: 8}, Fraction {num: 1, den: 6}
-            , Fraction {num: 1, den: 6}, Fraction {num: 5, den: 24}
-            , Fraction {num: 1, den: 4}, Fraction {num: 7, den: 24}
-            , Fraction {num: 1, den: 3}, Fraction {num: 3, den: 8}
-            , Fraction {num: 5, den: 12}, Fraction {num: 11, den: 24}
-            , Fraction {num: 1, den: 2}, Fraction {num: 13, den: 24}
-            , Fraction {num: 7, den: 12}, Fraction {num: 5, den: 8}
-            , Fraction {num: 2, den: 3}, Fraction {num: 17, den: 24}
-            , Fraction {num: 3, den: 4}, Fraction {num: 19, den: 24}
-            , Fraction {num: 5, den: 6}, Fraction {num: 7, den: 8}
-            , Fraction {num: 11, den: 12}, Fraction {num: 23, den: 24}]
-{-
+primes :: Array Int
+primes = [2,2,2,2,2,2,3,3,3,3,3,5,5,5,5]
+
+avgNbFactors = 1 :: Int
+
+randProba :: Rand -> {probability :: Fraction, nextRand :: Rand}
+randProba = unsafePartial \ r -> 
+  let r0 = rand r
+      nbNumFactors = 1 + (r0.val `mod` avgNbFactors)
+      r1 = rand r0
+      nbDenFactors = 1 + (r1.val `mod` avgNbFactors)
+      nrands = (\f -> f r1) <$> (scanl (<<<) identity 
+                             $ replicate nbNumFactors rand)
+      Just r2 = last nrands
+      drands = (\f -> f r2) <$> (scanl (<<<) identity 
+                             $ replicate nbDenFactors rand)
+      Just r3 = last drands
+      nextRand = rand r3
+      prime = unsafePartial $ \ ix -> fromJust $ primes !! ix 
+      nums = prime <$> (\rnd -> rnd.val `mod` (Array.length primes)) 
+                   <$> nrands
+      dens = prime <$> (\rnd -> rnd.val `mod` (Array.length primes)) 
+                   <$> drands
+      num = foldr (*) 1 $ nums \\ dens
+      den = foldr (*) 1 $ dens \\ nums
+   in case unit of
+           unit | num < den -> {probability: Fraction {num, den}, nextRand}
+                | num > den -> { probability: Fraction {num: den, den: num}
+                               , nextRand}
+                | otherwise -> randProba nextRand 
+
 randExperience :: Rand -> { experience :: { pAB :: Fraction
                                           , pnAB :: Fraction
                                           , pAnB :: Fraction}
-                          , nextRand :: Rand}
-                          -}
+                          , nextRand :: Rand}                        
 randExperience r = 
-  let r1 = rand r
-      r2 = rand r1
-      r3 = rand r2
-      f1 = fromJust $ fractions !! (r1.val `mod` (Array.length fractions))
-      f2 = fromJust $ fractions !! (r2.val `mod` (Array.length fractions))
-      f3 = fromJust $ fractions !! (r3.val `mod` (Array.length fractions))
-      fs = sort [f1, f2, f3]
-  in fs
-
+  let {probability: pAB, nextRand: r'} = randProba r
+      {probability: p', nextRand: r''} = randProba r'
+      pnAB = p' * (fromInt 1 - pAB)
+      {probability: p'', nextRand} = randProba r''
+      pAnB = p'' * (fromInt 1 - pAB - pnAB) 
+   in {experience: {pAB, pnAB, pAnB}, nextRand}
 
 tree :: forall r. { pA :: Fraction
                   , pgAB :: Fraction
@@ -170,6 +152,7 @@ tree :: forall r. { pA :: Fraction
                   , pgnAB :: Fraction
                   , pgnAnB :: Fraction | r}  -> Effect Unit
 tree {pA, pgAB, pgAnB, pnA, pgnAB, pgnAnB} = do
+-- https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
   line "12" "175" "100" "92"
   line "12" "175" "100" "244"
   line "126" "80" "202" "24"
@@ -206,8 +189,9 @@ cb doc = unsafePartial $ \ev -> do
   thisPosition <- DOM.getElementById "description" doc
   
   subsection "1)"
-  tree empty
-  raw $ show $ randExperience r0
+  let {experience: e1, nextRand: r1} = randExperience r0
+  tree $ complete5 e1
+  raw $ show e1
   
   subsection "2)"
   tree empty

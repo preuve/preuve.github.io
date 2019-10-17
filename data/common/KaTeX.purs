@@ -14,7 +14,7 @@ foreign import raw :: String -> Effect Unit
 foreign import rawIn :: forall location. location -> String -> Effect Unit
 foreign import newLine :: Unit -> Effect Unit
 foreign import newLineIn :: forall location. location -> Unit -> Effect Unit
-foreign import line :: String -> String -> String -> String -> Effect Unit
+foreign import line :: String -> String -> String -> String -> Effect Units
 
 newline :: Effect Unit
 newline = newLine unit
