@@ -14,93 +14,117 @@ import Data.Ord(abs) as Ord
 import Data.Ord(min, max)
 import Fraction (Fraction(..), inlineFraction, fromInt, abs)
 import Rand (Rand, rand)
-import Math(pi)
 
 foreign import fromString :: String -> Int 
 
-type Experience = { pA :: Fraction, pnA :: Fraction
-                  , pgAB :: Fraction, pgAnB :: Fraction
-                  , pgnAB :: Fraction, pgnAnB :: Fraction
-                  , pAB :: Fraction, pAnB :: Fraction
-                  , pnAB :: Fraction, pnAnB :: Fraction
-                  , pB :: Fraction, pnB :: Fraction}
+data P a = P a | Z
+
+perhaps :: forall a b. b -> (a -> b) -> P a  -> b
+perhaps _ f (P a) = f a
+perhaps default _ Z = default
+
+instance showP :: Show a => Show (P a) where
+  show (P a) = show a
+  show _ = ""
+
+type Experience = { pA :: P Fraction, pnA :: P Fraction
+                  , pB :: P Fraction, pnB :: P Fraction
+                  , pAB :: P Fraction, pAnB :: P Fraction
+                  , pnAB :: P Fraction, pnAnB :: P Fraction
+                  , pgAB :: P Fraction, pgAnB :: P Fraction
+                  , pgnAB :: P Fraction, pgnAnB :: P Fraction }
 
 empty :: Experience
-empty = {pA: zero, pgAB: zero, pgnAB: zero, pnA: zero, pAB: zero, pnAB: zero, pB: zero, pnB:
-  zero, pgAnB: zero, pgnAnB: zero, pAnB: zero, pnAnB: zero}  
+empty = { pA: Z, pnA: Z
+        , pB: Z, pnB: Z
+        , pAB: Z, pAnB: Z
+        , pnAB: Z, pnAnB: Z
+        , pgAB: Z, pgAnB: Z 
+        , pgnAB: Z, pgnAnB: Z } 
 
-complete0 {pA, pgAB, pgnAB} =
-  let pnA = fromInt 1 - pA
-      pgAnB = fromInt 1 - pgAB
-      pgnAnB = fromInt 1 - pgnAB
-      pAB = pA * pgAB
-      pnAB = pnA * pgnAB
-      pAnB = pA * pgAnB
-      pB = pAB + pnAB
-      pnB = fromInt 1 - pB
-      pnAnB = pnA * pgnAnB
-   in {pA, pgAB, pgnAB, pnA, pAB, pnAB, pB, pnB, pgAnB, pgnAnB, pAnB, pnAnB}  
+complete :: Experience -> Experience
+complete e@{pA,pnA,pB,pnB,pAB,pAnB,pnAB,pnAnB,pgAB,pgAnB,pgnAB,pgnAnB} = 
+  case [pA,pnA,pB,pnB,pAB,pAnB,pnAB,pnAnB,pgAB,pgAnB,pgnAB,pgnAnB] of
+        [P pA',Z,Z,Z,Z,Z,Z,Z,P pgAB',Z,P pgnAB',Z] ->
+          let pnA' = fromInt 1 - pA'
+              pgAnB' = fromInt 1 - pgAB'
+              pgnAnB' = fromInt 1 - pgnAB'
+              pAB' = pA' * pgAB'
+              pnAB' = pgnAB' * pnA'
+              pAnB' = pA' * pgAnB'
+              pB' = pAB' + pnAB'
+              pnB' = fromInt 1 - pB'
+              pnAnB' = pnA' * pgnAnB'
+          in { pA, pgAB, pgnAB
+             , pnA: P pnA', pAB: P pAB', pnAB: P pnAB'
+             , pB: P pB', pnB: P pnB'
+             , pgAnB: P pgAnB', pgnAnB: P pgnAnB'
+             , pAnB:  P pAnB', pnAnB: P pnAnB'}  
+        
+        [P pA',Z,Z,Z,Z,Z,P pnAB',Z,P pgAB',Z,Z,Z] ->
+          let pnA' = fromInt 1 - pA'
+              pgnAB' = pnAB' / pnA'
+           in complete empty{pA = pA, pgAB = pgAB, pgnAB = P pgnAB'}
 
-complete1 {pA, pgAB, pnAB} =
-  let pnA = fromInt 1 - pA
-      pgnAB = pnAB / pnA
-   in complete0 {pA, pgAB, pgnAB}
+        [Z,P pnA',Z,Z,P pAB',Z,Z,P pnAnB',Z,Z,Z,Z] ->
+          let pA' = fromInt 1 - pnA'
+              pgAB' = pAB' / pA'
+              pnAB' = pnA' - pnAnB'
+           in complete empty{pA = P pA', pgAB = P pgAB', pnAB = P pnAB'}
 
+        [Z,Z,Z,Z,Z,Z,Z,P pnAnB',P pgAB',Z,P pgnAB',Z] ->
+          let pgnAnB' = fromInt 1 - pgnAB'
+              pnA' = pnAnB' / pgnAnB'
+              pA' = fromInt 1 - pnA'
+          in complete empty{pA = P pA', pgAB = pgAB, pgnAB = pgnAB}
 
-complete2 {pnA, pAB, pnAnB} = 
-  let pA = fromInt 1 - pnA
-      pgAB = pAB / pA
-      pnAB = pnA - pnAnB
-   in complete1 {pA, pgAB, pnAB}
-   
+        [Z,Z,Z,Z,P pAB',Z,P pnAB',Z,Z,P pgAnB',Z,Z] ->
+          let pgAB' = fromInt 1 - pgAnB'
+              pA' = pAB' / pgAB'
+              pnA' = fromInt 1 - pA'
+              pgnAB' = pnAB' / pnA'
+          in complete empty{pA = P pA' , pgAB = P pgAB', pgnAB = P pgnAB'}
 
-complete3 {pgAB, pgnAB, pnAnB} =
-  let pgnAnB = fromInt 1 - pgnAB
-      pnA = pnAnB / pgnAnB
-      pA = fromInt 1 - pnA
-   in complete0 {pA, pgAB, pgnAB}
+        [Z,Z,Z,Z,P pAB', P pAnB', P pnAB',Z,Z,Z,Z,Z] ->
+          let pA' = pAB' + pAnB'
+              pgAnB' = pAnB' / pA'
+          in complete empty {pgAnB = P pgAnB', pAB = pAB, pnAB = pnAB}
 
-complete4 {pgAnB, pAB, pnAB} =
-  let pgAB = fromInt 1 - pgAnB
-      pA = pAB / pgAB
-      pnA = fromInt 1 - pA
-      pgnAB = pnAB / pnA
-   in complete0 {pA, pgAB, pgnAB}
+        [P pA',Z,Z,P pnB',Z,Z,Z,Z,P pgAB',Z,Z,Z] ->
+          let pAB' = pA' * pgAB'
+              pB' = fromInt 1 - pnB'
+              pnAB' = pB' - pAB'
+              pnA' = fromInt 1 - pA'
+              pgnAB' = pnAB' / pnA'
+          in complete empty{pA = pA, pgAB = pgAB, pgnAB = P pgnAB'}
 
-complete5 {pAB, pAnB, pnAB} =
-  let pA = pAB + pAnB
-      pgAnB = pAnB / pA
-  in complete4 {pgAnB, pAB, pnAB}
-  
-complete6 {pA, pgAB, pnB} = 
-  let pAB = pA * pgAB
-      pB = fromInt 1 - pnB
-      pnAB = pB - pAB
-      pnA = fromInt 1 - pA
-      pgnAB = pnAB / pnA
-   in complete0 {pA, pgAB, pgnAB}
-   
-complete7 {pnA, pnAnB, pB} =
-  let pnB = fromInt 1 - pB
-      pAnB = pnB - pnAnB
-      pA = fromInt 1 - pnA
-      pAB = pA - pAnB
-      pgAB = pAB / pA
-  in complete6 {pA, pgAB, pnB}
+        [Z,P pnA',P pB',Z,Z,Z,Z,P pnAnB',Z,Z,Z,Z] ->
+          let pnB' = fromInt 1 - pB'
+              pAnB' = pnB' - pnAnB'
+              pA' = fromInt 1 - pnA'
+              pAB' = pA' - pAnB'
+              pgAB' = pAB' / pA'
+          in complete empty{pA = P pA', pgAB = P pgAB', pnB = P pnB'}
 
-complete8 {pgAB, pgnAB, pB} = 
-  let mn = min pgAB pgnAB
-      mx = max pgAB pgnAB
-  in if mn < pB && pB < mx
-       then let pA = (pB - pgnAB) / (pgAB - pgnAB)
-                pnB = fromInt 1 - pB
-             in complete6 {pA, pgAB, pnB}
-       else empty
-       
-complete9 {pgAnB, pnAB, pnB} = 
-  let pB = fromInt 1 - pnB
-      pAB = pB - pnAB
-  in complete4 {pgAnB, pAB, pnAB}
+        [Z,Z,P pB',Z,Z,Z,Z,Z,P pgAB',Z,P pgnAB',Z] ->
+          let mn = min pgAB' pgnAB'
+              mx = max pgAB' pgnAB'
+          in if mn < pB' && pB' < mx
+              then 
+                let pA' = (pB' - pgnAB') / (pgAB' - pgnAB')
+                    pnB' = fromInt 1 - pB'
+                in complete empty{pA = P pA', pgAB = pgAB, pnB = P pnB'}
+              else empty
+
+        [Z,Z,Z,P pnB',Z,Z,P pnAB',Z,Z,P pgAnB',Z,Z] ->
+          let pB' = fromInt 1 - pnB'
+              pAB' = pB' - pnAB'
+          in complete empty {pgAnB = pgAnB, pAB = P pAB', pnAB = pnAB}
+        [Z,Z,P pB',Z,Z,P pAnB',P pnAB',Z,Z,Z,Z,Z] ->
+          let pAB' = pB'- pnAB'
+           in complete empty{pAB = P pAB', pAnB = pAnB, pnAB = pnAB}
+
+        otherwise -> e
 
 primes :: Array Int
 primes = [2,2,2,2,2,2,3,3,3,3,3,5,5,5,5]
@@ -133,9 +157,7 @@ randProba = unsafePartial \ r ->
                                , nextRand}
                 | otherwise -> randProba nextRand 
 
-randExperience :: Rand -> { experience :: { pAB :: Fraction
-                                          , pnAB :: Fraction
-                                          , pAnB :: Fraction}
+randExperience :: Rand -> { experience :: Experience
                           , nextRand :: Rand}                        
 randExperience r = 
   let {probability: pAB, nextRand: r'} = randProba r
@@ -143,15 +165,11 @@ randExperience r =
       pnAB = p' * (fromInt 1 - pAB)
       {probability: p'', nextRand} = randProba r''
       pAnB = p'' * (fromInt 1 - pAB - pnAB) 
-   in {experience: {pAB, pnAB, pAnB}, nextRand}
+   in { experience: empty {pAB = P pAB, pnAB = P pnAB, pAnB = P pAnB}
+      , nextRand}
 
-tree :: forall r. { pA :: Fraction
-                  , pgAB :: Fraction
-                  , pgAnB :: Fraction
-                  , pnA :: Fraction
-                  , pgnAB :: Fraction
-                  , pgnAnB :: Fraction | r}  -> Effect Unit
-tree {pA, pgAB, pgAnB, pnA, pgnAB, pgnAnB} = do
+tree :: Experience  -> Effect Unit
+tree e = do
 -- https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
   line "12" "175" "100" "92"
   line "12" "175" "100" "244"
@@ -160,19 +178,42 @@ tree {pA, pgAB, pgAnB, pnA, pgnAB, pgnAnB} = do
   line "126" "264" "202" "208"
   line "126" "264" "202" "320"
   render $ "\\begin{array}{ccccccccc} & & & & & & & & B \\\\ "
-          <> "& & & & & " <> show pgAB <> " \\\\ \\\\ "
+          <> "& & & & & " <> show e.pgAB <> " \\\\ \\\\ "
           <> "& & & & A \\\\ "
-          <> "&" <> show pA <> " \\\\ "
-          <> "& & & & &" <> show pgAnB <> " \\\\ "
+          <> "&" <> show e.pA <> " \\\\ "
+          <> "& & & & &" <> show e.pgAnB <> " \\\\ "
           <> "& & & & & & & &" <> "\\overline{B} \\\\ "
           <> "\\cdot \\\\ "
           <> "& & & & & & & &" <> "B \\\\ "
-          <> "& & & & & " <> show pgnAB <> " \\\\ "
-          <> "&" <> show pnA <> " \\\\ "
+          <> "& & & & & " <> show e.pgnAB <> " \\\\ "
+          <> "&" <> show e.pnA <> " \\\\ "
           <> "& & & & \\overline{A} \\\\ \\\\"
-          <> "& & & & & " <> show pgnAnB <> " \\\\ "
+          <> "& & & & & " <> show e.pgnAnB <> " \\\\ "
           <> "& & & & & & & & \\overline{B} \\end{array}"
+  let pB = perhaps "" (\x -> "&&&&P(B)=" <> show x <> "\\\\") e.pB
+  let pnB = perhaps "" (\x -> "&&&&P(\\overline{B})=" <> show x <> "\\\\") e.pnB
+  let pAB = perhaps "" (\x -> "&&&&P(A\\cap B)=" <> show x <> "\\\\") e.pAB
+  let pAnB = perhaps "" (\x -> "&&&&P(A\\cap\\overline{B})=" <> show x <> "\\\\") e.pAnB
+  let pnAB = perhaps "" (\x -> "&&&&P(\\overline{A}\\cap B)=" <> show x <> "\\\\") e.pnAB
+  let pnAnB = perhaps "" (\x -> "&&&&P(\\overline{A}\\cap\\overline{B})=" <> show x <> "\\\\") e.pnAnB
+  render $ "\\begin{array}{lllll}" <> pB <> pnB <> pAB <> pAnB <> pnAB <> pnAnB <> "\\end{array}"
 
+exercice :: Int -> Experience -> Experience
+exercice n ref =
+  case n of
+       0 -> empty{pA = ref.pA, pgAB = ref.pgAB, pgnAB = ref.pgnAB}
+       1 -> empty{pA = ref.pA, pgAB = ref.pgAB, pnAB = ref.pnAB}
+       2 -> empty{pnA = ref.pnA, pAB = ref.pAB, pnAnB = ref.pnAnB}
+       3 -> empty{pnAnB = ref.pnAnB, pgAB = ref.pgAB, pgnAB = ref.pgnAB}
+       4 -> empty{pAB = ref.pAB, pnAB = ref.pnAB, pgAnB = ref.pgAnB}
+       5 -> empty{pAB = ref.pAB, pnAB = ref.pnAB, pAnB = ref.pAnB}
+       6 -> empty{pA = ref.pA, pnB = ref.pnB, pgAB = ref.pgAB}
+       7 -> empty{pnA = ref.pnA, pB = ref.pB, pnAnB = ref.pnAnB}
+       8 -> empty{pB = ref.pB, pgAB = ref.pgAB, pgnAB = ref.pgnAB}
+       9 -> empty{pnB = ref.pnB, pnAB = ref.pnAB, pgAnB = ref.pgAnB}
+       10 -> empty{pAnB = ref.pAnB, pnAB = ref.pnAB, pB = ref.pB}
+       otherwise -> empty
+  
 cb :: DOM.Document -> DOM.Event -> Effect Unit
 cb doc = unsafePartial $ \ev -> do
   val <- DOM.inputedValueFromEvent ev
@@ -189,12 +230,16 @@ cb doc = unsafePartial $ \ev -> do
   thisPosition <- DOM.getElementById "description" doc
   
   subsection "1)"
-  let {experience: e1, nextRand: r1} = randExperience r0
-  tree $ complete5 e1
-  raw $ show e1
+  let r1 = rand r0
+  let {experience: e1, nextRand: r2} = randExperience r0
+  let exo = r1.val `mod` 11
+  let e2 = exercice exo (complete e1) 
+  tree e2
+
   
   subsection "2)"
-  tree empty
+  tree $ complete e2
+  raw $ show $ complete e2
   
   newline
   let rep = ["réponses: " ]

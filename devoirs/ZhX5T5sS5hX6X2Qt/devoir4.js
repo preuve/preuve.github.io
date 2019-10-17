@@ -1833,7 +1833,48 @@ var PS = {};
   var Fraction = $PS["Fraction"];
   var KaTeX = $PS["KaTeX"];
   var Rand = $PS["Rand"];                
-  var tree = function (v) {
+  var P = (function () {
+      function P(value0) {
+          this.value0 = value0;
+      };
+      P.create = function (value0) {
+          return new P(value0);
+      };
+      return P;
+  })();
+  var Z = (function () {
+      function Z() {
+
+      };
+      Z.value = new Z();
+      return Z;
+  })();
+  var spacex = function (n) {
+      return Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Semigroup.append(Data_Semigroup.semigroupString))("")(Data_Array.replicate(n)("\\;"));
+  };
+  var showP = function (dictShow) {
+      return new Data_Show.Show(function (v) {
+          if (v instanceof P) {
+              return Data_Show.show(dictShow)(v.value0);
+          };
+          return "";
+      });
+  };
+  var primes = [ 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 5, 5, 5, 5 ];
+  var perhaps = function (v) {
+      return function (v1) {
+          return function (v2) {
+              if (v2 instanceof P) {
+                  return v1(v2.value0);
+              };
+              if (v2 instanceof Z) {
+                  return v;
+              };
+              throw new Error("Failed pattern match at Main (line 22, column 1 - line 22, column 50): " + [ v.constructor.name, v1.constructor.name, v2.constructor.name ]);
+          };
+      };
+  };
+  var tree = function (e) {
       return function __do() {
           KaTeX.line("12")("175")("100")("92")();
           KaTeX.line("12")("175")("100")("244")();
@@ -1841,148 +1882,467 @@ var PS = {};
           KaTeX.line("126")("80")("202")("136")();
           KaTeX.line("126")("264")("202")("208")();
           KaTeX.line("126")("264")("202")("320")();
-          return KaTeX.render("\\begin{array}{ccccccccc} & & & & & & & & B \\\\ " + ("& & & & & " + (Data_Show.show(Fraction.showFraction)(v.pgAB) + (" \\\\ \\\\ " + ("& & & & A \\\\ " + ("&" + (Data_Show.show(Fraction.showFraction)(v.pA) + (" \\\\ " + ("& & & & &" + (Data_Show.show(Fraction.showFraction)(v.pgAnB) + (" \\\\ " + ("& & & & & & & &" + ("\\overline{B} \\\\ " + ("\\cdot \\\\ " + ("& & & & &\xa0& & &" + ("B \\\\ " + ("& & & & & " + (Data_Show.show(Fraction.showFraction)(v.pgnAB) + (" \\\\ " + ("&" + (Data_Show.show(Fraction.showFraction)(v.pnA) + (" \\\\ " + ("& & & & \\overline{A} \\\\ \\\\" + ("& & & & & " + (Data_Show.show(Fraction.showFraction)(v.pgnAnB) + (" \\\\ " + "& & & & & & & & \\overline{B} \\end{array}"))))))))))))))))))))))))))();
+          KaTeX.render("\\begin{array}{ccccccccc} & & & & & & & & B \\\\ " + ("& & & & & " + (Data_Show.show(showP(Fraction.showFraction))(e.pgAB) + (" \\\\ \\\\ " + ("& & & & A \\\\ " + ("&" + (Data_Show.show(showP(Fraction.showFraction))(e.pA) + (" \\\\ " + ("& & & & &" + (Data_Show.show(showP(Fraction.showFraction))(e.pgAnB) + (" \\\\ " + ("& & & & & & & &" + ("\\overline{B} \\\\ " + ("\\cdot \\\\ " + ("& & & & &\xa0& & &" + ("B \\\\ " + ("& & & & & " + (Data_Show.show(showP(Fraction.showFraction))(e.pgnAB) + (" \\\\ " + ("&" + (Data_Show.show(showP(Fraction.showFraction))(e.pnA) + (" \\\\ " + ("& & & & \\overline{A} \\\\ \\\\" + ("& & & & & " + (Data_Show.show(showP(Fraction.showFraction))(e.pgnAnB) + (" \\\\ " + "& & & & & & & & \\overline{B} \\end{array}"))))))))))))))))))))))))))();
+          var pB = perhaps("")(function (x) {
+              return "&&&&P(B)=" + (Data_Show.show(Fraction.showFraction)(x) + "\\\\");
+          })(e.pB);
+          var pnB = perhaps("")(function (x) {
+              return "&&&&P(\\overline{B})=" + (Data_Show.show(Fraction.showFraction)(x) + "\\\\");
+          })(e.pnB);
+          var pAB = perhaps("")(function (x) {
+              return "&&&&P(A\\cap B)=" + (Data_Show.show(Fraction.showFraction)(x) + "\\\\");
+          })(e.pAB);
+          var pAnB = perhaps("")(function (x) {
+              return "&&&&P(A\\cap\\overline{B})=" + (Data_Show.show(Fraction.showFraction)(x) + "\\\\");
+          })(e.pAnB);
+          var pnAB = perhaps("")(function (x) {
+              return "&&&&P(\\overline{A}\\cap B)=" + (Data_Show.show(Fraction.showFraction)(x) + "\\\\");
+          })(e.pnAB);
+          var pnAnB = perhaps("")(function (x) {
+              return "&&&&P(\\overline{A}\\cap\\overline{B})=" + (Data_Show.show(Fraction.showFraction)(x) + "\\\\");
+          })(e.pnAnB);
+          return KaTeX.render("\\begin{array}{lllll}" + (pB + (pnB + (pAB + (pAnB + (pnAB + (pnAnB + "\\end{array}")))))))();
       };
   };
-  var spacex = function (n) {
-      return Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Semigroup.append(Data_Semigroup.semigroupString))("")(Data_Array.replicate(n)("\\;"));
-  };
-  var primes = [ 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 5, 5, 5, 5 ];
   var empty = {
-      pA: Data_Semiring.zero(Fraction.semiRingFraction),
-      pgAB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pgnAB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pnA: Data_Semiring.zero(Fraction.semiRingFraction),
-      pAB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pnAB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pnB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pgAnB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pgnAnB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pAnB: Data_Semiring.zero(Fraction.semiRingFraction),
-      pnAnB: Data_Semiring.zero(Fraction.semiRingFraction)
+      pA: Z.value,
+      pnA: Z.value,
+      pB: Z.value,
+      pnB: Z.value,
+      pAB: Z.value,
+      pAnB: Z.value,
+      pnAB: Z.value,
+      pnAnB: Z.value,
+      pgAB: Z.value,
+      pgAnB: Z.value,
+      pgnAB: Z.value,
+      pgnAnB: Z.value
   };
-  var complete0 = function (v) {
-      var pnA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pA);
-      var pnAB = Data_Semiring.mul(Fraction.semiRingFraction)(pnA)(v.pgnAB);
-      var pgnAnB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pgnAB);
-      var pnAnB = Data_Semiring.mul(Fraction.semiRingFraction)(pnA)(pgnAnB);
-      var pgAnB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pgAB);
-      var pAnB = Data_Semiring.mul(Fraction.semiRingFraction)(v.pA)(pgAnB);
-      var pAB = Data_Semiring.mul(Fraction.semiRingFraction)(v.pA)(v.pgAB);
-      var pB = Data_Semiring.add(Fraction.semiRingFraction)(pAB)(pnAB);
-      var pnB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(pB);
-      return {
-          pA: v.pA,
-          pgAB: v.pgAB,
-          pgnAB: v.pgnAB,
-          pnA: pnA,
-          pAB: pAB,
-          pnAB: pnAB,
-          pB: pB,
-          pnB: pnB,
-          pgAnB: pgAnB,
-          pgnAnB: pgnAnB,
-          pAnB: pAnB,
-          pnAnB: pnAnB
+  var exercice = function (n) {
+      return function (ref) {
+          if (n === 0) {
+              return {
+                  pA: ref.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: ref.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: ref.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 1) {
+              return {
+                  pA: ref.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: ref.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: ref.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 2) {
+              return {
+                  pA: empty.pA,
+                  pnA: ref.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: ref.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: ref.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 3) {
+              return {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: ref.pnAnB,
+                  pgAB: ref.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: ref.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 4) {
+              return {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: ref.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: ref.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: ref.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 5) {
+              return {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: ref.pAB,
+                  pAnB: ref.pAnB,
+                  pnAB: ref.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 6) {
+              return {
+                  pA: ref.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: ref.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: ref.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 7) {
+              return {
+                  pA: empty.pA,
+                  pnA: ref.pnA,
+                  pB: ref.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: ref.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 8) {
+              return {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: ref.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: ref.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: ref.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 9) {
+              return {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: ref.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: ref.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: ref.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          if (n === 10) {
+              return {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: ref.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: ref.pAnB,
+                  pnAB: ref.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+          };
+          return empty;
       };
   };
-  var complete1 = function (v) {
-      var pnA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pA);
-      var pgnAB = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(v.pnAB)(pnA);
-      return complete0({
-          pA: v.pA,
-          pgAB: v.pgAB,
-          pgnAB: pgnAB
-      });
-  };
-  var complete2 = function (v) {
-      var pnAB = Data_Ring.sub(Fraction.ringFraction)(v.pnA)(v.pnAnB);
-      var pA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pnA);
-      var pgAB = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(v.pAB)(pA);
-      return complete1({
-          pA: pA,
-          pgAB: pgAB,
-          pnAB: pnAB
-      });
-  };
-  var complete3 = function (v) {
-      var pgnAnB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pgnAB);
-      var pnA = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(v.pnAnB)(pgnAnB);
-      var pA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(pnA);
-      return complete0({
-          pA: pA,
-          pgAB: v.pgAB,
-          pgnAB: v.pgnAB
-      });
-  };
-  var complete4 = function (v) {
-      var pgAB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pgAnB);
-      var pA = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(v.pAB)(pgAB);
-      var pnA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(pA);
-      var pgnAB = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(v.pnAB)(pnA);
-      return complete0({
-          pA: pA,
-          pgAB: pgAB,
-          pgnAB: pgnAB
-      });
-  };
-  var complete5 = function (v) {
-      var pA = Data_Semiring.add(Fraction.semiRingFraction)(v.pAB)(v.pAnB);
-      var pgAnB = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(v.pAnB)(pA);
-      return complete4({
-          pgAnB: pgAnB,
-          pAB: v.pAB,
-          pnAB: v.pnAB
-      });
-  };
-  var complete9 = function (v) {
-      var pB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pnB);
-      var pAB = Data_Ring.sub(Fraction.ringFraction)(pB)(v.pnAB);
-      return complete4({
-          pgAnB: v.pgAnB,
-          pAB: pAB,
-          pnAB: v.pnAB
-      });
-  };
-  var complete6 = function (v) {
-      var pnA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pA);
-      var pB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pnB);
-      var pAB = Data_Semiring.mul(Fraction.semiRingFraction)(v.pA)(v.pgAB);
-      var pnAB = Data_Ring.sub(Fraction.ringFraction)(pB)(pAB);
-      var pgnAB = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(pnAB)(pnA);
-      return complete0({
-          pA: v.pA,
-          pgAB: v.pgAB,
-          pgnAB: pgnAB
-      });
-  };
-  var complete7 = function (v) {
-      var pnB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pB);
-      var pAnB = Data_Ring.sub(Fraction.ringFraction)(pnB)(v.pnAnB);
-      var pA = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pnA);
-      var pAB = Data_Ring.sub(Fraction.ringFraction)(pA)(pAnB);
-      var pgAB = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(pAB)(pA);
-      return complete6({
-          pA: pA,
-          pgAB: pgAB,
-          pnB: pnB
-      });
-  };
-  var complete8 = function (v) {
-      var mx = Data_Ord.max(Fraction.ordFraction)(v.pgAB)(v.pgnAB);
-      var mn = Data_Ord.min(Fraction.ordFraction)(v.pgAB)(v.pgnAB);
-      var $77 = Data_Ord.lessThan(Fraction.ordFraction)(mn)(v.pB) && Data_Ord.lessThan(Fraction.ordFraction)(v.pB)(mx);
-      if ($77) {
-          var pnB = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.pB);
-          var pA = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(Data_Ring.sub(Fraction.ringFraction)(v.pB)(v.pgnAB))(Data_Ring.sub(Fraction.ringFraction)(v.pgAB)(v.pgnAB));
-          return complete6({
-              pA: pA,
-              pgAB: v.pgAB,
-              pnB: pnB
-          });
+  var complete = function ($copy_v) {
+      var $tco_done = false;
+      var $tco_result;
+      function $tco_loop(v) {
+          var $58 = [ v.pA, v.pnA, v.pB, v.pnB, v.pAB, v.pAnB, v.pnAB, v.pnAnB, v.pgAB, v.pgAnB, v.pgnAB, v.pgnAnB ];
+          if ($58.length === 12 && ($58[0] instanceof P && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof Z && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof Z && ($58[7] instanceof Z && ($58[8] instanceof P && ($58[9] instanceof Z && ($58[10] instanceof P && $58[11] instanceof Z)))))))))))) {
+              var pnA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[0].value0);
+              var pnAB$prime = Data_Semiring.mul(Fraction.semiRingFraction)($58[10].value0)(pnA$prime);
+              var pgnAnB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[10].value0);
+              var pnAnB$prime = Data_Semiring.mul(Fraction.semiRingFraction)(pnA$prime)(pgnAnB$prime);
+              var pgAnB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[8].value0);
+              var pAnB$prime = Data_Semiring.mul(Fraction.semiRingFraction)($58[0].value0)(pgAnB$prime);
+              var pAB$prime = Data_Semiring.mul(Fraction.semiRingFraction)($58[0].value0)($58[8].value0);
+              var pB$prime = Data_Semiring.add(Fraction.semiRingFraction)(pAB$prime)(pnAB$prime);
+              var pnB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(pB$prime);
+              $tco_done = true;
+              return {
+                  pA: v.pA,
+                  pgAB: v.pgAB,
+                  pgnAB: v.pgnAB,
+                  pnA: new P(pnA$prime),
+                  pAB: new P(pAB$prime),
+                  pnAB: new P(pnAB$prime),
+                  pB: new P(pB$prime),
+                  pnB: new P(pnB$prime),
+                  pgAnB: new P(pgAnB$prime),
+                  pgnAnB: new P(pgnAnB$prime),
+                  pAnB: new P(pAnB$prime),
+                  pnAnB: new P(pnAnB$prime)
+              };
+          };
+          if ($58.length === 12 && ($58[0] instanceof P && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof Z && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof P && ($58[7] instanceof Z && ($58[8] instanceof P && ($58[9] instanceof Z && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pnA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[0].value0);
+              var pgnAB$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)($58[6].value0)(pnA$prime);
+              $copy_v = {
+                  pA: v.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: v.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: new P(pgnAB$prime),
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof P && ($58[2] instanceof Z && ($58[3] instanceof Z && ($58[4] instanceof P && ($58[5] instanceof Z && ($58[6] instanceof Z && ($58[7] instanceof P && ($58[8] instanceof Z && ($58[9] instanceof Z && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pnAB$prime = Data_Ring.sub(Fraction.ringFraction)($58[1].value0)($58[7].value0);
+              var pA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[1].value0);
+              var pgAB$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)($58[4].value0)(pA$prime);
+              $copy_v = {
+                  pA: new P(pA$prime),
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: new P(pnAB$prime),
+                  pnAnB: empty.pnAnB,
+                  pgAB: new P(pgAB$prime),
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof Z && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof Z && ($58[7] instanceof P && ($58[8] instanceof P && ($58[9] instanceof Z && ($58[10] instanceof P && $58[11] instanceof Z)))))))))))) {
+              var pgnAnB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[10].value0);
+              var pnA$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)($58[7].value0)(pgnAnB$prime);
+              var pA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(pnA$prime);
+              $copy_v = {
+                  pA: new P(pA$prime),
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: v.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: v.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof Z && ($58[4] instanceof P && ($58[5] instanceof Z && ($58[6] instanceof P && ($58[7] instanceof Z && ($58[8] instanceof Z && ($58[9] instanceof P && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pgAB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[9].value0);
+              var pA$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)($58[4].value0)(pgAB$prime);
+              var pnA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(pA$prime);
+              var pgnAB$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)($58[6].value0)(pnA$prime);
+              $copy_v = {
+                  pA: new P(pA$prime),
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: new P(pgAB$prime),
+                  pgAnB: empty.pgAnB,
+                  pgnAB: new P(pgnAB$prime),
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof Z && ($58[4] instanceof P && ($58[5] instanceof P && ($58[6] instanceof P && ($58[7] instanceof Z && ($58[8] instanceof Z && ($58[9] instanceof Z && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pA$prime = Data_Semiring.add(Fraction.semiRingFraction)($58[4].value0)($58[5].value0);
+              var pgAnB$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)($58[5].value0)(pA$prime);
+              $copy_v = {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: v.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: v.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: new P(pgAnB$prime),
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof P && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof P && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof Z && ($58[7] instanceof Z && ($58[8] instanceof P && ($58[9] instanceof Z && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pnA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[0].value0);
+              var pB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[3].value0);
+              var pAB$prime = Data_Semiring.mul(Fraction.semiRingFraction)($58[0].value0)($58[8].value0);
+              var pnAB$prime = Data_Ring.sub(Fraction.ringFraction)(pB$prime)(pAB$prime);
+              var pgnAB$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(pnAB$prime)(pnA$prime);
+              $copy_v = {
+                  pA: v.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: v.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: new P(pgnAB$prime),
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof P && ($58[2] instanceof P && ($58[3] instanceof Z && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof Z && ($58[7] instanceof P && ($58[8] instanceof Z && ($58[9] instanceof Z && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pnB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[2].value0);
+              var pAnB$prime = Data_Ring.sub(Fraction.ringFraction)(pnB$prime)($58[7].value0);
+              var pA$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[1].value0);
+              var pAB$prime = Data_Ring.sub(Fraction.ringFraction)(pA$prime)(pAnB$prime);
+              var pgAB$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(pAB$prime)(pA$prime);
+              $copy_v = {
+                  pA: new P(pA$prime),
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: new P(pnB$prime),
+                  pAB: empty.pAB,
+                  pAnB: empty.pAnB,
+                  pnAB: empty.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: new P(pgAB$prime),
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof Z && ($58[2] instanceof P && ($58[3] instanceof Z && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof Z && ($58[7] instanceof Z && ($58[8] instanceof P && ($58[9] instanceof Z && ($58[10] instanceof P && $58[11] instanceof Z)))))))))))) {
+              var mx = Data_Ord.max(Fraction.ordFraction)($58[8].value0)($58[10].value0);
+              var mn = Data_Ord.min(Fraction.ordFraction)($58[8].value0)($58[10].value0);
+              var $179 = Data_Ord.lessThan(Fraction.ordFraction)(mn)($58[2].value0) && Data_Ord.lessThan(Fraction.ordFraction)($58[2].value0)(mx);
+              if ($179) {
+                  var pnB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[2].value0);
+                  var pA$prime = Data_EuclideanRing.div(Fraction.euclideanRingFraction)(Data_Ring.sub(Fraction.ringFraction)($58[2].value0)($58[10].value0))(Data_Ring.sub(Fraction.ringFraction)($58[8].value0)($58[10].value0));
+                  $copy_v = {
+                      pA: new P(pA$prime),
+                      pnA: empty.pnA,
+                      pB: empty.pB,
+                      pnB: new P(pnB$prime),
+                      pAB: empty.pAB,
+                      pAnB: empty.pAnB,
+                      pnAB: empty.pnAB,
+                      pnAnB: empty.pnAnB,
+                      pgAB: v.pgAB,
+                      pgAnB: empty.pgAnB,
+                      pgnAB: empty.pgnAB,
+                      pgnAnB: empty.pgnAnB
+                  };
+                  return;
+              };
+              $tco_done = true;
+              return empty;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof Z && ($58[2] instanceof Z && ($58[3] instanceof P && ($58[4] instanceof Z && ($58[5] instanceof Z && ($58[6] instanceof P && ($58[7] instanceof Z && ($58[8] instanceof Z && ($58[9] instanceof P && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pB$prime = Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))($58[3].value0);
+              var pAB$prime = Data_Ring.sub(Fraction.ringFraction)(pB$prime)($58[6].value0);
+              $copy_v = {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: new P(pAB$prime),
+                  pAnB: empty.pAnB,
+                  pnAB: v.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: v.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          if ($58.length === 12 && ($58[0] instanceof Z && ($58[1] instanceof Z && ($58[2] instanceof P && ($58[3] instanceof Z && ($58[4] instanceof Z && ($58[5] instanceof P && ($58[6] instanceof P && ($58[7] instanceof Z && ($58[8] instanceof Z && ($58[9] instanceof Z && ($58[10] instanceof Z && $58[11] instanceof Z)))))))))))) {
+              var pAB$prime = Data_Ring.sub(Fraction.ringFraction)($58[2].value0)($58[6].value0);
+              $copy_v = {
+                  pA: empty.pA,
+                  pnA: empty.pnA,
+                  pB: empty.pB,
+                  pnB: empty.pnB,
+                  pAB: new P(pAB$prime),
+                  pAnB: v.pAnB,
+                  pnAB: v.pnAB,
+                  pnAnB: empty.pnAnB,
+                  pgAB: empty.pgAB,
+                  pgAnB: empty.pgAnB,
+                  pgnAB: empty.pgnAB,
+                  pgnAnB: empty.pgnAnB
+              };
+              return;
+          };
+          $tco_done = true;
+          return v;
       };
-      return empty;
+      while (!$tco_done) {
+          $tco_result = $tco_loop($copy_v);
+      };
+      return $tco_result;
   };
   var avgNbFactors = 1;
   var randProba = function ($copy_r) {
@@ -2039,11 +2399,11 @@ var PS = {};
                       $copy_r = nextRand;
                       return;
                   };
-                  throw new Error("Failed pattern match at Main (line 130, column 7 - line 134, column 50): " + [ Data_Unit.unit.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 154, column 7 - line 158, column 50): " + [ Data_Unit.unit.constructor.name ]);
               };
-              throw new Error("Failed pattern match at Main (line 121, column 7 - line 121, column 28): " + [ v1.constructor.name ]);
+              throw new Error("Failed pattern match at Main (line 145, column 7 - line 145, column 28): " + [ v1.constructor.name ]);
           };
-          throw new Error("Failed pattern match at Main (line 118, column 7 - line 118, column 28): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 142, column 7 - line 142, column 28): " + [ v.constructor.name ]);
       };
       while (!$tco_done) {
           $tco_result = $tco_loop($copy_r);
@@ -2058,9 +2418,18 @@ var PS = {};
       var pAnB = Data_Semiring.mul(Fraction.semiRingFraction)(v2.probability)(Data_Ring.sub(Fraction.ringFraction)(Data_Ring.sub(Fraction.ringFraction)(Fraction.fromInt(1))(v.probability))(pnAB));
       return {
           experience: {
-              pAB: v.probability,
-              pnAB: pnAB,
-              pAnB: pAnB
+              pA: empty.pA,
+              pnA: empty.pnA,
+              pB: empty.pB,
+              pnB: empty.pnB,
+              pAB: new P(v.probability),
+              pAnB: new P(pAnB),
+              pnAB: new P(pnAB),
+              pnAnB: empty.pnAnB,
+              pgAB: empty.pgAB,
+              pgAnB: empty.pgAnB,
+              pgnAB: empty.pgnAB,
+              pgnAnB: empty.pgnAnB
           },
           nextRand: v2.nextRand
       };
@@ -2080,22 +2449,43 @@ var PS = {};
               KaTeX.newline();
               var v1 = DOM_Editor.getElementById("description")(doc)();
               KaTeX.subsection("1)")();
+              var r1 = Rand.rand(r0);
               var v2 = randExperience(r0);
-              tree(complete5(v2.experience))();
+              var exo = Data_EuclideanRing.mod(Data_EuclideanRing.euclideanRingInt)(r1.val)(11);
+              var e2 = exercice(exo)(complete(v2.experience));
+              tree(e2)();
+              KaTeX.subsection("2)")();
+              tree(complete(e2))();
               KaTeX.raw(Data_Show.show(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pA";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
                   return "pAB";
               }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
                   return "pAnB";
               }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pB";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pgAB";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pgAnB";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pgnAB";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pgnAnB";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pnA";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
                   return "pnAB";
-              }))(Data_Show.showRecordFieldsNil)(Fraction.showFraction))(Fraction.showFraction))(Fraction.showFraction)))(v2.experience))();
-              KaTeX.subsection("2)")();
-              tree(empty)();
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pnAnB";
+              }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+                  return "pnB";
+              }))(Data_Show.showRecordFieldsNil)(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction)))(showP(Fraction.showFraction))))(complete(e2)))();
               KaTeX.newline();
               var rep = [ "r\xe9ponses: " ];
               return KaTeX.render((function () {
-                  var $98 = $foreign.fromString(v) < 0;
-                  if ($98) {
+                  var $254 = $foreign.fromString(v) < 0;
+                  if ($254) {
                       return Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Semigroup.append(Data_Semigroup.semigroupString))("")(rep);
                   };
                   return "";
@@ -2116,25 +2506,21 @@ var PS = {};
       KaTeX.raw("Classe:")();
       return Data_Unit.unit;
   });
+  exports["P"] = P;
+  exports["Z"] = Z;
+  exports["perhaps"] = perhaps;
   exports["empty"] = empty;
-  exports["complete0"] = complete0;
-  exports["complete1"] = complete1;
-  exports["complete2"] = complete2;
-  exports["complete3"] = complete3;
-  exports["complete4"] = complete4;
-  exports["complete5"] = complete5;
-  exports["complete6"] = complete6;
-  exports["complete7"] = complete7;
-  exports["complete8"] = complete8;
-  exports["complete9"] = complete9;
+  exports["complete"] = complete;
   exports["primes"] = primes;
   exports["avgNbFactors"] = avgNbFactors;
   exports["randProba"] = randProba;
   exports["randExperience"] = randExperience;
   exports["tree"] = tree;
+  exports["exercice"] = exercice;
   exports["cb"] = cb;
   exports["spacex"] = spacex;
   exports["main"] = main;
+  exports["showP"] = showP;
   exports["fromString"] = $foreign.fromString;
 })(PS);
 PS["Main"].main();
