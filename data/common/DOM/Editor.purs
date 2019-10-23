@@ -12,9 +12,9 @@ import Web.HTML (Window, window) as HTML
 import Web.HTML.Window (document) as HTML
 import Web.HTML.HTMLDocument (body, toDocument) as HTML
 import Web.DOM.Document (Document, createElement, toNonElementParentNode) as DOM
-import Web.HTML.HTMLElement (toNode) as HTML
+import Web.HTML.HTMLElement (toNode, focus, fromNode) as HTML
 import Web.HTML.HTMLInputElement (fromElement, value) as HTMLInput
-import Web.HTML.HTMLSelectElement (HTMLSelectElement, value,selectedIndex,fromElement) as HTMLSelect
+import Web.HTML.HTMLSelectElement (fromElement, value) as HTMLSelect
 import Data.Maybe (fromJust)
 import Partial.Unsafe (unsafePartial)
 import Effect(Effect)
@@ -98,3 +98,6 @@ click = Event.click
 
 change :: Event.EventType
 change = Event.change
+
+focus :: DOM.Node -> Effect Unit
+focus node = HTML.focus $ unsafePartial $ fromJust $ HTML.fromNode node
