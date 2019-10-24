@@ -7,166 +7,83 @@ import Partial.Unsafe(unsafePartial)
 import KaTeX (cat, line, list, newline, raw, render
              , setTitle, subraw, subsection)
 import DOM.Editor as DOM
-import Data.Array(replicate, (!!), (\\), scanl, last,uncons)
+import Data.Array(fromFoldable,replicate, (!!), (\\), scanl, last,uncons)
 import Data.Array(length) as Array
 import Data.Foldable(foldr,all)
 import Data.Ord(abs) as Ord
 import Fraction (Fraction(..), fromInt)
 import Rand (Rand, rand)
-import Type.Prelude (SProxy(..))
-import Record(set, get)
-import Prim.Row(class Cons)
-import Data.Symbol(class IsSymbol)
+import Data.Map (Map, empty, insert, lookup, values)
 
 foreign import fromString :: String -> Int 
 
-data P a = P a | Z
+type Key = String
+type Experience = Map Key Fraction
 
-instance eqP :: Eq a => Eq (P a) where
-  eq (P a) (P b) = a == b
-  eq Z Z = true
-  eq _ _ = false
-
-unP :: forall a. P a -> a
-unP = unsafePartial $ \ (P a) -> a
-
-perhaps :: forall a b. b -> (a -> b) -> P a  -> b
-perhaps _ f (P a) = f a
-perhaps default _ Z = default
-
-instance showP :: Show a => Show (P a) where
-  show (P a) = show a
-  show _ = ""
-
-type Experience = { pA :: P Fraction, pnA :: P Fraction
-                  , pB :: P Fraction, pnB :: P Fraction
-                  , pAB :: P Fraction, pAnB :: P Fraction
-                  , pnAB :: P Fraction, pnAnB :: P Fraction
-                  , pgAB :: P Fraction, pgAnB :: P Fraction
-                  , pgnAB :: P Fraction, pgnAnB :: P Fraction 
-                  , pgBA :: P Fraction, pgBnA :: P Fraction
-                  , pgnBA :: P Fraction, pgnBnA :: P Fraction }
-
-content :: Experience
-content = { pA: Z, pnA: Z
-          , pB: Z, pnB: Z
-          , pAB: Z, pAnB: Z
-          , pnAB: Z, pnAnB: Z
-          , pgAB: Z, pgAnB: Z 
-          , pgnAB: Z, pgnAnB: Z 
-          , pgBA: Z, pgBnA: Z 
-          , pgnBA: Z, pgnBnA: Z } 
-
-pA = SProxy :: SProxy "pA"
-pnA = SProxy :: SProxy "pnA"
-pB = SProxy :: SProxy "pB"
-pnB = SProxy :: SProxy "pnB"
-pAB = SProxy :: SProxy "pAB"
-pAnB = SProxy :: SProxy "pAnB"
-pnAB = SProxy :: SProxy "pnAB"
-pnAnB = SProxy :: SProxy "pnAnB"
-pgAB = SProxy :: SProxy "pgAB"
-pgAnB = SProxy :: SProxy "pgAnB"
-pgnAB = SProxy :: SProxy "pgnAB"
-pgnAnB = SProxy :: SProxy "pgnAnB"
-pgBA = SProxy :: SProxy "pgBA"
-pgBnA = SProxy :: SProxy "pgBnA"
-pgnBA = SProxy :: SProxy "pgnBA"
-pgnBnA = SProxy :: SProxy "pgnBnA"
-
-cond :: forall pc pi pr row rc ri rr. 
-     IsSymbol pc => Cons pc (P Fraction) rc row 
-  => IsSymbol pi => Cons pi (P Fraction) ri row
-  => IsSymbol pr => Cons pr (P Fraction) rr row =>
-     SProxy pc 
-  -> SProxy pi 
-  -> SProxy pr 
-  -> Record row -> P (Record row)
+cond :: Key -> Key -> Key -> Experience -> Maybe Experience
 cond pc pi pr e = 
-  case [get pc e, get pi e, get pr e] of
-       [P c, P i, Z] -> P $ set pr (P $ i / c) e
-       [P c, Z, P r] -> P $ set pi (P $ c * r) e
-       [Z, P i, P r] -> P $ set pc (P $ i / r) e
-       otherwise -> Z
+  case [lookup pc e, lookup pi e, lookup pr e] of
+       [Just c, Just i, Nothing] -> Just $ insert pr (i / c) e
+       [Just c, Nothing, Just r] -> Just $ insert pi (c * r) e
+       [Nothing, Just i, Just r] -> Just $ insert pc (i / r) e
+       otherwise -> Nothing
 
-contr :: forall pa pna ra rna row. 
-     IsSymbol pa => Cons pa (P Fraction) ra row
-  => IsSymbol pna => Cons pna (P Fraction) rna row => 
-     SProxy pa 
-  -> SProxy pna 
-  -> Record row -> P (Record row)
+contr :: Key -> Key -> Experience -> Maybe Experience
 contr pa pna e = 
-  case [get pa e, get pna e] of
-       [P a, Z] -> P $ set pna (P $ fromInt 1 - a) e
-       [Z, P na] -> P $ set pa (P $ fromInt 1 - na) e
-       otherwise -> Z
+  case [lookup pa e, lookup pna e] of
+       [Just a, Nothing] -> Just $ insert pna (fromInt 1 - a) e
+       [Nothing, Just na] -> Just $ insert pa (fromInt 1 - na) e
+       otherwise -> Nothing
 
-ptot :: forall pa pab panb row ra rab ranb. 
-     IsSymbol pa  => Cons pa (P Fraction) ra row 
-  => IsSymbol pab => Cons pab (P Fraction) rab row 
-  => IsSymbol panb => Cons panb (P Fraction) ranb row =>
-     SProxy pa
-  -> SProxy pab 
-  -> SProxy panb 
-  -> Record row -> P (Record row)
+ptot :: Key -> Key -> Key -> Experience -> Maybe Experience
 ptot pa pab panb e = 
-  case [get pa e, get pab e, get panb e] of
-       [P a, P ab, Z] -> P $ set panb (P $ a - ab) e
-       [P a, Z, P anb] -> P $ set pab (P $ a - anb) e
-       [Z, P ab, P anb] -> P $ set pa (P $ ab + anb) e
-       otherwise -> Z
+  case [lookup pa e, lookup pab e, lookup panb e] of
+       [Just a, Just ab, Nothing] -> Just $ insert panb (a - ab) e
+       [Just a, Nothing, Just anb] -> Just $ insert pab (a - anb) e
+       [Nothing, Just ab, Just anb] -> Just $ insert pa (ab + anb) e
+       otherwise -> Nothing
 
-dep :: forall pa pb pgab pgnab row ra rb rgab rgnab. 
-     IsSymbol pa  => Cons pa (P Fraction) ra row 
-  => IsSymbol pb => Cons pb (P Fraction) rb row 
-  => IsSymbol pgab => Cons pgab (P Fraction) rgab row
-  => IsSymbol pgnab => Cons pgnab (P Fraction) rgnab row =>
-     SProxy pa 
-  -> SProxy pb 
-  -> SProxy pgab 
-  -> SProxy pgnab 
-  -> Record row -> P (Record row)
+dep :: Key -> Key -> Key -> Key -> Experience -> Maybe Experience
 dep pa pb pgab pgnab e = 
-  case [get pa e, get pb e, get pgab e, get pgnab e] of
-       [P a, P b, P gab, Z] -> 
-         P $ set pgnab (P $ (b-gab*a)/(fromInt 1 -a)) e
-       [P a, P b, Z, P gnab] -> 
-         P $ set pgab (P $ (b-gnab*(fromInt 1 - a))/a) e
-       [P a, Z, P gab, P gnab] -> 
-         P $ set pb (P $ gab*a+gnab*(fromInt 1 - a)) e
-       [Z, P b, P gab, P gnab] -> 
-         P $ set pa (P $ (b-gnab)/(gab-gnab)) e
-       otherwise -> Z
-
+  case [lookup pa e, lookup pb e, lookup pgab e, lookup pgnab e] of
+       [Just a, Just b, Just gab, Nothing] -> 
+          Just $ insert pgnab ((b-gab*a)/(fromInt 1 -a)) e
+       [Just a, Just b, Nothing, Just gnab] -> 
+          Just $ insert pgab ((b-gnab*(fromInt 1 - a))/a) e
+       [Just a, Nothing, Just gab, Just gnab] -> 
+          Just $ insert pb (gab*a+gnab*(fromInt 1 - a)) e
+       [Nothing, Just b, Just gab, Just gnab] -> 
+          Just $ insert pa ((b-gnab)/(gab-gnab)) e
+       otherwise -> Nothing
 
 complete :: Experience -> Experience
 complete e =
-  let rules = [ contr pA pnA e
-              , contr pB pnB e
-              , contr pgAB pgAnB e
-              , contr pgnAB pgnAnB e
-              , contr pgBA pgBnA e
-              , contr pgnBA pgnBnA e
-              , cond pgAB pAB pA e
-              , cond pgAnB pAnB pA e
-              , cond pgnAB pnAB pnA e
-              , cond pgnAnB pnAnB pnA e
-              , cond pgBA pAB pB e
-              , cond pgBnA pnAB pB e
-              , cond pgnBA pAnB pnB e
-              , cond pgnBnA pnAnB pnB e
-              , ptot pA pAB pAnB e
-              , ptot pnA pnAB pnAnB e
-              , ptot pB pAB pnAB e
-              , ptot pnB pAnB pnAnB e
-              , dep pA pB pgAB pgnAB e]
+  let rules = [ contr "pA" "pnA"
+              , contr "pB" "pnB"
+              , contr "pgAB" "pgAnB"
+              , contr "pgnAB" "pgnAnB"
+              , contr "pgBA" "pgBnA"
+              , contr "pgnBA" "pgnBnA"
+              , cond "pgAB" "pAB" "pA"
+              , cond "pgAnB" "pAnB" "pA"
+              , cond "pgnAB" "pnAB" "pnA"
+              , cond "pgnAnB" "pnAnB" "pnA"
+              , cond "pgBA" "pAB" "pB"
+              , cond "pgBnA" "pnAB" "pB"
+              , cond "pgnBA" "pAnB" "pnB"
+              , cond "pgnBnA" "pnAnB" "pnB"
+              , ptot "pA" "pAB" "pAnB"
+              , ptot "pnA" "pnAB" "pnAnB"
+              , ptot "pB" "pAB" "pnAB"
+              , ptot "pnB" "pAnB" "pnAnB"
+              , dep "pA" "pB" "pgAB" "pgnAB"]
       f xs = 
         case uncons xs of
              Nothing -> e
-             Just {head: r, tail: rs} ->
-               case r of
-                  P e' -> complete e'
-                  Z -> f rs
+             Just {head: rule, tail} ->
+               case rule e of
+                  Just e' -> complete e'
+                  Nothing -> f tail
   in f rules
 
 primes :: Array Int
@@ -201,18 +118,18 @@ randProba = unsafePartial \ r ->
                 | otherwise -> randProba nextRand 
 
 validExperience :: Experience -> Boolean
-validExperience { pA: P pA', pnA: P pnA'
-                , pB: P pB', pnB: P pnB'
-                , pAB: P pAB', pAnB: P pAnB'
-                , pnAB: P pnAB', pnAnB: P pnAnB'
-                , pgAB: P pgAB', pgAnB: P pgAnB' 
-                , pgnAB: P pgnAB', pgnAnB: P pgnAnB' 
-                , pgBA: P pgBA', pgBnA: P pgBnA' 
-                , pgnBA: P pgnBA', pgnBnA: P pgnBnA' } =
+validExperience e =
       let valid x = fromInt 0 < x && x < fromInt 1
-      in all valid [pA',pnA',pB',pnB',pAB',pAnB',pnAB',pnAnB'
-                   ,pgAB',pgAnB',pgnAB',pgnAnB',pgBA',pgBnA',pgnBA',pgnBnA']
-validExperience _ = false
+          vs = fromFoldable $ values e
+      in Array.length vs == 16 && all valid vs
+
+print :: Experience -> Key -> String
+print e key = 
+        case lookup key e of
+             Just p -> show p
+             Nothing -> ""
+
+infixr 6 print as °
 
 tree :: Experience  -> Effect Unit
 tree e = do
@@ -224,68 +141,64 @@ tree e = do
   line "126" "264" "202" "208"
   line "126" "264" "202" "320"
   render $ "\\begin{array}{ccccccccc} & & & & & & & & B \\\\ "
-          <> "& & & & & " <> show e.pgAB <> " \\\\ \\\\ "
+          <> "& & & & & " <> e°"pgAB" <> " \\\\ \\\\ "
           <> "& & & & A \\\\ "
-          <> "&" <> show e.pA <> " \\\\ "
-          <> "& & & & &" <> show e.pgAnB <> " \\\\ "
+          <> "&" <> e°"pA" <> " \\\\ "
+          <> "& & & & &" <> e°"pgAnB" <> " \\\\ "
           <> "& & & & & & & &" <> "\\overline{B} \\\\ "
           <> "\\cdot \\\\ "
           <> "& & & & & & & &" <> "B \\\\ "
-          <> "& & & & & " <> show e.pgnAB <> " \\\\ "
-          <> "&" <> show e.pnA <> " \\\\ "
+          <> "& & & & & " <> e°"pgnAB" <> " \\\\ "
+          <> "&" <> e°"pnA" <> " \\\\ "
           <> "& & & & \\overline{A} \\\\ \\\\"
-          <> "& & & & & " <> show e.pgnAnB <> " \\\\ "
+          <> "& & & & & " <> e°"pgnAnB" <> " \\\\ "
           <> "& & & & & & & & \\overline{B} \\end{array}"
-  let dress str x = "&&&&" <> str <> show x <> "\\\\" 
-  let pB' = perhaps "" (dress "P(B)=") e.pB
-  let pnB' = perhaps "" (dress "P(\\overline{B})=") e.pnB
-  let pAB' = perhaps "" (dress "P(A\\cap B)=") e.pAB
-  let pAnB' = perhaps "" (dress "P(A\\cap\\overline{B})=") e.pAnB
-  let pnAB' = perhaps "" (dress "P(\\overline{A}\\cap B)=") e.pnAB
-  let pnAnB' = perhaps "" (dress "P(\\overline{A}\\cap\\overline{B})=") e.pnAnB
-  let pgBA' = perhaps "" (dress "P_B(A)=") e.pgBA
-  let pgBnA' = perhaps "" (dress "P_B(\\overline{A})=") e.pgBnA
-  let pgnBA' = perhaps "" (dress "P_{\\overline{B}}(A)=") e.pgnBA
-  let pgnBnA' = perhaps "" (dress "P_{\\overline{B}}(\\overline{A})=") e.pgnBnA
+  let dress str x k = 
+        case lookup k x of
+           Just v -> "&&&&" <> str <> show v <> "\\\\"
+           Nothing -> "" 
+  let pB' = dress "P(B)=" e "pB"
+  let pnB' = dress "P(\\overline{B})=" e "pnB"
+  let pAB' = dress "P(A\\cap B)=" e "pAB"
+  let pAnB' = dress "P(A\\cap\\overline{B})=" e "pAnB"
+  let pnAB' = dress "P(\\overline{A}\\cap B)=" e "pnAB"
+  let pnAnB' = dress "P(\\overline{A}\\cap\\overline{B})="  e "pnAnB"
+  let pgBA' = dress "P_B(A)=" e "pgBA"
+  let pgBnA' = dress "P_B(\\overline{A})=" e "pgBnA"
+  let pgnBA' = dress "P_{\\overline{B}}(A)=" e "pgnBA"
+  let pgnBnA' = dress "P_{\\overline{B}}(\\overline{A})=" e "pgnBnA"
   render $ "\\begin{array}{lllll}" <> pB' <> pnB' 
                                    <> pAB' <> pAnB' <> pnAB' <> pnAnB' 
                                    <> pgBA' <> pgBnA' <> pgnBA' <> pgnBnA' 
                                    <>"\\end{array}"
 
-exercice :: forall p1 p2 p3 row r1 r2 r3. 
-     IsSymbol p1  => Cons p1 (P Fraction) r1 row 
-  => IsSymbol p2  => Cons p2 (P Fraction) r2 row
-  => IsSymbol p3  => Cons p3 (P Fraction) r3 row => 
-     Record row 
-  -> SProxy p1 
-  -> SProxy p2 
-  -> SProxy p3 
-  -> Record row -> Record row
-exercice cnt p1 p2 p3 ref = 
-  set p1 (get p1 ref) $ set p2 (get p2 ref) 
-    $ set p3 (get p3 ref) cnt
+exercice :: Key -> Key -> Key -> Experience -> Experience 
+exercice p1 p2 p3 ref = 
+   insert p1 (unsafePartial $ fromJust $ lookup p1 ref) 
+    $ insert p2 (unsafePartial $ fromJust $ lookup p2 ref) 
+      $ insert p3 (unsafePartial $ fromJust $ lookup p3 ref) empty
 
 majIndex = 16 :: Int 
 
 setWithIndex :: Int -> Fraction -> Experience -> Experience
 setWithIndex n f e = 
-  case n of
-       0 -> set pA (P f) e
-       1 -> set pnA (P f) e
-       2 -> set pB (P f) e
-       3 -> set pnB (P f) e
-       4 -> set pAB (P f) e
-       5 -> set pAnB (P f) e
-       6 -> set pnAB (P f) e
-       7 -> set pnAnB (P f) e
-       8 -> set pgAB (P f) e
-       9 -> set pgAnB (P f) e
-       10 -> set pgnAB (P f) e
-       11 -> set pgnAnB (P f) e
-       12 -> set pgBA (P f) e
-       13 -> set pgBnA (P f) e
-       14 -> set pgnBA (P f) e
-       otherwise -> set pgnBnA (P f) e
+  insert (case n of
+       0 -> "pA"
+       1 -> "pnA"
+       2 -> "pB"
+       3 -> "pnB"
+       4 -> "pAB"
+       5 -> "pAnB"
+       6 -> "pnAB"
+       7 -> "pnAnB"
+       8 -> "pgAB"
+       9 -> "pgAnB"
+       10 -> "pgnAB"
+       11 -> "pgnAnB"
+       12 -> "pgBA"
+       13 -> "pgBnA"
+       14 -> "pgnBA"
+       otherwise -> "pgnBnA") f e
 
 randExercise :: Rand -> {experience :: Experience, nextRand :: Rand}
 randExercise r1 =
@@ -307,10 +220,11 @@ randExercise r1 =
       {probability: p3, nextRand} = randProba r5
       e = setWithIndex (modMaj r1.val) p1
              $ setWithIndex (modMaj r2.val) p2
-             $ setWithIndex (modMaj r3.val) p3 content
+             $ setWithIndex (modMaj r3.val) p3 empty
    in if validExperience (complete e)
         then {experience: e, nextRand}
         else randExercise nextRand
+
 
 cb :: DOM.Document -> DOM.Event -> Effect Unit
 cb doc = unsafePartial $ \ev -> do
@@ -326,11 +240,12 @@ cb doc = unsafePartial $ \ev -> do
   
   newline
   thisPosition <- DOM.getElementById "description" doc
-  
+ 
   subsection "1)"
   let r1 = rand r0
   let {experience: e1, nextRand: r2} = randExercise r1
-    {-      
+          
+ {-
             pA pgAB pgnAB
             pAB pnAB pgAnB
             pAB pAnB pnAB
@@ -342,7 +257,8 @@ cb doc = unsafePartial $ \ev -> do
             pB pgAB pgnAB
             pnB pnAB pgAnB
             pB pAnB pnAB
-            -}
+  -}
+            
   tree e1
   tree $ complete e1
   raw $ show $ complete e1
@@ -354,29 +270,29 @@ cb doc = unsafePartial $ \ev -> do
   raw $ show $ complete e2
   
   subsection "3)"
-  let e3 = content { pAB = P (Fraction {num: 1, den: 4})
-                   , pAnB = P (Fraction {num: 1, den: 2})
-                   , pnAB = P (Fraction {num: 1, den: 5})}
+  let e3 = insert "pAB" (Fraction {num: 1, den: 4})
+           $ insert "pAnB" (Fraction {num: 1, den: 2})
+           $ insert "pnAB" (Fraction {num: 1, den: 5}) empty
   tree e3
   tree $ complete e3
   raw $ show $ complete e3
   
   subsection "4)"
-  let e4 = content { pgAB = P (Fraction {num: 1, den: 6})
-                   , pgnAB = P (Fraction {num: 1, den: 4})
-                   , pB = P (Fraction {num: 1, den: 5})}
+  let e4 = insert "pgAB" (Fraction {num: 1, den: 6})
+            $ insert "pgnAB" (Fraction {num: 1, den: 4})
+                $ insert "pB" (Fraction {num: 1, den: 5}) empty
   tree e4
   tree $ complete e4
   raw $ show $ complete e4
   
   subsection "5)"
-  let e5 = content { pgBA = P (Fraction {num: 1, den: 6})
-                   , pgnBA = P (Fraction {num: 1, den: 6})
-                   , pB = P (Fraction {num: 1, den: 5})}
+  let e5 = insert "pgBA" (Fraction {num: 1, den: 6})
+            $ insert "pgnBA" (Fraction {num: 1, den: 6})
+                $ insert "pB" (Fraction {num: 1, den: 5}) empty
   tree e5
   tree $ complete e5
   raw $ show $ complete e5
-
+ 
   newline
   let rep = ["réponses: " ]
   render $ if fromString val < 0 then foldr (<>) "" rep else ""
