@@ -564,7 +564,7 @@ cb doc = unsafePartial $ \ev -> do
  
   newline
   let rep = ["réponses: "
-      ,"\\; 1)1. \\; 0<x<"<> show (ad `div` 2)
+      ,"\\; 1)1. \\; 0<x<"<> show (fromInt ad / fromInt 2)
       ,"\\; 1)2. \\;", "AB AD = "<> show (ab*ad)
       ,"\\; 1)3. \\;", "\\mathcal{S}=\\{" <> show (fromInt (ab+ad-triple.c) 
 / fromInt 4) <> "," <> show (fromInt (ab+ad+triple.c) / fromInt 4) <> "\\} "
