@@ -353,7 +353,19 @@ cb doc = unsafePartial $ \ev -> do
   rawIn right1 "."
   newlineIn right1
   newlineIn right1
-  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
   subsection "1◦"
   raw "Expliquer brièvement pourquoi le rectangle intérieur a pour longeur "
   render $ show ab <> "-2x"
@@ -561,19 +573,27 @@ cb doc = unsafePartial $ \ev -> do
   raw ", "
   render "\\cos(x)\\sin(y)=\\cos(y)\\sin(x)"
   raw "."
- 
+
   newline
   let rep = ["réponses: "
-      ,"\\; 1)1. \\; 0<x<"<> show (fromInt ad / fromInt 2)
-      ,"\\; 1)2. \\;", "AB AD = "<> show (ab*ad)
-      ,"\\; 1)3. \\;", "\\mathcal{S}=\\{" <> show (fromInt (ab+ad-triple.c) 
+      ,"\\; 1)1◦ \\; 0<x<"<> show (fromInt ad / fromInt 2)
+      ,"\\; 1)2•◦ \\;", "AB AD = "<> show (ab*ad)
+      ,"\\; 1)3••◦ \\;", "\\mathcal{S}=\\{" <> show (fromInt (ab+ad-triple.c) 
 / fromInt 4) <> "," <> show (fromInt (ab+ad+triple.c) / fromInt 4) <> "\\} "
-      ,"\\; 2)1. \\;JK=KL=LJ=\\sqrt{3}"
-      ,"\\; 2)2. \\;\\widehat{JKL}=\\frac{\\pi}{3}"
-      ,"\\; 3)2. \\;\\mathcal{S}=\\{(" <> show f1.fraction <> "," <> show (-f2.fraction)
+      ,"\\; 1)4◦"
+      ,"\\; 2)1•••◦ \\;JK=KL=LJ=\\sqrt{3}"
+      ,"\\; 2)2•◦ \\;\\widehat{JKL}=\\frac{\\pi}{3}"
+      ,"\\; 3)1◦"
+      ,"\\; 3)2•••◦ \\;\\mathcal{S}=\\{(" <> show f1.fraction <> "," <> show (-f2.fraction)
                                      <> "),(" <> show (-f2.fraction) <> ","  <> show f1.fraction <> ")\\}"
-      ,"\\; 3)3.\\; \\mathcal{S}=\\{(" <> show f1.fraction <> "," <> show f2.fraction
+      ,"\\; 3)3•\\; \\mathcal{S}=\\{(" <> show f1.fraction <> "," <> show f2.fraction
                                      <> "),(" <> show (-f2.fraction) <> ","  <> show (-f1.fraction) <> ")\\}"
+      ,"\\; 4)1•◦"
+      ,"\\; 4)2◦"
+      ,"\\; 4)3•◦"
+      ,"\\; 4)4◦"
+      ,"\\; 4)5◦"
+      ,"\\; 4)6◦"
 ]
   render $ if fromString val < 0 then foldr (<>) "" rep else ""
     
