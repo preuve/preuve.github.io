@@ -1,0 +1,91 @@
+Node install:
+-------------
+emsdk to PATH
+emsdk/clang/e1.38.27_64bit to PATH
+emsdk/node/8.9.1_64bit/bin to PATH
+emsdk/emscripten/1.38.27 to PATH
+
+PureScript binairies:
+---------------------
+https://github.com/purescript/purescript/releases/latest
+purescript to PATH
+
+Spago binairies:
+----------------
+https://github.com/spacchetti/spago/releases/latest
+spago to PATH
+cd emsdk/node/8.9.1_64bit/bin/
+ln -s path/spago spago
+
+Spork install:
+----------------
+spago install spork
+
+page.html:
+----------
+<!doctype html>
+<html>
+  <head> 
+    <meta charset="utf-8">
+    <title>Purescript is amazing</title>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script src="dist/ps.js" ></script>
+  </body>
+</html>
+
+Hello world:
+------------
+module Main where
+
+import Prelude
+
+import Effect (Effect)
+import Spork.Html (Html)
+import Spork.Html as H
+import Spork.PureApp (PureApp)
+import Spork.PureApp as PureApp
+import Data.Maybe(Maybe(..))
+
+type State = { name ∷ String }
+
+data Action = UpdateName String
+
+handleAction :: State -> Action -> State
+handleAction {name} (UpdateName newName) = { name: newName }
+
+render :: State -> Html Action
+render state =
+    H.div []
+       [H.p []
+           [H.text "What is your name?"] 
+       , H.input [ H.type_ H.InputText
+                 , H.onValueInput $ Just <<< UpdateName
+                 ]
+       , hello
+       ]
+
+    where
+      hello = if state.name == ""
+              then H.p [] []
+              else H.p [] [ H.text $ "Hello " <> state.name ]
+
+initialState ∷ State
+initialState = { name: "" }
+
+
+page ∷ PureApp State Action
+page =  { update: handleAction
+        , render
+        , init: initialState
+        }
+
+main :: Effect Unit
+main = void $ PureApp.makeWithSelector page "#app"
+
+Automatic rebuild:
+------------------
+spago bundle-app --watch -t ./dist/ps.js
+
+

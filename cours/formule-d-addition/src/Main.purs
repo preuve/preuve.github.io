@@ -4,9 +4,8 @@ import Prelude
 import Effect (Effect)
 import Data.Maybe(Maybe(..))
 import Partial.Unsafe(unsafePartial)
-import Graphics.Drawing(render) as Canvas
-import Color (rgb)
-import Graphics.Canvas.Geometry (class DrawableSet, arc, circle, drawIn, length, point, rename, rightangle, rotated, segment, vector, (<+|))
+import SVG.Geometry (arc, circle, length, point, rename, rightangle, rotated, segment, vector, (<+|))
+import SVG.Render(class Render, render', defaultContext)
 import DOM.Editor as DOM
 import KaTeX (cat, equation, list, newline, raw, render, setTitle, subraw, subrender)
 import Math as Math
@@ -14,32 +13,23 @@ import Math as Math
 main :: Effect Unit
 main = void $ unsafePartial do
   setup <- DOM.setup
-  _ <- DOM.setAttribute "style" "background: #ffffff" setup.body --"#635351"
-  canvas <- DOM.getElementById "canvas" setup.document
-  _ <- DOM.setAttribute "width" "400" canvas
-  _ <- DOM.setAttribute "height" "600" canvas
-  context2D <- DOM.getContext2D canvas
+  _ <- DOM.setAttribute "style" "background: #ffffff;" setup.body --"#635351"
   
-  let ctx = { color: rgb 0 0 0 -- 195 194 199
-            , lineWidth: 1.50}
-  let draw :: forall a. DrawableSet a => a -> Effect Unit
-      draw = Canvas.render context2D <<< drawIn ctx 
+  page <- DOM.createElement "div" setup.document
+  _ <- DOM.setAttribute "style" "display: grid; grid-template-columns: 2fr 3fr;" page
+  _ <- DOM.appendChild page setup.body
+  
+  svg <- DOM.newSVG "position: relative; width: 600px; height: 100%;" page
+  
+  div <- DOM.createElement "div" setup.document
+  _ <- DOM.setId "description" div
+  _ <- DOM.appendChild div page
+  
+  let ctx = defaultContext svg
+  let draw :: forall a. Render a => a -> Effect Unit
+      draw = render' ctx 
   
   setTitle "Formules d'addition du sinus et du cosinus"
-  
-  raw "Sur le cercle trigonométrique du repère "
-  let i = "\\overrightarrow{\\imath}"
-  let j = "\\overrightarrow{\\jmath}"
-  let par x y = "("<>x<>","<>y<>")"
-  
-  render $ "(O,"<>i<>","<>j<>")"
-  raw ", on place "
-  let oa = "\\overrightarrow{OA}"
-  let oa' = "\\overrightarrow{OA'}"
-  let ob = "\\overrightarrow{OB}"
-  list [ cat [subrender "A", subraw ", tel que ", subrender $ par i oa <> "=a"]
-       , cat [subrender "B", subraw ", tel que ", subrender $ par i ob <> "=a+b"]
-       , cat [subrender "A'", subraw ", tel que ", subrender $ par oa oa' <> "=\\frac{\\pi}{2}"]]
   
   let origx = 95.0
   let origy = 350.0
@@ -54,20 +44,35 @@ main = void $ unsafePartial do
   draw $ segment po pi $ Just ""
   draw $ segment po pj $ Just ""
   draw trigo
+
+  raw "Sur le cercle trigonométrique du repère "
+  let i = "\\overrightarrow{\\imath}"
+  let j = "\\overrightarrow{\\jmath}"
+  let par x y = "("<>x<>","<>y<>")"
+  
+  render $ "(O,"<>i<>","<>j<>")"
+  raw ", on place "
+  let oa = "\\overrightarrow{OA}"
+  let oa' = "\\overrightarrow{OA'}"
+  let ob = "\\overrightarrow{OB}"
+  list [ cat [subrender "A", subraw ", tel que ", subrender $ par i oa <> "=a"]
+       , cat [subrender "B", subraw ", tel que ", subrender $ par i ob <> "=a+b"]
+       , cat [subrender "A'", subraw ", tel que ", subrender $ par oa oa' <> "=\\frac{\\pi}{2}"]]
+  
    
   let angleA = -0.35
   let voa = rotated angleA vi
   let pa = rename "A" $ po <+| voa
   draw pa
   draw $ segment po pa $ Just ""
-  draw $ arc vi po voa (unity*0.4) false true $ Just "   a"
+  draw $ arc vi po voa (unity*0.4) false true false $ Just "   a"
   
   let angleB = -0.5
   let vob = rotated angleB vi
   let pb = rename "B" $ po <+| vob
   draw pb
   draw $ segment po pb $ Just ""
-  draw $ arc vi po vob (unity*0.75) false true $ Just "     a+b"
+  draw $ arc vi po vob (unity*0.75) false true false $ Just "     a+b"
   
   let angleA' = angleA - Math.pi/2.0
   let voa' = rotated angleA' vi

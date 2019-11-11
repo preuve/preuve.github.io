@@ -12,11 +12,9 @@ import Data.Foldable(foldr)
 import Data.Ord(abs) as Ord
 import Fraction (Fraction(..), inlineFraction, fromInt, abs)
 import Rand (Rand, rand)
-import Graphics.Canvas.Geometry (class DrawableSet, drawIn
-                                , point, segment, middle, meets,line,rename)
+import SVG.Geometry (point, segment, middle, meets,line,rename)
+import SVG.Render(class Render,render',defaultContext)
 import Math(pi)
-import Color (rgb)
-import Graphics.Drawing(render) as Canvas
 
 foreign import fromString :: String -> Int 
 
@@ -263,26 +261,21 @@ cb doc = unsafePartial $ \ev -> do
   
   newline
   thisPosition <- DOM.getElementById "description" doc
-  let ctx = { color: rgb 0 0 0 -- 195 194 199
-            , lineWidth: 1.0}
   
   section "Exercice 1"
   div1 <- DOM.createElement "div" doc
-  _ <- DOM.setAttribute "style" "display: grid; grid-template-columns : 1fr 4fr;" div1
+  _ <- DOM.setAttribute "style" "display: grid; grid-template-columns : 2fr 4fr;" div1
   right1 <- DOM.createElement "div" doc
-  canvas1 <- DOM.createElement "canvas" doc
-  _ <- DOM.setAttribute "width" "400" canvas1
-  _ <- DOM.setAttribute "height" "250" canvas1
-  _ <- DOM.appendChild canvas1 div1
+  svg <- DOM.newSVG "position: relative; width: 400; height: 310;" div1
+  let ctx = (defaultContext  svg){ strokeWidth = 1.0}
   _ <- DOM.appendChild right1 div1
   _ <- DOM.appendChild div1 thisPosition
-  context2D1 <- DOM.getContext2D canvas1
-  let draw1 :: forall a. DrawableSet a => a -> Effect Unit
-      draw1 = Canvas.render context2D1 <<< drawIn ctx 
-  let origx1 = 200.0
-  let origy1 = 125.0
-  let theUnit1 = 75.0
-  let x' = 30.0
+  let draw1 :: forall a. Render a => a -> Effect Unit
+      draw1 = render' ctx 
+  let origx1 = 150.0
+  let origy1 = 90.0
+  let theUnit1 = 55.0
+  let x' = 25.0
   let pO = point "O" (origx1)  (origy1)
   let pA = point "A" (origx1 - 2.0 * theUnit1)  (origy1 + theUnit1)
   let pB = point "B" (origx1 + 2.0 * theUnit1) (origy1 + theUnit1)
@@ -327,7 +320,6 @@ cb doc = unsafePartial $ \ev -> do
   newlineIn right1 
   newlineIn right1 
   
-  newlineIn right1 
   rawIn right1 "Soit "
   renderIn right1 "ABCD"
   rawIn right1 " un rectangle de centre "
@@ -354,18 +346,6 @@ cb doc = unsafePartial $ \ev -> do
   newlineIn right1
   newlineIn right1
  
-
-
-
-
-
-
-
-
-
-
-
-
   subsection "1◦"
   raw "Expliquer brièvement pourquoi le rectangle intérieur a pour longeur "
   render $ show ab <> "-2x"

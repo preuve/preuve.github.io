@@ -5,16 +5,14 @@ import Effect (Effect)
 import Data.Maybe(Maybe(..), maybe, fromJust)
 import Data.Array( filter, length, (..), uncons, dropWhile
                  , head, tail)
-import Data.Foldable (foldr)
+import Data.Foldable (foldr,foldM)
 import Control.Alt(alt)
-import Color (Color, rgb)
-import Graphics.Drawing (Drawing, FillStyle
-                        , fillColor, filled, rectangle, render)
-import Graphics.Canvas.Geometry (
-  class DrawableSet, Circle(..), HalfLine(..), Line, Point, Segment(..)
-  , aPointOnLine, aVectorOfLine, abs, circle, drawIn
+import SVG.Geometry (
+  Circle(..), HalfLine(..), Line, Point, Segment(..)
+  , aPointOnLine, aVectorOfLine, abs, circle
   , line, meets, ord, point, scale, segment, vector, (<+|))
-import Graphics.Canvas.Geometry(length) as Geo
+import SVG.Render(class Render, defaultContext, render', Context, svgclear, svgpath)
+import SVG.Geometry(length) as SVG
 import DOM.Editor as DOM
 import FRP.Behavior (Behavior, animate, unfold)
 import FRP.Event(Event, create)
@@ -29,14 +27,16 @@ import Data.String(stripPrefix, drop, Pattern(..))
 
 foreign import fromString :: String -> Number
 
-width = 800.0 :: Number
+width = 600.0 :: Number
 height = 600.0 :: Number
 density = 200 :: Int
-  
-white = fillColor $ rgb 255 255 255 :: FillStyle
-beige = fillColor $ rgb 255 255 175 :: FillStyle
-blue = rgb 6 2 198 :: Color
-purple = rgb 179 14 203 :: Color
+
+type Color = String
+
+white = "#FFFFFF" :: Color
+beige = "#FFFFAF" :: Color
+blue = "#0602C6" :: Color
+purple = "#B30ECB" :: Color
 
 type Domain = Number -> Boolean
 newtype Function = Function { domain :: Domain
@@ -164,8 +164,8 @@ pen from acc (Just p) xs =
                                        (unsafePartial fromJust $ tail ys)
       Nothing -> acc
 
-plot :: (Final -> Drawing) -> Box -> Box -> Function -> Drawing
-plot draw from to (Function {domain, expression}) = 
+plot :: Context -> Box -> Box -> Function -> Effect Unit
+plot ctx from to (Function {domain, expression}) = 
         let botX = abs from.center - from.halfWidth
             topX = abs from.center + from.halfWidth
             zs = dropWhile (_ == Nothing) $ 
@@ -177,8 +177,9 @@ plot draw from to (Function {domain, expression}) =
                      toNumber n * (topX - botX) / toNumber density) <$> 
                      0..density
         in if length zs == 0 
-              then mempty 
-              else foldr (\s acc -> acc <> (draw $ FS from to s) ) mempty $ 
+              then pure unit 
+              else foldM (\acc s -> 
+                      pure acc <> (render' ctx $ FS from to s) ) unit $ 
                            unsafePartial pen from [] 
                              (unsafePartial fromJust $ head zs) 
                              (unsafePartial fromJust $ tail zs)
@@ -239,25 +240,25 @@ data Final = FA (Array Final)
   | FH Box Box HalfLine 
   | FS Box Box Segment
 
-instance drawableFinal :: DrawableSet Final where
-  drawIn ctx (FP from to p) = drawIn ctx $ remap from p to
-  drawIn ctx (FL from to l) = 
+instance renderFinal :: Render Final where
+  render' ctx (FP from to p) = render' ctx $ remap from p to
+  render' ctx (FL from to l) = 
     let p = aPointOnLine l
         q = p <+| aVectorOfLine l
-      in drawIn ctx $ line (remap from p to) (remap from q to)
-  drawIn ctx (FC from to (Circle {center, radius})) =
+      in render' ctx $ line (remap from p to) (remap from q to)
+  render' ctx (FC from to (Circle {center, radius})) =
     let p = remap from center to
         q = remap from (point "" (abs center + radius) (ord center)) to
-      in drawIn ctx $ circle p (Geo.length $ vector p q)  
-  drawIn ctx (FH from to (HalfLine {origin, direction})) = 
+      in render' ctx $ circle p (SVG.length $ vector p q)  
+  render' ctx (FH from to (HalfLine {origin, direction})) = 
     let p = remap from origin to
         q = remap from (origin <+| direction) to
-     in drawIn ctx $ HalfLine {origin: p, direction: vector p q}
-  drawIn ctx (FS from to (Segment {origin, extremity,asOriented})) = 
-    drawIn ctx $ Segment { origin: remap from origin to
+     in render' ctx $ HalfLine {origin: p, direction: vector p q}
+  render' ctx (FS from to (Segment {origin, extremity,asOriented})) = 
+    render' ctx $ Segment { origin: remap from origin to
                          , extremity: remap from extremity to
                          , asOriented}
-  drawIn ctx (FA arr) = drawIn ctx arr
+  render' ctx (FA arr) = render' ctx arr
 
 type State = { parabola :: Triplet 
              , fromF :: Box
@@ -265,8 +266,8 @@ type State = { parabola :: Triplet
              , previousX :: Number
              , previousY :: Number}
 
-grid :: Box -> Box -> Drawing
-grid from to = 
+grid :: Context -> Box -> Box -> Effect Unit
+grid ctx from to = 
   let topX = abs from.center + from.halfWidth
       botX = abs from.center - from.halfWidth
       topY = ord from.center + from.halfHeight
@@ -275,18 +276,22 @@ grid from to =
                         segment (point "" x y) (point "" x' y') Nothing
       segAtX x = seg x botY x topY
       segAtY y = seg botX y topX y
-      ctx lW = {color: rgb 50 50 50, lineWidth: lW}
-   in  ( foldr (<>) mempty $ 
-         (\ n -> drawIn (ctx 0.5) $
-           segAtX $ toNumber n) <$> ceil botX .. floor topX)
-           <>
-      ( foldr (<>) mempty $ 
-         (\ n -> drawIn (ctx 0.5) $
-           segAtY $ toNumber n) <$> ceil botY .. floor topY)
-                 <> (drawIn (ctx 1.5) $ segAtX 0.0)
-                 <> (if botY <= 0.0 && 0.0 <= topY 
-                       then drawIn (ctx 1.5) $ segAtY 0.0
-                       else mempty)
+      ctx' lW = ctx{stroke = "#323232", strokeWidth = lW}
+   in do
+      
+        foldM (\ a n -> 
+             pure a <> (render' (ctx' 0.5) $ segAtX $ toNumber n)) unit $ 
+                ceil botX .. floor topX
+      
+        foldM (\ a n ->
+          pure a <> (render' (ctx' 0.5) $ segAtY $ toNumber n)) unit $
+            ceil botY .. floor topY
+        
+        render' (ctx' 1.5) $ segAtX 0.0
+      
+        if botY <= 0.0 && 0.0 <= topY 
+          then render' (ctx' 1.5) $ segAtY 0.0
+          else pure unit
 
 initialState :: State
 initialState = 
@@ -299,28 +304,29 @@ initialState =
 digit3 :: Number -> Number
 digit3 a = (_ / 1000.0) $ toNumber $ round $ a * 1000.0
 
-reframe :: (Final -> Drawing) -> State -> Drawing
-reframe draw { parabola
-             , fromF, toF
-             , previousX, previousY} =
-  grid fromF toF 
-    <> plot draw fromF toF (convert parabola)
-    <> (let Reduced {a,b,c} = convert parabola
-            delta = b*b-4.0*a*c
-         in if delta >= 0.0
-              then (let p1 = point "" ((-b+sqrt delta)/2.0/a) 0.0
-                    in if inBox fromF p1
-                         then draw $ FP fromF toF p1
-                         else mempty)
-                    <>(let p2 = point "" ((-b-sqrt delta)/2.0/a) 0.0
-                        in if inBox fromF p2
-                             then draw $ FP fromF toF p2
-                             else mempty)
-              else mempty)
+reframe :: Context -> State -> Effect Unit
+reframe ctx { parabola
+            , fromF, toF
+           , previousX, previousY} = do
+  grid ctx fromF toF 
+  plot ctx fromF toF (convert parabola)
+  let Reduced {a,b,c} = convert parabola
+  pure unit
+  let delta = b*b-4.0*a*c
+  if delta >= 0.0
+    then do let p1 = point "" ((-b+sqrt delta)/2.0/a) 0.0
+            if inBox fromF p1
+                 then render' ctx $ FP fromF toF p1
+                 else pure unit
+            let p2 = point "" ((-b-sqrt delta)/2.0/a) 0.0
+            if inBox fromF p2
+                 then render' ctx $ FP fromF toF p2
+                 else pure unit
+    else pure unit 
 
-ePage :: Array ButtonEvent -> (Final -> Drawing) 
-        -> Effect (Behavior Drawing) 
-ePage events draw = liftA1 (reframe draw) <$> 
+ePage :: Array ButtonEvent -> Context 
+        -> Effect (Behavior (Effect Unit)) 
+ePage events ctx = liftA1 (reframe ctx) <$> 
   (\ event -> 
     unfold (\{value, pos: {x,y}} st -> 
       case value of
@@ -450,9 +456,9 @@ cbInput msg {event, push} doc ev = do
   
   _ <- case stripPrefix (Pattern "ABC") msg of
          Just _ -> do 
-            vala <- DOM.inputedValue inA
-            valb <- DOM.inputedValue inB
-            valc <- DOM.inputedValue inC
+            vala <- DOM.inputValue inA
+            valb <- DOM.inputValue inB
+            valc <- DOM.inputValue inC
             let red = Reduced { a: fromString vala
                               , b: fromString valb
                               , c: fromString valc}
@@ -473,9 +479,9 @@ cbInput msg {event, push} doc ev = do
 
   _ <- case stripPrefix (Pattern "CAN") msg of
          Just _ -> do
-            coefa <- DOM.inputedValue incA
-            coefalpha <- DOM.inputedValue inAlpha
-            coefbeta <- DOM.inputedValue inBeta
+            coefa <- DOM.inputValue incA
+            coefalpha <- DOM.inputValue inAlpha
+            coefbeta <- DOM.inputValue inBeta
             let can = Canonical { a: fromString coefa
                                 , alpha: fromString coefalpha
                                 , beta: fromString coefbeta}
@@ -496,12 +502,12 @@ cbInput msg {event, push} doc ev = do
 
   _ <- case stripPrefix (Pattern "PTS") msg of
          Just _ -> do
-            x0 <- DOM.inputedValue inX0
-            y0 <- DOM.inputedValue inY0
-            x1 <- DOM.inputedValue inX1
-            y1 <- DOM.inputedValue inY1
-            x2 <- DOM.inputedValue inX2
-            y2 <- DOM.inputedValue inY2
+            x0 <- DOM.inputValue inX0
+            y0 <- DOM.inputValue inY0
+            x1 <- DOM.inputValue inX1
+            y1 <- DOM.inputValue inY1
+            x2 <- DOM.inputValue inX2
+            y2 <- DOM.inputValue inY2
             let tri = Triplet { c0: {x: fromString x0, y: fromString y0}
                               , c1: {x: fromString x1, y: fromString y1}
                               , c2: {x: fromString x2, y: fromString y2}}
@@ -618,19 +624,29 @@ curryBox f {center, halfWidth, halfHeight} =
   f (abs center - halfWidth) (ord center - halfHeight) 
     (2.0 * halfWidth)        (2.0 * halfHeight)
 
+rectangle :: Context -> Number -> Number -> Number -> Number -> Effect Unit
+rectangle ctx x y dx dy = do 
+  let bl = point "" x (y+dy)
+  let br = point "" (x+dx) (y+dy)
+  let tr = point "" (x+dx) y
+  let tl = point "" x y
+  svgpath ctx.svg ctx.stroke ctx.strokeWidth ctx.fill $
+        "M " <> (show $ abs bl) <> " " <> (show $ ord bl) <> " "
+     <> "L " <> (show $ abs br) <> " " <> (show $ ord br) <> " "
+     <> "L " <> (show $ abs tr) <> " " <> (show $ ord tr) <> " "
+     <> "L " <> (show $ abs tl) <> " " <> (show $ ord tl) <> " "
+     <> "z"
+
 main :: Effect Unit
 main = do
   setup <- DOM.setup
-  canvas <- DOM.getElementById "canvas" setup.document
-  context2D <- DOM.getContext2D canvas
-  _ <- DOM.setAttribute "width" (show width) canvas
-  _ <- DOM.setAttribute "height" (show height) canvas
+   
+  svg <- DOM.newSVG "position: absolute; width:50%; height:100%;" setup.body
   
-  let ctx = { color: rgb 5 4 9
-            , lineWidth: 1.50}
+  let ctx = (defaultContext svg) { stroke = "#050409"}
 
-  let background = filled white (rectangle 0.0 0.0 width height)
-  let functionBkg = filled beige (curryBox rectangle window)
+  let background = rectangle ctx{fill = white} 0.0 0.0 width height
+  let functionBkg = curryBox (rectangle ctx{fill = beige}) window
 
   mntr <- DOM.createElement "div" setup.document
   zox <- mkButtonEvent mntr "zoomOutX" setup.document
@@ -699,13 +715,13 @@ main = do
        "display: grid; grid-template-columns: repeat(2, 1fr);" 
        setup.body
 
-  page <- ePage [zox,zix,zofy,zify,ev] $ 
-           (drawIn ctx :: forall a. DrawableSet a => a -> Drawing)
+  page <- ePage [zox,zix,zofy,zify,ev] ctx
   _ <- animate (
-         pure background 
-           <> pure functionBkg 
-           <> page 
-           <> pure (drawIn ctx $ frame window)
-          ) (render context2D)
+            pure (svgclear svg)
+         <> pure background 
+         <> pure functionBkg 
+         <> page 
+         <> pure (render' ctx $ frame window)
+          ) identity
   pure unit
 

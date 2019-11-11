@@ -5,17 +5,14 @@ import Effect (Effect)
 import Data.Maybe(Maybe(..), maybe, fromJust)
 import Data.Array( filter, length, (..), uncons, dropWhile
                  , head, tail)
-import Data.Foldable (foldr)
+import Data.Foldable (foldr,foldM)
 import Control.Alt(alt)
-import Color (Color, rgb)
-import Graphics.Drawing( Drawing, FillStyle
-                       , render, fillColor, filled, rectangle, text)
-import Graphics.Canvas.Geometry ( 
-    class DrawableSet
-  , Circle(..), HalfLine(..), Line(..), Point, Segment(..), Context
-  , aPointOnLine, aVectorOfLine, abs, circle, drawIn
+import SVG.Geometry ( 
+    Circle(..), HalfLine(..), Line(..), Point, Segment(..)
+  , aPointOnLine, aVectorOfLine, abs, circle
   , line, meets, ord, point, segment, scale, vector, (<+|))
-import Graphics.Canvas.Geometry(length) as Geo
+import SVG.Render(class Render, render',defaultContext, Context,svgclear,svgpath,svgtext)
+import SVG.Geometry(length) as Geo
 import DOM.Editor as DOM
 import FRP.Behavior (Behavior, animate, unfold)
 import FRP.Event(Event, create)
@@ -25,18 +22,19 @@ import Data.Set(isEmpty)
 import Partial.Unsafe(unsafePartial)
 import Data.Int(toNumber, floor, ceil, round)
 import Prim hiding(Function)
-import Graphics.Drawing.Font (font, serif, bold, italic)
 
 width = 800.0 :: Number
 height = 600.0 :: Number
 density = 200 :: Int
-  
-white = fillColor $ rgb 255 255 255 :: FillStyle
-beige = fillColor $ rgb 255 255 175 :: FillStyle
-blue = rgb 6 2 198 :: Color
-purple = rgb 179 14 203 :: Color
 
-tanStyle = {color: purple, lineWidth: 1.5} :: Context
+type Color = String
+
+white = "#FFFFFF" :: Color
+beige = "#FFFFAF" :: Color
+blue = "#0602c6" :: Color
+purple = "#B314CB" :: Color
+
+tanStyle = _{stroke = purple, strokeWidth = 1.5} :: Context -> Context
 
 type Domain = Number -> Boolean
 type Function = {domain :: Domain, expression :: Number -> Number}
@@ -82,8 +80,8 @@ pen from acc (Just p) xs =
                                        (unsafePartial fromJust $ tail ys)
       Nothing -> acc
 
-plot :: (Final -> Drawing) -> Box -> Box -> Function -> Drawing
-plot draw from to {domain, expression} = 
+plot :: Context -> Box -> Box -> Function -> Effect Unit
+plot ctx from to {domain, expression} = 
         let botX = abs from.center - from.halfWidth
             topX = abs from.center + from.halfWidth
             zs = dropWhile (_ == Nothing) $ 
@@ -95,8 +93,9 @@ plot draw from to {domain, expression} =
                      toNumber n * (topX - botX) / toNumber density) <$> 
                      0..density
         in if length zs == 0 
-              then mempty 
-              else foldr (\s acc -> acc <> (draw $ FS from to s) ) mempty $ 
+              then pure unit 
+              else foldM (\acc s -> 
+                      pure acc <> (render' ctx $ FS from to s) ) unit $ 
                            unsafePartial pen from [] 
                              (unsafePartial fromJust $ head zs) 
                              (unsafePartial fromJust $ tail zs)
@@ -165,26 +164,26 @@ data Final = FA (Array Final)
   | FH Box Box HalfLine 
   | FS Box Box Segment
 
-instance drawableFinal :: DrawableSet Final where
-  drawIn ctx (FP from to p) = drawIn ctx $ remap from p to
-  drawIn ctx (FL from to l) = 
+instance drawableFinal :: Render Final where
+  render' ctx (FP from to p) = render' ctx $ remap from p to
+  render' ctx (FL from to l) = 
     let p = aPointOnLine l
         q = p <+| aVectorOfLine l
-      in drawIn ctx $ line (remap from p to) (remap from q to)
-  drawIn ctx (FC from to (Circle {center, radius})) =
+      in render' ctx $ line (remap from p to) (remap from q to)
+  render' ctx (FC from to (Circle {center, radius})) =
     let p = remap from center to
         q = remap from (point "" (abs center + radius) (ord center)) to
-      in drawIn ctx $ circle p (Geo.length $ vector p q)  
-  drawIn ctx (FH from to (HalfLine {origin, direction})) = 
+      in render' ctx $ circle p (Geo.length $ vector p q)  
+  render' ctx (FH from to (HalfLine {origin, direction})) = 
     let p = remap from origin to
         q = remap from (origin <+| direction) to
-     in drawIn ctx $ HalfLine {origin: p, direction: vector p q}
-  drawIn ctx (FS from to (Segment {origin, extremity,asOriented})) = 
-    drawIn ctx $ Segment { origin: remap from origin to
+     in render' ctx $ HalfLine {origin: p, direction: vector p q}
+  render' ctx (FS from to (Segment {origin, extremity,asOriented})) = 
+    render' ctx $ Segment { origin: remap from origin to
                          , extremity: remap from extremity to
                          , asOriented}
-  drawIn ctx (FA arr) = drawIn ctx arr
-
+  render' ctx (FA arr) = render' ctx arr
+ 
 type State = { fAndDf :: FandDf
              , fromF :: Box
              , toF :: Box
@@ -196,8 +195,8 @@ type State = { fAndDf :: FandDf
              , previousX :: Number
              , previousY :: Number}
 
-grid :: Box -> Box -> Drawing
-grid from to = 
+grid :: Context -> Box -> Box -> Effect Unit
+grid ctx from to = 
   let topX = abs from.center + from.halfWidth
       botX = abs from.center - from.halfWidth
       topY = ord from.center + from.halfHeight
@@ -206,18 +205,21 @@ grid from to =
                         segment (point "" x y) (point "" x' y') Nothing
       segAtX x = seg x botY x topY
       segAtY y = seg botX y topX y
-      ctx lW = {color: rgb 50 50 50, lineWidth: lW}
-   in  ( foldr (<>) mempty $ 
-         (\ n -> drawIn (ctx 0.5) $
-           segAtX $ toNumber n) <$> ceil botX .. floor topX)
-           <>
-      ( foldr (<>) mempty $ 
-         (\ n -> drawIn (ctx 0.5) $
-           segAtY $ toNumber n) <$> ceil botY .. floor topY)
-                 <> (drawIn (ctx 1.5) $ segAtX 0.0)
-                 <> (if botY <= 0.0 && 0.0 <= topY 
-                       then drawIn (ctx 1.5) $ segAtY 0.0
-                       else mempty)
+      ctx' lW = ctx{stroke = "#323232", strokeWidth = lW}
+   in do
+        foldM (\ a n -> 
+             pure a <> (render' (ctx' 0.5) $ segAtX $ toNumber n)) unit $ 
+                ceil botX .. floor topX
+      
+        foldM (\ a n ->
+          pure a <> (render' (ctx' 0.5) $ segAtY $ toNumber n)) unit $
+            ceil botY .. floor topY
+        
+        render' (ctx' 1.5) $ segAtX 0.0
+      
+        if botY <= 0.0 && 0.0 <= topY 
+          then render' (ctx' 1.5) $ segAtY 0.0
+          else pure unit
 
 cursor :: Box -> Segment
 cursor {center, halfWidth, halfHeight} = 
@@ -240,61 +242,70 @@ initialState =
 digit2 :: Number -> Number
 digit2 a = (_ / 100.0) $ toNumber $ round $ a * 100.0
 
-reframe :: (Final -> Drawing) -> State -> Drawing
-reframe draw { fAndDf
-             , fromF, toF
-             , fromD, toD, displayD
-             , displayT, numbers
-             , previousX, previousY} =
-  grid fromF toF 
-    <> grid fromD toD
-    <> plot draw fromF toF fAndDf.function
-    <> (if displayD then plot draw fromD toD fAndDf.diff else mempty)
-    <> (let x = abs $ remap toF toF.center fromF
-         in if fAndDf.function.domain x
-              then let f = fAndDf.function.expression
-                       df = fAndDf.diff.expression
-                       p = point "" x (- f x) {-Yaxis!-}
-                       a = - df x
-                       b = -1.0 {-Yaxis-}
-                       c = x * df x - f x
-                       a2 = digit2 $ -a
-                       c2 = digit2 $ -c
-                    in (text (font serif 15 $ italic <> bold)
-                             (width * 0.7) (height * 0.05) 
-                             (fillColor blue) $
-                             "a = " <> (show $ digit2 x))
-                   <> (if inBox fromF p 
-                          then draw $ FP fromF toF p
-                          else mempty) 
-                   <>   (if displayT 
-                         then 
-                           case lineInBox fromF (Line { a, b, c}) of
-                             Just seg -> 
-                               (drawIn tanStyle $ FS fromF toF seg) <>
-                                (text (font serif 15 $ italic <> bold) 
-                                     (width * 0.7) (height * 0.1) 
-                                     (fillColor purple) $ 
-                                     "y = " <> show a2 <> "x" <> (
-                                       if c2<0.0 
-                                         then show c2 
-                                         else if c2/=0.0
-                                                then "+" <> (show c2)
-                                                else "")) 
-                             _ -> mempty
-                         else mempty)
-             else mempty)
-    <> (foldr (<>) mempty $ (\x -> if fAndDf.diff.domain x 
-               then let df = fAndDf.diff.expression
-                        p  = point "" x (- df x) {-Yaxis!-}
-                    in if inBox fromD p
-                         then drawIn tanStyle $ FP fromD toD p
-                         else mempty
-               else mempty) <$> numbers)
+reframe :: Context -> State -> Effect Unit
+reframe ctx { fAndDf
+            , fromF, toF
+            , fromD, toD, displayD
+            , displayT, numbers
+            , previousX, previousY} = do
+  grid ctx fromF toF 
+  grid ctx fromD toD
+  plot ctx fromF toF fAndDf.function
+  if displayD 
+     then plot ctx fromD toD fAndDf.diff 
+     else pure unit
+  
+  let x = abs $ remap toF toF.center fromF
+  if fAndDf.function.domain x
+      then do
+            let f = fAndDf.function.expression
+            let df = fAndDf.diff.expression
+            let p = point "" x (- f x) {-Yaxis!-}
+            let a = - df x
+            let b = -1.0 {-Yaxis-}
+            let c = x * df x - f x
+            let a2 = digit2 $ -a
+            let c2 = digit2 $ -c
+            svgtext ctx.svg
+                    (width * 0.7) 
+                    (height * 0.05) 
+                    blue 
+                    "italic bold 15px arial, serif" $
+                    "a = " <> (show $ digit2 x)
+            if inBox fromF p 
+              then render' ctx $ FP fromF toF p
+              else pure unit
+            if displayT 
+              then 
+                case lineInBox fromF (Line { a, b, c}) of
+                  Just seg -> do render' (tanStyle ctx) $ FS fromF toF seg
+                                 svgtext ctx.svg
+                                         (width * 0.7) 
+                                         (height * 0.1) 
+                                         purple
+                                         "italic bold 15px arial, serif" $ 
+                                         "y = " <> show a2 
+                                                <> "x" 
+                                                <> (if c2<0.0 
+                                                      then show c2 
+                                                      else if c2/=0.0
+                                                             then "+" <> (show c2)
+                                                             else "") 
+                  _ -> pure unit
+              else pure unit
+      else pure unit
+  foldM (\ a n ->
+           pure a <> (if fAndDf.diff.domain n 
+                        then let df = fAndDf.diff.expression
+                                 p  = point "" n (- df n) {-Yaxis!-}
+                              in if inBox fromD p
+                                then render' (tanStyle ctx) $ FP fromD toD p
+                                else pure unit
+                        else pure unit)) unit numbers
     
 
-ePage :: Array ButtonEvent -> (Final -> Drawing) -> Effect (Behavior Drawing) 
-ePage events draw = liftA1 (reframe draw) <$> 
+ePage :: Array ButtonEvent -> Context -> Effect (Behavior (Effect Unit)) 
+ePage events ctx = liftA1 (reframe ctx) <$> 
   (\ event -> 
     unfold (\{value, pos: {x,y}} st -> 
       case value of
@@ -391,12 +402,13 @@ cbOption {event, push} = unsafePartial \ ev -> do
   push {value: msg, pos: {x: 0.0, y: 0.0}}
 
 mkButtonEvent :: forall r. {body :: DOM.Node, document :: DOM.Document | r} 
+  -> DOM.Node
   -> String 
   -> Effect ButtonEvent
-mkButtonEvent setup msg = do
+mkButtonEvent setup div msg = do
   b <- DOM.createElement "button" setup.document
   _ <- DOM.setTextContent msg b
-  _ <- DOM.appendChild b setup.body
+  _ <- DOM.appendChild b div
   ev <- create
   _ <- DOM.addEventListener (cb msg ev) DOM.click b 
   pure ev
@@ -417,32 +429,48 @@ curryBox f {center, halfWidth, halfHeight} =
   f (abs center - halfWidth) (ord center - halfHeight) 
     (2.0 * halfWidth)        (2.0 * halfHeight)
 
+rectangle :: Context -> Number -> Number -> Number -> Number -> Effect Unit
+rectangle ctx x y dx dy = do 
+  let bl = point "" x (y+dy)
+  let br = point "" (x+dx) (y+dy)
+  let tr = point "" (x+dx) y
+  let tl = point "" x y
+  svgpath ctx.svg ctx.stroke ctx.strokeWidth ctx.fill $
+        "M " <> (show $ abs bl) <> " " <> (show $ ord bl) <> " "
+     <> "L " <> (show $ abs br) <> " " <> (show $ ord br) <> " "
+     <> "L " <> (show $ abs tr) <> " " <> (show $ ord tr) <> " "
+     <> "L " <> (show $ abs tl) <> " " <> (show $ ord tl) <> " "
+     <> "z"
+
 main :: Effect Unit
 main = do
   setup <- DOM.setup
-  canvas <- DOM.getElementById "canvas" setup.document
-  context2D <- DOM.getContext2D canvas
-  _ <- DOM.setAttribute "width" (show width) canvas
-  _ <- DOM.setAttribute "height" (show height) canvas
   
-  let ctx = { color: rgb 5 4 9
-            , lineWidth: 1.50}
+  display <- DOM.createElement "div" setup.document
+  _ <- DOM.setAttribute "style" "display: grid; grid-template-columns: 3fr 2fr;" display
 
-  let background = filled white (rectangle 0.0 0.0 width height)
-  let functionBkg = filled beige (curryBox rectangle functionDisplay)
-  let diffBkg = filled beige (curryBox rectangle diffDisplay)
+  svg <- DOM.newSVG "position: relative; width:800px; height:600px;" display
+  
+  div <- DOM.createElement "div" setup.document
+  _ <- DOM.appendChild div display
 
-  zox <- mkButtonEvent setup "zoomOutX"
-  zix <- mkButtonEvent setup "zoomInX"
-  zofy <- mkButtonEvent setup "F: zoomOutY"
-  zify <- mkButtonEvent setup "F: zoomInY"
-  zody <- mkButtonEvent setup "F': zoomOutY"
-  zidy <- mkButtonEvent setup "F': zoomInY"
-  showDiff <- mkButtonEvent setup "show Derivative"
-  hideDiff <- mkButtonEvent setup "hide Derivative"
-  showTan <- mkButtonEvent setup "show Tangent"
-  hideTan <- mkButtonEvent setup "hide Tangent"
-  markCoef <- mkButtonEvent setup "mark Coefficient"
+  let ctx = (defaultContext svg) { stroke = "#050409"}
+
+  let background = rectangle ctx{fill = white} 0.0 0.0 width height
+  let functionBkg = curryBox (rectangle ctx{fill = beige}) functionDisplay
+  let diffBkg = curryBox (rectangle ctx{fill = beige}) diffDisplay
+ 
+  zox <- mkButtonEvent setup div "zoomOutX"
+  zix <- mkButtonEvent setup div "zoomInX"
+  zofy <- mkButtonEvent setup div "F: zoomOutY"
+  zify <- mkButtonEvent setup div "F: zoomInY"
+  zody <- mkButtonEvent setup div "F': zoomOutY"
+  zidy <- mkButtonEvent setup div "F': zoomInY"
+  showDiff <- mkButtonEvent setup div "show Derivative"
+  hideDiff <- mkButtonEvent setup div "hide Derivative"
+  showTan <- mkButtonEvent setup div "show Tangent"
+  hideTan <- mkButtonEvent setup div "hide Tangent"
+  markCoef <- mkButtonEvent setup div "mark Coefficient"
 
   list <- DOM.createElement "select" setup.document
   _ <- mkOptionEvent setup list "inverse"
@@ -451,20 +479,21 @@ main = do
   ev <- create
   _ <- DOM.addEventListener (cbOption ev) DOM.change list
 
-  _ <- DOM.appendChild list setup.body
+  _ <- DOM.appendChild list div
+  
+  _ <- DOM.appendChild display setup.body
 
   page <- ePage [showDiff,hideDiff,showTan,hideTan,markCoef
-                ,zox,zix,zody,zidy,zofy,zify,ev] $ 
-           (drawIn ctx :: forall a. DrawableSet a => a -> Drawing)
-  _ <- animate (
-         pure background 
-           <> pure functionBkg 
-           <> pure diffBkg 
-           <> page 
-           <> pure (drawIn ctx $ frame functionDisplay)
-           <> pure (drawIn ctx $ frame diffDisplay)
-           <> pure (drawIn ctx{color = blue} $ cursor functionDisplay)
-           <> pure (drawIn ctx{color = blue} $ cursor diffDisplay)
-          ) (render context2D)
+                ,zox,zix,zody,zidy,zofy,zify,ev] ctx
+  _ <- animate ( pure (svgclear svg)
+              <> pure background 
+              <> pure functionBkg 
+              <> pure diffBkg 
+              <> page 
+              <> pure (render' ctx $ frame functionDisplay)
+              <> pure (render' ctx $ frame diffDisplay)
+              <> pure (render' ctx{stroke = blue} $ cursor functionDisplay)
+              <> pure (render' ctx{stroke = blue} $ cursor diffDisplay)
+          ) identity
   pure unit
 

@@ -4,8 +4,10 @@ import Prelude
 import Effect (Effect)
 import Data.Maybe(Maybe(..),fromJust)
 import Partial.Unsafe(unsafePartial)
-import KaTeX (cat, line, list, newline, raw, render
+import KaTeX (cat, list, newline, raw, render
              , setTitle, subraw, subsection)
+import SVG.Geometry (segment,point)
+import SVG.Render as SVG
 import DOM.Editor as DOM
 import Data.Array(fromFoldable,replicate, (!!), (\\), scanl, last,uncons)
 import Data.Array(length) as Array
@@ -89,7 +91,7 @@ complete e =
 primes :: Array Int
 primes = [2,2,2,2,2,2,3,3,3,3,3,5,5,5,5]
 
-avgNbFactors = 1 :: Int
+avgNbFactors = 2 :: Int
 
 randProba :: Rand -> {probability :: Fraction, nextRand :: Rand}
 randProba = unsafePartial \ r -> 
@@ -131,15 +133,44 @@ print e key =
 
 infixr 6 print as °
 
-tree :: Experience  -> Effect Unit
-tree e = do
+tree :: DOM.Document -> Experience  -> Effect Unit
+tree doc e = do
 -- https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
-  line "12" "175" "100" "92"
-  line "12" "175" "100" "244"
-  line "126" "80" "202" "24"
-  line "126" "80" "202" "136"
-  line "126" "264" "202" "208"
-  line "126" "264" "202" "320"
+  thisPosition <- DOM.getElementById "description" doc
+  svg <- DOM.newSVG "position: absolute; width: 500px; height: 400px;" thisPosition
+  let root = point "" 12.0 175.0
+  let nodeA = point "" 100.0 92.0
+  let nodeA' = point "" 100.0 244.0
+  let startA = point "" 126.0 80.0
+  let endAB = point "" 202.0 24.0
+  let endAB' = point "" 202.0 136.0
+  let startA' = point "" 126.0 264.0
+  let endA'B = point "" 202.0 208.0
+  let endA'B' = point "" 202.0 320.0
+
+  let frameTL = point "" 0.0 0.0
+  let frameTR = point "" 490.0 0.0
+  let frameBR = point "" 490.0 350.0
+  let frameBL = point "" 0.0 350.0
+  let context = { svg
+                , stroke: "#000"
+                , strokeWidth: 1.5
+                , fill: "#00000000"
+                , fontStyle: "italic 15px arial, sans-serif"
+                , textFill: "#000"}
+
+  SVG.render' context $  segment frameTL frameTR Nothing
+  SVG.render' context $  segment frameTR frameBR Nothing
+  SVG.render' context $  segment frameBR frameBL Nothing
+  SVG.render' context $  segment frameBL frameTL Nothing
+
+  SVG.render' context $ segment root nodeA Nothing
+  SVG.render' context $ segment root nodeA' Nothing 
+  SVG.render' context $ segment startA endAB  Nothing
+  SVG.render' context $ segment startA endAB'  Nothing
+  SVG.render' context $ segment startA' endA'B  Nothing
+  SVG.render' context $ segment startA' endA'B'  Nothing
+  
   render $ "\\begin{array}{ccccccccc} & & & & & & & & B \\\\ "
           <> "& & & & & " <> e°"pgAB" <> " \\\\ \\\\ "
           <> "& & & & A \\\\ "
@@ -155,7 +186,7 @@ tree e = do
           <> "& & & & & & & & \\overline{B} \\end{array}"
   let dress str x k = 
         case lookup k x of
-           Just v -> "&&&&" <> str <> show v <> "\\\\"
+           Just v -> "&&&" <> str <> show v <> " \\\\"
            Nothing -> "" 
   let pB' = dress "P(B)=" e "pB"
   let pnB' = dress "P(\\overline{B})=" e "pnB"
@@ -167,9 +198,10 @@ tree e = do
   let pgBnA' = dress "P_B(\\overline{A})=" e "pgBnA"
   let pgnBA' = dress "P_{\\overline{B}}(A)=" e "pgnBA"
   let pgnBnA' = dress "P_{\\overline{B}}(\\overline{A})=" e "pgnBnA"
-  render $ "\\begin{array}{lllll}" <> pB' <> pnB' 
+  render $ "\\begin{array}{llllllllllll}" <> pB' <> pnB' 
                                    <> pAB' <> pAnB' <> pnAB' <> pnAnB' 
                                    <> pgBA' <> pgBnA' <> pgnBA' <> pgnBnA' 
+                                   <> "\\\\ & & & & & & & & & & & & \\\\" 
                                    <>"\\end{array}"
 
 exercice :: Key -> Key -> Key -> Experience -> Experience 
@@ -178,7 +210,7 @@ exercice p1 p2 p3 ref =
     $ insert p2 (unsafePartial $ fromJust $ lookup p2 ref) 
       $ insert p3 (unsafePartial $ fromJust $ lookup p3 ref) empty
 
-majIndex = 16 :: Int 
+majIndex = 12 :: Int 
 
 setWithIndex :: Int -> Fraction -> Experience -> Experience
 setWithIndex n f e = 
@@ -225,26 +257,6 @@ randExercise r1 =
         then {experience: e, nextRand}
         else randExercise nextRand
 
-
-cb :: DOM.Document -> DOM.Event -> Effect Unit
-cb doc = unsafePartial $ \ev -> do
-  val <- DOM.inputedValueFromEvent ev
-  let odd = 2 * (Ord.abs $ fromString val) + 1
-  let r0 = {val: odd, gen: 0, seed: odd * odd}
-  newline
-  
-  list [ cat [subraw "10 arbres pondérés à compléter à partir des hypothèses"] 
-       , cat [subraw "1 point par arbre complet"]
-       , cat [subraw "calculatrice autorisée"]
-       , cat [subraw "toute valeur numérique sous forme entière ou fractionnaire"]]
-  
-  newline
-  thisPosition <- DOM.getElementById "description" doc
- 
-  subsection "1)"
-  let r1 = rand r0
-  let {experience: e1, nextRand: r2} = randExercise r1
-          
  {-
             pA pgAB pgnAB
             pAB pnAB pgAnB
@@ -258,44 +270,46 @@ cb doc = unsafePartial $ \ev -> do
             pnB pnAB pgAnB
             pB pAnB pnAB
   -}
-            
-  tree e1
-  tree $ complete e1
-  raw $ show $ complete e1
 
-  subsection "2)"
-  let {experience: e2, nextRand: r3} = randExercise r2
-  tree e2
-  tree $ complete e2
-  raw $ show $ complete e2
-  
-  subsection "3)"
-  let e3 = insert "pAB" (Fraction {num: 1, den: 4})
-           $ insert "pAnB" (Fraction {num: 1, den: 2})
-           $ insert "pnAB" (Fraction {num: 1, den: 5}) empty
-  tree e3
-  tree $ complete e3
-  raw $ show $ complete e3
-  
-  subsection "4)"
-  let e4 = insert "pgAB" (Fraction {num: 1, den: 6})
-            $ insert "pgnAB" (Fraction {num: 1, den: 4})
-                $ insert "pB" (Fraction {num: 1, den: 5}) empty
-  tree e4
-  tree $ complete e4
-  raw $ show $ complete e4
-  
-  subsection "5)"
-  let e5 = insert "pgBA" (Fraction {num: 1, den: 6})
-            $ insert "pgnBA" (Fraction {num: 1, den: 6})
-                $ insert "pB" (Fraction {num: 1, den: 5}) empty
-  tree e5
-  tree $ complete e5
-  raw $ show $ complete e5
- 
+cb :: DOM.Document -> DOM.Event -> Effect Unit
+cb doc = unsafePartial $ \ev -> do
+  val <- DOM.inputedValueFromEvent ev
+  let odd = 2 * (Ord.abs $ fromString val) + 1
+  let r0 = {val: odd, gen: 0, seed: odd * odd}
   newline
-  let rep = ["réponses: " ]
-  render $ if fromString val < 0 then foldr (<>) "" rep else ""
+  
+  list [ cat [subraw "5 arbres pondérés à compléter à partir des hypothèses"] 
+       , cat [subraw "1 point par arbre complet"]
+       , cat [subraw "calculatrice autorisée"]
+       , cat [subraw "documents autorisés"]
+       , cat [subraw "toute valeur numérique sous forme fractionnaire"]]
+  
+  newline
+ 
+  let r1 = rand r0
+  let prob e = 
+        if fromString val < 0
+          then tree doc $ complete e
+          else tree doc e
+ -- subsection "1)"
+  let {experience: e1, nextRand: r2} = randExercise r1
+  prob e1
+
+--  subsection "2)"
+  let {experience: e2, nextRand: r3} = randExercise r2
+  prob e2
+  
+  subsection ""  --3)
+  let {experience: e3, nextRand: r4} = randExercise r3
+  prob e3
+  
+  --subsection "4)"
+  let {experience: e4, nextRand: r5} = randExercise r4
+  prob e4
+  
+  subsection "" -- 5)
+  let {experience: e5, nextRand: r6} = randExercise r5
+  prob e5
     
 spacex :: Int -> String 
 spacex n = foldr (<>) "" $ replicate n "\\;"

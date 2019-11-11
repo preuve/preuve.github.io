@@ -1,1 +1,0 @@
-## purescript-canvas-plots

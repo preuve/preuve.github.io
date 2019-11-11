@@ -3,11 +3,9 @@ module Main where
 import Prelude
 import Effect (Effect)
 import Data.Maybe(Maybe(..),fromJust)
-import Graphics.Drawing(render) as Canvas
 import Partial.Unsafe(unsafePartial)
-import Color (rgb)
-import Graphics.Canvas.Geometry (class DrawableSet, drawIn
-                                , circle, length, point, segment, vector)
+import SVG.Geometry (circle, length, point, segment, vector)
+import SVG.Render(class Render,render',defaultContext)
 import KaTeX (equation, newline, newlineIn, raw, rawIn
              , render, renderIn, setTitle, list, cat, subrender, subraw)
 import DOM.Editor as DOM
@@ -208,20 +206,15 @@ cb doc = unsafePartial $ \ev -> do
   _ <- DOM.setAttribute "style" "display: grid; grid-template-columns : 1fr 4fr;" div
   thisPosition <- DOM.getElementById "description" doc
   right <- DOM.createElement "div" doc
-  canvas <- DOM.createElement "canvas" doc
-  _ <- DOM.setAttribute "width" "200" canvas
-  _ <- DOM.setAttribute "height" "200" canvas
-  _ <- DOM.appendChild canvas div
+  svg <- DOM.newSVG "position: relative; width: 100%; height: 100%" div
   _ <- DOM.appendChild right div
   _ <- DOM.appendChild div thisPosition
-  context2D <- DOM.getContext2D canvas
-  let ctx = { color: rgb 0 0 0 -- 195 194 199
-            , lineWidth: 1.0}
-  let draw :: forall a. DrawableSet a => a -> Effect Unit
-      draw = Canvas.render context2D <<< drawIn ctx 
-  let origx = 100.0
-  let origy = 100.0
-  let unit = 75.0
+  let ctx = (defaultContext svg){ strokeWidth = 1.0}
+  let draw :: forall a. Render a => a -> Effect Unit
+      draw = render' ctx 
+  let origx = 80.0
+  let origy = 80.0
+  let unit = 70.0
   let pO = point "O" origx origy
   let pI = point "I" (origx + unit) origy
   let pJ = point "J" origx (origy - unit)
