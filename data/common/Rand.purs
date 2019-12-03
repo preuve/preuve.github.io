@@ -1,6 +1,9 @@
 module Rand where
 
 import Prelude
+import Data.Array((\\),(!!),(:),(..),length)
+import Partial.Unsafe(unsafePartial)
+import Data.Maybe(fromJust)
 
 -- | 0 <= val < 1e4, 0 <= gen < 1e8, seed is a big odd integer 
 type Rand = {val :: Int, gen :: Int, seed :: Int}
@@ -25,3 +28,16 @@ rand {val, gen, seed} =
 rands :: Int -> Rand -> Array Int
 rands 0 r = [r.val]
 rands n r = [r.val] <> rands (n-1) (rand r)
+
+unsort :: Int -> Rand -> Array Int
+unsort n r =
+  let shake :: Array Int -> Rand -> Array Int -> Array Int
+      shake [] _ ys = ys
+      shake [x] _ ys = x : ys
+      shake xs r' ys = 
+        let r'' = rand r'
+            x = unsafePartial $  fromJust 
+                              $ xs !! (r''.val `mod` length xs)
+        in shake (xs \\ [x]) r'' (x : ys)
+   in shake (0..(n-1)) r []
+        

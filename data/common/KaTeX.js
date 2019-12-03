@@ -67,6 +67,26 @@ exports.raw = function (content){
     };
 };
 
+exports.bold = function (content){
+    return function(){
+      let b = document.createElement("b");
+      let node = document.createTextNode(content);
+      b.appendChild(node);
+      document.querySelector("#description")
+              .appendChild(b);
+    };
+};
+
+exports.emph = function (content){
+    return function(){
+      let e = document.createElement("em");
+      let node = document.createTextNode(content);
+      e.appendChild(node);
+      document.querySelector("#description")
+              .appendChild(e);
+    };
+};
+
 exports.rawIn = function(location){
     return function (content){
     return function(){

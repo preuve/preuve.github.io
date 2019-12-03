@@ -17,7 +17,7 @@ type State = { id :: Int
 
 data Query a
     = ReceiveMessage Post a
-    | CountMessages (Int -> a)
+    -- | CountMessages (Int -> a)
 
 data Message
     = SendMessage Post
@@ -62,11 +62,11 @@ handleQuery :: forall m a . Query a -> H.HalogenM State Action () Message m (May
 handleQuery ( ReceiveMessage post k ) = do
     H.modify_ ( \st -> st { received = Array.snoc st.received post } )
     pure $ Just k
-
+{-
 handleQuery ( CountMessages k ) = do
   count <- Array.length <$> H.gets _.received
   pure <<< Just $ k count
-
+-}
 render :: forall m. State -> H.ComponentHTML Action () m
 render { received, message } =
     HH.div_ [ HH.input [ HP.value message
