@@ -1,8 +1,13 @@
 exports.render = function (content){
+    return function (node){
     return function(){
-      let node = document.createElement("label");
-      document.querySelector("#description")
-              .appendChild(node);
       katex.render(content,node);
     };
+  };
+};
+
+exports.renderToString = function (content){
+  return function (){
+    return katex.renderToString(content);
+  };
 };
