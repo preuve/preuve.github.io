@@ -12,8 +12,8 @@ import Spork.App as App
 import Spork.Html as H
 import Spork.Interpreter (liftNat, merge, never)
 
-import SporKaTeX(runRenderEffect, fromSeq, put, RenderEffect(..)) as KaTeX
-import SporKaTeX(get)
+import SporKaTeX(runRenderEffect, fromIncremental, put, RenderEffect(..)) as KaTeX
+import SporKaTeX(get, t, mathInline, nl, em, b, setTitle, section, subsection, subsubsection, mathEquation)
 
 type Model =
   { }
@@ -43,23 +43,12 @@ render ∷ Model → H.Html Action
 render model =
   H.div
     []
-    $ KaTeX.fromSeq content
+    $ KaTeX.fromIncremental content
 
 content :: State (Array (H.Html Action)) (Array (H.Html Action))
 content = do
-  let t str = KaTeX.put $ H.label [] [H.text str]
-      m str = KaTeX.put $ H.label [H.ref (H.always (RenderElement str))] []
-      nl = KaTeX.put $ H.br []
-      em str = KaTeX.put $ H.em [] [H.text str]
-      b str = KaTeX.put $ H.b [] [H.text str]
-      setTitle str = KaTeX.put $ H.h1 [] [H.text str]
-      section str = KaTeX.put $ H.h2 [] [H.text str]
-      subsection str = KaTeX.put $ H.h3 [] [H.text str]
-      subsubsection str = KaTeX.put $ H.h4 [] [H.text str]
-      equation str = KaTeX.put $ 
-                      H.label [H.style "display: block; text-align: center;"
-                              ,H.ref (H.always (RenderElement str))] 
-                                   [H.text str]
+  let m = mathInline RenderElement
+      equation = mathEquation RenderElement
              
   setTitle "Essai n°1: "
   section "Formule des sinus: "

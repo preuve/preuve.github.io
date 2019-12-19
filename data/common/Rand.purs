@@ -29,6 +29,7 @@ rands :: Int -> Rand -> Array Int
 rands 0 r = [r.val]
 rands n r = [r.val] <> rands (n-1) (rand r)
 
+-- | generates a random permutation of [0,1,..,n-1] 
 unsort :: Int -> Rand -> Array Int
 unsort n r =
   let shake :: Array Int -> Rand -> Array Int -> Array Int
