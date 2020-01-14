@@ -5665,18 +5665,18 @@ var PS = {};
       return Graft;
   })();
   var unGraft = function (f) {
-      return function ($45) {
-          return f($45);
+      return function ($58) {
+          return f($58);
       };
   };           
   var graft = Unsafe_Coerce.unsafeCoerce;
   var bifunctorGraft = new Data_Bifunctor.Bifunctor(function (f) {
       return function (g) {
           return unGraft(function (v) {
-              return graft(new Graft(function ($47) {
-                  return f(v.value0($47));
-              }, function ($48) {
-                  return g(v.value1($48));
+              return graft(new Graft(function ($60) {
+                  return f(v.value0($60));
+              }, function ($61) {
+                  return g(v.value1($61));
               }, v.value2));
           });
       };
@@ -5698,7 +5698,7 @@ var PS = {};
           if (v2 instanceof Grafted) {
               return new Grafted(Data_Bifunctor.bimap(bifunctorGraft)(v.value0)(v.value1)(v2.value0));
           };
-          throw new Error("Failed pattern match at Halogen.VDom.Types (line 73, column 7 - line 73, column 27): " + [ v2.constructor.name ]);
+          throw new Error("Failed pattern match at Halogen.VDom.Types (line 86, column 7 - line 86, column 27): " + [ v2.constructor.name ]);
       };
       return go(v.value2);
   });
