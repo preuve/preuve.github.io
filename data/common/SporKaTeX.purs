@@ -85,4 +85,4 @@ mathEquation :: forall a. (String -> H.ElementRef -> a) -> String -> Incremental
 mathEquation renderElement str = put $ 
                       H.label [H.style "display: block; text-align: center;"
                               ,H.ref (H.always (renderElement str))] 
-                                   [H.text str]
+                                   []
