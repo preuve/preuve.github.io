@@ -2,15 +2,14 @@ module Main where
 
 import Prelude
 
-import Data.Array (filter, length, (..), uncons, dropWhile, head, tail, any, take, drop)
+import Data.Array (filter, length, (..), uncons, dropWhile, head, tail, any)
 import Data.Const (Const)
 import Data.Either (Either(..))
-import Data.Foldable (foldr)
 import Data.Int (toNumber, floor, ceil, round)
-import Data.Map (empty, insert)
+import Data.Map (empty, insert, lookup)
 import Data.Maybe (Maybe(..), fromJust)
-import Data.String (Pattern(..), split)
-import Data.String (length, take, drop) as String
+import Data.String (Pattern(..), split, take, drop, joinWith)
+import Data.String (length) as String
 import Effect (Effect)
 import Global (readFloat)
 import Parser.Eval (eval)
@@ -29,7 +28,6 @@ import Web.UIEvent.MouseEvent (MouseEvent, pageX, pageY)
 
 svgWidth = 800.0 :: Number
 svgHeight = 600.0 :: Number
-density = 100 :: Int
 
 type Color = String
 
@@ -43,12 +41,14 @@ tanStyle = _{stroke = purple, strokeWidth = 1.5} :: Context -> Context
 type Box = {center :: Point, halfWidth :: Number, halfHeight :: Number}
 
 type Model =
-  { texSlot :: Maybe H.ElementRef
+  { functionSlot :: Maybe H.ElementRef
+  , domainSlot :: Maybe H.ElementRef
   , command :: String
   , argument :: Number
   , isDragged :: Boolean
   , domain :: Array Intrvl
   , message :: String
+  , density :: Int
   , fromF :: Box
   , toF :: Box
   , fromD :: Box
@@ -66,8 +66,10 @@ initialModel =
   , argument: 0.0
   , isDragged: false
   , domain: []
-  , texSlot: Nothing
+  , functionSlot: Nothing
+  , domainSlot: Nothing
   , message: ""
+  , density: 100
   , fromF:  local
   , toF: functionDisplay
   , fromD: local
@@ -98,12 +100,15 @@ execute command x =
     _ -> Var "undefined"
 
 data Ext = R Number | PlusInf | MinusInf
-data Intrvl = OpenOpen Ext Ext | OpenClose Ext Ext | CloseOpen Ext Ext | CloseClose Ext Ext
+data Intrvl = OpenOpen Ext Ext
+            | OpenClose Ext Ext
+            | CloseOpen Ext Ext
+            | CloseClose Ext Ext
 
 instance showExt :: Show Ext where
   show (R x) = show x
-  show PlusInf = "+oo"
-  show MinusInf = "-oo"
+  show PlusInf = "+\\infty"
+  show MinusInf = "-\\infty"
 
 instance showIntrvl :: Show Intrvl where
   show (OpenOpen a b) = "]" <> show a <> ";" <> show b <> "["
@@ -126,9 +131,9 @@ inside _ _ = false
 parseIntrvl :: String -> Intrvl
 parseIntrvl str =
   let n = String.length str
-      c0 = String.take 1 str
-      cn = String.drop (n - 1) str
-      s = String.drop 1 $ String.take (n - 1) str
+      c0 = take 1 str
+      cn = drop (n - 1) str
+      s = drop 1 $ take (n - 1) str
       parseExtremities xs = case xs of
         "+oo" -> PlusInf
         "-oo" -> MinusInf
@@ -161,25 +166,48 @@ diff command x =
     Lit (Dual {height, slope: value}) -> value
     _ -> unused
 
-type StringPos = {value :: String, pos :: {x :: Number, y :: Number}}
+zoomOutX = "zoomOutX" :: String
+zoomInX = "zoomInX" :: String
+fzoomOutY = "F: zoomOutY" :: String
+fzoomInY = "F: zoomInY" :: String
+f'zoomOutY = "F': zoomOutY" :: String
+f'zoomInY = "F': zoomInY" :: String
+showDerivative = "show Derivative" :: String
+hideDerivative = "hide Derivative" :: String
+showTangent = "show Tangent" :: String
+hideTangent = "hide Tangent" :: String
+markCoefficient = "mark Coefficient" :: String
 
 data Action
   = None
-  | SaveRef (Maybe H.ElementRef)
+  | FunctionSlot (Maybe H.ElementRef)
+  | DomainSlot (Maybe H.ElementRef)
   | UpdateArgument MouseEvent
   | RenderCommand String
-  | UpdateDomain String
+  | RenderDomain String
   | Send String
   | StartDragging MouseEvent
   | EndDragging
+  | IncreaseDensity
+  | DecreaseDensity
 
 update ∷ Model → Action
        → App.Transition KaTeX.RenderEffect Model Action
-update model = case _ of
+update model action = case action of
   None →  App.purely model
 
-  SaveRef (Just ref) -> App.purely model{texSlot = Just ref}
-  SaveRef _ -> App.purely model
+  IncreaseDensity -> App.purely model{density = model.density + 10}
+
+  DecreaseDensity -> App.purely $
+    if model.density > 10
+      then model{density = model.density - 10}
+      else model
+
+  FunctionSlot (Just ref) -> App.purely model{functionSlot = Just ref}
+  FunctionSlot _ -> App.purely model
+
+  DomainSlot (Just ref) -> App.purely model{domainSlot = Just ref}
+  DomainSlot _ -> App.purely model
 
   StartDragging mouse -> App.purely model{ previousX = toNumber $ pageX mouse
                                          , previousY = toNumber $ pageY mouse
@@ -225,35 +253,60 @@ update model = case _ of
   RenderCommand cmd ->
     let  m = model{command = cmd}
          effects =
-          case model.texSlot of
-            Just(H.Created el) → App.lift (KaTeX.RenderEffect (transmit m) el None)
+          case model.functionSlot of
+            Just(H.Created el) →
+              App.lift (KaTeX.RenderEffect (transmit m) el None)
             Just(H.Removed _)  → mempty
             Nothing -> mempty
     in
       { model: m, effects }
 
-  UpdateDomain str ->  App.purely $
-        case str of
-          "R" -> model{domain = [OpenOpen MinusInf PlusInf]}
-          _   -> model{domain = parseIntrvl <$> split (Pattern "U") str}
+  RenderDomain str ->
+    let ds = case str of
+              "R+" -> [CloseOpen (R 0.0) PlusInf]
+              "R*" -> [OpenOpen MinusInf (R 0.0), OpenOpen (R 0.0) PlusInf]
+              "R" -> [OpenOpen MinusInf PlusInf]
+              _   -> parseIntrvl <$> split (Pattern "U") str
+        renderDs = joinWith "\\cup" $ show <$> ds
+        effects =
+          case model.domainSlot of
+            Just(H.Created el) →
+              App.lift (KaTeX.RenderEffect renderDs el None)
+            Just(H.Removed _)  → mempty
+            Nothing -> mempty
+      in {model: model{domain = ds}, effects}
 
-  Send str -> App.purely $
-    case str of
-      "zoomOutX" -> model{ fromF{halfWidth = model.fromF.halfWidth*1.1}
-                         , fromD{halfWidth = model.fromD.halfWidth*1.1}}
-      "zoomInX" -> model{ fromF{halfWidth = model.fromF.halfWidth/1.1}
-                        , fromD{halfWidth = model.fromD.halfWidth/1.1}}
-      "F: zoomOutY" -> model{ fromF{halfHeight = model.fromF.halfHeight*1.1}}
-      "F: zoomInY" -> model{ fromF{halfHeight = model.fromF.halfHeight/1.1}}
-      "F': zoomOutY" -> model{ fromD{halfHeight = model.fromD.halfHeight*1.1}}
-      "F': zoomInY" -> model{ fromD{halfHeight = model.fromD.halfHeight/1.1}}
-      "show Derivative" -> model{displayD = true}
-      "hide Derivative" -> model{displayD = false}
-      "show Tangent" -> model{displayT = true}
-      "hide Tangent" -> model{displayT = false}
-      "mark Coefficient" ->
-          model{numbers = model.numbers <> [abs model.fromD.center]}
-      _ -> model
+  Send str ->
+    App.purely $
+      let m = insert zoomOutX
+                     (model{ fromF{halfWidth = model.fromF.halfWidth*1.1}
+                           , fromD{halfWidth = model.fromD.halfWidth*1.1}})
+              $ insert zoomInX
+                       (model{ fromF{halfWidth = model.fromF.halfWidth/1.1}
+                             , fromD{halfWidth = model.fromD.halfWidth/1.1}})
+              $ insert fzoomOutY
+                       (model{ fromF{halfHeight = model.fromF.halfHeight*1.1}})
+              $ insert fzoomInY
+                       (model{ fromF{halfHeight = model.fromF.halfHeight/1.1}})
+              $ insert f'zoomOutY
+                       (model{ fromD{halfHeight = model.fromD.halfHeight*1.1}})
+              $ insert f'zoomInY
+                       (model{ fromD{halfHeight = model.fromD.halfHeight/1.1}})
+              $ insert showDerivative
+                       (model{displayD = true})
+              $ insert hideDerivative
+                       (model{displayD = false})
+              $ insert showTangent
+                       (model{displayT = true})
+              $ insert hideTangent
+                       (model{displayT = false})
+              $ insert markCoefficient
+                       (model{numbers = model.numbers
+                                       <> [abs model.fromD.center]})
+                       empty
+        in case lookup str m of
+              Just v -> v
+              _      -> model
 
 data Final = FA (Array Final)
   | FP Box Box Point
@@ -316,7 +369,8 @@ curryBox f {center, halfWidth, halfHeight} =
   f (abs center - halfWidth) (ord center - halfHeight)
     (2.0 * halfWidth)        (2.0 * halfHeight)
 
-rectangle :: forall action. Context -> Number -> Number -> Number -> Number -> Html action
+rectangle :: forall action. Context -> Number -> Number -> Number -> Number
+                                    -> Html action
 rectangle ctx x y dx dy =
   let bl = point "" x (y+dy)
       br = point "" (x+dx) (y+dy)
@@ -358,9 +412,11 @@ grid ctx from to =
       segAtY y = seg botX y topX y
       ctx' lW = ctx{stroke = "#323232", strokeWidth = lW}
    in
-        ((\ n -> render' (ctx' 0.5) $ segAtX $ toNumber n) =<< (ceil botX .. floor topX))
+        ((\ n -> render' (ctx' 0.5) $ segAtX
+                                    $ toNumber n) =<< (ceil botX .. floor topX))
        <>
-        ((\ n -> render' (ctx' 0.5) $ segAtY $ toNumber n) =<< (ceil botY .. floor topY))
+        ((\ n -> render' (ctx' 0.5) $ segAtY
+                                    $ toNumber n) =<< (ceil botY .. floor topY))
        <>
         (render' (ctx' 1.5) $ segAtX 0.0)
        <>
@@ -432,8 +488,8 @@ pen from acc (Just p) xs =
 
 type F = {function :: Number -> Number, domain :: Array Intrvl}
 
-plot :: forall action. Context -> Box -> Box -> F -> Array (Html action)
-plot ctx from to {function, domain} =
+plot :: forall action. Context -> Box -> Box -> Int -> F -> Array (Html action)
+plot ctx from to density {function, domain} =
         let botX = abs from.center - from.halfWidth
             topX = abs from.center + from.halfWidth
             zs = dropWhile (_ == Nothing) $
@@ -451,76 +507,85 @@ plot ctx from to {function, domain} =
                              (unsafePartial fromJust $ head zs)
                              (unsafePartial fromJust $ tail zs))
 
-reframe :: forall action. Context -> Model -> Array (Html action)
-reframe ctx { fromF, toF
+localDrawings :: forall action. Context -> Number
+                            -> String -> Box -> Box -> Boolean
+                            -> Array (Html action)
+localDrawings ctx x command fromF toF displayT =
+  let f = image command
+      df = diff command
+      p = point "" x (- f x) --Yaxis!
+      a = - df x
+      b = -1.0  --Yaxis
+      c = x * df x - f x
+      a2 = digit2 $ -a
+      c2 = digit2 $ -c
+  in  [ svgtext
+          (svgWidth * 0.7)
+          (svgHeight * 0.05)
+          blue
+          "italic bold 15px arial, serif" $
+            "a = " <> (show $ digit2 x)
+      ]
+      <> (if inBox fromF p
+            then render' ctx $ FP fromF toF p
+            else [] )
+      <> (if displayT
+            then
+              case lineInBox fromF (Line { a, b, c}) of
+                  Just seg -> (render' (tanStyle ctx) $ FS fromF toF seg)
+                                <> [svgtext
+                                    (svgWidth * 0.7)
+                                    (svgHeight * 0.1)
+                                    purple
+                                    "italic bold 15px arial, serif" $
+                                      "y = " <> show a2
+                                              <> "x"
+                                              <> (if c2<0.0
+                                                  then show c2
+                                                  else if c2/=0.0
+                                                    then "+" <> (show c2)
+                                                    else "")]
+                  _ -> []
+                else []
+          )
+
+markDrawing :: forall action. Context -> F -> Box -> Box -> Number
+                             -> Array (Html action)
+markDrawing ctx {function: df, domain} fromD toD x  =
+  if inDomain domain x
+    then
+      let p  = point "" x (- df x) --Yaxis!
+      in
+        if inBox fromD p
+            then render' (tanStyle ctx) $ FP fromD toD p
+            else []
+    else []
+
+page :: forall action. Context -> Model -> Array (Html action)
+page ctx { fromF, toF
             , fromD, toD, displayD
             , displayT, numbers
-            , previousX, previousY, texSlot
+            , previousX, previousY, functionSlot, domainSlot
               , command
               , argument
+              , density
               , isDragged
               , domain
               , message} =
-     grid ctx fromF toF
-      <> grid ctx fromD toD
-      <> plot ctx fromF toF {function: image command, domain}
-      <> (if displayD
-            then plot ctx fromD toD {function: diff command, domain}
+   grid ctx fromF toF
+    <> grid ctx fromD toD
+    <> plot ctx fromF toF density {function: image command, domain}
+    <> (if displayD
+          then plot ctx fromD toD density {function: diff command, domain}
+          else [])
+    <> (let x = abs $ remap toF toF.center fromF
+        in if inDomain domain x
+            then localDrawings ctx x command fromF toF displayT
             else [])
-{-
-  let x = abs $ remap toF toF.center fromF
-  if fAndDf.function.domain x
-      then do
-            let f = fAndDf.function.expression
-            let df = fAndDf.diff.expression
-            let p = point "" x (- f x) --Yaxis!
-            let a = - df x
-            let b = -1.0 --Yaxis
-            let c = x * df x - f x
-            let a2 = digit2 $ -a
-            let c2 = digit2 $ -c
-            svgtext ctx.svg
-                    (svgWidth * 0.7)
-                    (svgHeight * 0.05)
-                    blue
-                    "italic bold 15px arial, serif" $
-                    "a = " <> (show $ digit2 x)
-            if inBox fromF p
-              then render' ctx $ FP fromF toF p
-              else pure unit
-            if displayT
-              then
-                case lineInBox fromF (Line { a, b, c}) of
-                  Just seg -> do render' (tanStyle ctx) $ FS fromF toF seg
-                                 svgtext ctx.svg
-                                         (svgWidth * 0.7)
-                                         (svgHeight * 0.1)
-                                         purple
-                                         "italic bold 15px arial, serif" $
-                                         "y = " <> show a2
-                                                <> "x"
-                                                <> (if c2<0.0
-                                                      then show c2
-                                                      else if c2/=0.0
-                                                             then "+" <> (show c2)
-                                                             else "")
-                  _ -> pure unit
-              else pure unit
-      else pure unit
-  foldM (\ a n ->
-           pure a <> (if fAndDf.diff.domain n
-                        then let df = fAndDf.diff.expression
-                                 p  = point "" n (- df n) --Yaxis!
-                              in if inBox fromD p
-                                then render' (tanStyle ctx) $ FP fromD toD p
-                                else pure unit
-                        else pure unit)) unit numbers
-    -}
+    <> (markDrawing ctx {function: diff command, domain} fromD toD =<< numbers)
 
-
-page :: forall action. Context -> Model -> Array (Html action)
-page ctx model = reframe ctx model
-
+styleCenter :: String
+styleCenter = "display: flex; align-items: center; justify-content: center;"
 
 render ∷ Model → H.Html Action
 render model =
@@ -551,23 +616,28 @@ render model =
         <> (render' ctx{stroke = blue} $ cursor diffDisplay)
         )
     , H.div [H.attr "style" "display: grid; grid-template-columns: 1fr 1fr;"]
-      [ mkButtonEvent "zoomOutX"
-      , mkButtonEvent "zoomInX"
-      , mkButtonEvent "F: zoomOutY"
-      , mkButtonEvent "F: zoomInY"
-      , mkButtonEvent "F': zoomOutY"
-      , mkButtonEvent "F': zoomInY"
-      , mkButtonEvent "show Derivative"
-      , mkButtonEvent "hide Derivative"
-      , mkButtonEvent "show Tangent"
-      , mkButtonEvent "hide Tangent"
-      , mkButtonEvent "mark Coefficient"
+      [ mkButtonEvent zoomOutX
+      , mkButtonEvent zoomInX
+      , mkButtonEvent fzoomOutY
+      , mkButtonEvent fzoomInY
+      , mkButtonEvent f'zoomOutY
+      , mkButtonEvent f'zoomInY
+      , mkButtonEvent showDerivative
+      , mkButtonEvent hideDerivative
+      , mkButtonEvent showTangent
+      , mkButtonEvent hideTangent
+      , mkButtonEvent markCoefficient
+      , H.div [H.attr "style" "display: grid; grid-template-columns: 1fr 2fr 1fr;"]
+        [ H.button [H.onClick (H.always_ DecreaseDensity)] [H.text "-"]
+        , H.label [H.attr "style" styleCenter] [H.text $ show model.density]
+        , H.button [H.onClick (H.always_ IncreaseDensity)] [H.text "+"]
+        ]
       , functionInput
-      , H.input [ H.onValueChange  (H.always UpdateDomain)]
-      , H.label [H.ref (H.always $ SaveRef <<< Just)] []
-      , H.label [] [H.text $ show model.argument]
-      , H.label [] [H.text $ show $ image model.command model.argument]
-      , H.label [] [H.text $ show $ diff model.command model.argument]
+      , H.label [ H.attr "style" styleCenter
+                , H.ref (H.always $ FunctionSlot <<< Just)] []
+      , H.input [ H.onValueChange  (H.always RenderDomain)]
+      , H.label [ H.attr "style" styleCenter
+                , H.ref (H.always $ DomainSlot <<< Just)] []
       ]
     ]
 
