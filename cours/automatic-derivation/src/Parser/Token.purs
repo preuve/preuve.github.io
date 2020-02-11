@@ -1,4 +1,4 @@
-module Token where
+module Parser.Token where
 
 import Control.Alt ((<|>))
 
@@ -10,14 +10,17 @@ languageDef :: LanguageDef
 languageDef = LanguageDef
   { commentStart: ""
   , commentEnd: ""
-  , commentLine: "#"
+  , commentLine: ""
   , nestedComments: false
   , identStart: letter
   , identLetter: alphaNum <|> char '\''
-  , opStart: oneOf ['-', ':', '+', '*', '/', '|', '=', '~', '<', '^']
-  , opLetter: oneOf ['=', '|']
-  , reservedNames: ["true", "false"]
-  , reservedOpNames: [":=", "+", "-", "*", "/", "||", "=", "~", "<", "sqrt", "^"]
+  , opStart: oneOf ['-', '+', '*', '/', '^']
+  , opLetter: oneOf []
+  , reservedNames: ["pi"]
+  , reservedOpNames: ["+", "-", "*", "/", "^"
+                     , "sqrt" , "ln", "exp", "sin", "cos", "tan"
+                     , "sinh", "cosh", "tanh", "asin", "acos", "atan"
+                     , "asinh", "acosh", "atanh"]
   , caseSensitive: true
 }
 

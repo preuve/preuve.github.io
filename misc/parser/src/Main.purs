@@ -42,11 +42,23 @@ main :: Effect Unit
 main = do
   let env = initEnv
 
-  let input = " 2 + 2"
+  let input = "9"
   { env, str } <- evalCmd env input
   log str
 
-  let input = "x:=5"
+  let input = "3.14159"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "2.2 + 8.0"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "2 + 8"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "x:=1.5"
   { env, str } <- evalCmd env input
   log str
 
@@ -54,14 +66,38 @@ main = do
   { env, str } <- evalCmd env input
   log str
 
-  let input = "y:=7"
-  { env, str } <- evalCmd env input
+  let input = "y:=7.3"
+  { env, str} <- evalCmd env input
   log str
 
   let input = "x+y"
   { env, str } <- evalCmd env input
   log str
 
-  let input = "3*(x-y)"
+  let input = "3.0*(x-y)"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "z:=5.2"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "z*z"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "sqrt(z*z)"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "n:=3"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "n^n^n"
+  { env, str } <- evalCmd env input
+  log str
+
+  let input = "x^x^x"
   { env, str } <- evalCmd env input
   log str

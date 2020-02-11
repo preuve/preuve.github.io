@@ -1,4 +1,4 @@
-module Parser where
+module Parser.Parser where
 
 import Prelude
 
@@ -6,12 +6,14 @@ import Control.Alt ((<|>))
 import Control.Lazy (fix)
 import Data.Either (Either(..))
 import Data.Identity (Identity)
-import Error (Expect, parseError)
-import Syntax (Lit(..), Expr(..), Binop(..), Unop(..), Cmd(..), (:=))
+import Data.Int (toNumber)
+import Math (pi) as Math
+import Parser.Error (Expect, parseError)
+import Parser.Syntax (Dual, Expr(..), Binop(..), Unop(..), Cmd(..), fromNumber)
+import Parser.Token (token)
 import Text.Parsing.Parser (ParseError(..), Parser, runParser)
 import Text.Parsing.Parser.Combinators (try)
 import Text.Parsing.Parser.Expr (OperatorTable, Assoc(..), Operator(..), buildExprParser)
-import Token (token)
 
 type P a = Parser String a
 
@@ -27,17 +29,14 @@ reserved = token.reserved
 identifier :: P String
 identifier = token.identifier
 
-int :: P Lit
-int = Int <$> token.integer
+dual :: P Dual
+dual = fromNumber <$> (try token.float <|> (toNumber <$> token.integer))
 
-float :: P Lit
-float = Float <$> token.float
-
-bool :: P Lit
-bool = reserved "true" $> Bool true <|> reserved "false" $> Bool false
+pi :: P Dual
+pi = reserved "pi" $> fromNumber Math.pi
 
 lit :: P Expr
-lit = (try (Lit <$> float) <|> (Lit <$> int)) <|> (Lit <$> bool)
+lit = Lit <$> dual <|> Lit <$> pi
 
 var :: P Expr
 var = Var <$> identifier
@@ -45,39 +44,42 @@ var = Var <$> identifier
 term :: P Expr -> P Expr
 term p = parens p <|> lit <|> var
 
+-- ORDER MATTERS !!!!
 table :: OperatorTable Identity String Expr
 table =
-  [ [ Prefix (reservedOp "~" $> Unop Not)
-    , Prefix (reservedOp "-" $> Unop Negate)
-    , Prefix (reservedOp "sqrt" $> Unop Sqrt) ]
+  [ [ Prefix (reservedOp "-" $> Unop Negate)
+    , Prefix (reservedOp "sqrt" $> Unop Sqrt)
+    , Prefix (reservedOp "ln" $> Unop Log)
+    , Prefix (reservedOp "exp" $> Unop Exp)
+    , Prefix (reservedOp "cosh" $> Unop Cosh)
+    , Prefix (reservedOp "cos" $> Unop Cos)
+    , Prefix (reservedOp "tanh" $> Unop Tanh)
+    , Prefix (reservedOp "tan" $> Unop Tan)
+    , Prefix (reservedOp "sinh" $> Unop Sinh)
+    , Prefix (reservedOp "sin" $> Unop Sin)
+    , Prefix (reservedOp "asinh" $> Unop Asinh)
+    , Prefix (reservedOp "asin" $> Unop Asin)
+    , Prefix (reservedOp "acosh" $> Unop Acosh)
+    , Prefix (reservedOp "acos" $> Unop Acos)
+    , Prefix (reservedOp "atanh" $> Unop Atanh)
+    , Prefix (reservedOp "atan" $> Unop Atan)
+    ]
   , [ Infix (reservedOp "^" $> Binop Pow) AssocRight ]
   , [ Infix (reservedOp "*" $> Binop Mul) AssocLeft
     , Infix (reservedOp "/" $> Binop Div) AssocLeft ]
   , [ Infix (reservedOp "+" $> Binop Add) AssocLeft
     , Infix (reservedOp "-" $> Binop Sub) AssocLeft ]
-  , [ Infix (reservedOp "<" $> Binop Less) AssocRight
-    , Infix (reservedOp "=" $> Binop Eql) AssocRight ]
-  , [ Infix (reservedOp "||" $> Binop Or) AssocRight ] ]
+  ]
 
 expr :: P Expr
 expr = fix allExprs
   where
     allExprs p = buildExprParser table (term p)
 
-def :: P Cmd
-def = do
-  name <- identifier
-  reservedOp ":="
-  t <- expr
-  pure (name := t)
-
 evalExpr :: P Cmd
 evalExpr = Eval <$> expr
 
-cmd :: P Cmd
-cmd = try def <|> evalExpr
-
 parse :: String -> Expect Cmd
-parse s = case runParser s cmd of
+parse s = case runParser s evalExpr of
   Left (ParseError message pos) -> parseError message
   Right c -> pure c
