@@ -10,12 +10,9 @@ PureScript binairies:
 https://github.com/purescript/purescript/releases/latest
 purescript to PATH
 
-Spago binairies:
+Spago install:
 ----------------
-https://github.com/spacchetti/spago/releases/latest
-spago to PATH
-cd emsdk/node/8.9.1_64bit/bin/
-ln -s path/spago spago
+npm install -g spago 
 
 Spork install:
 ----------------
