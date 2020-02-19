@@ -9,11 +9,14 @@ import Parser.Syntax (class Powerable, pow
                      , class Real, log, sqrt
                      , exp, sin, cos, tan, sinh, cosh, tanh
                      , asin, acos, atan, asinh, acosh, atanh
-                     , Dual, Expr(..), Binop(..), Unop(..))
+                     , Expr(..), Binop(..), Unop(..))
 
-type Env = Map String Expr
+type Env a = Map String (Expr a)
 
-eval :: Env -> Expr -> Expect Expr
+eval :: forall a. EuclideanRing a
+               => Powerable a
+               => Real a
+               => Env a -> Expr a -> Expect (Expr a)
 eval env = case _ of
   d@(Lit _) -> pure d
   Var name -> case lookup name env of
@@ -22,10 +25,14 @@ eval env = case _ of
   Binop op e1 e2 -> evalBinop env op e1 e2
   Unop op e -> evalUnop env op e
 
-raiseDual :: Dual -> Expect Expr
-raiseDual = pure <<< Lit
+raiseReal :: forall a. a -> Expect (Expr a)
+raiseReal = pure <<< Lit
 
-evalBinop :: Env -> Binop -> Expr -> Expr -> Expect Expr
+evalBinop :: forall a. Real a
+                    => Powerable a
+                    => EuclideanRing a
+                    => Ring a
+                    => Env a -> Binop -> Expr a -> Expr a -> Expect (Expr a)
 evalBinop env op e1 e2 = case op of
   Add -> evalArithBinop add env e1 e2
   Sub -> evalArithBinop sub env e1 e2
@@ -33,22 +40,28 @@ evalBinop env op e1 e2 = case op of
   Div -> evalArithBinop div env e1 e2
   Pow -> evalArithBinop pow env e1 e2
 
-type EvalBinop = Env -> Expr -> Expr -> Expect Expr
+type EvalBinop a = Env a -> Expr a -> Expr a -> Expect (Expr a)
 
-evalArithBinop :: (forall a. Ring a => Semiring a
-                                    => EuclideanRing a
-                                    => Powerable a
-                                    => Real a => a -> a -> a) -> EvalBinop
+evalArithBinop :: forall a. Ring a
+                         => Semiring a
+                         => EuclideanRing a
+                         => Powerable a
+                         => Real a
+                         => (a -> a -> a) -> EvalBinop a
 evalArithBinop op env e1 e2 = case e1, e2 of
-  Lit x, Lit y -> raiseDual $ op x y
+  Lit x, Lit y -> raiseReal $ op x y
   _, _ -> do
     e <- eval env e1
     e' <- eval env e2
     evalArithBinop op env e e'
 
-type EvalUnop = Env -> Expr -> Expect Expr
+type EvalUnop a = Env a -> Expr a -> Expect (Expr a)
 
-evalUnop :: Env -> Unop -> Expr -> Expect Expr
+evalUnop :: forall a. EuclideanRing a
+                   => Powerable a
+                   => Ring a
+                   => Real a
+                   => Env a -> Unop -> Expr a -> Expect (Expr a)
 evalUnop env op e = case op of
   Negate -> evalReal negate env e
   Sqrt -> evalReal sqrt env e
@@ -67,12 +80,19 @@ evalUnop env op e = case op of
   Atanh -> evalReal atanh env e
   Log -> evalReal log env e
 
-evalNegate :: EvalUnop
+evalNegate :: forall a. Real a
+                     => Powerable a
+                     => EuclideanRing a
+                     => Ring a
+                     => EvalUnop a
 evalNegate env = case _ of
-  Lit d -> raiseDual (-d)
+  Lit d -> raiseReal (-d)
   e -> eval env e >>= evalNegate env
 
-evalReal :: (Dual -> Dual) -> EvalUnop
+evalReal :: forall a. EuclideanRing a
+                   => Powerable a
+                   => Real a
+                   => (a -> a) -> EvalUnop a
 evalReal op env = case _ of
-  Lit d -> raiseDual (op d)
+  Lit d -> raiseReal (op d)
   e -> eval env e >>= evalReal op env

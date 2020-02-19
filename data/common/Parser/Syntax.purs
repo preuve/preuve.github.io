@@ -2,8 +2,7 @@ module Parser.Syntax where
 
 import Prelude
 
-import Math ( pow, log, sqrt, exp, sin, cos, tan
-            , asin, acos, atan) as Math
+import Math (pow, log, sqrt, exp, sin, cos, tan, asin, acos, atan, pi) as Math
 
 mathsinh :: Number -> Number
 mathsinh x = (Math.exp x - Math.exp (-x)) / 2.0
@@ -23,10 +22,10 @@ mathacosh x = Math.log (x + Math.sqrt(x * x - 1.0))
 mathatanh :: Number -> Number
 mathatanh x = 0.5 * Math.log ((1.0 + x) / (1.0 - x))
 
-data Expr = Lit Dual
+data Expr a = Lit a
           | Var Name
-          | Binop Binop Expr Expr
-          | Unop Unop Expr
+          | Binop Binop (Expr a) (Expr a)
+          | Unop Unop (Expr a)
 
 type Name = String
 
@@ -38,6 +37,9 @@ data Unop = Negate | Sqrt | Log | Exp | Sin | Cos | Tan | Sinh | Cosh | Tanh
 data Dual = Dual {height :: Number, slope :: Number}
 
 derive instance eqDual :: Eq Dual
+
+instance showDual :: Show Dual where
+  show (Dual {height, slope}) = show height
 
 instance semiringDual :: Semiring Dual where
   add (Dual {height: f, slope: f'}) (Dual {height: g, slope: g'}) =
@@ -64,6 +66,7 @@ instance euclideanRingDual :: EuclideanRing Dual where
 
 class Real t where
   fromNumber :: Number -> t
+  pi :: t
   log :: t -> t
   sqrt :: t -> t
   exp :: t -> t
@@ -81,6 +84,7 @@ class Real t where
   atanh :: t -> t
 
 instance realDual :: Real Dual where
+  pi = Dual {height: Math.pi, slope: 0.0}
   fromNumber x = Dual {height: x, slope: 0.0}
   log (Dual {height: f, slope: f'}) =
     Dual {height: Math.log f, slope: f'/f}
@@ -120,8 +124,8 @@ instance powerDual :: Powerable Dual where
   pow (Dual {height: f, slope: f'}) (Dual {height: g, slope: g'}) =
     Dual {height: Math.pow f g, slope: ((if g' == 0.0 then 0.0 else g' * Math.log f) + g * f' / f) * Math.pow f g}
 
-instance showExpr :: Show Expr where
-  show (Lit (Dual d)) = show d.height
+instance showExpr :: Show a => Show (Expr a) where
+  show (Lit x) = show x
   show (Var n) = n
   show (Binop Pow e1 e2) = show e1 <> "^{" <> show e2 <> "}"
   show (Binop Div e1 e2) = "\\dfrac{" <> show e1 <> "}{" <> show e2 <> "}"
@@ -168,10 +172,6 @@ instance showUnop :: Show Unop where
   show Acosh = "{- cumbersome symbol for inverse hyperbolic cosine -}"
   show Atanh = "{- cumbersome symbol for inverse hyperbolic tangent -}"
 
-derive instance eqExpr :: Eq Expr
+derive instance eqExpr :: Eq a => Eq (Expr a)
 derive instance eqBinop :: Eq Binop
 derive instance eqUnop :: Eq Unop
-
-data Cmd = Assign Name Expr | Eval Expr
-
-infix 0 Assign as :=

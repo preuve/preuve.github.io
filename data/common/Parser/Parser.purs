@@ -9,7 +9,7 @@ import Data.Identity (Identity)
 import Data.Int (toNumber)
 import Math (pi) as Math
 import Parser.Error (Expect, parseError)
-import Parser.Syntax (Dual, Expr(..), Binop(..), Unop(..), Cmd(..), fromNumber)
+import Parser.Syntax (Dual, class Real, Expr(..), Binop(..), Unop(..), fromNumber, pi)
 import Parser.Token (token)
 import Text.Parsing.Parser (ParseError(..), Parser, runParser)
 import Text.Parsing.Parser.Combinators (try)
@@ -29,23 +29,23 @@ reserved = token.reserved
 identifier :: P String
 identifier = token.identifier
 
-dual :: P Dual
-dual = fromNumber <$> (try token.float <|> (toNumber <$> token.integer))
+getLit :: forall a. Real a => P a
+getLit = fromNumber <$> (try token.float <|> (toNumber <$> token.integer))
 
-pi :: P Dual
-pi = reserved "pi" $> fromNumber Math.pi
+getPi :: forall a. Real a => P a
+getPi = reserved "pi" $> pi
 
-lit :: P Expr
-lit = Lit <$> dual <|> Lit <$> pi
+lit :: forall a. Real a => P (Expr a)
+lit = Lit <$> getLit <|> Lit <$> getPi
 
-var :: P Expr
+var :: forall a. P (Expr a)
 var = Var <$> identifier
 
-term :: P Expr -> P Expr
+term :: forall a. Real a => P (Expr a) -> P (Expr a)
 term p = parens p <|> lit <|> var
 
 -- ORDER MATTERS !!!!
-table :: OperatorTable Identity String Expr
+table :: forall a. OperatorTable Identity String (Expr a)
 table =
   [ [ Prefix (reservedOp "-" $> Unop Negate)
     , Prefix (reservedOp "sqrt" $> Unop Sqrt)
@@ -71,15 +71,12 @@ table =
     , Infix (reservedOp "-" $> Binop Sub) AssocLeft ]
   ]
 
-expr :: P Expr
+expr :: forall a. Real a => P (Expr a)
 expr = fix allExprs
   where
     allExprs p = buildExprParser table (term p)
 
-evalExpr :: P Cmd
-evalExpr = Eval <$> expr
-
-parse :: String -> Expect Cmd
-parse s = case runParser s evalExpr of
+parse :: forall a. Real a => String -> Expect (Expr a)
+parse s = case runParser s expr of
   Left (ParseError message pos) -> parseError message
   Right c -> pure c

@@ -12,9 +12,10 @@ import Data.String (Pattern(..), split, take, drop, joinWith)
 import Data.String (length) as String
 import Effect (Effect)
 import Global (readFloat)
+import Parser.Error (Expect)
 import Parser.Eval (eval)
 import Parser.Parser (parse)
-import Parser.Syntax (Dual(..), Cmd(..), Expr(..))
+import Parser.Syntax (Dual(..), Expr(..))
 import Partial.Unsafe (unsafePartial)
 import SVGpork.Geometry (Circle(..), HalfLine(..), Line(..), Point, Segment(..), aPointOnLine, aVectorOfLine, abs, circle, line, meets, ord, point, segment, scale, vector, (<+|))
 import SVGpork.Geometry (length) as Geo
@@ -83,17 +84,17 @@ initialModel =
 
 transmit :: Model -> String
 transmit model =
-  case parse model.command of
-    Right (Eval expr) -> show expr
+  case (parse :: String -> Expect (Expr Dual)) model.command of
+    Right expr -> show expr
     _ -> ""
 
-liftExprDual :: Number -> Expr
+liftExprDual :: Number -> Expr Dual
 liftExprDual x = Lit $ Dual {height: x, slope: 1.0}
 
-execute :: String -> Number -> Expr
+execute :: String -> Number -> Expr Dual
 execute command x =
   case parse command of
-    Right (Eval expr) ->
+    Right expr ->
       case eval (insert "x" (liftExprDual x) empty) expr of
         Right exp -> exp
         _ -> Var "undefined"
