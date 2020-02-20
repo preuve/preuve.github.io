@@ -133,7 +133,7 @@ problems = [{q: (\ m -> do
                   , a: "\\mathrm{les}\\;\\mathrm{signes}\\;\\mathrm{de}\\; f"
                   , b: "\\mathrm{les}\\;\\mathrm{variations}\\;\\mathrm{de}\\; f"
                   , c: "\\mathrm{les}\\;\\mathrm{signes}\\;\\mathrm{de}\\; (u_n)"
-                  , r: "b"}
+                  , r: "a"}
             ,{q: (\m -> do
                            t "Soit "
                            _ <- m "(u_n) "

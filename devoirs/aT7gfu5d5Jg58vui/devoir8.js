@@ -4705,7 +4705,7 @@ var PS = {};
       a: "\\mathrm{les}\\;\\mathrm{signes}\\;\\mathrm{de}\\; f",
       b: "\\mathrm{les}\\;\\mathrm{variations}\\;\\mathrm{de}\\; f",
       c: "\\mathrm{les}\\;\\mathrm{signes}\\;\\mathrm{de}\\; (u_n)",
-      r: "b"
+      r: "a"
   }, {
       q: function (m) {
           return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(SporKaTeX.t("Soit "))(function () {
