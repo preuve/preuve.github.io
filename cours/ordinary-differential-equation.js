@@ -26600,23 +26600,23 @@ var PS = {};
   var Spork_Html_Events = $PS["Spork.Html.Events"];
   var Spork_Html_Properties = $PS["Spork.Html.Properties"];
   var Spork_PureApp = $PS["Spork.PureApp"];                
-  var Command0 = (function () {
-      function Command0(value0) {
+  var Fx = (function () {
+      function Fx(value0) {
           this.value0 = value0;
       };
-      Command0.create = function (value0) {
-          return new Command0(value0);
+      Fx.create = function (value0) {
+          return new Fx(value0);
       };
-      return Command0;
+      return Fx;
   })();
-  var Command1 = (function () {
-      function Command1(value0) {
+  var Fy = (function () {
+      function Fy(value0) {
           this.value0 = value0;
       };
-      Command1.create = function (value0) {
-          return new Command1(value0);
+      Fy.create = function (value0) {
+          return new Fy(value0);
       };
-      return Command1;
+      return Fy;
   })();
   var UpdateMagnitude = (function () {
       function UpdateMagnitude(value0) {
@@ -26664,24 +26664,34 @@ var PS = {};
       DecreaseCount.value = new DecreaseCount();
       return DecreaseCount;
   })();
-  var width = 800;
-  var xoffset = Data_Int.toNumber(width) / 2.0;
   var update = function (model) {
       return function (v) {
-          if (v instanceof Command0) {
+          if (v instanceof Fx) {
               return {
-                  command0: v.value0,
-                  command1: model.command1,
+                  fx: (function () {
+                      var v2 = Control_Bind.bind(Data_Either.bindEither)(new Data_Either.Right(v.value0))(Parser_Parser.parse(Parser_Syntax.realNumber));
+                      if (v2 instanceof Data_Either.Right) {
+                          return new Data_Maybe.Just(v2.value0);
+                      };
+                      return Data_Maybe.Nothing.value;
+                  })(),
+                  fy: model.fy,
                   magnitude: model.magnitude,
                   h: model.h,
                   pathLength: model.pathLength,
                   pathCount: model.pathCount
               };
           };
-          if (v instanceof Command1) {
+          if (v instanceof Fy) {
               return {
-                  command0: model.command0,
-                  command1: v.value0,
+                  fx: model.fx,
+                  fy: (function () {
+                      var v2 = Control_Bind.bind(Data_Either.bindEither)(new Data_Either.Right(v.value0))(Parser_Parser.parse(Parser_Syntax.realNumber));
+                      if (v2 instanceof Data_Either.Right) {
+                          return new Data_Maybe.Just(v2.value0);
+                      };
+                      return Data_Maybe.Nothing.value;
+                  })(),
                   magnitude: model.magnitude,
                   h: model.h,
                   pathLength: model.pathLength,
@@ -26690,8 +26700,8 @@ var PS = {};
           };
           if (v instanceof UpdateMagnitude) {
               return {
-                  command0: model.command0,
-                  command1: model.command1,
+                  fx: model.fx,
+                  fy: model.fy,
                   magnitude: Global.readFloat(v.value0),
                   h: model.h,
                   pathLength: model.pathLength,
@@ -26700,8 +26710,8 @@ var PS = {};
           };
           if (v instanceof UpdateH) {
               return {
-                  command0: model.command0,
-                  command1: model.command1,
+                  fx: model.fx,
+                  fy: model.fy,
                   magnitude: model.magnitude,
                   h: Global.readFloat(v.value0),
                   pathLength: model.pathLength,
@@ -26710,8 +26720,8 @@ var PS = {};
           };
           if (v instanceof IncreaseLength) {
               return {
-                  command0: model.command0,
-                  command1: model.command1,
+                  fx: model.fx,
+                  fy: model.fy,
                   magnitude: model.magnitude,
                   h: model.h,
                   pathLength: model.pathLength + 1 | 0,
@@ -26720,13 +26730,13 @@ var PS = {};
           };
           if (v instanceof DecreaseLength) {
               return {
-                  command0: model.command0,
-                  command1: model.command1,
+                  fx: model.fx,
+                  fy: model.fy,
                   magnitude: model.magnitude,
                   h: model.h,
                   pathLength: (function () {
-                      var $29 = model.pathLength > 0;
-                      if ($29) {
+                      var $34 = model.pathLength > 0;
+                      if ($34) {
                           return model.pathLength - 1 | 0;
                       };
                       return model.pathLength;
@@ -26736,8 +26746,8 @@ var PS = {};
           };
           if (v instanceof IncreaseCount) {
               return {
-                  command0: model.command0,
-                  command1: model.command1,
+                  fx: model.fx,
+                  fy: model.fy,
                   magnitude: model.magnitude,
                   h: model.h,
                   pathLength: model.pathLength,
@@ -26746,21 +26756,21 @@ var PS = {};
           };
           if (v instanceof DecreaseCount) {
               return {
-                  command0: model.command0,
-                  command1: model.command1,
+                  fx: model.fx,
+                  fy: model.fy,
                   magnitude: model.magnitude,
                   h: model.h,
                   pathLength: model.pathLength,
                   pathCount: (function () {
-                      var $30 = model.pathCount > 0;
-                      if ($30) {
+                      var $35 = model.pathCount > 0;
+                      if ($35) {
                           return model.pathCount - 1 | 0;
                       };
                       return model.pathCount;
                   })()
               };
           };
-          throw new Error("Failed pattern match at Main (line 77, column 16 - line 91, column 28): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 77, column 16 - line 97, column 28): " + [ v.constructor.name ]);
       };
   };
   var styleCounter = "display: grid; grid-template-columns: 1fr 2fr 1fr 2fr;";
@@ -26770,8 +26780,8 @@ var PS = {};
           var rs = Rand.rand(r);
           var rx = Rand.rand(rs);
           var s = (function () {
-              var $31 = Data_EuclideanRing.mod(Data_EuclideanRing.euclideanRingInt)(rs.val)(2) === 0;
-              if ($31) {
+              var $36 = Data_EuclideanRing.mod(Data_EuclideanRing.euclideanRingInt)(rs.val)(2) === 0;
+              if ($36) {
                   return 1.0;
               };
               return -1.0;
@@ -26788,35 +26798,35 @@ var PS = {};
       };
   };
   var initialModel = {
-      command0: "",
-      command1: "",
-      magnitude: 30.0,
-      h: 6.0e-2,
-      pathLength: 100,
+      fx: Data_Maybe.Nothing.value,
+      fy: Data_Maybe.Nothing.value,
+      magnitude: 1.0,
+      h: 7.0e-2,
+      pathLength: 90,
       pathCount: 3
   };
-  var height = 600;
-  var yoffset = Data_Int.toNumber(height) / 2.0;
+  var halfwidth = 400;
+  var xoffset = Data_Int.toNumber(halfwidth);
+  var halfheight = 300;
+  var yoffset = Data_Int.toNumber(halfheight);
+  var fy = Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(Fy.create)) ]);
+  var fx = Spork_Html_Elements.input([ Spork_Html_Properties.autofocus(true), Spork_Html_Events.onValueChange(Spork_Html_Events.always(Fx.create)) ]);
+  var fail = Control_Bind.bind(Data_Either.bindEither)(Parser_Parser.parse(Parser_Syntax.realNumber)("x"))(Parser_Eval["eval"](Data_EuclideanRing.euclideanRingNumber)(Parser_Syntax.powerNumber)(Parser_Syntax.realNumber)(Data_Map_Internal.empty));
   var execute = function (model) {
       return function (sol) {
           return function (time) {
-              var evalCommand = function (str) {
-                  var v = Parser_Parser.parse(Parser_Syntax.realNumber)(str);
-                  if (v instanceof Data_Either.Right) {
-                      var v1 = Parser_Eval["eval"](Data_EuclideanRing.euclideanRingNumber)(Parser_Syntax.powerNumber)(Parser_Syntax.realNumber)(withSolution(sol)(time))(v.value0);
-                      if (v1 instanceof Data_Either.Right && v1.value0 instanceof Parser_Syntax.Lit) {
-                          return new Data_Maybe.Just(v1.value0.value0);
-                      };
-                      return Data_Maybe.Nothing.value;
+              var evalF = function (v) {
+                  if (v instanceof Data_Maybe.Just) {
+                      return Control_Bind.bind(Data_Either.bindEither)(new Data_Either.Right(v.value0))(Parser_Eval["eval"](Data_EuclideanRing.euclideanRingNumber)(Parser_Syntax.powerNumber)(Parser_Syntax.realNumber)(withSolution(sol)(time)));
                   };
-                  return Data_Maybe.Nothing.value;
+                  return fail;
               };
-              var x_ = evalCommand(model.command0);
-              var y_ = evalCommand(model.command1);
-              if (x_ instanceof Data_Maybe.Just && y_ instanceof Data_Maybe.Just) {
+              var x_ = evalF(model.fx);
+              var y_ = evalF(model.fy);
+              if (x_ instanceof Data_Either.Right && (x_.value0 instanceof Parser_Syntax.Lit && (y_ instanceof Data_Either.Right && y_.value0 instanceof Parser_Syntax.Lit))) {
                   return new Data_Maybe.Just({
-                      x: x_.value0,
-                      y: y_.value0
+                      x: x_.value0.value0,
+                      y: y_.value0.value0
                   });
               };
               return Data_Maybe.Nothing.value;
@@ -26872,13 +26882,13 @@ var PS = {};
       return function (model) {
           return function (v) {
               return function (t) {
-                  var $78 = iter === 0;
-                  if ($78) {
+                  var $82 = iter === 0;
+                  if ($82) {
                       return [  ];
                   };
                   var v1 = rk4(model)(v)(t);
                   if (v1 instanceof Data_Maybe.Just) {
-                      return Data_Semigroup.append(Data_Semigroup.semigroupArray)([ SVGpork_Geometry.segment(SVGpork_Geometry.point("")(v.x + xoffset)(-v.y + yoffset))(SVGpork_Geometry.point("")(v1.value0.x + xoffset)(-v1.value0.y + yoffset))(Data_Maybe.Nothing.value) ])(segmentSolution(iter - 1 | 0)(model)(v1.value0)(t + model.h));
+                      return Data_Semigroup.append(Data_Semigroup.semigroupArray)([ SVGpork_Geometry.segment(SVGpork_Geometry.point("")(v.x * Data_Int.toNumber(halfwidth) + xoffset)(-v.y * Data_Int.toNumber(halfheight) + yoffset))(SVGpork_Geometry.point("")(v1.value0.x * Data_Int.toNumber(halfwidth) + xoffset)(-v1.value0.y * Data_Int.toNumber(halfheight) + yoffset))(Data_Maybe.Nothing.value) ])(segmentSolution(iter - 1 | 0)(model)(v1.value0)(t + model.h));
                   };
                   return [  ];
               };
@@ -26889,8 +26899,8 @@ var PS = {};
       return function (ctx) {
           return function (r) {
               return function (model) {
-                  var $85 = iter === 0;
-                  if ($85) {
+                  var $89 = iter === 0;
+                  if ($89) {
                       return [  ];
                   };
                   var rx = Rand.rand(r);
@@ -26898,7 +26908,7 @@ var PS = {};
                   var y = randomNumberLessThan(model.magnitude)(ry);
                   var x = randomNumberLessThan(model.magnitude)(rx);
                   var rt = Rand.rand(ry);
-                  var t = randomNumberLessThan(1.0e-3)(rt);
+                  var t = randomNumberLessThan(5.0e-4)(rt);
                   return Data_Semigroup.append(Data_Semigroup.semigroupArray)([ SVGpork_Render["render'"](SVGpork_Render.renderSequence(SVGpork_Render.renderSegment))(ctx)(segmentSolution(model.pathLength)(model)({
                       x: x,
                       y: y
@@ -26907,8 +26917,6 @@ var PS = {};
           };
       };
   };
-  var command1 = Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(Command1.create)) ]);
-  var command0 = Spork_Html_Elements.input([ Spork_Html_Properties.autofocus(true), Spork_Html_Events.onValueChange(Spork_Html_Events.always(Command0.create)) ]);
   var render = function (model) {
       var ctx = {
           stroke: "#050409",
@@ -26917,11 +26925,11 @@ var PS = {};
           fontStyle: SVGpork_Render.defaultContext.fontStyle,
           textFill: SVGpork_Render.defaultContext.textFill
       };
-      return Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 1fr;") ])([ Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("svg")([ Spork_Html_Core.attr("width")(Data_Show.show(Data_Show.showInt)(width) + "px"), Spork_Html_Core.attr("height")(Data_Show.show(Data_Show.showInt)(height) + "px") ])(Data_Array.concat(renderSolutions(model.pathCount)(ctx)({
+      return Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 1fr;") ])([ Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("svg")([ Spork_Html_Core.attr("width")(Data_Show.show(Data_Show.showInt)(2 * halfwidth | 0) + "px"), Spork_Html_Core.attr("height")(Data_Show.show(Data_Show.showInt)(2 * halfheight | 0) + "px") ])(Data_Array.concat(renderSolutions(model.pathCount)(ctx)({
           gen: 345,
           seed: 543562263,
           val: 75
-      })(model))), Spork_Html_Elements.div([  ])([ command0, command1, Spork_Html_Elements.br([  ]), Spork_Html_Elements.label([  ])([ Spork_Html_Core.text("magnitude (30.0): ") ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(UpdateMagnitude.create)) ]), Spork_Html_Elements.br([  ]), Spork_Html_Elements.label([  ])([ Spork_Html_Core.text("h (0.06): ") ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(UpdateH.create)) ]), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")(styleCounter) ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseLength.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.pathLength)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseLength.value)) ])([ Spork_Html_Core.text("+") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text("steps") ]) ]), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")(styleCounter) ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseCount.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.pathCount)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseCount.value)) ])([ Spork_Html_Core.text("+") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text("paths") ]) ]) ]) ]);
+      })(model))), Spork_Html_Elements.div([  ])([ fx, fy, Spork_Html_Elements.br([  ]), Spork_Html_Elements.label([  ])([ Spork_Html_Core.text("magnitude (1.0): ") ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(UpdateMagnitude.create)) ]), Spork_Html_Elements.br([  ]), Spork_Html_Elements.label([  ])([ Spork_Html_Core.text("h (0.07): ") ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(UpdateH.create)) ]), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")(styleCounter) ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseLength.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.pathLength)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseLength.value)) ])([ Spork_Html_Core.text("+") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text("steps") ]) ]), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")(styleCounter) ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseCount.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.pathCount)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseCount.value)) ])([ Spork_Html_Core.text("+") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text("paths") ]) ]) ]) ]);
   };
   var app = {
       render: render,
@@ -26932,9 +26940,10 @@ var PS = {};
   exports["initialModel"] = initialModel;
   exports["liftExprNumber"] = liftExprNumber;
   exports["withSolution"] = withSolution;
+  exports["fail"] = fail;
   exports["execute"] = execute;
-  exports["Command0"] = Command0;
-  exports["Command1"] = Command1;
+  exports["Fx"] = Fx;
+  exports["Fy"] = Fy;
   exports["UpdateMagnitude"] = UpdateMagnitude;
   exports["UpdateH"] = UpdateH;
   exports["IncreaseLength"] = IncreaseLength;
@@ -26942,13 +26951,13 @@ var PS = {};
   exports["IncreaseCount"] = IncreaseCount;
   exports["DecreaseCount"] = DecreaseCount;
   exports["update"] = update;
-  exports["height"] = height;
-  exports["width"] = width;
+  exports["halfheight"] = halfheight;
+  exports["halfwidth"] = halfwidth;
   exports["styleCenter"] = styleCenter;
   exports["styleCounter"] = styleCounter;
   exports["render"] = render;
-  exports["command0"] = command0;
-  exports["command1"] = command1;
+  exports["fx"] = fx;
+  exports["fy"] = fy;
   exports["randomNumberLessThan"] = randomNumberLessThan;
   exports["renderSolutions"] = renderSolutions;
   exports["rk4"] = rk4;

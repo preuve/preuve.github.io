@@ -27678,9 +27678,8 @@ var PS = {};
   var white = "#FFFFFF";
   var unused = 0.0;
   var transmit = function (model) {
-      var v = Parser_Parser.parse(Parser_Syntax.realDual)(model.command);
-      if (v instanceof Data_Either.Right) {
-          return Data_Show.show(Parser_Syntax.showExpr(Parser_Syntax.showDual))(v.value0);
+      if (model.f instanceof Data_Maybe.Just) {
+          return Data_Show.show(Parser_Syntax.showExpr(Parser_Syntax.showDual))(model.f.value0);
       };
       return "";
   };
@@ -27703,7 +27702,7 @@ var PS = {};
       if (v instanceof MinusInf) {
           return "-\\infty";
       };
-      throw new Error("Failed pattern match at Main (line 109, column 1 - line 112, column 29): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 108, column 1 - line 111, column 29): " + [ v.constructor.name ]);
   });
   var showIntrvl = new Data_Show.Show(function (v) {
       if (v instanceof OpenOpen) {
@@ -27718,7 +27717,7 @@ var PS = {};
       if (v instanceof CloseClose) {
           return "[" + (Data_Show.show(showExt)(v.value0) + (";" + (Data_Show.show(showExt)(v.value1) + "]")));
       };
-      throw new Error("Failed pattern match at Main (line 114, column 1 - line 118, column 64): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 113, column 1 - line 117, column 64): " + [ v.constructor.name ]);
   });
   var showDerivative = "show Derivative";
   var remap = function (v) {
@@ -27784,8 +27783,8 @@ var PS = {};
                                       $tco_var_dictPartial = undefined;
                                       $tco_var_from = from;
                                       $tco_var_acc = (function () {
-                                          var $109 = okY(v.value0.y) && okY(v2.value0.head.value0.y);
-                                          if ($109) {
+                                          var $108 = okY(v.value0.y) && okY(v2.value0.head.value0.y);
+                                          if ($108) {
                                               return Data_Semigroup.append(Data_Semigroup.semigroupArray)(acc)([ SVGpork_Geometry.segment(SVGpork_Geometry.point("")(v.value0.x)(v.value0.y))(SVGpork_Geometry.point("")(v2.value0.head.value0.x)(v2.value0.head.value0.y))(Data_Maybe.Nothing.value) ]);
                                           };
                                           return acc;
@@ -27802,8 +27801,8 @@ var PS = {};
                                               return "x";
                                           }))(Data_Eq.eqNumber))))(v3)(Data_Maybe.Nothing.value);
                                       })(v2.value0.tail);
-                                      var $113 = Data_Array.length(ys) === 0;
-                                      if ($113) {
+                                      var $112 = Data_Array.length(ys) === 0;
+                                      if ($112) {
                                           $tco_done = true;
                                           return acc;
                                       };
@@ -27814,15 +27813,15 @@ var PS = {};
                                       $copy_v1 = Data_Maybe.fromJust()(Data_Array.tail(ys));
                                       return;
                                   };
-                                  throw new Error("Failed pattern match at Main (line 475, column 11 - line 487, column 74): " + [ v2.value0.head.constructor.name ]);
+                                  throw new Error("Failed pattern match at Main (line 477, column 11 - line 489, column 74): " + [ v2.value0.head.constructor.name ]);
                               };
                               if (v2 instanceof Data_Maybe.Nothing) {
                                   $tco_done = true;
                                   return acc;
                               };
-                              throw new Error("Failed pattern match at Main (line 473, column 6 - line 488, column 21): " + [ v2.constructor.name ]);
+                              throw new Error("Failed pattern match at Main (line 475, column 6 - line 490, column 21): " + [ v2.constructor.name ]);
                           };
-                          throw new Error("Failed pattern match at Main (line 464, column 1 - line 467, column 76): " + [ from.constructor.name, acc.constructor.name, v.constructor.name, v1.constructor.name ]);
+                          throw new Error("Failed pattern match at Main (line 466, column 1 - line 469, column 76): " + [ from.constructor.name, acc.constructor.name, v.constructor.name, v1.constructor.name ]);
                       };
                       while (!$tco_done) {
                           $tco_result = $tco_loop($tco_var_dictPartial, $tco_var_from, $tco_var_acc, $tco_var_v, $copy_v1);
@@ -27954,10 +27953,10 @@ var PS = {};
   };
   var segmentInBox = function (v) {
       return function (v1) {
-          var candidates = Data_Array.filter(function ($303) {
+          var candidates = Data_Array.filter(function ($304) {
               return (function (v2) {
                   return v2 === 1;
-              })(Data_Array.length($303));
+              })(Data_Array.length($304));
           })(Data_Functor.map(Data_Functor.functorArray)(function (v2) {
               return SVGpork_Geometry.meets(SVGpork_Geometry.interSegmentSegment)(v1)(v2);
           })(frame(v)));
@@ -27968,25 +27967,25 @@ var PS = {};
               if (candidates.length === 1 && candidates[0].length === 1) {
                   return Data_Maybe.Just.create(SVGpork_Geometry.segment(v1.origin)(candidates[0][0])(Data_Maybe.Nothing.value));
               };
-              throw new Error("Failed pattern match at Main (line 446, column 21 - line 446, column 39): " + [ candidates.constructor.name ]);
+              throw new Error("Failed pattern match at Main (line 448, column 21 - line 448, column 39): " + [ candidates.constructor.name ]);
           };
           if (inBox(v)(v1.extremity)) {
               if (candidates.length === 1 && candidates[0].length === 1) {
                   return Data_Maybe.Just.create(SVGpork_Geometry.segment(v1.extremity)(candidates[0][0])(Data_Maybe.Nothing.value));
               };
-              throw new Error("Failed pattern match at Main (line 449, column 20 - line 449, column 38): " + [ candidates.constructor.name ]);
+              throw new Error("Failed pattern match at Main (line 451, column 20 - line 451, column 38): " + [ candidates.constructor.name ]);
           };
           if (Data_Boolean.otherwise) {
-              var $171 = Data_Array.length(candidates) === 2;
-              if ($171) {
+              var $170 = Data_Array.length(candidates) === 2;
+              if ($170) {
                   if (candidates.length === 2 && (candidates[0].length === 1 && candidates[1].length === 1)) {
                       return Data_Maybe.Just.create(SVGpork_Geometry.segment(candidates[0][0])(candidates[1][0])(Data_Maybe.Nothing.value));
                   };
-                  throw new Error("Failed pattern match at Main (line 453, column 28 - line 453, column 50): " + [ candidates.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 455, column 28 - line 455, column 50): " + [ candidates.constructor.name ]);
               };
               return Data_Maybe.Nothing.value;
           };
-          throw new Error("Failed pattern match at Main (line 443, column 7 - line 455, column 31): " + [ Data_Unit.unit.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 445, column 7 - line 457, column 31): " + [ Data_Unit.unit.constructor.name ]);
       };
   };
   var lineInBox = function (b) {
@@ -28007,11 +28006,11 @@ var PS = {};
               return Spork_Transition.purely({
                   density: model.density + 10 | 0,
                   argument: model.argument,
-                  command: model.command,
                   displayD: model.displayD,
                   displayT: model.displayT,
                   domain: model.domain,
                   domainSlot: model.domainSlot,
+                  f: model.f,
                   fromD: model.fromD,
                   fromF: model.fromF,
                   functionSlot: model.functionSlot,
@@ -28026,16 +28025,16 @@ var PS = {};
           };
           if (action instanceof DecreaseDensity) {
               return Spork_Transition.purely((function () {
-                  var $181 = model.density > 10;
-                  if ($181) {
+                  var $180 = model.density > 10;
+                  if ($180) {
                       return {
                           density: model.density - 10 | 0,
                           argument: model.argument,
-                          command: model.command,
                           displayD: model.displayD,
                           displayT: model.displayT,
                           domain: model.domain,
                           domainSlot: model.domainSlot,
+                          f: model.f,
                           fromD: model.fromD,
                           fromF: model.fromF,
                           functionSlot: model.functionSlot,
@@ -28055,12 +28054,12 @@ var PS = {};
               return Spork_Transition.purely({
                   functionSlot: new Data_Maybe.Just(action.value0.value0),
                   argument: model.argument,
-                  command: model.command,
                   density: model.density,
                   displayD: model.displayD,
                   displayT: model.displayT,
                   domain: model.domain,
                   domainSlot: model.domainSlot,
+                  f: model.f,
                   fromD: model.fromD,
                   fromF: model.fromF,
                   isDragged: model.isDragged,
@@ -28079,11 +28078,11 @@ var PS = {};
               return Spork_Transition.purely({
                   domainSlot: new Data_Maybe.Just(action.value0.value0),
                   argument: model.argument,
-                  command: model.command,
                   density: model.density,
                   displayD: model.displayD,
                   displayT: model.displayT,
                   domain: model.domain,
+                  f: model.f,
                   fromD: model.fromD,
                   fromF: model.fromF,
                   functionSlot: model.functionSlot,
@@ -28105,12 +28104,12 @@ var PS = {};
                   previousY: Data_Int.toNumber(Web_UIEvent_MouseEvent.pageY(action.value0)),
                   isDragged: true,
                   argument: model.argument,
-                  command: model.command,
                   density: model.density,
                   displayD: model.displayD,
                   displayT: model.displayT,
                   domain: model.domain,
                   domainSlot: model.domainSlot,
+                  f: model.f,
                   fromD: model.fromD,
                   fromF: model.fromF,
                   functionSlot: model.functionSlot,
@@ -28124,12 +28123,12 @@ var PS = {};
               return Spork_Transition.purely({
                   isDragged: false,
                   argument: model.argument,
-                  command: model.command,
                   density: model.density,
                   displayD: model.displayD,
                   displayT: model.displayT,
                   domain: model.domain,
                   domainSlot: model.domainSlot,
+                  f: model.f,
                   fromD: model.fromD,
                   fromF: model.fromF,
                   functionSlot: model.functionSlot,
@@ -28147,8 +28146,8 @@ var PS = {};
                       var y = Data_Int.toNumber(Web_UIEvent_MouseEvent.pageY(action.value0));
                       var x = Data_Int.toNumber(Web_UIEvent_MouseEvent.pageX(action.value0));
                       var previous = SVGpork_Geometry.point("")(model.previousX)(model.previousY);
-                      var $190 = inBox(model.toF)(previous);
-                      if ($190) {
+                      var $189 = inBox(model.toF)(previous);
+                      if ($189) {
                           var q0 = remap(model.toF)(SVGpork_Geometry.point("")(x)(model.previousY))(model.fromF);
                           var q = remap(model.toF)(SVGpork_Geometry.point("")(x)(y))(model.fromF);
                           var p = remap(model.toF)(previous)(model.fromF);
@@ -28166,12 +28165,12 @@ var PS = {};
                               previousX: x,
                               previousY: y,
                               argument: SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(model.fromF.center),
-                              command: model.command,
                               density: model.density,
                               displayD: model.displayD,
                               displayT: model.displayT,
                               domain: model.domain,
                               domainSlot: model.domainSlot,
+                              f: model.f,
                               functionSlot: model.functionSlot,
                               isDragged: model.isDragged,
                               message: model.message,
@@ -28180,8 +28179,8 @@ var PS = {};
                               toF: model.toF
                           };
                       };
-                      var $191 = inBox(model.toD)(previous);
-                      if ($191) {
+                      var $190 = inBox(model.toD)(previous);
+                      if ($190) {
                           var q0 = remap(model.toD)(SVGpork_Geometry.point("")(x)(model.previousY))(model.fromD);
                           var q = remap(model.toD)(SVGpork_Geometry.point("")(x)(y))(model.fromD);
                           var p = remap(model.toD)(previous)(model.fromD);
@@ -28199,12 +28198,12 @@ var PS = {};
                               previousX: x,
                               previousY: y,
                               argument: SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(model.fromD.center),
-                              command: model.command,
                               density: model.density,
                               displayD: model.displayD,
                               displayT: model.displayT,
                               domain: model.domain,
                               domainSlot: model.domainSlot,
+                              f: model.f,
                               functionSlot: model.functionSlot,
                               isDragged: model.isDragged,
                               message: model.message,
@@ -28220,7 +28219,13 @@ var PS = {};
           };
           if (action instanceof RenderCommand) {
               var m = {
-                  command: action.value0,
+                  f: (function () {
+                      var v1 = Control_Bind.bind(Data_Either.bindEither)(new Data_Either.Right(action.value0))(Parser_Parser.parse(Parser_Syntax.realDual));
+                      if (v1 instanceof Data_Either.Right) {
+                          return new Data_Maybe.Just(v1.value0);
+                      };
+                      return Data_Maybe.Nothing.value;
+                  })(),
                   argument: model.argument,
                   density: model.density,
                   displayD: model.displayD,
@@ -28248,7 +28253,7 @@ var PS = {};
                   if (model.functionSlot instanceof Data_Maybe.Nothing) {
                       return Data_Monoid.mempty(Spork_Batch.monoidBatch);
                   };
-                  throw new Error("Failed pattern match at Main (line 257, column 11 - line 261, column 30): " + [ model.functionSlot.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 259, column 11 - line 263, column 30): " + [ model.functionSlot.constructor.name ]);
               })();
               return {
                   model: m,
@@ -28279,13 +28284,13 @@ var PS = {};
                   if (model.domainSlot instanceof Data_Maybe.Nothing) {
                       return Data_Monoid.mempty(Spork_Batch.monoidBatch);
                   };
-                  throw new Error("Failed pattern match at Main (line 273, column 11 - line 277, column 30): " + [ model.domainSlot.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 275, column 11 - line 279, column 30): " + [ model.domainSlot.constructor.name ]);
               })();
               return {
                   model: {
                       functionSlot: model.functionSlot,
                       domainSlot: model.domainSlot,
-                      command: model.command,
+                      f: model.f,
                       argument: model.argument,
                       isDragged: model.isDragged,
                       domain: ds,
@@ -28318,12 +28323,12 @@ var PS = {};
                           halfHeight: model.fromD.halfHeight
                       },
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       functionSlot: model.functionSlot,
                       isDragged: model.isDragged,
                       message: model.message,
@@ -28344,12 +28349,12 @@ var PS = {};
                           halfHeight: model.fromD.halfHeight
                       },
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       functionSlot: model.functionSlot,
                       isDragged: model.isDragged,
                       message: model.message,
@@ -28365,12 +28370,12 @@ var PS = {};
                           halfWidth: model.fromF.halfWidth
                       },
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       functionSlot: model.functionSlot,
                       isDragged: model.isDragged,
@@ -28387,12 +28392,12 @@ var PS = {};
                           halfWidth: model.fromF.halfWidth
                       },
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       functionSlot: model.functionSlot,
                       isDragged: model.isDragged,
@@ -28409,12 +28414,12 @@ var PS = {};
                           halfWidth: model.fromD.halfWidth
                       },
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
                       isDragged: model.isDragged,
@@ -28431,12 +28436,12 @@ var PS = {};
                           halfWidth: model.fromD.halfWidth
                       },
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
                       isDragged: model.isDragged,
@@ -28449,11 +28454,11 @@ var PS = {};
                   })(Data_Map_Internal.insert(Data_Ord.ordString)(showDerivative)({
                       displayD: true,
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
@@ -28467,11 +28472,11 @@ var PS = {};
                   })(Data_Map_Internal.insert(Data_Ord.ordString)(hideDerivative)({
                       displayD: false,
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
@@ -28485,11 +28490,11 @@ var PS = {};
                   })(Data_Map_Internal.insert(Data_Ord.ordString)(showTangent)({
                       displayT: true,
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
@@ -28503,11 +28508,11 @@ var PS = {};
                   })(Data_Map_Internal.insert(Data_Ord.ordString)(hideTangent)({
                       displayT: false,
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
@@ -28521,12 +28526,12 @@ var PS = {};
                   })(Data_Map_Internal.insert(Data_Ord.ordString)(markCoefficient)({
                       numbers: Data_Semigroup.append(Data_Semigroup.semigroupArray)(model.numbers)([ SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(model.fromD.center) ]),
                       argument: model.argument,
-                      command: model.command,
                       density: model.density,
                       displayD: model.displayD,
                       displayT: model.displayT,
                       domain: model.domain,
                       domainSlot: model.domainSlot,
+                      f: model.f,
                       fromD: model.fromD,
                       fromF: model.fromF,
                       functionSlot: model.functionSlot,
@@ -28544,25 +28549,24 @@ var PS = {};
                   return model;
               })());
           };
-          throw new Error("Failed pattern match at Main (line 197, column 23 - line 310, column 30): " + [ action.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 196, column 23 - line 312, column 30): " + [ action.constructor.name ]);
       };
   };
-  var execute = function (command) {
+  var execute = function (f) {
       return function (x) {
-          var v = Parser_Parser.parse(Parser_Syntax.realDual)(command);
-          if (v instanceof Data_Either.Right) {
-              var v1 = Parser_Eval["eval"](Parser_Syntax.euclideanRingDual)(Parser_Syntax.powerDual)(Parser_Syntax.realDual)(Data_Map_Internal.insert(Data_Ord.ordString)("x")(liftExprDual(x))(Data_Map_Internal.empty))(v.value0);
-              if (v1 instanceof Data_Either.Right) {
-                  return v1.value0;
+          if (f instanceof Data_Maybe.Just) {
+              var v = Parser_Eval["eval"](Parser_Syntax.euclideanRingDual)(Parser_Syntax.powerDual)(Parser_Syntax.realDual)(Data_Map_Internal.insert(Data_Ord.ordString)("x")(liftExprDual(x))(Data_Map_Internal.empty))(f.value0);
+              if (v instanceof Data_Either.Right) {
+                  return v.value0;
               };
               return new Parser_Syntax.Var("undefined");
           };
           return new Parser_Syntax.Var("undefined");
       };
   };
-  var image = function (command) {
+  var image = function (f) {
       return function (x) {
-          var v = execute(command)(x);
+          var v = execute(f)(x);
           if (v instanceof Parser_Syntax.Lit) {
               return v.value0.value0.height;
           };
@@ -28602,7 +28606,7 @@ var PS = {};
           if (v instanceof FA) {
               return SVGpork_Render["render'"](SVGpork_Render.renderSequence(drawableFinal))(ctx)(v.value0);
           };
-          throw new Error("Failed pattern match at Main (line 319, column 1 - line 337, column 41): " + [ ctx.constructor.name, v.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 321, column 1 - line 339, column 41): " + [ ctx.constructor.name, v.constructor.name ]);
       };
   });
   var grid = function (ctx) {
@@ -28641,8 +28645,8 @@ var PS = {};
               })(Data_Array.range(Data_Int.ceil(botX))(Data_Int.floor(topX))))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Control_Bind.bindFlipped(Control_Bind.bindArray)(function (n) {
                   return SVGpork_Render["render'"](drawableFinal)(ctx$prime(0.5))(segAtY(Data_Int.toNumber(n)));
               })(Data_Array.range(Data_Int.ceil(botY))(Data_Int.floor(topY))))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(SVGpork_Render["render'"](drawableFinal)(ctx$prime(1.5))(segAtX(0.0)))((function () {
-                  var $243 = botY <= 0.0 && 0.0 <= topY;
-                  if ($243) {
+                  var $244 = botY <= 0.0 && 0.0 <= topY;
+                  if ($244) {
                       return SVGpork_Render["render'"](drawableFinal)(ctx$prime(1.5))(segAtY(0.0));
                   };
                   return [  ];
@@ -28655,11 +28659,11 @@ var PS = {};
           return function (fromD) {
               return function (toD) {
                   return function (x) {
-                      var $249 = inDomain(v.domain)(x);
-                      if ($249) {
+                      var $250 = inDomain(v.domain)(x);
+                      if ($250) {
                           var p = SVGpork_Geometry.point("")(x)(-v["function"](x));
-                          var $250 = inBox(fromD)(p);
-                          if ($250) {
+                          var $251 = inBox(fromD)(p);
+                          if ($251) {
                               return SVGpork_Render["render'"](drawableFinal)(tanStyle(ctx))(new FP(fromD, toD, p));
                           };
                           return [  ];
@@ -28684,8 +28688,8 @@ var PS = {};
                               return "x";
                           }))(Data_Eq.eqNumber))))(v1)(Data_Maybe.Nothing.value);
                       })(Data_Functor.map(Data_Functor.functorArray)(Data_Functor.map(Data_Functor.functorFn)(function (x) {
-                          var $258 = inDomain(v.domain)(x);
-                          if ($258) {
+                          var $259 = inDomain(v.domain)(x);
+                          if ($259) {
                               return new Data_Maybe.Just({
                                   x: x,
                                   y: -v["function"](x)
@@ -28695,8 +28699,8 @@ var PS = {};
                       })(function (n) {
                           return botX + (Data_Int.toNumber(n) * (topX - botX)) / Data_Int.toNumber(density);
                       }))(Data_Array.range(0)(density)));
-                      var $259 = Data_Array.length(zs) === 0;
-                      if ($259) {
+                      var $260 = Data_Array.length(zs) === 0;
+                      if ($260) {
                           return [  ];
                       };
                       return Control_Bind.bindFlipped(Control_Bind.bindArray)(function (s) {
@@ -28718,7 +28722,7 @@ var PS = {};
       halfHeight: svgHeight / 4.1
   };
   var initialModel = {
-      command: "",
+      f: Data_Maybe.Nothing.value,
       argument: 0.0,
       isDragged: false,
       domain: [  ],
@@ -28736,9 +28740,9 @@ var PS = {};
       previousX: 0.0,
       previousY: 0.0
   };
-  var diff = function (command) {
+  var diff = function (f) {
       return function (x) {
-          var v = execute(command)(x);
+          var v = execute(f)(x);
           if (v instanceof Parser_Syntax.Lit) {
               return v.value0.value0.slope;
           };
@@ -28756,21 +28760,21 @@ var PS = {};
   var blue = "#0602c6";
   var localDrawings = function (ctx) {
       return function (x) {
-          return function (command) {
+          return function (fun) {
               return function (fromF) {
                   return function (toF) {
                       return function (displayT) {
-                          var f = image(command);
+                          var f = image(fun);
                           var p = SVGpork_Geometry.point("")(x)(-f(x));
-                          var df = diff(command);
+                          var df = diff(fun);
                           var c = x * df(x) - f(x);
                           var c2 = digit2(-c);
                           var b = -1.0;
                           var a = -df(x);
                           var a2 = digit2(-a);
                           return Data_Semigroup.append(Data_Semigroup.semigroupArray)([ SVGpork_Render.svgtext(svgWidth * 0.7)(svgHeight * 5.0e-2)(blue)("italic bold 15px arial, serif")("a = " + Data_Show.show(Data_Show.showNumber)(digit2(x))) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
-                              var $276 = inBox(fromF)(p);
-                              if ($276) {
+                              var $277 = inBox(fromF)(p);
+                              if ($277) {
                                   return SVGpork_Render["render'"](drawableFinal)(ctx)(new FP(fromF, toF, p));
                               };
                               return [  ];
@@ -28783,12 +28787,12 @@ var PS = {};
                                   });
                                   if (v instanceof Data_Maybe.Just) {
                                       return Data_Semigroup.append(Data_Semigroup.semigroupArray)(SVGpork_Render["render'"](drawableFinal)(tanStyle(ctx))(new FS(fromF, toF, v.value0)))([ SVGpork_Render.svgtext(svgWidth * 0.7)(svgHeight * 0.1)(purple)("italic bold 15px arial, serif")("y = " + (Data_Show.show(Data_Show.showNumber)(a2) + ("x" + (function () {
-                                          var $279 = c2 < 0.0;
-                                          if ($279) {
+                                          var $280 = c2 < 0.0;
+                                          if ($280) {
                                               return Data_Show.show(Data_Show.showNumber)(c2);
                                           };
-                                          var $280 = c2 !== 0.0;
-                                          if ($280) {
+                                          var $281 = c2 !== 0.0;
+                                          if ($281) {
                                               return "+" + Data_Show.show(Data_Show.showNumber)(c2);
                                           };
                                           return "";
@@ -28807,25 +28811,25 @@ var PS = {};
   var page = function (ctx) {
       return function (v) {
           return Data_Semigroup.append(Data_Semigroup.semigroupArray)(grid(ctx)(v.fromF)(v.toF))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(grid(ctx)(v.fromD)(v.toD))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(plot(ctx)(v.fromF)(v.toF)(v.density)({
-              "function": image(v.command),
+              "function": image(v.f),
               domain: v.domain
           }))(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
               if (v.displayD) {
                   return plot(ctx)(v.fromD)(v.toD)(v.density)({
-                      "function": diff(v.command),
+                      "function": diff(v.f),
                       domain: v.domain
                   });
               };
               return [  ];
           })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
               var x = SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(remap(v.toF)(v.toF.center)(v.fromF));
-              var $285 = inDomain(v.domain)(x);
-              if ($285) {
-                  return localDrawings(ctx)(x)(v.command)(v.fromF)(v.toF)(v.displayT);
+              var $286 = inDomain(v.domain)(x);
+              if ($286) {
+                  return localDrawings(ctx)(x)(v.f)(v.fromF)(v.toF)(v.displayT);
               };
               return [  ];
           })())(Control_Bind.bindFlipped(Control_Bind.bindArray)(markDrawing(ctx)({
-              "function": diff(v.command),
+              "function": diff(v.f),
               domain: v.domain
           })(v.fromD)(v.toD))(v.numbers))))));
       };
@@ -28872,10 +28876,10 @@ var PS = {};
           strokeWidth: ctx.strokeWidth,
           fontStyle: ctx.fontStyle,
           textFill: ctx.textFill
-      })(cursor(diffDisplay)))))))), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 1fr;") ])([ mkButtonEvent(zoomOutX), mkButtonEvent(zoomInX), mkButtonEvent(fzoomOutY), mkButtonEvent(fzoomInY), mkButtonEvent(f$primezoomOutY), mkButtonEvent(f$primezoomInY), mkButtonEvent(showDerivative), mkButtonEvent(hideDerivative), mkButtonEvent(showTangent), mkButtonEvent(hideTangent), mkButtonEvent(markCoefficient), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 2fr 1fr;") ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseDensity.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.density)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseDensity.value)) ])([ Spork_Html_Core.text("+") ]) ]), functionInput, Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($304) {
-          return FunctionSlot.create(Data_Maybe.Just.create($304));
-      })) ])([  ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(RenderDomain.create)) ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($305) {
-          return DomainSlot.create(Data_Maybe.Just.create($305));
+      })(cursor(diffDisplay)))))))), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 1fr;") ])([ mkButtonEvent(zoomOutX), mkButtonEvent(zoomInX), mkButtonEvent(fzoomOutY), mkButtonEvent(fzoomInY), mkButtonEvent(f$primezoomOutY), mkButtonEvent(f$primezoomInY), mkButtonEvent(showDerivative), mkButtonEvent(hideDerivative), mkButtonEvent(showTangent), mkButtonEvent(hideTangent), mkButtonEvent(markCoefficient), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 2fr 1fr;") ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseDensity.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.density)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseDensity.value)) ])([ Spork_Html_Core.text("+") ]) ]), functionInput, Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($305) {
+          return FunctionSlot.create(Data_Maybe.Just.create($305));
+      })) ])([  ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(RenderDomain.create)) ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($306) {
+          return DomainSlot.create(Data_Maybe.Just.create($306));
       })) ])([  ]) ]) ]);
   };
   var app = {

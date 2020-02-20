@@ -12,7 +12,6 @@ import Data.String (Pattern(..), split, take, drop, joinWith)
 import Data.String (length) as String
 import Effect (Effect)
 import Global (readFloat)
-import Parser.Error (Expect)
 import Parser.Eval (eval)
 import Parser.Parser (parse)
 import Parser.Syntax (Dual(..), Expr(..))
@@ -44,7 +43,7 @@ type Box = {center :: Point, halfWidth :: Number, halfHeight :: Number}
 type Model =
   { functionSlot :: Maybe H.ElementRef
   , domainSlot :: Maybe H.ElementRef
-  , command :: String
+  , f :: Maybe (Expr Dual)
   , argument :: Number
   , isDragged :: Boolean
   , domain :: Array Intrvl
@@ -63,7 +62,7 @@ type Model =
 
 initialModel ∷ Model
 initialModel =
-  { command: ""
+  { f: Nothing
   , argument: 0.0
   , isDragged: false
   , domain: []
@@ -84,17 +83,17 @@ initialModel =
 
 transmit :: Model -> String
 transmit model =
-  case (parse :: String -> Expect (Expr Dual)) model.command of
-    Right expr -> show expr
+  case model.f of
+    Just expr -> show expr
     _ -> ""
 
 liftExprDual :: Number -> Expr Dual
 liftExprDual x = Lit $ Dual {height: x, slope: 1.0}
 
-execute :: String -> Number -> Expr Dual
-execute command x =
-  case parse command of
-    Right expr ->
+execute :: Maybe (Expr Dual) -> Number -> Expr Dual
+execute f x =
+  case f of
+    Just expr ->
       case eval (insert "x" (liftExprDual x) empty) expr of
         Right exp -> exp
         _ -> Var "undefined"
@@ -155,15 +154,15 @@ inDomain domain x =
 
 unused = 0.0 :: Number
 
-image :: String -> Number -> Number
-image command x =
-  case execute command x of
+image :: Maybe (Expr Dual) -> Number -> Number
+image f x =
+  case execute f x of
     Lit (Dual {height: value, slope}) -> value
     _ -> unused
 
-diff :: String -> Number -> Number
-diff command x =
-  case execute command x of
+diff :: Maybe (Expr Dual) -> Number -> Number
+diff f x =
+  case execute f x of
     Lit (Dual {height, slope: value}) -> value
     _ -> unused
 
@@ -252,7 +251,10 @@ update model action = case action of
               else model
 
   RenderCommand cmd ->
-    let  m = model{command = cmd}
+    let  m = model{f = case Right cmd >>= parse of
+                      Right expr -> Just expr
+                      _          -> Nothing
+                  }
          effects =
           case model.functionSlot of
             Just(H.Created el) →
@@ -509,11 +511,11 @@ plot ctx from to density {function, domain} =
                              (unsafePartial fromJust $ tail zs))
 
 localDrawings :: forall action. Context -> Number
-                            -> String -> Box -> Box -> Boolean
+                            -> Maybe (Expr Dual) -> Box -> Box -> Boolean
                             -> Array (Html action)
-localDrawings ctx x command fromF toF displayT =
-  let f = image command
-      df = diff command
+localDrawings ctx x fun fromF toF displayT =
+  let f = image fun
+      df = diff fun
       p = point "" x (- f x) --Yaxis!
       a = - df x
       b = -1.0  --Yaxis
@@ -567,7 +569,7 @@ page ctx { fromF, toF
             , fromD, toD, displayD
             , displayT, numbers
             , previousX, previousY, functionSlot, domainSlot
-              , command
+              , f
               , argument
               , density
               , isDragged
@@ -575,15 +577,15 @@ page ctx { fromF, toF
               , message} =
    grid ctx fromF toF
     <> grid ctx fromD toD
-    <> plot ctx fromF toF density {function: image command, domain}
+    <> plot ctx fromF toF density {function: image f, domain}
     <> (if displayD
-          then plot ctx fromD toD density {function: diff command, domain}
+          then plot ctx fromD toD density {function: diff f, domain}
           else [])
     <> (let x = abs $ remap toF toF.center fromF
         in if inDomain domain x
-            then localDrawings ctx x command fromF toF displayT
+            then localDrawings ctx x f fromF toF displayT
             else [])
-    <> (markDrawing ctx {function: diff command, domain} fromD toD =<< numbers)
+    <> (markDrawing ctx {function: diff f, domain} fromD toD =<< numbers)
 
 styleCenter :: String
 styleCenter = "display: flex; align-items: center; justify-content: center;"

@@ -9,6 +9,7 @@ import Data.Map (empty, insert)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Global (readFloat)
+import Parser.Error (Expect)
 import Parser.Eval (eval, Env)
 import Parser.Parser (parse)
 import Parser.Syntax (Expr(..))
@@ -19,8 +20,8 @@ import Spork.Html as H
 import Spork.PureApp as PureApp
 
 type Model =
-  { command0 :: String
-  , command1 :: String
+  { fx :: Maybe (Expr Number)
+  , fy :: Maybe (Expr Number)
   , magnitude :: Number
   , h :: Number
   , pathLength :: Int
@@ -29,11 +30,11 @@ type Model =
 
 initialModel ∷ Model
 initialModel =
-  { command0: ""
-  , command1: ""
-  , magnitude: 30.0
-  , h: 0.06
-  , pathLength: 100
+  { fx: Nothing
+  , fy: Nothing
+  , magnitude: 1.0
+  , h: 0.07
+  , pathLength: 90
   , pathCount: 3
   }
 
@@ -49,23 +50,22 @@ withSolution {x, y} time =
     insert "y" (liftExprNumber y) $
       insert "t" (liftExprNumber time) empty
 
+fail :: Expect (Expr Number)
+fail = parse "x" >>= eval empty
+
 execute :: Model -> Solution -> Time -> Maybe Solution
 execute model sol time =
-  let evalCommand str =
-        case parse str of
-          Right expr -> case eval (withSolution sol time) expr of
-            Right (Lit x) -> Just x
-            _             -> Nothing
-          _          -> Nothing
-      x_ = evalCommand model.command0
-      y_ = evalCommand model.command1
+  let evalF (Just f) = Right f >>= eval (withSolution sol time)
+      evalF _ = fail
+      x_ = evalF model.fx
+      y_ = evalF model.fy
     in case x_, y_ of
-              Just x, Just y -> Just {x, y}
-              _, _           -> Nothing
+      Right (Lit x), Right (Lit y) -> Just {x, y}
+      _, _                         -> Nothing
 
 data Action
-  = Command0 String
-  | Command1 String
+  = Fx String
+  | Fy String
   | UpdateMagnitude String
   | UpdateH String
   | IncreaseLength
@@ -75,8 +75,14 @@ data Action
 
 update ∷ Model → Action → Model
 update model = case _ of
-  Command0 str -> model{command0 = str}
-  Command1 str -> model{command1 = str}
+  Fx str -> model{fx = case Right str >>= parse of
+                        Right exp -> Just exp
+                        _         -> Nothing
+                 }
+  Fy str -> model{fy = case Right str >>= parse of
+                        Right exp -> Just exp
+                        _         -> Nothing
+                 }
   UpdateMagnitude str -> model{magnitude = readFloat str}
   UpdateH str -> model{h = readFloat str}
   IncreaseLength -> model{pathLength = model.pathLength + 1}
@@ -90,8 +96,8 @@ update model = case _ of
       then model.pathCount - 1
       else model.pathCount}
 
-height = 600 :: Int
-width = 800 :: Int
+halfheight = 300 :: Int
+halfwidth = 400 :: Int
 
 styleCenter :: String
 styleCenter = "display: flex; align-items: center; justify-content: center;"
@@ -106,19 +112,19 @@ render model =
             [ H.elemWithNS
                 (Just $ H.Namespace "http://www.w3.org/2000/svg")
                 "svg"
-                [ H.attr "width" $ show width <> "px"
-                , H.attr "height" $ show height <> "px"
+                [ H.attr "width" $ show (2 * halfwidth) <> "px"
+                , H.attr "height" $ show (2 * halfheight) <> "px"
                 ] $
                 concat $ renderSolutions model.pathCount ctx {gen: 345, seed: 543562263, val: 75} model
 
             , H.div []
-              [ command0
-              , command1
+              [ fx
+              , fy
               , H.br []
-              , H.label [] [H.text "magnitude (30.0): "]
+              , H.label [] [H.text "magnitude (1.0): "]
               , H.input [H.onValueChange $ H.always UpdateMagnitude]
               , H.br []
-              , H.label [] [H.text "h (0.06): "]
+              , H.label [] [H.text "h (0.07): "]
               , H.input [H.onValueChange $ H.always UpdateH]
 
               , H.div [H.attr "style" styleCounter]
@@ -136,12 +142,12 @@ render model =
               ]
             ]
 
-command0 :: H.Html Action
-command0 = H.input [ H.autofocus true
-                  , H.onValueChange  (H.always Command0)]
+fx :: H.Html Action
+fx = H.input [ H.autofocus true
+             , H.onValueChange  (H.always Fx)]
 
-command1 :: H.Html Action
-command1 = H.input [ H.onValueChange  (H.always Command1)]
+fy :: H.Html Action
+fy = H.input [ H.onValueChange  (H.always Fy)]
 
 randomNumberLessThan :: Number -> Rand -> Number
 randomNumberLessThan mag r =
@@ -160,7 +166,7 @@ renderSolutions iter ctx r model =
           ry = rand rx
           y = randomNumberLessThan model.magnitude ry
           rt = rand ry
-          t = randomNumberLessThan 0.001 rt
+          t = randomNumberLessThan 0.0005 rt
       in [render' ctx $ segmentSolution model.pathLength model {x, y} t]
         <> renderSolutions (iter-1) ctx (rand rt) model
 
@@ -192,8 +198,8 @@ rk4 model {x, y} t =
                               , y: y0 + h * (k1y + 2.0 * k2y + 2.0 * k3y + k4y) / 6.0}) <$>
                               Just {x, y} <*> mk1 <*> mk2 <*> mk3 <*> mk4
 
-xoffset = toNumber width / 2.0  :: Number
-yoffset = toNumber height / 2.0 :: Number
+xoffset = toNumber halfwidth :: Number
+yoffset = toNumber halfheight :: Number
 
 segmentSolution :: Int -> Model -> Solution -> Time -> Array Segment
 segmentSolution iter model sol@{x, y} t =
@@ -202,8 +208,10 @@ segmentSolution iter model sol@{x, y} t =
     else
       case rk4 model sol t of
         Just sol_@{x: x_, y: y_} ->
-          [segment (point "" (x + xoffset) (- y + yoffset))  -- Yaxis !!
-                   (point "" (x_ + xoffset) (- y_ + yoffset)) Nothing]
+          [segment (point "" (x * toNumber halfwidth + xoffset)
+                             (- y * toNumber halfheight + yoffset))  -- Yaxis !!
+                   (point "" (x_ * toNumber halfwidth + xoffset)
+                             (- y_ * toNumber halfheight + yoffset)) Nothing]
           <> segmentSolution (iter-1) model sol_ (t + model.h)
         _ -> []
 
