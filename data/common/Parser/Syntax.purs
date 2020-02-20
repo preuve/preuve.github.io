@@ -83,6 +83,26 @@ class Real t where
   acosh :: t -> t
   atanh :: t -> t
 
+instance realNumber :: Real Number where
+  pi = Math.pi
+  fromNumber = identity
+  log = Math.log
+  sqrt = Math.sqrt
+  exp = Math.exp
+  sin = Math.sin
+  cos = Math.cos
+  tan = Math.tan
+  sinh = mathsinh
+  cosh = mathcosh
+  tanh = mathtanh
+  asin = Math.asin
+  acos = Math.acos
+  atan = Math.atan
+  asinh = mathasinh
+  acosh = mathacosh
+  atanh = mathatanh
+
+
 instance realDual :: Real Dual where
   pi = Dual {height: Math.pi, slope: 0.0}
   fromNumber x = Dual {height: x, slope: 0.0}
@@ -119,6 +139,9 @@ instance realDual :: Real Dual where
 
 class Powerable t where
   pow :: t -> t -> t
+
+instance powerNumber :: Powerable Number where
+  pow = Math.pow
 
 instance powerDual :: Powerable Dual where
   pow (Dual {height: f, slope: f'}) (Dual {height: g, slope: g'}) =

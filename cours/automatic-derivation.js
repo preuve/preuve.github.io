@@ -24093,7 +24093,7 @@ var PS = {};
       if (v instanceof Atanh) {
           return "{- cumbersome symbol for inverse hyperbolic tangent -}";
       };
-      throw new Error("Failed pattern match at Parser.Syntax (line 157, column 1 - line 173, column 72): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Parser.Syntax (line 180, column 1 - line 196, column 72): " + [ v.constructor.name ]);
   });
   var showDual = new Data_Show.Show(function (v) {
       return Data_Show.show(Data_Show.showNumber)(v.value0.height);
@@ -24114,7 +24114,7 @@ var PS = {};
       if (v instanceof Pow) {
           return "{- cumbersome symbol for exponent -}";
       };
-      throw new Error("Failed pattern match at Parser.Syntax (line 150, column 1 - line 155, column 52): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Parser.Syntax (line 173, column 1 - line 178, column 52): " + [ v.constructor.name ]);
   });
   var showExpr = function (dictShow) {
       return new Data_Show.Show(function (v) {
@@ -24181,7 +24181,7 @@ var PS = {};
           if (v instanceof Unop) {
               return Data_Show.show(showUnop)(v.value0) + Data_Show.show(showExpr(dictShow))(v.value1);
           };
-          throw new Error("Failed pattern match at Parser.Syntax (line 127, column 1 - line 148, column 41): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Parser.Syntax (line 150, column 1 - line 171, column 41): " + [ v.constructor.name ]);
       });
   };
   var semiringDual = new Data_Semiring.Semiring(function (v) {
@@ -24214,7 +24214,7 @@ var PS = {};
               slope: v.value0.slope - v1.value0.slope
           });
       };
-  });
+  });                                         
   var powerDual = new Powerable(function (v) {
       return function (v1) {
           return new Dual({
@@ -24336,7 +24336,7 @@ var PS = {};
           height: mathtanh(v.value0.height),
           slope: v.value0.slope / $$Math.pow(mathcosh(v.value0.height))(2.0)
       });
-  });
+  });                                                                                                                                                                                                                                                                         
   var log = function (dict) {
       return dict.log;
   };
@@ -25903,7 +25903,7 @@ var PS = {};
           if (v instanceof Data_Either.Right) {
               return Control_Applicative.pure(Data_Either.applicativeEither)(v.value0);
           };
-          throw new Error("Failed pattern match at Parser.Parser (line 80, column 11 - line 82, column 20): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Parser.Parser (line 79, column 11 - line 81, column 20): " + [ v.constructor.name ]);
       };
   };
   exports["parse"] = parse;

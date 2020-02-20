@@ -8,9 +8,10 @@ import Data.Int (toNumber)
 import Data.Map (empty, insert)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
+import Global (readFloat)
 import Parser.Eval (eval, Env)
 import Parser.Parser (parse)
-import Parser.Syntax (Dual(..), Expr(..))
+import Parser.Syntax (Expr(..))
 import Rand (Rand, rand)
 import SVGpork.Geometry (Segment, point, segment)
 import SVGpork.Render (Context, defaultContext, render')
@@ -20,34 +21,42 @@ import Spork.PureApp as PureApp
 type Model =
   { command0 :: String
   , command1 :: String
+  , magnitude :: Number
+  , h :: Number
+  , pathLength :: Int
+  , pathCount :: Int
   }
 
 initialModel ∷ Model
 initialModel =
   { command0: ""
   , command1: ""
+  , magnitude: 30.0
+  , h: 0.06
+  , pathLength: 100
+  , pathCount: 3
   }
 
-liftExprDual :: Number -> Expr Dual
-liftExprDual x = Lit $ Dual {height: x, slope: 1.0}
+liftExprNumber :: Number -> Expr Number
+liftExprNumber x = Lit x
 
 type Solution = {x :: Number, y :: Number}
 type Time = Number
 
-withSolution :: Solution -> Time -> Env Dual
+withSolution :: Solution -> Time -> Env Number
 withSolution {x, y} time =
-  insert "x" (liftExprDual x) $
-    insert "y" (liftExprDual y) $
-      insert "t" (liftExprDual time) empty
+  insert "x" (liftExprNumber x) $
+    insert "y" (liftExprNumber y) $
+      insert "t" (liftExprNumber time) empty
 
 execute :: Model -> Solution -> Time -> Maybe Solution
 execute model sol time =
   let evalCommand str =
         case parse str of
           Right expr -> case eval (withSolution sol time) expr of
-            Right (Lit (Dual {height, slope})) -> Just height
-            _                                  -> Nothing
-          _           -> Nothing
+            Right (Lit x) -> Just x
+            _             -> Nothing
+          _          -> Nothing
       x_ = evalCommand model.command0
       y_ = evalCommand model.command1
     in case x_, y_ of
@@ -57,26 +66,74 @@ execute model sol time =
 data Action
   = Command0 String
   | Command1 String
+  | UpdateMagnitude String
+  | UpdateH String
+  | IncreaseLength
+  | DecreaseLength
+  | IncreaseCount
+  | DecreaseCount
 
 update ∷ Model → Action → Model
 update model = case _ of
   Command0 str -> model{command0 = str}
   Command1 str -> model{command1 = str}
+  UpdateMagnitude str -> model{magnitude = readFloat str}
+  UpdateH str -> model{h = readFloat str}
+  IncreaseLength -> model{pathLength = model.pathLength + 1}
+  DecreaseLength -> model{pathLength =
+    if model.pathLength > 0
+      then model.pathLength - 1
+      else model.pathLength}
+  IncreaseCount -> model{pathCount = model.pathCount + 1}
+  DecreaseCount -> model{pathCount =
+    if model.pathCount > 0
+      then model.pathCount - 1
+      else model.pathCount}
+
+height = 600 :: Int
+width = 800 :: Int
+
+styleCenter :: String
+styleCenter = "display: flex; align-items: center; justify-content: center;"
+
+styleCounter :: String
+styleCounter = "display: grid; grid-template-columns: 1fr 2fr 1fr 2fr;"
 
 render ∷ Model → H.Html Action
 render model =
   let ctx = defaultContext { stroke = "#050409", strokeWidth = 0.2}
-   in H.div []
+   in H.div [H.attr "style" "display: grid; grid-template-columns: 1fr 1fr;"]
             [ H.elemWithNS
                 (Just $ H.Namespace "http://www.w3.org/2000/svg")
                 "svg"
-                [ H.attr "width" "800px"
-                , H.attr "height" "600px"
+                [ H.attr "width" $ show width <> "px"
+                , H.attr "height" $ show height <> "px"
                 ] $
-                concat $ renderSolutions pathNumber ctx {gen: 345, seed: 543562263, val: 75} model
+                concat $ renderSolutions model.pathCount ctx {gen: 345, seed: 543562263, val: 75} model
 
-            , command0
-            , command1
+            , H.div []
+              [ command0
+              , command1
+              , H.br []
+              , H.label [] [H.text "magnitude (30.0): "]
+              , H.input [H.onValueChange $ H.always UpdateMagnitude]
+              , H.br []
+              , H.label [] [H.text "h (0.06): "]
+              , H.input [H.onValueChange $ H.always UpdateH]
+
+              , H.div [H.attr "style" styleCounter]
+                [ H.button [H.onClick $ H.always_ DecreaseLength] [H.text "-"]
+                , H.label [H.attr "style" styleCenter] [H.text $ show model.pathLength]
+                , H.button [H.onClick $ H.always_ IncreaseLength] [H.text "+"]
+                , H.label [H.attr "style" styleCenter] [H.text "steps"]
+                ]
+              , H.div [H.attr "style" styleCounter]
+                [ H.button [H.onClick $ H.always_ DecreaseCount] [H.text "-"]
+                , H.label [H.attr "style" styleCenter] [H.text $ show model.pathCount]
+                , H.button [H.onClick $ H.always_ IncreaseCount] [H.text "+"]
+                , H.label [H.attr "style" styleCenter] [H.text "paths"]
+                ]
+              ]
             ]
 
 command0 :: H.Html Action
@@ -99,17 +156,18 @@ renderSolutions iter ctx r model =
     then []
     else
       let rx = rand r
-          x = randomNumberLessThan magnitude rx
+          x = randomNumberLessThan model.magnitude rx
           ry = rand rx
-          y = randomNumberLessThan magnitude ry
+          y = randomNumberLessThan model.magnitude ry
           rt = rand ry
           t = randomNumberLessThan 0.001 rt
-      in [render' ctx $ segmentSolution pathLength model {x, y} t]
+      in [render' ctx $ segmentSolution model.pathLength model {x, y} t]
         <> renderSolutions (iter-1) ctx (rand rt) model
 
 rk4 :: Model -> Solution -> Time -> Maybe Solution
 rk4 model {x, y} t =
-  let mk1 = execute model {x, y} t
+  let h = model.h
+      mk1 = execute model {x, y} t
       mk2 = mk1 >>= (\ {x: k1x, y: k1y} ->
                   execute model { x: x + h * k1x / 2.0
                                 , y: y + h * k1y / 2.0
@@ -134,12 +192,8 @@ rk4 model {x, y} t =
                               , y: y0 + h * (k1y + 2.0 * k2y + 2.0 * k3y + k4y) / 6.0}) <$>
                               Just {x, y} <*> mk1 <*> mk2 <*> mk3 <*> mk4
 
-magnitude = 30.0 :: Number
-h = 0.1 :: Number
-xoffset = 400.0 :: Number
-yoffset = 300.0 :: Number
-pathLength = 100 :: Int
-pathNumber = 5 :: Int
+xoffset = toNumber width / 2.0  :: Number
+yoffset = toNumber height / 2.0 :: Number
 
 segmentSolution :: Int -> Model -> Solution -> Time -> Array Segment
 segmentSolution iter model sol@{x, y} t =
@@ -148,8 +202,9 @@ segmentSolution iter model sol@{x, y} t =
     else
       case rk4 model sol t of
         Just sol_@{x: x_, y: y_} ->
-          [segment (point "" (x+xoffset) (y+yoffset)) (point "" (x_+xoffset) (y_+yoffset)) Nothing]
-          <> segmentSolution (iter-1) model sol_ (t+h)
+          [segment (point "" (x + xoffset) (- y + yoffset))  -- Yaxis !!
+                   (point "" (x_ + xoffset) (- y_ + yoffset)) Nothing]
+          <> segmentSolution (iter-1) model sol_ (t + model.h)
         _ -> []
 
 app ∷ PureApp.PureApp Model Action
