@@ -3,7 +3,7 @@ module Main where
 import Prelude
 
 import Data.Array (concat)
-import Data.Either (Either(..))
+import Data.Either (Either(..), hush)
 import Data.Int (toNumber)
 import Data.Map (empty, insert)
 import Data.Maybe (Maybe(..))
@@ -75,26 +75,18 @@ data Action
 
 update ∷ Model → Action → Model
 update model = case _ of
-  Fx str -> model{fx = case Right str >>= parse of
-                        Right exp -> Just exp
-                        _         -> Nothing
-                 }
-  Fy str -> model{fy = case Right str >>= parse of
-                        Right exp -> Just exp
-                        _         -> Nothing
-                 }
+  Fx str -> model{fx = hush $ Right str >>= parse}
+  Fy str -> model{fy = hush $ Right str >>= parse}
   UpdateMagnitude str -> model{magnitude = readFloat str}
   UpdateH str -> model{h = readFloat str}
   IncreaseLength -> model{pathLength = model.pathLength + 1}
-  DecreaseLength -> model{pathLength =
-    if model.pathLength > 0
-      then model.pathLength - 1
-      else model.pathLength}
+  DecreaseLength -> model{pathLength = ifM (_ > 0)
+                                           (_ - 1)
+                                           identity model.pathLength}
   IncreaseCount -> model{pathCount = model.pathCount + 1}
-  DecreaseCount -> model{pathCount =
-    if model.pathCount > 0
-      then model.pathCount - 1
-      else model.pathCount}
+  DecreaseCount -> model{pathCount = ifM (_ > 0)
+                                         (_ - 1)
+                                         identity model.pathCount}
 
 halfheight = 300 :: Int
 halfwidth = 400 :: Int
@@ -115,7 +107,9 @@ render model =
                 [ H.attr "width" $ show (2 * halfwidth) <> "px"
                 , H.attr "height" $ show (2 * halfheight) <> "px"
                 ] $
-                concat $ renderSolutions model.pathCount ctx {gen: 345, seed: 543562263, val: 75} model
+                concat $ renderSolutions model.pathCount ctx { gen: 345
+                                                             , seed: 543562263
+                                                             , val: 75} model
 
             , H.div []
               [ fx

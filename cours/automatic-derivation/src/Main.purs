@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Array (filter, length, (..), uncons, dropWhile, head, tail, any)
 import Data.Const (Const)
-import Data.Either (Either(..))
+import Data.Either (Either(..), hush)
 import Data.Int (toNumber, floor, ceil, round)
 import Data.Map (empty, insert, lookup)
 import Data.Maybe (Maybe(..), fromJust)
@@ -198,10 +198,9 @@ update model action = case action of
 
   IncreaseDensity -> App.purely model{density = model.density + 10}
 
-  DecreaseDensity -> App.purely $
-    if model.density > 10
-      then model{density = model.density - 10}
-      else model
+  DecreaseDensity -> App.purely $ model{density = ifM (_ > 10)
+                                                      (_ - 10)
+                                                      identity model.density}
 
   FunctionSlot (Just ref) -> App.purely model{functionSlot = Just ref}
   FunctionSlot _ -> App.purely model
@@ -215,7 +214,7 @@ update model action = case action of
 
   EndDragging -> App.purely model{ isDragged = false}
 
-  UpdateArgument mouse ->   App.purely $
+  UpdateArgument mouse -> App.purely $
     if model.isDragged
       then
         let x = toNumber $ pageX mouse
@@ -251,10 +250,7 @@ update model action = case action of
               else model
 
   RenderCommand cmd ->
-    let  m = model{f = case Right cmd >>= parse of
-                      Right expr -> Just expr
-                      _          -> Nothing
-                  }
+    let  m = model{f = hush $ Right cmd >>= parse}
          effects =
           case model.functionSlot of
             Just(H.Created el) →
@@ -646,7 +642,7 @@ render model =
 
 functionInput :: H.Html Action
 functionInput = H.input [ H.autofocus true
-                  , H.onValueChange  (H.always RenderCommand)]
+                        , H.onValueChange  (H.always RenderCommand)]
 
 app ∷ App.App KaTeX.RenderEffect (Const Void) Model Action
 app =

@@ -188,7 +188,16 @@ var PS = {};
   var Apply = function (Functor0, apply) {
       this.Functor0 = Functor0;
       this.apply = apply;
-  }; 
+  };
+  var applyFn = new Apply(function () {
+      return Data_Functor.functorFn;
+  }, function (f) {
+      return function (g) {
+          return function (x) {
+              return f(x)(g(x));
+          };
+      };
+  });
   var applyArray = new Apply(function () {
       return Data_Functor.functorArray;
   }, $foreign.arrayApply);
@@ -213,6 +222,7 @@ var PS = {};
   exports["apply"] = apply;
   exports["applyFirst"] = applyFirst;
   exports["applySecond"] = applySecond;
+  exports["applyFn"] = applyFn;
   exports["applyArray"] = applyArray;
 })(PS);
 (function($PS) {
@@ -290,7 +300,16 @@ var PS = {};
   };
   var discard = function (dict) {
       return dict.discard;
-  }; 
+  };
+  var bindFn = new Bind(function () {
+      return Control_Apply.applyFn;
+  }, function (m) {
+      return function (f) {
+          return function (x) {
+              return f(m(x))(x);
+          };
+      };
+  });
   var bindArray = new Bind(function () {
       return Control_Apply.applyArray;
   }, $foreign.arrayBind);
@@ -312,11 +331,27 @@ var PS = {};
   var discardUnit = new Discard(function (dictBind) {
       return bind(dictBind);
   });
+  var ifM = function (dictBind) {
+      return function (cond) {
+          return function (t) {
+              return function (f) {
+                  return bind(dictBind)(cond)(function (cond$prime) {
+                      if (cond$prime) {
+                          return t;
+                      };
+                      return f;
+                  });
+              };
+          };
+      };
+  };
   exports["Bind"] = Bind;
   exports["bind"] = bind;
   exports["bindFlipped"] = bindFlipped;
   exports["discard"] = discard;
   exports["composeKleisli"] = composeKleisli;
+  exports["ifM"] = ifM;
+  exports["bindFn"] = bindFn;
   exports["bindArray"] = bindArray;
   exports["discardUnit"] = discardUnit;
 })(PS);
@@ -1072,7 +1107,9 @@ var PS = {};
   var Control_Apply = $PS["Control.Apply"];
   var Control_Bind = $PS["Control.Bind"];
   var Data_Foldable = $PS["Data.Foldable"];
+  var Data_Function = $PS["Data.Function"];
   var Data_Functor = $PS["Data.Functor"];
+  var Data_Maybe = $PS["Data.Maybe"];
   var Data_Monoid = $PS["Data.Monoid"];            
   var Left = (function () {
       function Left(value0) {
@@ -1152,7 +1189,8 @@ var PS = {};
               throw new Error("Failed pattern match at Data.Either (line 238, column 1 - line 238, column 64): " + [ v.constructor.name, v1.constructor.name, v2.constructor.name ]);
           };
       };
-  }; 
+  };
+  var hush = either(Data_Function["const"](Data_Maybe.Nothing.value))(Data_Maybe.Just.create);
   var applyEither = new Control_Apply.Apply(function () {
       return functorEither;
   }, function (v) {
@@ -1183,6 +1221,7 @@ var PS = {};
   exports["Left"] = Left;
   exports["Right"] = Right;
   exports["either"] = either;
+  exports["hush"] = hush;
   exports["functorEither"] = functorEither;
   exports["applicativeEither"] = applicativeEither;
   exports["bindEither"] = bindEither;
@@ -27390,6 +27429,7 @@ var PS = {};
   $PS["Main"] = $PS["Main"] || {};
   var exports = $PS["Main"];
   var Control_Bind = $PS["Control.Bind"];
+  var Control_Category = $PS["Control.Category"];
   var Data_Array = $PS["Data.Array"];
   var Data_Boolean = $PS["Data.Boolean"];
   var Data_Either = $PS["Data.Either"];
@@ -27783,8 +27823,8 @@ var PS = {};
                                       $tco_var_dictPartial = undefined;
                                       $tco_var_from = from;
                                       $tco_var_acc = (function () {
-                                          var $108 = okY(v.value0.y) && okY(v2.value0.head.value0.y);
-                                          if ($108) {
+                                          var $109 = okY(v.value0.y) && okY(v2.value0.head.value0.y);
+                                          if ($109) {
                                               return Data_Semigroup.append(Data_Semigroup.semigroupArray)(acc)([ SVGpork_Geometry.segment(SVGpork_Geometry.point("")(v.value0.x)(v.value0.y))(SVGpork_Geometry.point("")(v2.value0.head.value0.x)(v2.value0.head.value0.y))(Data_Maybe.Nothing.value) ]);
                                           };
                                           return acc;
@@ -27801,8 +27841,8 @@ var PS = {};
                                               return "x";
                                           }))(Data_Eq.eqNumber))))(v3)(Data_Maybe.Nothing.value);
                                       })(v2.value0.tail);
-                                      var $112 = Data_Array.length(ys) === 0;
-                                      if ($112) {
+                                      var $113 = Data_Array.length(ys) === 0;
+                                      if ($113) {
                                           $tco_done = true;
                                           return acc;
                                       };
@@ -27813,15 +27853,15 @@ var PS = {};
                                       $copy_v1 = Data_Maybe.fromJust()(Data_Array.tail(ys));
                                       return;
                                   };
-                                  throw new Error("Failed pattern match at Main (line 477, column 11 - line 489, column 74): " + [ v2.value0.head.constructor.name ]);
+                                  throw new Error("Failed pattern match at Main (line 473, column 11 - line 485, column 74): " + [ v2.value0.head.constructor.name ]);
                               };
                               if (v2 instanceof Data_Maybe.Nothing) {
                                   $tco_done = true;
                                   return acc;
                               };
-                              throw new Error("Failed pattern match at Main (line 475, column 6 - line 490, column 21): " + [ v2.constructor.name ]);
+                              throw new Error("Failed pattern match at Main (line 471, column 6 - line 486, column 21): " + [ v2.constructor.name ]);
                           };
-                          throw new Error("Failed pattern match at Main (line 466, column 1 - line 469, column 76): " + [ from.constructor.name, acc.constructor.name, v.constructor.name, v1.constructor.name ]);
+                          throw new Error("Failed pattern match at Main (line 462, column 1 - line 465, column 76): " + [ from.constructor.name, acc.constructor.name, v.constructor.name, v1.constructor.name ]);
                       };
                       while (!$tco_done) {
                           $tco_result = $tco_loop($tco_var_dictPartial, $tco_var_from, $tco_var_acc, $tco_var_v, $copy_v1);
@@ -27953,10 +27993,10 @@ var PS = {};
   };
   var segmentInBox = function (v) {
       return function (v1) {
-          var candidates = Data_Array.filter(function ($304) {
+          var candidates = Data_Array.filter(function ($302) {
               return (function (v2) {
                   return v2 === 1;
-              })(Data_Array.length($304));
+              })(Data_Array.length($302));
           })(Data_Functor.map(Data_Functor.functorArray)(function (v2) {
               return SVGpork_Geometry.meets(SVGpork_Geometry.interSegmentSegment)(v1)(v2);
           })(frame(v)));
@@ -27967,25 +28007,25 @@ var PS = {};
               if (candidates.length === 1 && candidates[0].length === 1) {
                   return Data_Maybe.Just.create(SVGpork_Geometry.segment(v1.origin)(candidates[0][0])(Data_Maybe.Nothing.value));
               };
-              throw new Error("Failed pattern match at Main (line 448, column 21 - line 448, column 39): " + [ candidates.constructor.name ]);
+              throw new Error("Failed pattern match at Main (line 444, column 21 - line 444, column 39): " + [ candidates.constructor.name ]);
           };
           if (inBox(v)(v1.extremity)) {
               if (candidates.length === 1 && candidates[0].length === 1) {
                   return Data_Maybe.Just.create(SVGpork_Geometry.segment(v1.extremity)(candidates[0][0])(Data_Maybe.Nothing.value));
               };
-              throw new Error("Failed pattern match at Main (line 451, column 20 - line 451, column 38): " + [ candidates.constructor.name ]);
+              throw new Error("Failed pattern match at Main (line 447, column 20 - line 447, column 38): " + [ candidates.constructor.name ]);
           };
           if (Data_Boolean.otherwise) {
-              var $170 = Data_Array.length(candidates) === 2;
-              if ($170) {
+              var $171 = Data_Array.length(candidates) === 2;
+              if ($171) {
                   if (candidates.length === 2 && (candidates[0].length === 1 && candidates[1].length === 1)) {
                       return Data_Maybe.Just.create(SVGpork_Geometry.segment(candidates[0][0])(candidates[1][0])(Data_Maybe.Nothing.value));
                   };
-                  throw new Error("Failed pattern match at Main (line 455, column 28 - line 455, column 50): " + [ candidates.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 451, column 28 - line 451, column 50): " + [ candidates.constructor.name ]);
               };
               return Data_Maybe.Nothing.value;
           };
-          throw new Error("Failed pattern match at Main (line 445, column 7 - line 457, column 31): " + [ Data_Unit.unit.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 441, column 7 - line 453, column 31): " + [ Data_Unit.unit.constructor.name ]);
       };
   };
   var lineInBox = function (b) {
@@ -28024,31 +28064,29 @@ var PS = {};
               });
           };
           if (action instanceof DecreaseDensity) {
-              return Spork_Transition.purely((function () {
-                  var $180 = model.density > 10;
-                  if ($180) {
-                      return {
-                          density: model.density - 10 | 0,
-                          argument: model.argument,
-                          displayD: model.displayD,
-                          displayT: model.displayT,
-                          domain: model.domain,
-                          domainSlot: model.domainSlot,
-                          f: model.f,
-                          fromD: model.fromD,
-                          fromF: model.fromF,
-                          functionSlot: model.functionSlot,
-                          isDragged: model.isDragged,
-                          message: model.message,
-                          numbers: model.numbers,
-                          previousX: model.previousX,
-                          previousY: model.previousY,
-                          toD: model.toD,
-                          toF: model.toF
-                      };
-                  };
-                  return model;
-              })());
+              return Spork_Transition.purely({
+                  density: Control_Bind.ifM(Control_Bind.bindFn)(function (v1) {
+                      return v1 > 10;
+                  })(function (v1) {
+                      return v1 - 10 | 0;
+                  })(Control_Category.identity(Control_Category.categoryFn))(model.density),
+                  argument: model.argument,
+                  displayD: model.displayD,
+                  displayT: model.displayT,
+                  domain: model.domain,
+                  domainSlot: model.domainSlot,
+                  f: model.f,
+                  fromD: model.fromD,
+                  fromF: model.fromF,
+                  functionSlot: model.functionSlot,
+                  isDragged: model.isDragged,
+                  message: model.message,
+                  numbers: model.numbers,
+                  previousX: model.previousX,
+                  previousY: model.previousY,
+                  toD: model.toD,
+                  toF: model.toF
+              });
           };
           if (action instanceof FunctionSlot && action.value0 instanceof Data_Maybe.Just) {
               return Spork_Transition.purely({
@@ -28219,13 +28257,7 @@ var PS = {};
           };
           if (action instanceof RenderCommand) {
               var m = {
-                  f: (function () {
-                      var v1 = Control_Bind.bind(Data_Either.bindEither)(new Data_Either.Right(action.value0))(Parser_Parser.parse(Parser_Syntax.realDual));
-                      if (v1 instanceof Data_Either.Right) {
-                          return new Data_Maybe.Just(v1.value0);
-                      };
-                      return Data_Maybe.Nothing.value;
-                  })(),
+                  f: Data_Either.hush(Control_Bind.bind(Data_Either.bindEither)(new Data_Either.Right(action.value0))(Parser_Parser.parse(Parser_Syntax.realDual))),
                   argument: model.argument,
                   density: model.density,
                   displayD: model.displayD,
@@ -28253,7 +28285,7 @@ var PS = {};
                   if (model.functionSlot instanceof Data_Maybe.Nothing) {
                       return Data_Monoid.mempty(Spork_Batch.monoidBatch);
                   };
-                  throw new Error("Failed pattern match at Main (line 259, column 11 - line 263, column 30): " + [ model.functionSlot.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 255, column 11 - line 259, column 30): " + [ model.functionSlot.constructor.name ]);
               })();
               return {
                   model: m,
@@ -28284,7 +28316,7 @@ var PS = {};
                   if (model.domainSlot instanceof Data_Maybe.Nothing) {
                       return Data_Monoid.mempty(Spork_Batch.monoidBatch);
                   };
-                  throw new Error("Failed pattern match at Main (line 275, column 11 - line 279, column 30): " + [ model.domainSlot.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 271, column 11 - line 275, column 30): " + [ model.domainSlot.constructor.name ]);
               })();
               return {
                   model: {
@@ -28549,7 +28581,7 @@ var PS = {};
                   return model;
               })());
           };
-          throw new Error("Failed pattern match at Main (line 196, column 23 - line 312, column 30): " + [ action.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 196, column 23 - line 308, column 30): " + [ action.constructor.name ]);
       };
   };
   var execute = function (f) {
@@ -28606,7 +28638,7 @@ var PS = {};
           if (v instanceof FA) {
               return SVGpork_Render["render'"](SVGpork_Render.renderSequence(drawableFinal))(ctx)(v.value0);
           };
-          throw new Error("Failed pattern match at Main (line 321, column 1 - line 339, column 41): " + [ ctx.constructor.name, v.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 317, column 1 - line 335, column 41): " + [ ctx.constructor.name, v.constructor.name ]);
       };
   });
   var grid = function (ctx) {
@@ -28645,8 +28677,8 @@ var PS = {};
               })(Data_Array.range(Data_Int.ceil(botX))(Data_Int.floor(topX))))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Control_Bind.bindFlipped(Control_Bind.bindArray)(function (n) {
                   return SVGpork_Render["render'"](drawableFinal)(ctx$prime(0.5))(segAtY(Data_Int.toNumber(n)));
               })(Data_Array.range(Data_Int.ceil(botY))(Data_Int.floor(topY))))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(SVGpork_Render["render'"](drawableFinal)(ctx$prime(1.5))(segAtX(0.0)))((function () {
-                  var $244 = botY <= 0.0 && 0.0 <= topY;
-                  if ($244) {
+                  var $242 = botY <= 0.0 && 0.0 <= topY;
+                  if ($242) {
                       return SVGpork_Render["render'"](drawableFinal)(ctx$prime(1.5))(segAtY(0.0));
                   };
                   return [  ];
@@ -28659,11 +28691,11 @@ var PS = {};
           return function (fromD) {
               return function (toD) {
                   return function (x) {
-                      var $250 = inDomain(v.domain)(x);
-                      if ($250) {
+                      var $248 = inDomain(v.domain)(x);
+                      if ($248) {
                           var p = SVGpork_Geometry.point("")(x)(-v["function"](x));
-                          var $251 = inBox(fromD)(p);
-                          if ($251) {
+                          var $249 = inBox(fromD)(p);
+                          if ($249) {
                               return SVGpork_Render["render'"](drawableFinal)(tanStyle(ctx))(new FP(fromD, toD, p));
                           };
                           return [  ];
@@ -28688,8 +28720,8 @@ var PS = {};
                               return "x";
                           }))(Data_Eq.eqNumber))))(v1)(Data_Maybe.Nothing.value);
                       })(Data_Functor.map(Data_Functor.functorArray)(Data_Functor.map(Data_Functor.functorFn)(function (x) {
-                          var $259 = inDomain(v.domain)(x);
-                          if ($259) {
+                          var $257 = inDomain(v.domain)(x);
+                          if ($257) {
                               return new Data_Maybe.Just({
                                   x: x,
                                   y: -v["function"](x)
@@ -28699,8 +28731,8 @@ var PS = {};
                       })(function (n) {
                           return botX + (Data_Int.toNumber(n) * (topX - botX)) / Data_Int.toNumber(density);
                       }))(Data_Array.range(0)(density)));
-                      var $260 = Data_Array.length(zs) === 0;
-                      if ($260) {
+                      var $258 = Data_Array.length(zs) === 0;
+                      if ($258) {
                           return [  ];
                       };
                       return Control_Bind.bindFlipped(Control_Bind.bindArray)(function (s) {
@@ -28773,8 +28805,8 @@ var PS = {};
                           var a = -df(x);
                           var a2 = digit2(-a);
                           return Data_Semigroup.append(Data_Semigroup.semigroupArray)([ SVGpork_Render.svgtext(svgWidth * 0.7)(svgHeight * 5.0e-2)(blue)("italic bold 15px arial, serif")("a = " + Data_Show.show(Data_Show.showNumber)(digit2(x))) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
-                              var $277 = inBox(fromF)(p);
-                              if ($277) {
+                              var $275 = inBox(fromF)(p);
+                              if ($275) {
                                   return SVGpork_Render["render'"](drawableFinal)(ctx)(new FP(fromF, toF, p));
                               };
                               return [  ];
@@ -28787,12 +28819,12 @@ var PS = {};
                                   });
                                   if (v instanceof Data_Maybe.Just) {
                                       return Data_Semigroup.append(Data_Semigroup.semigroupArray)(SVGpork_Render["render'"](drawableFinal)(tanStyle(ctx))(new FS(fromF, toF, v.value0)))([ SVGpork_Render.svgtext(svgWidth * 0.7)(svgHeight * 0.1)(purple)("italic bold 15px arial, serif")("y = " + (Data_Show.show(Data_Show.showNumber)(a2) + ("x" + (function () {
-                                          var $280 = c2 < 0.0;
-                                          if ($280) {
+                                          var $278 = c2 < 0.0;
+                                          if ($278) {
                                               return Data_Show.show(Data_Show.showNumber)(c2);
                                           };
-                                          var $281 = c2 !== 0.0;
-                                          if ($281) {
+                                          var $279 = c2 !== 0.0;
+                                          if ($279) {
                                               return "+" + Data_Show.show(Data_Show.showNumber)(c2);
                                           };
                                           return "";
@@ -28823,8 +28855,8 @@ var PS = {};
               return [  ];
           })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
               var x = SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(remap(v.toF)(v.toF.center)(v.fromF));
-              var $286 = inDomain(v.domain)(x);
-              if ($286) {
+              var $284 = inDomain(v.domain)(x);
+              if ($284) {
                   return localDrawings(ctx)(x)(v.f)(v.fromF)(v.toF)(v.displayT);
               };
               return [  ];
@@ -28876,10 +28908,10 @@ var PS = {};
           strokeWidth: ctx.strokeWidth,
           fontStyle: ctx.fontStyle,
           textFill: ctx.textFill
-      })(cursor(diffDisplay)))))))), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 1fr;") ])([ mkButtonEvent(zoomOutX), mkButtonEvent(zoomInX), mkButtonEvent(fzoomOutY), mkButtonEvent(fzoomInY), mkButtonEvent(f$primezoomOutY), mkButtonEvent(f$primezoomInY), mkButtonEvent(showDerivative), mkButtonEvent(hideDerivative), mkButtonEvent(showTangent), mkButtonEvent(hideTangent), mkButtonEvent(markCoefficient), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 2fr 1fr;") ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseDensity.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.density)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseDensity.value)) ])([ Spork_Html_Core.text("+") ]) ]), functionInput, Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($305) {
-          return FunctionSlot.create(Data_Maybe.Just.create($305));
-      })) ])([  ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(RenderDomain.create)) ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($306) {
-          return DomainSlot.create(Data_Maybe.Just.create($306));
+      })(cursor(diffDisplay)))))))), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 1fr;") ])([ mkButtonEvent(zoomOutX), mkButtonEvent(zoomInX), mkButtonEvent(fzoomOutY), mkButtonEvent(fzoomInY), mkButtonEvent(f$primezoomOutY), mkButtonEvent(f$primezoomInY), mkButtonEvent(showDerivative), mkButtonEvent(hideDerivative), mkButtonEvent(showTangent), mkButtonEvent(hideTangent), mkButtonEvent(markCoefficient), Spork_Html_Elements.div([ Spork_Html_Core.attr("style")("display: grid; grid-template-columns: 1fr 2fr 1fr;") ])([ Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(DecreaseDensity.value)) ])([ Spork_Html_Core.text("-") ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter) ])([ Spork_Html_Core.text(Data_Show.show(Data_Show.showInt)(model.density)) ]), Spork_Html_Elements.button([ Spork_Html_Events.onClick(Spork_Html_Events.always_(IncreaseDensity.value)) ])([ Spork_Html_Core.text("+") ]) ]), functionInput, Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($303) {
+          return FunctionSlot.create(Data_Maybe.Just.create($303));
+      })) ])([  ]), Spork_Html_Elements.input([ Spork_Html_Events.onValueChange(Spork_Html_Events.always(RenderDomain.create)) ]), Spork_Html_Elements.label([ Spork_Html_Core.attr("style")(styleCenter), Spork_Html_Core.ref(Spork_Html_Events.always(function ($304) {
+          return DomainSlot.create(Data_Maybe.Just.create($304));
       })) ])([  ]) ]) ]);
   };
   var app = {
