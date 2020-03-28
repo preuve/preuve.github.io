@@ -2,8 +2,7 @@ module Exercise4 where
 
 import Prelude
 
-import Control.Monad.State (StateT)
-import Data.Identity (Identity)
+import Control.Monad.State (State)
 import Rand (Rand, rand)
 import SporKaTeX (t, nl, section)
 import Spork.Html (Html)
@@ -49,17 +48,11 @@ rshow r =
 
 spacing = "\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;\\;" :: String
 
-exo4 :: forall t35 t40 t78 t85.
-  Discard t78 => { code :: Int
-                 | t85
-                 }
-                 -> (String -> StateT (Array (Html t40)) Identity t78)
-                    -> t35
-                       -> { gen :: Int
-                          , seed :: Int
-                          , val :: Int
-                          }
-                          -> StateT (Array (Html t40)) Identity Unit
+exo4 :: forall eq b r.
+   { code :: Int | r }
+                 -> (String -> State (Array (Html b)) Unit)
+                    -> eq -> Rand 
+                       -> State (Array (Html b)) Unit
 exo4 model m equation r0 = do
   section "Exercice 4"
   t "Soit "

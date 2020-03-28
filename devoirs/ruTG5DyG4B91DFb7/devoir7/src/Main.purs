@@ -62,7 +62,7 @@ update model = case _ of
                     , seed: odd*odd
                     }
           seeds = (\s -> rand {val: s, gen: 0, seed: s*s})
-                   <$> rands 5 r0
+                   <$> ((_ + 1) <<< (_ * 2)) <$> rands 5 r0
       in model { disabled = false
                , code = code
                , seeds = seeds

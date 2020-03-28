@@ -4,10 +4,12 @@ import Prelude
 import Data.Array((!!), (..), length)
 import Data.Maybe(fromJust)
 import Partial.Unsafe(unsafePartial)
+import Control.Monad.State (State)
+import Spork.Html (Html)
 
 import SporKaTeX( t, nl
                 , section)
-import Rand(Rand, rand, rands, unsort)
+import Rand(Rand, rand, unsort)
 
 possibleSides :: Array Int
 possibleSides = 2..23
@@ -39,6 +41,12 @@ randomTriangle r =
 
 scalarT :: Triangle -> Int 
 scalarT {ab, ac, bc} = (ab*ab + ac*ac - bc*bc) / 2
+
+exo4 :: forall eq b a r.
+   Discard a => Monoid a => { code :: Int | r }
+                 -> (String -> State (Array (Html b)) a)
+                    -> eq -> Rand 
+                       -> State (Array (Html b)) a
 
 exo4 model m equation r0 = do
   section "Exercice 4"

@@ -9,6 +9,8 @@ import Partial.Unsafe(unsafePartial)
 import SporKaTeX( t, nl
                 , section)
 import Rand(Rand, rand, rands)
+import Control.Monad.State (State)
+import Spork.Html (Html)
 
 possibleSides :: Array Int
 possibleSides = 2..23
@@ -52,6 +54,11 @@ rshow r =
                     <> show d
                     <> "}"
 
+exo1 :: forall eq b a r.
+   Discard a => Monoid a => { code :: Int | r }
+                 -> (String -> State (Array (Html b)) a)
+                    -> eq -> Rand 
+                       -> State (Array (Html b)) a
 
 exo1 model m equation r0 = do
   section "Exercice 1"

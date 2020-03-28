@@ -7,7 +7,9 @@ import Partial.Unsafe(unsafePartial)
 
 import SporKaTeX( t, nl
                 , section)
-import Rand(Rand, rand, rands)
+import Rand(Rand, rand)
+import Control.Monad.State (State)
+import Spork.Html (Html)
 
 possibleValues :: Array Int
 possibleValues = 2..13
@@ -31,6 +33,12 @@ scalarT {ab, ac, t} =
   if t 
     then ab * ac
     else - ab * ac
+
+exo5 :: forall eq b a r.
+   Discard a => Monoid a => { code :: Int | r }
+                 -> (String -> State (Array (Html b)) a)
+                    -> eq -> Rand 
+                       -> State (Array (Html b)) a
 
 exo5 model m equation r0 = do
   section "Exercice 5"

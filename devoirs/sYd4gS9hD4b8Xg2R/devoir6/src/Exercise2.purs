@@ -4,6 +4,8 @@ import Prelude
 import Data.Array((!!), (..), length)
 import Data.Maybe(fromJust)
 import Partial.Unsafe(unsafePartial)
+import Control.Monad.State (State)
+import Spork.Html (Html)
 
 import SporKaTeX( t, nl
                 , section)
@@ -32,6 +34,11 @@ scalarT {a, b, c} =
       ac = {x: c.x - a.x, y: c.y - a.y}
    in ab.x * ac.x + ab.y * ac.y
 
+exo2 :: forall eq b a r.
+   Discard a => Monoid a => { code :: Int | r }
+                 -> (String -> State (Array (Html b)) a)
+                    -> eq -> Rand 
+                       -> State (Array (Html b)) a
 
 exo2 model m equation r0 = do
   section "Exercice 2"
