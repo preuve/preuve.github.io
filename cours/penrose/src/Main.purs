@@ -3,8 +3,8 @@ module Main where
 import Prelude
 import Data.Ord (abs) as Ord
 
-import Data.Array ((!!)) as Array
-import Data.Array (concat, filter, findIndex, fold, length, mapWithIndex, (..))
+import Data.Array ((!!),(..)) as Array
+import Data.Array (concat, filter, findIndex, fold, length, mapWithIndex)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..), fromJust, maybe)
 import Effect (Effect)
@@ -22,6 +22,14 @@ nth :: forall a. Array a -> Int -> a
 nth xs i = unsafePartial $ fromJust $ xs Array.!! i
 
 infix 5 nth as !!
+
+range :: Int -> Int -> Array Int
+range a b =
+  if a < b
+    then Array.(..) a b
+    else []
+
+infix 5 range as ..
 
 un = 50.0 :: Number
 svgWidth = 800.0 :: Number
@@ -99,24 +107,24 @@ cave q0 a =
 extensions :: Length -> Array (Point -> Angle -> Mesh)
 extensions One =
   [ \ q0 a -> vexe q0 (a-a72)
-  , \ q0 a -> vexe (q0 <+| vOne) (a+a108)
-  , \ q0 a -> vexe (q0 <+| vOne) (a-a108)
+  , \ q0 a -> vexe (q0 <+| rotated a vOne) (a+a108)
+  , \ q0 a -> vexe (q0 <+| rotated a vOne) (a-a108)
   , \ q0 a -> vexe q0 (a+a72)
   , \ q0 a -> cave q0 (a-a108)
   , \ q0 a -> cave q0 (a+a108)
-  , \ q0 a -> cave (q0 <+| vOne) (a+a72)
-  , \ q0 a -> cave (q0 <+| vOne) (a-a72)
+  , \ q0 a -> cave (q0 <+| rotated a vOne) (a+a72)
+  , \ q0 a -> cave (q0 <+| rotated a vOne) (a-a72)
   ]
 
 extensions Phi =
-  [ \ q0 a -> vexe (q0 <+| rotated a72 vOne) (a-a36)
-  , \ q0 a -> vexe (q0 <+| rotated (-a72) vOne) (a+a36)
-  , \ q0 a -> vexe (q0 <+| rotated (-a36) vPhi) (a+a144)
-  , \ q0 a -> vexe (q0 <+| rotated a36 vPhi) (a-a144)
-  , \ q0 a -> cave (q0 <+| rotated (-a36) vOne) (a+a36)
-  , \ q0 a -> cave (q0 <+| rotated a36 vOne) (a-a36)
-  , \ q0 a -> cave (q0 <+| rotated (-a36) vOne) (a+a144)
-  , \ q0 a -> cave (q0 <+| rotated a36 vOne) (a-a144)
+  [ \ q0 a -> vexe (q0 <+| rotated (a+a72) vOne) (a-a36)
+  , \ q0 a -> vexe (q0 <+| rotated (a-a72) vOne) (a+a36)
+  , \ q0 a -> vexe (q0 <+| rotated (a-a36) vPhi) (a+a144)
+  , \ q0 a -> vexe (q0 <+| rotated (a+a36) vPhi) (a-a144)
+  , \ q0 a -> cave (q0 <+| rotated (a-a36) vOne) (a+a36)
+  , \ q0 a -> cave (q0 <+| rotated (a+a36) vOne) (a-a36)
+  , \ q0 a -> cave (q0 <+| rotated (a-a36) vOne) (a+a144)
+  , \ q0 a -> cave (q0 <+| rotated (a+a36) vOne) (a-a144)
   ]
 
 type State =
@@ -203,29 +211,33 @@ merge tiling proposition = proposition
 
 extend :: Number -> Number -> State -> State
 extend x y m =
-  let index = findIndex (\i -> inside x y ((m.propositions !! i) (ref i) 0.0))
-                $ 0 .. (length m.propositions - 1)
-      proposition =  (\i -> (m.propositions !! i) (ref i) 0.0) <$> index
-  in maybe  m
-            (\prop ->  { tiling: merge m.tiling prop
+  maybe  m
+         (\preview ->  { tiling: { points: m.tiling.points <> preview.points
+                                 , edges: m.tiling.edges
+                                    <> ((\{p0,p1,active,selected,locked,length:l} ->
+                                        { p0: p0 + length m.tiling.points
+                                        , p1: p1 + length m.tiling.points
+                                        , active,selected,locked,length:l}) <$> preview.edges) 
+                                 }
                        , propositions: []
                        , preview: Nothing
                        })
-            proposition
+         m.preview
 
 teaser :: Number -> Number -> State -> State
 teaser x y m =
   let index = findIndex (\i -> inside x y ((m.propositions !! i) (ref i) 0.0))
               $ 0 .. (length m.propositions - 1)
-      locked = maybe Nothing (const $ Just $ (filter (_.locked) m.tiling.edges) !! 0) index
-      q0 = maybe Nothing (\lckd -> Just $ m.tiling.points !! (lckd.p0)) locked
-      q1 = maybe Nothing (\lckd -> Just $ m.tiling.points !! (lckd.p1)) locked
+
+      locked = filter (_.locked) m.tiling.edges
+      q0 = if length locked == 0 then Nothing else Just $ m.tiling.points !! ((locked !! 0).p0)
+      q1 = if length locked == 0 then Nothing else Just $ m.tiling.points !! ((locked !! 0).p1)
       angle = (\r0 r1 -> atan2 (ord r1 - ord r0) (abs r1 - abs r0)) <$> q0 <*> q1
-  in maybe m identity $ (\ i r0 a -> m {preview = Just $ (m.propositions !! i) r0 a}) <$> index <*> q0 <*> angle
-  {-maybe  m
-            (\i ->  m{ preview = Just $ (m.propositions !! i) q0 angle})
-            index
--}
+  in maybe m
+           identity
+           $ (\ i r0 a ->
+            m {preview = Just $ (m.propositions !! i) r0 a}) <$> index <*> q0 <*> angle
+
 update ∷ State → Action → State
 update m =
  case _ of
