@@ -1,21 +1,24 @@
 module Main where
 
 import Prelude
-import Data.Ord (abs) as Ord
 
-import Data.Array ((!!),(..)) as Array
-import Data.Array (concat, filter, findIndex, fold, length, mapWithIndex)
+import Data.Array ((!!), (..)) as Array
+import Data.Array (concat, filter, findIndex, fold, length, mapWithIndex, take, uncons)
+import Data.Const (Const)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..), fromJust, maybe)
+import Data.Ord (abs) as Ord
+import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Math (sqrt, pi, atan2)
 import Partial.Unsafe (unsafePartial)
 import SVGpork.Geometry (Point, Vector, abs, ord, point, rotated, scale, vector, (<+|))
 import SVGpork.Render (Context, defaultContext, svgline)
+import Spork.App as App
 import Spork.Html (Html)
 import Spork.Html as H
-import Spork.PureApp (PureApp)
-import Spork.PureApp as PureApp
+import Spork.Interpreter (liftNat, merge, never)
+import Web.HTML.HTMLElement (HTMLElement, fromElement, getBoundingClientRect)
 import Web.UIEvent.MouseEvent (MouseEvent, clientX, clientY)
 
 nth :: forall a. Array a -> Int -> a
@@ -30,6 +33,20 @@ range a b =
     else []
 
 infix 5 range as ..
+
+type Corner =
+  { left :: Number
+  , top :: Number
+  }
+
+data Measure a
+  = Measure (Maybe HTMLElement) (Corner -> a) a
+
+getCorner ∷ Measure ~> Effect
+getCorner (Measure (Just el) next _) = do
+  {bottom, height, left, right, top, width} <- getBoundingClientRect el
+  pure $ next {left, top}
+getCorner (Measure _ _ none) = pure none
 
 un = 50.0 :: Number
 svgWidth = 800.0 :: Number
@@ -58,7 +75,6 @@ type Edge =
   { p0 :: Int
   , p1 :: Int
   , length :: Length
-  , active :: Boolean
   , selected :: Boolean
   , locked :: Boolean
   }
@@ -67,6 +83,22 @@ type Mesh = {points :: Array Point, edges :: Array Edge}
 
 vOne = vector (point "" 0.0 0.0) (point "" un 0.0) :: Vector
 vPhi = scale phi vOne :: Vector
+
+defaultEdge :: Length -> Int -> Int -> Edge
+defaultEdge length p0 p1 =
+   {p0
+  , p1
+  , length
+  , selected: false
+  , locked: false}
+
+defaultShape :: Array Edge
+defaultShape =
+    [ defaultEdge One 0 1
+    , defaultEdge Phi 1 2
+    , defaultEdge Phi 2 3
+    , defaultEdge One 3 0
+    ]
 
 -- | Penrose Tile 1 : 2 triangles (phi,phi,1) glued on phi
 -- | point is the "flat" arrow head
@@ -78,12 +110,7 @@ vexe q0 a =
       q2 = q0 <+| scale phi v0
       q3 = q0 <+| rotated a72 v0
       points = [q0,q1,q2,q3]
-      edges =
-        [ {p0: 0, p1: 1, length: One, active: true, selected: false, locked: false}
-        , {p0: 1, p1: 2, length: Phi, active: true, selected: false, locked: false}
-        , {p0: 2, p1: 3, length: Phi, active: true, selected: false, locked: false}
-        , {p0: 3, p1: 0, length: One, active: true, selected: false, locked: false}
-      ]
+      edges = defaultShape
     in {points, edges}
 
 -- | Penrose Tile 2 : 2 triangles (phi,1,1) glued on 1
@@ -96,12 +123,7 @@ cave q0 a =
       q2 = q0 <+| v0
       q3 = q0 <+| rotated a108 v0
       points = [q0,q1,q2,q3]
-      edges =
-        [ {p0: 0, p1: 1, length: One, active: true, selected: false, locked: false}
-        , {p0: 1, p1: 2, length: Phi, active: true, selected: false, locked: false}
-        , {p0: 2, p1: 3, length: Phi, active: true, selected: false, locked: false}
-        , {p0: 3, p1: 0, length: One, active: true, selected: false, locked: false}
-      ]
+      edges = defaultShape
     in {points, edges}
 
 extensions :: Length -> Array (Point -> Angle -> Mesh)
@@ -127,15 +149,13 @@ extensions Phi =
   , \ q0 a -> cave (q0 <+| rotated (a+a36) vOne) (a-a144)
   ]
 
-type State =
-  { tiling :: Mesh
+type Model =
+  { corner :: Maybe Corner
+  , tiling :: Mesh
   , propositions :: Array (Point -> Angle -> Mesh)
   , preview :: Maybe Mesh
+  , path :: Array (Tuple Int Int)
   }
-
-data Action =
-    Probe MouseEvent
-  | Chooz MouseEvent
 
 closeEdge :: Mesh -> Number -> Number -> Edge -> Boolean
 closeEdge m x y e =
@@ -147,17 +167,23 @@ closeEdge m x y e =
 
 probe :: Number -> Number -> Mesh -> Mesh
 probe x y m =
-  let sample = filter (\ e -> e.active && not e.locked) m.edges
+  let sample = filter (\ e -> not e.locked) m.edges
       candidates = filter (closeEdge m x y) sample
       edge =
         if length candidates == 0
           then Nothing
           else Just $ candidates !! 0
-  in maybe m {edges = (\e -> if e.locked then e else e{selected = false}) <$> m.edges}
-           (\e -> m{edges = (\e' -> if e == e' then e{selected = true} else e') <$> m.edges})
+  in maybe m {edges = (\e ->
+                        if e.locked
+                          then e
+                          else e{selected = false}) <$> m.edges}
+           (\e -> m {edges = (\e' ->
+                              if e == e'
+                                then e{selected = true}
+                                else e') <$> m.edges})
            edge
 
-toggleLock :: Number -> Number -> State -> State
+toggleLock :: Number -> Number -> Model -> Model
 toggleLock x y m =
   let candidates =
         filter (closeEdge m.tiling x y)
@@ -184,7 +210,7 @@ toggleLock x y m =
                       else [])
                       <$> tiling.edges
 
-    in {tiling, propositions, preview: m.preview}
+    in {tiling, propositions, preview: m.preview, path: m.path, corner: m.corner}
 
 det :: Point -> Point -> Number
 det p0 p1 = abs p0 * ord p1 - abs p1 * ord p0
@@ -200,55 +226,101 @@ inside x y m =
       q2 = m.points !! 2
       q3 = m.points !! 3
       q = point "" x y
-    in Ord.abs (surf q0 q1 q2) + Ord.abs (surf q0 q2 q3)
+    in (Ord.abs (surf q0 q1 q2) + Ord.abs (surf q0 q2 q3)) * 1.05
         >= Ord.abs (surf q0 q1 q)
         +  Ord.abs (surf q1 q2 q)
         +  Ord.abs (surf q2 q3 q)
         +  Ord.abs (surf q3 q0 q)
 
-merge :: Mesh -> Mesh -> Mesh
-merge tiling proposition = proposition
-
-extend :: Number -> Number -> State -> State
+extend :: Number -> Number -> Model -> Model
 extend x y m =
   maybe  m
-         (\preview ->  { tiling: { points: m.tiling.points <> preview.points
-                                 , edges: m.tiling.edges
-                                    <> ((\{p0,p1,active,selected,locked,length:l} ->
-                                        { p0: p0 + length m.tiling.points
-                                        , p1: p1 + length m.tiling.points
-                                        , active,selected,locked,length:l}) <$> preview.edges) 
-                                 }
-                       , propositions: []
-                       , preview: Nothing
-                       })
+         (\preview ->
+            { tiling: { points: m.tiling.points <> preview.points
+                       , edges: m.tiling.edges
+                          <> ((\ {p0,p1,selected,locked,length: l} ->
+                              { p0: p0 + length m.tiling.points
+                              , p1: p1 + length m.tiling.points
+                              ,selected
+                              ,locked
+                              ,length: l}) <$> preview.edges)
+                       }
+             , propositions: []
+             , preview: Nothing
+             , path: [Tuple (length m.tiling.points) (length m.tiling.edges)]
+                      <> m.path
+             , corner: m.corner
+             })
          m.preview
 
-teaser :: Number -> Number -> State -> State
+teaser :: Number -> Number -> Model -> Model
 teaser x y m =
   let index = findIndex (\i -> inside x y ((m.propositions !! i) (ref i) 0.0))
               $ 0 .. (length m.propositions - 1)
 
       locked = filter (_.locked) m.tiling.edges
-      q0 = if length locked == 0 then Nothing else Just $ m.tiling.points !! ((locked !! 0).p0)
-      q1 = if length locked == 0 then Nothing else Just $ m.tiling.points !! ((locked !! 0).p1)
-      angle = (\r0 r1 -> atan2 (ord r1 - ord r0) (abs r1 - abs r0)) <$> q0 <*> q1
-  in maybe m
+      q0 =
+        if length locked == 0
+          then Nothing
+          else Just $ m.tiling.points !! ((locked !! 0).p0)
+      q1 =
+        if length locked == 0
+          then Nothing
+          else Just $ m.tiling.points !! ((locked !! 0).p1)
+      angle =
+        (\r0 r1 -> atan2 (ord r1 - ord r0) (abs r1 - abs r0)) <$> q0 <*> q1
+  in maybe m {preview = Nothing}
            identity
            $ (\ i r0 a ->
-            m {preview = Just $ (m.propositions !! i) r0 a}) <$> index <*> q0 <*> angle
+            m {preview = Just $ (m.propositions !! i) r0 a})
+              <$> index <*> q0 <*> angle
 
-update ∷ State → Action → State
-update m =
- case _ of
+data Action =
+  None
+  | TransmitRef H.ElementRef
+  | SetCorner Corner
+  | Probe MouseEvent
+  | Chooz MouseEvent
+  | Undo
+
+update ∷ Model → Action → App.Transition Measure Model Action
+update model =
+  case _ of
+    None -> App.purely model
+
+    SetCorner corner ->  App.purely model {corner = Just corner}
+
+    TransmitRef href ->
+      let effects =
+            case href of
+              H.Created el -> App.lift $ Measure (fromElement el) SetCorner None
+              _            -> mempty
+      in {model, effects}
+
     Probe mouse →
-        let x = (_ - 5.0) $ toNumber $ clientX mouse
-            y = (_ - 5.0) $ toNumber $ clientY mouse
-        in teaser x y $ m { tiling = probe x y m.tiling}
+      case model.corner of
+        Just {left, top} ->
+          let x = (_ - left) $ toNumber $ clientX mouse
+              y = (_ - top) $ toNumber $ clientY mouse
+            in App.purely $ teaser x y $ model { tiling = probe x y model.tiling}
+        _               -> App.purely model
+
     Chooz mouse →
-        let x = (_ - 5.0) $ toNumber $ clientX mouse
-            y = (_ - 5.0) $ toNumber $ clientY mouse
-    in extend x y (toggleLock x y m)
+      case model.corner of
+        Just {left, top} ->
+          let x = (_ - left) $ toNumber $ clientX mouse
+              y = (_ - top) $ toNumber $ clientY mouse
+          in App.purely $ extend x y (toggleLock x y model)
+        _               -> App.purely model
+
+    Undo -> App.purely $
+      maybe model
+            (\ {head: Tuple np ne, tail} ->
+              model { tiling = { points: take np model.tiling.points
+                           , edges: take ne model.tiling.edges}
+                , path = tail
+                })
+            $ uncons model.path
 
 type Color = String
 
@@ -264,22 +336,24 @@ mesh :: forall action. Context -> Mesh -> Array (Html action)
 mesh ctx m =
   (\edge ->
     let stroke =
-          case edge.active, edge.selected, edge.locked of
-            true, false, false -> ctx.stroke
-            false, _, _ -> grey
-            true, true, false -> purple
-            true, false, true -> red
-            _, _, _ -> ctx.stroke
+          case edge.selected, edge.locked of
+            false, false -> ctx.stroke
+            true, false -> purple
+            false, true -> red
+            _, _ -> ctx.stroke
         q0 = m.points !! edge.p0
         q1 = m.points !! edge.p1
       in svgline (abs q0) (ord q0) (abs q1) (ord q1) stroke ctx.strokeWidth)
        <$> m.edges
 
-render ∷ State → Html Action
+render ∷ Model → Html Action
 render m =
-  let ctx = defaultContext { stroke = lightblue, strokeWidth = 2.0}
+  let ctx = defaultContext { stroke = grey, strokeWidth = 2.0}
 
-  in H.elemWithNS
+  in H.div []
+    [ H.button [H.classes ["fa", "fa-undo"], H.onClick $ H.always_ Undo] []
+    ,  H.div [ H.ref (H.always TransmitRef)]
+      [H.elemWithNS
         (Just $ H.Namespace "http://www.w3.org/2000/svg")
         "svg"
         [ H.attr "width" "800px"
@@ -293,6 +367,8 @@ render m =
                      prop (ref i) 0.0) m.propositions)
         <> (maybe [] (\msh -> mesh ctx msh) m.preview)
         )
+        ]
+    ]
 
 ref :: Int -> Point
 ref i = point "" (toNumber $ (i+1) * dx) dy
@@ -300,8 +376,29 @@ ref i = point "" (toNumber $ (i+1) * dx) dy
 dx = 85 :: Int
 dy = 100.0 :: Number
 
-app ∷ PureApp State Action
-app = { update, render, init: {tiling: vexe orig 0.0, propositions: [], preview: Nothing}}
+initialModel :: Model
+initialModel =
+        { corner: Nothing
+        , tiling: { points: [orig, orig <+| vOne]
+                  , edges: [defaultEdge One 0 1]
+                  }
+        , propositions: []
+        , preview: Nothing
+        , path: []
+        }
+
+app ∷ App.App Measure (Const Void) Model Action
+app = { update
+      , render
+      , init: App.purely initialModel
+      , subs: const mempty
+      }
 
 main ∷ Effect Unit
-main = void $ PureApp.makeWithSelector app "#app"
+main = do
+  inst ←
+    App.makeWithSelector
+      (liftNat getCorner `merge` never)
+      app
+      "#app"
+  inst.run
