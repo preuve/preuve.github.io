@@ -5437,11 +5437,26 @@ var PS = {};
       Undo.value = new Undo();
       return Undo;
   })();
+  var Plus = (function () {
+      function Plus() {
+
+      };
+      Plus.value = new Plus();
+      return Plus;
+  })();
+  var Minus = (function () {
+      function Minus() {
+
+      };
+      Minus.value = new Minus();
+      return Minus;
+  })();
   var white = "#FFFFFF";
-  var un = 50.0;
-  var vOne = SVGpork_Geometry.vector(SVGpork_Geometry.point("")(0.0)(0.0))(SVGpork_Geometry.point("")(un)(0.0));
-  var svgWidth = 800.0;
-  var svgHeight = 600.0;
+  var vOne = function (un) {
+      return SVGpork_Geometry.vector(SVGpork_Geometry.point("")(0.0)(0.0))(SVGpork_Geometry.point("")(un)(0.0));
+  };
+  var svgWidth = 800;
+  var svgHeight = 600;
   var showLength = new Data_Show.Show(function (v) {
       if (v instanceof One) {
           return "One";
@@ -5449,13 +5464,13 @@ var PS = {};
       if (v instanceof Phi) {
           return "Phi";
       };
-      throw new Error("Failed pattern match at Main (line 70, column 1 - line 72, column 19): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 69, column 1 - line 71, column 19): " + [ v.constructor.name ]);
   });
   var red = "#FF0000";
   var range = function (a) {
       return function (b) {
-          var $29 = a < b;
-          if ($29) {
+          var $33 = a < b;
+          if ($33) {
               return Data_Array.range(a)(b);
           };
           return [  ];
@@ -5463,8 +5478,10 @@ var PS = {};
   };
   var purple = "#B314CB";
   var phi = (1.0 + $$Math.sqrt(5.0)) / 2.0;
-  var vPhi = SVGpork_Geometry.scale(phi)(vOne);
-  var orig = SVGpork_Geometry.point("")(svgWidth / 2.0)(svgHeight / 2.0);
+  var vPhi = function (un) {
+      return SVGpork_Geometry.scale(phi)(vOne(un));
+  };
+  var orig = SVGpork_Geometry.point("")(Data_Int.toNumber(svgWidth) / 2.0)(Data_Int.toNumber(svgHeight) / 2.0);
   var nth = function (xs) {
       return function (i) {
           return Data_Maybe.fromJust()(Data_Array.index(xs)(i));
@@ -5492,6 +5509,12 @@ var PS = {};
       };
   };
   var lightblue = "#060276";
+  var initialUnity = 50.0;
+  var homothecy = function (r) {
+      return function (p) {
+          return SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(orig)(SVGpork_Geometry.scale(-r)(SVGpork_Geometry.vector(p)(orig)));
+      };
+  };
   var grey = "#050409";
   var getCorner = function (v) {
       if (v.value0 instanceof Data_Maybe.Just) {
@@ -5525,7 +5548,8 @@ var PS = {};
                       propositions: [  ],
                       preview: Data_Maybe.Nothing.value,
                       path: Data_Semigroup.append(Data_Semigroup.semigroupArray)([ new Data_Tuple.Tuple(Data_Array.length(m.tiling.points), Data_Array.length(m.tiling.edges)) ])(m.path),
-                      corner: m.corner
+                      corner: m.corner,
+                      unity: m.unity
                   };
               })(m.preview);
           };
@@ -5555,7 +5579,7 @@ var PS = {};
           fontStyle: SVGpork_Render.defaultContext.fontStyle,
           textFill: SVGpork_Render.defaultContext.textFill
       };
-      return Spork_Html_Elements.div([  ])([ Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-undo" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Undo.value)) ])([  ]), Spork_Html_Elements.div([ Spork_Html_Core.ref(Spork_Html_Events.always(TransmitRef.create)) ])([ Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("svg")([ Spork_Html_Core.attr("width")("800px"), Spork_Html_Core.attr("height")("600px"), Spork_Html_Events.onMouseMove(Spork_Html_Events.always(Probe.create)), Spork_Html_Events.onMouseDown(Spork_Html_Events.always(Chooz.create)) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(mesh(ctx)(m.tiling))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Foldable.fold(Data_Foldable.foldableArray)(Data_Monoid.monoidArray)(Data_Functor.map(Data_Functor.functorArray)(mesh(ctx))(Data_Array.mapWithIndex(function (i) {
+      return Spork_Html_Elements.div([  ])([ Spork_Html_Elements.div([  ])([ Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-minus" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Minus.value)) ])([  ]), Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-plus" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Plus.value)) ])([  ]) ]), Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-undo" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Undo.value)) ])([  ]), Spork_Html_Elements.div([ Spork_Html_Core.ref(Spork_Html_Events.always(TransmitRef.create)) ])([ Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("svg")([ Spork_Html_Core.attr("width")(Data_Show.show(Data_Show.showInt)(svgWidth) + "px"), Spork_Html_Core.attr("height")(Data_Show.show(Data_Show.showInt)(svgHeight) + "px"), Spork_Html_Events.onMouseMove(Spork_Html_Events.always(Probe.create)), Spork_Html_Events.onMouseDown(Spork_Html_Events.always(Chooz.create)) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(mesh(ctx)(m.tiling))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Foldable.fold(Data_Foldable.foldableArray)(Data_Monoid.monoidArray)(Data_Functor.map(Data_Functor.functorArray)(mesh(ctx))(Data_Array.mapWithIndex(function (i) {
           return function (prop) {
               return prop(ref(i))(0.0);
           };
@@ -5594,15 +5618,15 @@ var PS = {};
                   return v.locked;
               })(m.tiling.edges);
               var q0 = (function () {
-                  var $55 = Data_Array.length(locked) === 0;
-                  if ($55) {
+                  var $59 = Data_Array.length(locked) === 0;
+                  if ($59) {
                       return Data_Maybe.Nothing.value;
                   };
                   return Data_Maybe.Just.create(nth(m.tiling.points)((nth(locked)(0)).p0));
               })();
               var q1 = (function () {
-                  var $56 = Data_Array.length(locked) === 0;
-                  if ($56) {
+                  var $60 = Data_Array.length(locked) === 0;
+                  if ($60) {
                       return Data_Maybe.Nothing.value;
                   };
                   return Data_Maybe.Just.create(nth(m.tiling.points)((nth(locked)(0)).p1));
@@ -5620,7 +5644,8 @@ var PS = {};
                   corner: m.corner,
                   path: m.path,
                   propositions: m.propositions,
-                  tiling: m.tiling
+                  tiling: m.tiling,
+                  unity: m.unity
               })(Control_Category.identity(Control_Category.categoryFn))(Control_Apply.apply(Data_Maybe.applyMaybe)(Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(function (i) {
                   return function (r0) {
                       return function (a) {
@@ -5629,7 +5654,8 @@ var PS = {};
                               corner: m.corner,
                               path: m.path,
                               propositions: m.propositions,
-                              tiling: m.tiling
+                              tiling: m.tiling,
+                              unity: m.unity
                           };
                       };
                   };
@@ -5652,100 +5678,107 @@ var PS = {};
   };
   var defaultShape = [ defaultEdge(One.value)(0)(1), defaultEdge(Phi.value)(1)(2), defaultEdge(Phi.value)(2)(3), defaultEdge(One.value)(3)(0) ];
   var initialModel = {
+      unity: initialUnity,
       corner: Data_Maybe.Nothing.value,
       tiling: {
-          points: [ orig, SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(orig)(vOne) ],
+          points: [ orig, SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(orig)(vOne(initialUnity)) ],
           edges: [ defaultEdge(One.value)(0)(1) ]
       },
       propositions: [  ],
       preview: Data_Maybe.Nothing.value,
       path: [  ]
   };
-  var closeEdge = function (m) {
-      return function (x) {
-          return function (y) {
-              return function (e) {
-                  var q1 = nth(m.points)(e.p1);
-                  var q0 = nth(m.points)(e.p0);
-                  var xI = (SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q0) + SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q1)) / 2.0;
-                  var yI = (SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q0) + SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q1)) / 2.0;
-                  return (xI - x) * (xI - x) + (yI - y) * (yI - y) < (un / 5.0) * (un / 5.0);
+  var closeEdge = function (un) {
+      return function (m) {
+          return function (x) {
+              return function (y) {
+                  return function (e) {
+                      var q1 = nth(m.points)(e.p1);
+                      var q0 = nth(m.points)(e.p0);
+                      var xI = (SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q0) + SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q1)) / 2.0;
+                      var yI = (SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q0) + SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q1)) / 2.0;
+                      return (xI - x) * (xI - x) + (yI - y) * (yI - y) < (un / 5.0) * (un / 5.0);
+                  };
               };
           };
       };
   };
-  var probe = function (x) {
-      return function (y) {
-          return function (m) {
-              var sample = Data_Array.filter(function (e) {
-                  return !e.locked;
-              })(m.edges);
-              var candidates = Data_Array.filter(closeEdge(m)(x)(y))(sample);
-              var edge = (function () {
-                  var $57 = Data_Array.length(candidates) === 0;
-                  if ($57) {
-                      return Data_Maybe.Nothing.value;
-                  };
-                  return Data_Maybe.Just.create(nth(candidates)(0));
-              })();
-              return Data_Maybe.maybe({
-                  edges: Data_Functor.map(Data_Functor.functorArray)(function (e) {
-                      if (e.locked) {
-                          return e;
+  var probe = function (un) {
+      return function (x) {
+          return function (y) {
+              return function (m) {
+                  var sample = Data_Array.filter(function (e) {
+                      return !e.locked;
+                  })(m.edges);
+                  var candidates = Data_Array.filter(closeEdge(un)(m)(x)(y))(sample);
+                  var edge = (function () {
+                      var $61 = Data_Array.length(candidates) === 0;
+                      if ($61) {
+                          return Data_Maybe.Nothing.value;
                       };
-                      return {
-                          selected: false,
-                          locked: e.locked,
-                          length: e.length,
-                          p0: e.p0,
-                          p1: e.p1
-                      };
-                  })(m.edges),
-                  points: m.points
-              })(function (e) {
-                  return {
-                      edges: Data_Functor.map(Data_Functor.functorArray)(function (e$prime) {
-                          var $59 = Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
-                              return "selected";
-                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
-                              return "p1";
-                          }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
-                              return "p0";
-                          }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
-                              return "locked";
-                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
-                              return "length";
-                          }))(eqLength)))(e)(e$prime);
-                          if ($59) {
-                              return {
-                                  selected: true,
-                                  length: e.length,
-                                  locked: e.locked,
-                                  p0: e.p0,
-                                  p1: e.p1
-                              };
+                      return Data_Maybe.Just.create(nth(candidates)(0));
+                  })();
+                  return Data_Maybe.maybe({
+                      edges: Data_Functor.map(Data_Functor.functorArray)(function (e) {
+                          if (e.locked) {
+                              return e;
                           };
-                          return e$prime;
+                          return {
+                              selected: false,
+                              locked: e.locked,
+                              length: e.length,
+                              p0: e.p0,
+                              p1: e.p1
+                          };
                       })(m.edges),
                       points: m.points
-                  };
-              })(edge);
+                  })(function (e) {
+                      return {
+                          edges: Data_Functor.map(Data_Functor.functorArray)(function (e$prime) {
+                              var $63 = Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                                  return "selected";
+                              }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                                  return "p1";
+                              }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
+                                  return "p0";
+                              }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
+                                  return "locked";
+                              }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                                  return "length";
+                              }))(eqLength)))(e)(e$prime);
+                              if ($63) {
+                                  return {
+                                      selected: true,
+                                      length: e.length,
+                                      locked: e.locked,
+                                      p0: e.p0,
+                                      p1: e.p1
+                                  };
+                              };
+                              return e$prime;
+                          })(m.edges),
+                          points: m.points
+                      };
+                  })(edge);
+              };
           };
       };
   };
   var blue = "#0602c6";
   var beige = "#FFFFAF";
   var a72 = (2.0 * $$Math.pi) / 5.0;
-  var vexe = function (q0) {
-      return function (a) {
-          var v0 = SVGpork_Geometry.rotated(a)(vOne);
-          var q3 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a72)(v0));
-          var q2 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.scale(phi)(v0));
-          var q1 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(-a72)(v0));
-          var points = [ q0, q1, q2, q3 ];
-          return {
-              points: points,
-              edges: defaultShape
+  var vexe = function (un) {
+      return function (q0) {
+          return function (a) {
+              var v0 = SVGpork_Geometry.rotated(a)(vOne(un));
+              var q3 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a72)(v0));
+              var q2 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.scale(phi)(v0));
+              var q1 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(-a72)(v0));
+              var points = [ q0, q1, q2, q3 ];
+              return {
+                  points: points,
+                  edges: defaultShape
+              };
           };
       };
   };
@@ -5753,101 +5786,105 @@ var PS = {};
   var a36 = $$Math.pi / 5.0;
   var a144 = (4.0 * $$Math.pi) / 5.0;
   var a108 = (3.0 * $$Math.pi) / 5.0;
-  var cave = function (q0) {
-      return function (a) {
-          var v0 = SVGpork_Geometry.rotated(a)(vOne);
-          var q3 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a108)(v0));
-          var q2 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(v0);
-          var q1 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(-a108)(v0));
-          var points = [ q0, q1, q2, q3 ];
-          return {
-              points: points,
-              edges: defaultShape
+  var cave = function (un) {
+      return function (q0) {
+          return function (a) {
+              var v0 = SVGpork_Geometry.rotated(a)(vOne(un));
+              var q3 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a108)(v0));
+              var q2 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(v0);
+              var q1 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(-a108)(v0));
+              var points = [ q0, q1, q2, q3 ];
+              return {
+                  points: points,
+                  edges: defaultShape
+              };
           };
       };
   };
-  var extensions = function (v) {
-      if (v instanceof One) {
-          return [ function (q0) {
-              return function (a) {
-                  return vexe(q0)(a - a72);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return vexe(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne)))(a + a108);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return vexe(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne)))(a - a108);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return vexe(q0)(a + a72);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(q0)(a - a108);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(q0)(a + a108);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne)))(a + a72);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne)))(a - a72);
-              };
-          } ];
+  var extensions = function (un) {
+      return function (v) {
+          if (v instanceof One) {
+              return [ function (q0) {
+                  return function (a) {
+                      return vexe(un)(q0)(a - a72);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a + a108);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a - a108);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return vexe(un)(q0)(a + a72);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(q0)(a - a108);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(q0)(a + a108);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a + a72);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a - a72);
+                  };
+              } ];
+          };
+          if (v instanceof Phi) {
+              return [ function (q0) {
+                  return function (a) {
+                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a72)(vOne(un))))(a - a36);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a72)(vOne(un))))(a + a36);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vPhi(un))))(a + a144);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vPhi(un))))(a - a144);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne(un))))(a + a36);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne(un))))(a - a36);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne(un))))(a + a144);
+                  };
+              }, function (q0) {
+                  return function (a) {
+                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne(un))))(a - a144);
+                  };
+              } ];
+          };
+          throw new Error("Failed pattern match at Main (line 130, column 1 - line 130, column 65): " + [ un.constructor.name, v.constructor.name ]);
       };
-      if (v instanceof Phi) {
-          return [ function (q0) {
-              return function (a) {
-                  return vexe(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a72)(vOne)))(a - a36);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return vexe(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a72)(vOne)))(a + a36);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return vexe(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vPhi)))(a + a144);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return vexe(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vPhi)))(a - a144);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne)))(a + a36);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne)))(a - a36);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne)))(a + a144);
-              };
-          }, function (q0) {
-              return function (a) {
-                  return cave(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne)))(a - a144);
-              };
-          } ];
-      };
-      throw new Error("Failed pattern match at Main (line 129, column 1 - line 129, column 55): " + [ v.constructor.name ]);
   };
   var toggleLock = function (x) {
       return function (y) {
           return function (m) {
-              var candidates = Data_Array.filter(closeEdge(m.tiling)(x)(y))(Data_Array.filter(function (e) {
+              var candidates = Data_Array.filter(closeEdge(m.unity)(m.tiling)(x)(y))(Data_Array.filter(function (e) {
                   return e.selected || e.locked;
               })(m.tiling.edges));
               var edge = (function () {
-                  var $61 = Data_Array.length(candidates) === 0;
-                  if ($61) {
+                  var $66 = Data_Array.length(candidates) === 0;
+                  if ($66) {
                       return Data_Maybe.Nothing.value;
                   };
                   return Data_Maybe.Just.create(nth(candidates)(0));
@@ -5856,7 +5893,7 @@ var PS = {};
                   return {
                       points: m.tiling.points,
                       edges: Data_Functor.map(Data_Functor.functorArray)(function (e$prime) {
-                          var $62 = Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                          var $67 = Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
                               return "selected";
                           }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
                               return "p1";
@@ -5867,7 +5904,7 @@ var PS = {};
                           }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
                               return "length";
                           }))(eqLength)))(e)(e$prime);
-                          if ($62) {
+                          if ($67) {
                               return {
                                   locked: !e.locked,
                                   selected: e.locked,
@@ -5888,7 +5925,7 @@ var PS = {};
               })(edge);
               var propositions = Data_Array.concat(Data_Functor.map(Data_Functor.functorArray)(function (e) {
                   if (e.locked) {
-                      return extensions(e.length);
+                      return extensions(m.unity)(e.length);
                   };
                   return [  ];
               })(tiling.edges));
@@ -5897,7 +5934,8 @@ var PS = {};
                   propositions: propositions,
                   preview: m.preview,
                   path: m.path,
-                  corner: m.corner
+                  corner: m.corner,
+                  unity: m.unity
               };
           };
       };
@@ -5913,7 +5951,8 @@ var PS = {};
                   path: model.path,
                   preview: model.preview,
                   propositions: model.propositions,
-                  tiling: model.tiling
+                  tiling: model.tiling,
+                  unity: model.unity
               });
           };
           if (v instanceof TransmitRef) {
@@ -5937,8 +5976,9 @@ var PS = {};
                       return v1 - model.corner.value0.left;
                   })(Data_Int.toNumber(Web_UIEvent_MouseEvent.clientX(v.value0)));
                   return Spork_Transition.purely(teaser(x)(y)({
+                      unity: model.unity,
                       corner: model.corner,
-                      tiling: probe(x)(y)(model.tiling),
+                      tiling: probe(model.unity)(x)(y)(model.tiling),
                       propositions: model.propositions,
                       preview: model.preview,
                       path: model.path
@@ -5961,6 +6001,7 @@ var PS = {};
           if (v instanceof Undo) {
               return Spork_Transition.purely(Data_Maybe.maybe(model)(function (v1) {
                   return {
+                      unity: model.unity,
                       corner: model.corner,
                       tiling: {
                           points: Data_Array.take(v1.head.value0)(model.tiling.points),
@@ -5972,7 +6013,33 @@ var PS = {};
                   };
               })(Data_Array.uncons(model.path)));
           };
-          throw new Error("Failed pattern match at Main (line 288, column 3 - line 323, column 32): " + [ v.constructor.name ]);
+          if (v instanceof Minus) {
+              return Spork_Transition.purely({
+                  unity: model.unity / 1.1,
+                  tiling: {
+                      points: Data_Functor.map(Data_Functor.functorArray)(homothecy(1.0 / 1.1))(model.tiling.points),
+                      edges: model.tiling.edges
+                  },
+                  corner: model.corner,
+                  path: model.path,
+                  preview: model.preview,
+                  propositions: model.propositions
+              });
+          };
+          if (v instanceof Plus) {
+              return Spork_Transition.purely({
+                  unity: model.unity * 1.1,
+                  tiling: {
+                      points: Data_Functor.map(Data_Functor.functorArray)(homothecy(1.1))(model.tiling.points),
+                      edges: model.tiling.edges
+                  },
+                  corner: model.corner,
+                  path: model.path,
+                  preview: model.preview,
+                  propositions: model.propositions
+              });
+          };
+          throw new Error("Failed pattern match at Main (line 296, column 3 - line 338, column 33): " + [ v.constructor.name ]);
       };
   };
   var app = {
@@ -5989,7 +6056,6 @@ var PS = {};
   exports["range"] = range;
   exports["Measure"] = Measure;
   exports["getCorner"] = getCorner;
-  exports["un"] = un;
   exports["svgWidth"] = svgWidth;
   exports["svgHeight"] = svgHeight;
   exports["orig"] = orig;
@@ -6016,12 +6082,15 @@ var PS = {};
   exports["inside"] = inside;
   exports["extend"] = extend;
   exports["teaser"] = teaser;
+  exports["homothecy"] = homothecy;
   exports["None"] = None;
   exports["TransmitRef"] = TransmitRef;
   exports["SetCorner"] = SetCorner;
   exports["Probe"] = Probe;
   exports["Chooz"] = Chooz;
   exports["Undo"] = Undo;
+  exports["Plus"] = Plus;
+  exports["Minus"] = Minus;
   exports["update"] = update;
   exports["white"] = white;
   exports["beige"] = beige;
@@ -6035,6 +6104,7 @@ var PS = {};
   exports["ref"] = ref;
   exports["dx"] = dx;
   exports["dy"] = dy;
+  exports["initialUnity"] = initialUnity;
   exports["initialModel"] = initialModel;
   exports["app"] = app;
   exports["main"] = main;
