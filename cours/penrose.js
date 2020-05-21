@@ -114,6 +114,7 @@ var PS = {};
   $PS["Data.Functor"] = $PS["Data.Functor"] || {};
   var exports = $PS["Data.Functor"];
   var $foreign = $PS["Data.Functor"];
+  var Control_Semigroupoid = $PS["Control.Semigroupoid"];
   var Data_Function = $PS["Data.Function"];
   var Data_Unit = $PS["Data.Unit"];                
   var Functor = function (map) {
@@ -131,12 +132,14 @@ var PS = {};
   };
   var $$void = function (dictFunctor) {
       return map(dictFunctor)(Data_Function["const"](Data_Unit.unit));
-  };                                                                                             
+  };
+  var functorFn = new Functor(Control_Semigroupoid.compose(Control_Semigroupoid.semigroupoidFn));
   var functorArray = new Functor($foreign.arrayMap);
   exports["Functor"] = Functor;
   exports["map"] = map;
   exports["mapFlipped"] = mapFlipped;
   exports["void"] = $$void;
+  exports["functorFn"] = functorFn;
   exports["functorArray"] = functorArray;
 })(PS);
 (function($PS) {
@@ -151,7 +154,16 @@ var PS = {};
   var Apply = function (Functor0, apply) {
       this.Functor0 = Functor0;
       this.apply = apply;
-  }; 
+  };
+  var applyFn = new Apply(function () {
+      return Data_Functor.functorFn;
+  }, function (f) {
+      return function (g) {
+          return function (x) {
+              return f(x)(g(x));
+          };
+      };
+  });
   var applyArray = new Apply(function () {
       return Data_Functor.functorArray;
   }, $foreign.arrayApply);
@@ -172,10 +184,21 @@ var PS = {};
           };
       };
   };
+  var lift2 = function (dictApply) {
+      return function (f) {
+          return function (a) {
+              return function (b) {
+                  return apply(dictApply)(Data_Functor.map(dictApply.Functor0())(f)(a))(b);
+              };
+          };
+      };
+  };
   exports["Apply"] = Apply;
   exports["apply"] = apply;
   exports["applyFirst"] = applyFirst;
   exports["applySecond"] = applySecond;
+  exports["lift2"] = lift2;
+  exports["applyFn"] = applyFn;
   exports["applyArray"] = applyArray;
 })(PS);
 (function($PS) {
@@ -228,6 +251,7 @@ var PS = {};
   "use strict";
   $PS["Control.Bind"] = $PS["Control.Bind"] || {};
   var exports = $PS["Control.Bind"];
+  var Control_Apply = $PS["Control.Apply"];
   var Data_Function = $PS["Data.Function"];                
   var Discard = function (discard) {
       this.discard = discard;
@@ -238,7 +262,16 @@ var PS = {};
   };
   var discard = function (dict) {
       return dict.discard;
-  };                     
+  };
+  var bindFn = new Bind(function () {
+      return Control_Apply.applyFn;
+  }, function (m) {
+      return function (f) {
+          return function (x) {
+              return f(m(x))(x);
+          };
+      };
+  });                    
   var bind = function (dict) {
       return dict.bind;
   };
@@ -248,10 +281,26 @@ var PS = {};
   var discardUnit = new Discard(function (dictBind) {
       return bind(dictBind);
   });
+  var ifM = function (dictBind) {
+      return function (cond) {
+          return function (t) {
+              return function (f) {
+                  return bind(dictBind)(cond)(function (cond$prime) {
+                      if (cond$prime) {
+                          return t;
+                      };
+                      return f;
+                  });
+              };
+          };
+      };
+  };
   exports["Bind"] = Bind;
   exports["bind"] = bind;
   exports["bindFlipped"] = bindFlipped;
   exports["discard"] = discard;
+  exports["ifM"] = ifM;
+  exports["bindFn"] = bindFn;
   exports["discardUnit"] = discardUnit;
 })(PS);
 (function($PS) {
@@ -955,6 +1004,19 @@ var PS = {};
           return foldMap(dictFoldable)(dictMonoid)(Control_Category.identity(Control_Category.categoryFn));
       };
   };
+  var find = function (dictFoldable) {
+      return function (p) {
+          var go = function (v) {
+              return function (v1) {
+                  if (v instanceof Data_Maybe.Nothing && p(v1)) {
+                      return new Data_Maybe.Just(v1);
+                  };
+                  return v;
+              };
+          };
+          return foldl(dictFoldable)(go)(Data_Maybe.Nothing.value);
+      };
+  };
   exports["Foldable"] = Foldable;
   exports["foldr"] = foldr;
   exports["foldl"] = foldl;
@@ -962,6 +1024,7 @@ var PS = {};
   exports["fold"] = fold;
   exports["traverse_"] = traverse_;
   exports["for_"] = for_;
+  exports["find"] = find;
   exports["foldableArray"] = foldableArray;
   exports["foldableMaybe"] = foldableMaybe;
 })(PS);
@@ -4208,6 +4271,9 @@ var PS = {};
   var Summable = function (plus) {
       this.plus = plus;
   };
+  var Measurable = function (length) {
+      this.length = length;
+  };
   var Based = function (abs, coords, ord) {
       this.abs = abs;
       this.coords = coords;
@@ -4216,6 +4282,17 @@ var PS = {};
   var vector = function (v) {
       return function (v1) {
           return Vector(Data_Ring.sub(Data_Sparse_Polynomial.ringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber))(v1.coordinates)(v.coordinates));
+      };
+  }; 
+  var segment = function (origin) {
+      return function (extremity) {
+          return function (asOriented) {
+              return {
+                  origin: origin,
+                  extremity: extremity,
+                  asOriented: asOriented
+              };
+          };
       };
   };
   var scale = function (k) {
@@ -4238,6 +4315,17 @@ var PS = {};
   };
   var ord = function (dict) {
       return dict.ord;
+  };
+  var middle = function (name) {
+      return function (v) {
+          return {
+              name: name,
+              coordinates: Data_Semiring.mul(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(v.origin.coordinates)(v.extremity.coordinates))(Data_Sparse_Polynomial.monoPol(0.5)(0))
+          };
+      };
+  };
+  var length = function (dict) {
+      return dict.length;
   }; 
   var coords = function (dict) {
       return dict.coords;
@@ -4267,122 +4355,27 @@ var PS = {};
   var abs = function (dict) {
       return dict.abs;
   };
+  var measurableVector = new Measurable(function (v) {
+      return $$Math.sqrt(abs(basedVector)(v) * abs(basedVector)(v) + ord(basedVector)(v) * ord(basedVector)(v));
+  });
   var rotated = function (ang) {
       return function (v) {
           return Vector(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Sparse_Polynomial.monoPol(abs(basedVector)(v) * $$Math.cos(ang) - ord(basedVector)(v) * $$Math.sin(ang))(0))(Data_Sparse_Polynomial.monoPol(abs(basedVector)(v) * $$Math.sin(ang) + ord(basedVector)(v) * $$Math.cos(ang))(1)));
       };
   };
   exports["abs"] = abs;
+  exports["length"] = length;
+  exports["middle"] = middle;
   exports["ord"] = ord;
   exports["plus"] = plus;
   exports["point"] = point;
   exports["rotated"] = rotated;
   exports["scale"] = scale;
+  exports["segment"] = segment;
   exports["vector"] = vector;
   exports["basedPoint"] = basedPoint;
+  exports["measurableVector"] = measurableVector;
   exports["summublePointVector"] = summublePointVector;
-})(PS);
-(function($PS) {
-  // Generated by purs version 0.13.6
-  "use strict";
-  $PS["Spork.Html.Core"] = $PS["Spork.Html.Core"] || {};
-  var exports = $PS["Spork.Html.Core"];
-  var Data_Maybe = $PS["Data.Maybe"];
-  var Data_Newtype = $PS["Data.Newtype"];
-  var Halogen_VDom_DOM_Prop = $PS["Halogen.VDom.DOM.Prop"];
-  var Halogen_VDom_Types = $PS["Halogen.VDom.Types"];
-  var Unsafe_Coerce = $PS["Unsafe.Coerce"];                
-  var IProp = function (x) {
-      return x;
-  };
-  var Html = function (x) {
-      return x;
-  };
-  var ToPropValue = function (toPropValue) {
-      this.toPropValue = toPropValue;
-  };                                       
-  var unwrapF = Unsafe_Coerce.unsafeCoerce;
-  var toPropValue = function (dict) {
-      return dict.toPropValue;
-  };
-  var stringToPropValue = new ToPropValue(Halogen_VDom_DOM_Prop.propFromString);
-  var ref = function ($16) {
-      return IProp(Halogen_VDom_DOM_Prop.Ref.create($16));
-  };
-  var prop = function (dictToPropValue) {
-      return function (n) {
-          var $17 = Halogen_VDom_DOM_Prop.Property.create(n);
-          var $18 = toPropValue(dictToPropValue);
-          return function ($19) {
-              return IProp($17($18($19)));
-          };
-      };
-  }; 
-  var on = function (ty) {
-      var $23 = Halogen_VDom_DOM_Prop.Handler.create(ty);
-      return function ($24) {
-          return IProp($23($24));
-      };
-  };                                                                            
-  var newtypeHtml = new Data_Newtype.Newtype(function (n) {
-      return n;
-  }, Html);
-  var elemWithNS = function (ns) {
-      return function (name) {
-          return function (props) {
-              return function (children) {
-                  return new Halogen_VDom_Types.Elem(ns, name, props, unwrapF(children));
-              };
-          };
-      };
-  };
-  var elem = elemWithNS(Data_Maybe.Nothing.value);                                
-  var attr = function (n) {
-      var $36 = Halogen_VDom_DOM_Prop.Attribute.create(Data_Maybe.Nothing.value)(n);
-      return function ($37) {
-          return IProp($36($37));
-      };
-  };
-  exports["elem"] = elem;
-  exports["elemWithNS"] = elemWithNS;
-  exports["prop"] = prop;
-  exports["attr"] = attr;
-  exports["on"] = on;
-  exports["ref"] = ref;
-  exports["newtypeHtml"] = newtypeHtml;
-  exports["stringToPropValue"] = stringToPropValue;
-})(PS);
-(function($PS) {
-  // Generated by purs version 0.13.6
-  "use strict";
-  $PS["SVGpork.Render"] = $PS["SVGpork.Render"] || {};
-  var exports = $PS["SVGpork.Render"];
-  var Data_Maybe = $PS["Data.Maybe"];
-  var Data_Show = $PS["Data.Show"];
-  var Spork_Html_Core = $PS["Spork.Html.Core"];
-  var ns = Data_Maybe.Just.create("http://www.w3.org/2000/svg");
-  var svgline = function (x1) {
-      return function (y1) {
-          return function (x2) {
-              return function (y2) {
-                  return function (stroke) {
-                      return function (strokeWidth) {
-                          return Spork_Html_Core.elemWithNS(ns)("line")([ Spork_Html_Core.attr("x1")(Data_Show.show(Data_Show.showNumber)(x1)), Spork_Html_Core.attr("y1")(Data_Show.show(Data_Show.showNumber)(y1)), Spork_Html_Core.attr("x2")(Data_Show.show(Data_Show.showNumber)(x2)), Spork_Html_Core.attr("y2")(Data_Show.show(Data_Show.showNumber)(y2)), Spork_Html_Core.attr("style")("stroke:" + (stroke + ("; stroke-width:" + (Data_Show.show(Data_Show.showNumber)(strokeWidth) + "px;")))) ])([  ]);
-                      };
-                  };
-              };
-          };
-      };
-  }; 
-  var defaultContext = {
-      stroke: "#000",
-      fill: "#00000000",
-      strokeWidth: 1.5,
-      fontStyle: "italic 15px arial, sans-serif",
-      textFill: "#000"
-  };
-  exports["svgline"] = svgline;
-  exports["defaultContext"] = defaultContext;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.13.6
@@ -4530,6 +4523,76 @@ var PS = {};
   exports["stepper"] = stepper;
   exports["withAccum"] = withAccum;
   exports["fix"] = fix;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.13.6
+  "use strict";
+  $PS["Spork.Html.Core"] = $PS["Spork.Html.Core"] || {};
+  var exports = $PS["Spork.Html.Core"];
+  var Data_Maybe = $PS["Data.Maybe"];
+  var Data_Newtype = $PS["Data.Newtype"];
+  var Halogen_VDom_DOM_Prop = $PS["Halogen.VDom.DOM.Prop"];
+  var Halogen_VDom_Types = $PS["Halogen.VDom.Types"];
+  var Unsafe_Coerce = $PS["Unsafe.Coerce"];                
+  var IProp = function (x) {
+      return x;
+  };
+  var Html = function (x) {
+      return x;
+  };
+  var ToPropValue = function (toPropValue) {
+      this.toPropValue = toPropValue;
+  };                                       
+  var unwrapF = Unsafe_Coerce.unsafeCoerce;
+  var toPropValue = function (dict) {
+      return dict.toPropValue;
+  };
+  var stringToPropValue = new ToPropValue(Halogen_VDom_DOM_Prop.propFromString);
+  var ref = function ($16) {
+      return IProp(Halogen_VDom_DOM_Prop.Ref.create($16));
+  };
+  var prop = function (dictToPropValue) {
+      return function (n) {
+          var $17 = Halogen_VDom_DOM_Prop.Property.create(n);
+          var $18 = toPropValue(dictToPropValue);
+          return function ($19) {
+              return IProp($17($18($19)));
+          };
+      };
+  }; 
+  var on = function (ty) {
+      var $23 = Halogen_VDom_DOM_Prop.Handler.create(ty);
+      return function ($24) {
+          return IProp($23($24));
+      };
+  };                                                                            
+  var newtypeHtml = new Data_Newtype.Newtype(function (n) {
+      return n;
+  }, Html);
+  var elemWithNS = function (ns) {
+      return function (name) {
+          return function (props) {
+              return function (children) {
+                  return new Halogen_VDom_Types.Elem(ns, name, props, unwrapF(children));
+              };
+          };
+      };
+  };
+  var elem = elemWithNS(Data_Maybe.Nothing.value);                                
+  var attr = function (n) {
+      var $36 = Halogen_VDom_DOM_Prop.Attribute.create(Data_Maybe.Nothing.value)(n);
+      return function ($37) {
+          return IProp($36($37));
+      };
+  };
+  exports["elem"] = elem;
+  exports["elemWithNS"] = elemWithNS;
+  exports["prop"] = prop;
+  exports["attr"] = attr;
+  exports["on"] = on;
+  exports["ref"] = ref;
+  exports["newtypeHtml"] = newtypeHtml;
+  exports["stringToPropValue"] = stringToPropValue;
 })(PS);
 (function(exports) {
   "use strict";
@@ -5328,6 +5391,7 @@ var PS = {};
   var exports = $PS["Main"];
   var Control_Applicative = $PS["Control.Applicative"];
   var Control_Apply = $PS["Control.Apply"];
+  var Control_Bind = $PS["Control.Bind"];
   var Control_Category = $PS["Control.Category"];
   var Data_Array = $PS["Data.Array"];
   var Data_Eq = $PS["Data.Eq"];
@@ -5347,7 +5411,6 @@ var PS = {};
   var Halogen_VDom_DOM_Prop = $PS["Halogen.VDom.DOM.Prop"];
   var $$Math = $PS["Math"];
   var SVGpork_Geometry = $PS["SVGpork.Geometry"];
-  var SVGpork_Render = $PS["SVGpork.Render"];
   var Spork_App = $PS["Spork.App"];
   var Spork_Batch = $PS["Spork.Batch"];
   var Spork_Html_Core = $PS["Spork.Html.Core"];
@@ -5455,6 +5518,15 @@ var PS = {};
   var vOne = function (un) {
       return SVGpork_Geometry.vector(SVGpork_Geometry.point("")(0.0)(0.0))(SVGpork_Geometry.point("")(un)(0.0));
   };
+  var svgline = function (q0) {
+      return function (q1) {
+          return function (stroke) {
+              return function (strokeWidth) {
+                  return Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("line")([ Spork_Html_Core.attr("x1")(Data_Show.show(Data_Show.showNumber)(SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q0))), Spork_Html_Core.attr("y1")(Data_Show.show(Data_Show.showNumber)(SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q0))), Spork_Html_Core.attr("x2")(Data_Show.show(Data_Show.showNumber)(SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q1))), Spork_Html_Core.attr("y2")(Data_Show.show(Data_Show.showNumber)(SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q1))), Spork_Html_Core.attr("style")("stroke:" + (stroke + ("; stroke-width:" + (Data_Show.show(Data_Show.showNumber)(strokeWidth) + "px;")))) ])([  ]);
+              };
+          };
+      };
+  };
   var svgWidth = 800;
   var svgHeight = 600;
   var showLength = new Data_Show.Show(function (v) {
@@ -5464,13 +5536,13 @@ var PS = {};
       if (v instanceof Phi) {
           return "Phi";
       };
-      throw new Error("Failed pattern match at Main (line 69, column 1 - line 71, column 19): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 70, column 1 - line 72, column 19): " + [ v.constructor.name ]);
   });
   var red = "#FF0000";
   var range = function (a) {
       return function (b) {
-          var $33 = a < b;
-          if ($33) {
+          var $42 = a < b;
+          if ($42) {
               return Data_Array.range(a)(b);
           };
           return [  ];
@@ -5504,7 +5576,7 @@ var PS = {};
               })();
               var q1 = nth(m.points)(edge.p1);
               var q0 = nth(m.points)(edge.p0);
-              return SVGpork_Render.svgline(SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q0))(SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q0))(SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q1))(SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q1))(stroke)(ctx.strokeWidth);
+              return svgline(q0)(q1)(stroke)(ctx.strokeWidth);
           })(m.edges);
       };
   };
@@ -5515,6 +5587,7 @@ var PS = {};
           return SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(orig)(SVGpork_Geometry.scale(-r)(SVGpork_Geometry.vector(p)(orig)));
       };
   };
+  var homRatio = 1.1;
   var grey = "#050409";
   var getCorner = function (v) {
       if (v.value0 instanceof Data_Maybe.Just) {
@@ -5528,32 +5601,29 @@ var PS = {};
       };
       return Control_Applicative.pure(Effect.applicativeEffect)(v.value2);
   };
-  var extend = function (x) {
-      return function (y) {
-          return function (m) {
-              return Data_Maybe.maybe(m)(function (preview) {
-                  return {
-                      tiling: {
-                          points: Data_Semigroup.append(Data_Semigroup.semigroupArray)(m.tiling.points)(preview.points),
-                          edges: Data_Semigroup.append(Data_Semigroup.semigroupArray)(m.tiling.edges)(Data_Functor.map(Data_Functor.functorArray)(function (v) {
-                              return {
-                                  p0: v.p0 + Data_Array.length(m.tiling.points) | 0,
-                                  p1: v.p1 + Data_Array.length(m.tiling.points) | 0,
-                                  selected: v.selected,
-                                  locked: v.locked,
-                                  length: v.length
-                              };
-                          })(preview.edges))
-                      },
-                      propositions: [  ],
-                      preview: Data_Maybe.Nothing.value,
-                      path: Data_Semigroup.append(Data_Semigroup.semigroupArray)([ new Data_Tuple.Tuple(Data_Array.length(m.tiling.points), Data_Array.length(m.tiling.edges)) ])(m.path),
-                      corner: m.corner,
-                      unity: m.unity
-                  };
-              })(m.preview);
+  var extend = function (m) {
+      return Data_Maybe.maybe(m)(function (preview) {
+          return {
+              tiling: {
+                  points: Data_Semigroup.append(Data_Semigroup.semigroupArray)(m.tiling.points)(preview.points),
+                  edges: Data_Semigroup.append(Data_Semigroup.semigroupArray)(m.tiling.edges)(Data_Functor.map(Data_Functor.functorArray)(function (e) {
+                      return {
+                          p0: e.p0 + Data_Array.length(m.tiling.points) | 0,
+                          p1: e.p1 + Data_Array.length(m.tiling.points) | 0,
+                          length: e.length,
+                          locked: e.locked,
+                          opposed: e.opposed,
+                          selected: e.selected
+                      };
+                  })(preview.edges))
+              },
+              propositions: [  ],
+              preview: Data_Maybe.Nothing.value,
+              path: Data_Semigroup.append(Data_Semigroup.semigroupArray)([ new Data_Tuple.Tuple(Data_Array.length(m.tiling.points), Data_Array.length(m.tiling.edges)) ])(m.path),
+              corner: m.corner,
+              unity: m.unity
           };
-      };
+      })(m.preview);
   };
   var eqLength = new Data_Eq.Eq(function (x) {
       return function (y) {
@@ -5571,22 +5641,6 @@ var PS = {};
   var ref = function (i) {
       return SVGpork_Geometry.point("")(Data_Int.toNumber((i + 1 | 0) * dx | 0))(dy);
   };
-  var render = function (m) {
-      var ctx = {
-          stroke: grey,
-          strokeWidth: 2.0,
-          fill: SVGpork_Render.defaultContext.fill,
-          fontStyle: SVGpork_Render.defaultContext.fontStyle,
-          textFill: SVGpork_Render.defaultContext.textFill
-      };
-      return Spork_Html_Elements.div([  ])([ Spork_Html_Elements.div([  ])([ Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-minus" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Minus.value)) ])([  ]), Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-plus" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Plus.value)) ])([  ]) ]), Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-undo" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Undo.value)) ])([  ]), Spork_Html_Elements.div([ Spork_Html_Core.ref(Spork_Html_Events.always(TransmitRef.create)) ])([ Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("svg")([ Spork_Html_Core.attr("width")(Data_Show.show(Data_Show.showInt)(svgWidth) + "px"), Spork_Html_Core.attr("height")(Data_Show.show(Data_Show.showInt)(svgHeight) + "px"), Spork_Html_Events.onMouseMove(Spork_Html_Events.always(Probe.create)), Spork_Html_Events.onMouseDown(Spork_Html_Events.always(Chooz.create)) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(mesh(ctx)(m.tiling))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Foldable.fold(Data_Foldable.foldableArray)(Data_Monoid.monoidArray)(Data_Functor.map(Data_Functor.functorArray)(mesh(ctx))(Data_Array.mapWithIndex(function (i) {
-          return function (prop) {
-              return prop(ref(i))(0.0);
-          };
-      })(m.propositions))))(Data_Maybe.maybe([  ])(function (msh) {
-          return mesh(ctx)(msh);
-      })(m.preview)))) ]) ]);
-  };
   var det = function (p0) {
       return function (p1) {
           return SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(p0) * SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(p1) - SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(p1) * SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(p0);
@@ -5599,168 +5653,178 @@ var PS = {};
           };
       };
   };
-  var inside = function (x) {
-      return function (y) {
-          return function (m) {
-              var q3 = nth(m.points)(3);
-              var q2 = nth(m.points)(2);
-              var q1 = nth(m.points)(1);
-              var q0 = nth(m.points)(0);
-              var q = SVGpork_Geometry.point("")(x)(y);
-              return (Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q0)(q1)(q2)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q0)(q2)(q3))) * 1.05 >= Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q0)(q1)(q)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q1)(q2)(q)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q2)(q3)(q)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q3)(q0)(q));
-          };
+  var inside = function (q) {
+      return function (m) {
+          var q3 = nth(m.points)(3);
+          var q2 = nth(m.points)(2);
+          var q1 = nth(m.points)(1);
+          var q0 = nth(m.points)(0);
+          return (Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q0)(q1)(q2)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q0)(q2)(q3))) * 1.05 >= Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q0)(q1)(q)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q1)(q2)(q)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q2)(q3)(q)) + Data_Ord.abs(Data_Ord.ordNumber)(Data_Ring.ringNumber)(surf(q3)(q0)(q));
       };
   };
-  var teaser = function (x) {
-      return function (y) {
-          return function (m) {
-              var locked = Data_Array.filter(function (v) {
-                  return v.locked;
-              })(m.tiling.edges);
-              var q0 = (function () {
-                  var $59 = Data_Array.length(locked) === 0;
-                  if ($59) {
-                      return Data_Maybe.Nothing.value;
-                  };
-                  return Data_Maybe.Just.create(nth(m.tiling.points)((nth(locked)(0)).p0));
-              })();
-              var q1 = (function () {
-                  var $60 = Data_Array.length(locked) === 0;
-                  if ($60) {
-                      return Data_Maybe.Nothing.value;
-                  };
-                  return Data_Maybe.Just.create(nth(m.tiling.points)((nth(locked)(0)).p1));
-              })();
-              var index = Data_Array.findIndex(function (i) {
-                  return inside(x)(y)(nth(m.propositions)(i)(ref(i))(0.0));
-              })(range(0)(Data_Array.length(m.propositions) - 1 | 0));
-              var angle = Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(function (r0) {
-                  return function (r1) {
-                      return $$Math.atan2(SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(r1) - SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(r0))(SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(r1) - SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(r0));
-                  };
-              })(q0))(q1);
-              return Data_Maybe.maybe({
-                  preview: Data_Maybe.Nothing.value,
-                  corner: m.corner,
-                  path: m.path,
-                  propositions: m.propositions,
-                  tiling: m.tiling,
-                  unity: m.unity
-              })(Control_Category.identity(Control_Category.categoryFn))(Control_Apply.apply(Data_Maybe.applyMaybe)(Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(function (i) {
-                  return function (r0) {
-                      return function (a) {
-                          return {
-                              preview: Data_Maybe.Just.create(nth(m.propositions)(i)(r0)(a)),
-                              corner: m.corner,
-                              path: m.path,
-                              propositions: m.propositions,
-                              tiling: m.tiling,
-                              unity: m.unity
-                          };
+  var teaser = function (q) {
+      return function (m) {
+          var locked = Data_Array.filter(function (v) {
+              return v.locked;
+          })(m.tiling.edges);
+          var q0 = (function () {
+              var $62 = Data_Array.length(locked) === 0;
+              if ($62) {
+                  return Data_Maybe.Nothing.value;
+              };
+              return Data_Maybe.Just.create(nth(m.tiling.points)((nth(locked)(0)).p0));
+          })();
+          var q1 = (function () {
+              var $63 = Data_Array.length(locked) === 0;
+              if ($63) {
+                  return Data_Maybe.Nothing.value;
+              };
+              return Data_Maybe.Just.create(nth(m.tiling.points)((nth(locked)(0)).p1));
+          })();
+          var index = Data_Array.findIndex(function (i) {
+              return inside(q)(nth(m.propositions)(i)(ref(i))(0.0));
+          })(range(0)(Data_Array.length(m.propositions) - 1 | 0));
+          var angle = Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(function (r0) {
+              return function (r1) {
+                  return $$Math.atan2(SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(r1) - SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(r0))(SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(r1) - SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(r0));
+              };
+          })(q0))(q1);
+          return Data_Maybe.maybe({
+              preview: Data_Maybe.Nothing.value,
+              corner: m.corner,
+              path: m.path,
+              propositions: m.propositions,
+              tiling: m.tiling,
+              unity: m.unity
+          })(Control_Category.identity(Control_Category.categoryFn))(Control_Apply.apply(Data_Maybe.applyMaybe)(Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(function (i) {
+              return function (r0) {
+                  return function (a) {
+                      return {
+                          preview: Data_Maybe.Just.create(nth(m.propositions)(i)(r0)(a)),
+                          corner: m.corner,
+                          path: m.path,
+                          propositions: m.propositions,
+                          tiling: m.tiling,
+                          unity: m.unity
                       };
                   };
-              })(index))(q0))(angle));
-          };
+              };
+          })(index))(q0))(angle));
       };
   };
   var defaultEdge = function (length) {
       return function (p0) {
           return function (p1) {
-              return {
-                  p0: p0,
-                  p1: p1,
-                  length: length,
-                  selected: false,
-                  locked: false
-              };
-          };
-      };
-  };
-  var defaultShape = [ defaultEdge(One.value)(0)(1), defaultEdge(Phi.value)(1)(2), defaultEdge(Phi.value)(2)(3), defaultEdge(One.value)(3)(0) ];
-  var initialModel = {
-      unity: initialUnity,
-      corner: Data_Maybe.Nothing.value,
-      tiling: {
-          points: [ orig, SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(orig)(vOne(initialUnity)) ],
-          edges: [ defaultEdge(One.value)(0)(1) ]
-      },
-      propositions: [  ],
-      preview: Data_Maybe.Nothing.value,
-      path: [  ]
-  };
-  var closeEdge = function (un) {
-      return function (m) {
-          return function (x) {
-              return function (y) {
-                  return function (e) {
-                      var q1 = nth(m.points)(e.p1);
-                      var q0 = nth(m.points)(e.p0);
-                      var xI = (SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q0) + SVGpork_Geometry.abs(SVGpork_Geometry.basedPoint)(q1)) / 2.0;
-                      var yI = (SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q0) + SVGpork_Geometry.ord(SVGpork_Geometry.basedPoint)(q1)) / 2.0;
-                      return (xI - x) * (xI - x) + (yI - y) * (yI - y) < (un / 5.0) * (un / 5.0);
+              return function (opposed) {
+                  return {
+                      p0: p0,
+                      p1: p1,
+                      length: length,
+                      selected: false,
+                      locked: false,
+                      opposed: opposed
                   };
               };
           };
       };
   };
-  var probe = function (un) {
-      return function (x) {
-          return function (y) {
-              return function (m) {
-                  var sample = Data_Array.filter(function (e) {
-                      return !e.locked;
-                  })(m.edges);
-                  var candidates = Data_Array.filter(closeEdge(un)(m)(x)(y))(sample);
-                  var edge = (function () {
-                      var $61 = Data_Array.length(candidates) === 0;
-                      if ($61) {
-                          return Data_Maybe.Nothing.value;
-                      };
-                      return Data_Maybe.Just.create(nth(candidates)(0));
-                  })();
-                  return Data_Maybe.maybe({
-                      edges: Data_Functor.map(Data_Functor.functorArray)(function (e) {
-                          if (e.locked) {
-                              return e;
-                          };
-                          return {
-                              selected: false,
-                              locked: e.locked,
-                              length: e.length,
-                              p0: e.p0,
-                              p1: e.p1
-                          };
-                      })(m.edges),
-                      points: m.points
-                  })(function (e) {
-                      return {
-                          edges: Data_Functor.map(Data_Functor.functorArray)(function (e$prime) {
-                              var $63 = Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
-                                  return "selected";
-                              }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
-                                  return "p1";
-                              }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
-                                  return "p0";
-                              }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
-                                  return "locked";
-                              }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
-                                  return "length";
-                              }))(eqLength)))(e)(e$prime);
-                              if ($63) {
-                                  return {
-                                      selected: true,
-                                      length: e.length,
-                                      locked: e.locked,
-                                      p0: e.p0,
-                                      p1: e.p1
-                                  };
-                              };
-                              return e$prime;
-                          })(m.edges),
-                          points: m.points
-                      };
-                  })(edge);
+  var defaultShape = function (opposed) {
+      return [ defaultEdge(One.value)(0)(1)(opposed), defaultEdge(Phi.value)(1)(2)(!opposed), defaultEdge(Phi.value)(2)(3)(opposed), defaultEdge(One.value)(3)(0)(!opposed) ];
+  };
+  var initialModel = {
+      unity: initialUnity,
+      corner: Data_Maybe.Nothing.value,
+      tiling: {
+          points: [ orig, SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(orig)(vOne(initialUnity)) ],
+          edges: [ defaultEdge(One.value)(0)(1)(true) ]
+      },
+      propositions: [  ],
+      preview: Data_Maybe.Nothing.value,
+      path: [  ]
+  };
+  var defaultContext = {
+      stroke: "#000",
+      fill: "#00000000",
+      strokeWidth: 1.5,
+      fontStyle: "italic 15px arial, sans-serif",
+      textFill: "#000"
+  };
+  var render = function (m) {
+      var ctx = {
+          stroke: grey,
+          strokeWidth: 2.0,
+          fill: defaultContext.fill,
+          fontStyle: defaultContext.fontStyle,
+          textFill: defaultContext.textFill
+      };
+      return Spork_Html_Elements.div([  ])([ Spork_Html_Elements.div([  ])([ Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-minus" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Minus.value)) ])([  ]), Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-plus" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Plus.value)) ])([  ]) ]), Spork_Html_Elements.button([ Spork_Html_Properties.classes([ "fa", "fa-undo" ]), Spork_Html_Events.onClick(Spork_Html_Events.always_(Undo.value)) ])([  ]), Spork_Html_Elements.div([ Spork_Html_Core.ref(Spork_Html_Events.always(TransmitRef.create)) ])([ Spork_Html_Core.elemWithNS(Data_Maybe.Just.create("http://www.w3.org/2000/svg"))("svg")([ Spork_Html_Core.attr("width")(Data_Show.show(Data_Show.showInt)(svgWidth) + "px"), Spork_Html_Core.attr("height")(Data_Show.show(Data_Show.showInt)(svgHeight) + "px"), Spork_Html_Events.onMouseMove(Spork_Html_Events.always(Probe.create)), Spork_Html_Events.onMouseDown(Spork_Html_Events.always(Chooz.create)) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(mesh(ctx)(m.tiling))(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Foldable.fold(Data_Foldable.foldableArray)(Data_Monoid.monoidArray)(Data_Functor.map(Data_Functor.functorArray)(mesh(ctx))(Data_Array.mapWithIndex(function (i) {
+          return function (prop) {
+              return prop(ref(i))(0.0);
+          };
+      })(m.propositions))))(Data_Maybe.maybe([  ])(mesh(ctx))(m.preview)))) ]) ]);
+  };
+  var closeEdge = function (un) {
+      return function (m) {
+          return function (q) {
+              return function (e) {
+                  var q1 = nth(m.points)(e.p1);
+                  var q0 = nth(m.points)(e.p0);
+                  var qI = SVGpork_Geometry.middle("")(SVGpork_Geometry.segment(q0)(q1)(Data_Maybe.Nothing.value));
+                  return SVGpork_Geometry.length(SVGpork_Geometry.measurableVector)(SVGpork_Geometry.vector(q)(qI)) < un / 5.0;
               };
+          };
+      };
+  };
+  var probe = function (un) {
+      return function (q) {
+          return function (m) {
+              var sample = Data_Array.filter(function (e) {
+                  return !e.locked;
+              })(m.edges);
+              var edge = Data_Foldable.find(Data_Foldable.foldableArray)(closeEdge(un)(m)(q))(sample);
+              return Data_Maybe.maybe({
+                  edges: Data_Functor.map(Data_Functor.functorArray)(Control_Bind.ifM(Control_Bind.bindFn)(function (v1) {
+                      return v1.locked;
+                  })(Control_Category.identity(Control_Category.categoryFn))(function (v1) {
+                      return {
+                          locked: v1.locked,
+                          selected: false,
+                          length: v1.length,
+                          opposed: v1.opposed,
+                          p0: v1.p0,
+                          p1: v1.p1
+                      };
+                  }))(m.edges),
+                  points: m.points
+              })(function (e) {
+                  return {
+                      edges: Data_Functor.map(Data_Functor.functorArray)(Control_Bind.ifM(Control_Bind.bindFn)(function (v1) {
+                          return Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                              return "selected";
+                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                              return "p1";
+                          }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
+                              return "p0";
+                          }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
+                              return "opposed";
+                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                              return "locked";
+                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                              return "length";
+                          }))(eqLength)))(v1)(e);
+                      })(function (v1) {
+                          return {
+                              selected: true,
+                              length: v1.length,
+                              locked: v1.locked,
+                              opposed: v1.opposed,
+                              p0: v1.p0,
+                              p1: v1.p1
+                          };
+                      })(Control_Category.identity(Control_Category.categoryFn)))(m.edges),
+                      points: m.points
+                  };
+              })(edge);
           };
       };
   };
@@ -5775,14 +5839,14 @@ var PS = {};
               var q2 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.scale(phi)(v0));
               var q1 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(-a72)(v0));
               var points = [ q0, q1, q2, q3 ];
+              var edges = defaultShape(true);
               return {
                   points: points,
-                  edges: defaultShape
+                  edges: edges
               };
           };
       };
   };
-  var a54 = (3.0 * $$Math.pi) / 10.0;
   var a36 = $$Math.pi / 5.0;
   var a144 = (4.0 * $$Math.pi) / 5.0;
   var a108 = (3.0 * $$Math.pi) / 5.0;
@@ -5794,149 +5858,155 @@ var PS = {};
               var q2 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(v0);
               var q1 = SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(-a108)(v0));
               var points = [ q0, q1, q2, q3 ];
+              var edges = defaultShape(false);
               return {
                   points: points,
-                  edges: defaultShape
+                  edges: edges
               };
           };
       };
   };
   var extensions = function (un) {
-      return function (v) {
-          if (v instanceof One) {
-              return [ function (q0) {
-                  return function (a) {
-                      return vexe(un)(q0)(a - a72);
+      return function (opposed) {
+          return function (v) {
+              if (v instanceof One) {
+                  if (opposed) {
+                      return [ function (q0) {
+                          return function (a) {
+                              return vexe(un)(q0)(a - a72);
+                          };
+                      }, function (q0) {
+                          return function (a) {
+                              return vexe(un)(q0)(a + a72);
+                          };
+                      }, function (q0) {
+                          return function (a) {
+                              return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a + a72);
+                          };
+                      }, function (q0) {
+                          return function (a) {
+                              return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a - a72);
+                          };
+                      } ];
                   };
-              }, function (q0) {
-                  return function (a) {
-                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a + a108);
+                  return [ function (q0) {
+                      return function (a) {
+                          return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a + a108);
+                      };
+                  }, function (q0) {
+                      return function (a) {
+                          return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a - a108);
+                      };
+                  }, function (q0) {
+                      return function (a) {
+                          return cave(un)(q0)(a - a108);
+                      };
+                  }, function (q0) {
+                      return function (a) {
+                          return cave(un)(q0)(a + a108);
+                      };
+                  } ];
+              };
+              if (v instanceof Phi) {
+                  if (opposed) {
+                      return [ function (q0) {
+                          return function (a) {
+                              return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vPhi(un))))(a + a144);
+                          };
+                      }, function (q0) {
+                          return function (a) {
+                              return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vPhi(un))))(a - a144);
+                          };
+                      }, function (q0) {
+                          return function (a) {
+                              return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne(un))))(a + a36);
+                          };
+                      }, function (q0) {
+                          return function (a) {
+                              return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne(un))))(a - a36);
+                          };
+                      } ];
                   };
-              }, function (q0) {
-                  return function (a) {
-                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a - a108);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return vexe(un)(q0)(a + a72);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(q0)(a - a108);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(q0)(a + a108);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a + a72);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a)(vOne(un))))(a - a72);
-                  };
-              } ];
+                  return [ function (q0) {
+                      return function (a) {
+                          return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a72)(vOne(un))))(a - a36);
+                      };
+                  }, function (q0) {
+                      return function (a) {
+                          return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a72)(vOne(un))))(a + a36);
+                      };
+                  }, function (q0) {
+                      return function (a) {
+                          return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne(un))))(a + a144);
+                      };
+                  }, function (q0) {
+                      return function (a) {
+                          return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne(un))))(a - a144);
+                      };
+                  } ];
+              };
+              throw new Error("Failed pattern match at Main (line 137, column 1 - line 137, column 76): " + [ un.constructor.name, opposed.constructor.name, v.constructor.name ]);
           };
-          if (v instanceof Phi) {
-              return [ function (q0) {
-                  return function (a) {
-                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a72)(vOne(un))))(a - a36);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a72)(vOne(un))))(a + a36);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vPhi(un))))(a + a144);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return vexe(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vPhi(un))))(a - a144);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne(un))))(a + a36);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne(un))))(a - a36);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a - a36)(vOne(un))))(a + a144);
-                  };
-              }, function (q0) {
-                  return function (a) {
-                      return cave(un)(SVGpork_Geometry.plus(SVGpork_Geometry.summublePointVector)(q0)(SVGpork_Geometry.rotated(a + a36)(vOne(un))))(a - a144);
-                  };
-              } ];
-          };
-          throw new Error("Failed pattern match at Main (line 130, column 1 - line 130, column 65): " + [ un.constructor.name, v.constructor.name ]);
       };
   };
-  var toggleLock = function (x) {
-      return function (y) {
-          return function (m) {
-              var candidates = Data_Array.filter(closeEdge(m.unity)(m.tiling)(x)(y))(Data_Array.filter(function (e) {
-                  return e.selected || e.locked;
-              })(m.tiling.edges));
-              var edge = (function () {
-                  var $66 = Data_Array.length(candidates) === 0;
-                  if ($66) {
-                      return Data_Maybe.Nothing.value;
-                  };
-                  return Data_Maybe.Just.create(nth(candidates)(0));
-              })();
-              var tiling = Data_Maybe.maybe(m.tiling)(function (e) {
-                  return {
-                      points: m.tiling.points,
-                      edges: Data_Functor.map(Data_Functor.functorArray)(function (e$prime) {
-                          var $67 = Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
-                              return "selected";
-                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
-                              return "p1";
-                          }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
-                              return "p0";
-                          }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
-                              return "locked";
-                          }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
-                              return "length";
-                          }))(eqLength)))(e)(e$prime);
-                          if ($67) {
-                              return {
-                                  locked: !e.locked,
-                                  selected: e.locked,
-                                  length: e.length,
-                                  p0: e.p0,
-                                  p1: e.p1
-                              };
-                          };
-                          return {
-                              locked: false,
-                              selected: e$prime.selected,
-                              length: e$prime.length,
-                              p0: e$prime.p0,
-                              p1: e$prime.p1
-                          };
-                      })(m.tiling.edges)
-                  };
-              })(edge);
-              var propositions = Data_Array.concat(Data_Functor.map(Data_Functor.functorArray)(function (e) {
-                  if (e.locked) {
-                      return extensions(m.unity)(e.length);
-                  };
-                  return [  ];
-              })(tiling.edges));
+  var toggleLock = function (q) {
+      return function (m) {
+          var sample = Data_Array.filter(function (e) {
+              return e.selected || e.locked;
+          })(m.tiling.edges);
+          var edge = Data_Foldable.find(Data_Foldable.foldableArray)(closeEdge(m.unity)(m.tiling)(q))(sample);
+          var tiling$prime = Data_Maybe.maybe(m.tiling)(function (e) {
               return {
-                  tiling: tiling,
-                  propositions: propositions,
-                  preview: m.preview,
-                  path: m.path,
-                  corner: m.corner,
-                  unity: m.unity
+                  points: m.tiling.points,
+                  edges: Data_Functor.map(Data_Functor.functorArray)(Control_Bind.ifM(Control_Bind.bindFn)(function (v1) {
+                      return Data_Eq.eq(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                          return "selected";
+                      }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                          return "p1";
+                      }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
+                          return "p0";
+                      }))(Data_Eq.eqInt))()(new Data_Symbol.IsSymbol(function () {
+                          return "opposed";
+                      }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                          return "locked";
+                      }))(Data_Eq.eqBoolean))()(new Data_Symbol.IsSymbol(function () {
+                          return "length";
+                      }))(eqLength)))(v1)(e);
+                  })(function (v1) {
+                      return {
+                          locked: !e.locked,
+                          selected: e.locked,
+                          length: v1.length,
+                          opposed: v1.opposed,
+                          p0: v1.p0,
+                          p1: v1.p1
+                      };
+                  })(function (v1) {
+                      return {
+                          locked: false,
+                          selected: v1.selected,
+                          length: v1.length,
+                          opposed: v1.opposed,
+                          p0: v1.p0,
+                          p1: v1.p1
+                      };
+                  }))(m.tiling.edges)
               };
+          })(edge);
+          var propositions$prime = Data_Array.concat(Data_Functor.map(Data_Functor.functorArray)(Control_Bind.ifM(Control_Bind.bindFn)(function (v) {
+              return v.locked;
+          })(Control_Apply.lift2(Control_Apply.applyFn)(extensions(m.unity))(function (v) {
+              return v.opposed;
+          })(function (v) {
+              return v.length;
+          }))(Data_Function["const"]([  ])))(tiling$prime.edges));
+          return {
+              unity: m.unity,
+              corner: m.corner,
+              tiling: tiling$prime,
+              propositions: propositions$prime,
+              preview: m.preview,
+              path: m.path
           };
       };
   };
@@ -5944,16 +6014,6 @@ var PS = {};
       return function (v) {
           if (v instanceof None) {
               return Spork_Transition.purely(model);
-          };
-          if (v instanceof SetCorner) {
-              return Spork_Transition.purely({
-                  corner: new Data_Maybe.Just(v.value0),
-                  path: model.path,
-                  preview: model.preview,
-                  propositions: model.propositions,
-                  tiling: model.tiling,
-                  unity: model.unity
-              });
           };
           if (v instanceof TransmitRef) {
               var effects = (function () {
@@ -5967,6 +6027,16 @@ var PS = {};
                   effects: effects
               };
           };
+          if (v instanceof SetCorner) {
+              return Spork_Transition.purely({
+                  corner: new Data_Maybe.Just(v.value0),
+                  path: model.path,
+                  preview: model.preview,
+                  propositions: model.propositions,
+                  tiling: model.tiling,
+                  unity: model.unity
+              });
+          };
           if (v instanceof Probe) {
               if (model.corner instanceof Data_Maybe.Just) {
                   var y = (function (v1) {
@@ -5975,10 +6045,11 @@ var PS = {};
                   var x = (function (v1) {
                       return v1 - model.corner.value0.left;
                   })(Data_Int.toNumber(Web_UIEvent_MouseEvent.clientX(v.value0)));
-                  return Spork_Transition.purely(teaser(x)(y)({
+                  var q = SVGpork_Geometry.point("")(x)(y);
+                  return Spork_Transition.purely(teaser(q)({
                       unity: model.unity,
                       corner: model.corner,
-                      tiling: probe(model.unity)(x)(y)(model.tiling),
+                      tiling: probe(model.unity)(q)(model.tiling),
                       propositions: model.propositions,
                       preview: model.preview,
                       path: model.path
@@ -5994,7 +6065,8 @@ var PS = {};
                   var x = (function (v1) {
                       return v1 - model.corner.value0.left;
                   })(Data_Int.toNumber(Web_UIEvent_MouseEvent.clientX(v.value0)));
-                  return Spork_Transition.purely(extend(x)(y)(toggleLock(x)(y)(model)));
+                  var q = SVGpork_Geometry.point("")(x)(y);
+                  return Spork_Transition.purely(extend(toggleLock(q)(model)));
               };
               return Spork_Transition.purely(model);
           };
@@ -6015,31 +6087,41 @@ var PS = {};
           };
           if (v instanceof Minus) {
               return Spork_Transition.purely({
-                  unity: model.unity / 1.1,
+                  unity: model.unity / homRatio,
                   tiling: {
-                      points: Data_Functor.map(Data_Functor.functorArray)(homothecy(1.0 / 1.1))(model.tiling.points),
+                      points: Data_Functor.map(Data_Functor.functorArray)(homothecy(1.0 / homRatio))(model.tiling.points),
                       edges: model.tiling.edges
                   },
+                  preview: Data_Maybe.maybe(model.preview)(function (m) {
+                      return Data_Maybe.Just.create({
+                          points: Data_Functor.map(Data_Functor.functorArray)(homothecy(1.0 / homRatio))(m.points),
+                          edges: m.edges
+                      });
+                  })(model.preview),
+                  propositions: [  ],
                   corner: model.corner,
-                  path: model.path,
-                  preview: model.preview,
-                  propositions: model.propositions
+                  path: model.path
               });
           };
           if (v instanceof Plus) {
               return Spork_Transition.purely({
-                  unity: model.unity * 1.1,
+                  unity: model.unity * homRatio,
                   tiling: {
-                      points: Data_Functor.map(Data_Functor.functorArray)(homothecy(1.1))(model.tiling.points),
+                      points: Data_Functor.map(Data_Functor.functorArray)(homothecy(homRatio))(model.tiling.points),
                       edges: model.tiling.edges
                   },
+                  preview: Data_Maybe.maybe(model.preview)(function (m) {
+                      return Data_Maybe.Just.create({
+                          points: Data_Functor.map(Data_Functor.functorArray)(homothecy(homRatio))(m.points),
+                          edges: m.edges
+                      });
+                  })(model.preview),
+                  propositions: [  ],
                   corner: model.corner,
-                  path: model.path,
-                  preview: model.preview,
-                  propositions: model.propositions
+                  path: model.path
               });
           };
-          throw new Error("Failed pattern match at Main (line 296, column 3 - line 338, column 33): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 301, column 3 - line 364, column 25): " + [ v.constructor.name ]);
       };
   };
   var app = {
@@ -6061,7 +6143,6 @@ var PS = {};
   exports["orig"] = orig;
   exports["phi"] = phi;
   exports["a36"] = a36;
-  exports["a54"] = a54;
   exports["a72"] = a72;
   exports["a108"] = a108;
   exports["a144"] = a144;
@@ -6083,6 +6164,7 @@ var PS = {};
   exports["extend"] = extend;
   exports["teaser"] = teaser;
   exports["homothecy"] = homothecy;
+  exports["homRatio"] = homRatio;
   exports["None"] = None;
   exports["TransmitRef"] = TransmitRef;
   exports["SetCorner"] = SetCorner;
@@ -6092,6 +6174,7 @@ var PS = {};
   exports["Plus"] = Plus;
   exports["Minus"] = Minus;
   exports["update"] = update;
+  exports["svgline"] = svgline;
   exports["white"] = white;
   exports["beige"] = beige;
   exports["blue"] = blue;
@@ -6099,6 +6182,7 @@ var PS = {};
   exports["purple"] = purple;
   exports["grey"] = grey;
   exports["red"] = red;
+  exports["defaultContext"] = defaultContext;
   exports["mesh"] = mesh;
   exports["render"] = render;
   exports["ref"] = ref;
