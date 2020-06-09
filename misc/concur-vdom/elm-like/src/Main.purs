@@ -43,7 +43,7 @@ formWidget form = do
 
 forms :: Array Form
 forms = [ {name: "Kagol", rememberMe: false}
-        ,  {name: "Bedu", rememberMe: true}
+        , {name: "Bedu", rememberMe: true}
         ]
 
 multiFormWidget1 :: Array Form -> Widget HTML (Array Form)
