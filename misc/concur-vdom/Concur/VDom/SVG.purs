@@ -24,6 +24,13 @@ line = D.el' (\p _ -> mkHTMLNode $
                           p  
                           [])
  
+ellipse :: D.El
+ellipse = D.el' (\p _ -> mkHTMLNode $ 
+                  H.Elem  (Just $ H.Namespace svgNS) 
+                          (H.ElemName "ellipse") 
+                          p  
+                          [])
+
 -- | Construct a custom key value attr
 attr :: forall a. String -> String -> Props P.Prop a
 attr s v = PrimProp (P.Attribute Nothing s v)
@@ -51,3 +58,9 @@ strokeWidth = unsafeMkProp "stroke-width"
 
 stroke :: forall a. String -> Props P.Prop a
 stroke = attr "stroke"
+
+fill :: forall a. String -> Props P.Prop a
+fill = attr "fill"
+
+transform :: forall a. String -> Props P.Prop a
+transform = attr "transform"

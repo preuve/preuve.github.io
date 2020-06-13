@@ -26,6 +26,10 @@
     <div id="identity1"></div>
     <div id="primitive1"></div>
     <div id="primitive2"></div>
+    <div id="scalar"></div>
+    <div id="matrix"></div>
+    <div id="rotation"></div>
+    <div id="norm"></div>
     
            
     <script>
@@ -38,6 +42,10 @@
     	katex.render('\\displaystyle{\\ln(x+iy)=\\frac{1}{2}\\ln(x^2+y^2)+i\\arctan\\frac{y}{x}}', get('#identity1'));
     	katex.render('\\displaystyle{\\frac{\\mathrm{d}}{\\mathrm{d}x}\\left(\\frac{1}{a}\\arctan{\\frac{x}{a}}\\right)=\\frac{1}{x^2+a^2}}', get('#primitive1'));
     	katex.render('\\displaystyle{\\frac{\\mathrm{d}}{\\mathrm{d}x}\\left(\\frac{1}{2a}\\ln{\\frac{x-a}{x+a}}\\right)=\\frac{1}{x^2-a^2}}', get('#primitive2'));
+    	katex.render("\\displaystyle{xx'+yy'+zz'=\\frac{1}{2}\\left((x+y)(x'+y'-z')+(y+z)(y'+z'-x')+(x+z)(x'+z'-y')\\right)}",get('#scalar'));
+    	katex.render("\\displaystyle{\\tan(2\\theta)=\\dfrac{c}{b-a}\\Rightarrow\\left(\\begin{array}{ccc}\\cos^2(\\theta)&\\sin^2(\\theta)&-\\sin(2\\theta)\\\\ \\sin^2(\\theta)&\\cos^2(\\theta)&\\sin(2\\theta)\\\\ -\\tan(2\\theta)&\\tan(2\\theta)&0\\end{array}\\right)\\left(\\begin{array}{c}a\\\\b\\\\c \\end{array}\\right)=\\left(\\begin{array}{c}a\\\\b\\\\c\\\\ \\end{array}\\right)}",get('#matrix'));
+    	katex.render("\\displaystyle{Rot(\\omega_2,\\theta_2)\\circ Rot(\\omega_1,\\theta_1)=Rot(\\omega,\\theta_1+\\theta_2})\\;\\mathrm{avec}\\;\\omega=\\dfrac{\\omega_2+\\mathrm{e}^{i\\theta_2}(\\omega_1-\\omega_2)-\\mathrm{e}^{i(\\theta_1+\\theta_2)}\\omega_1}{1-\\mathrm{e}^{i(\\theta_1+\\theta_2)}}",get('#rotation'));
+    katex.render("\\displaystyle{\\det(\\overrightarrow{u},\\overrightarrow{v})^2+(\\overrightarrow{u}\\bullet\\overrightarrow{v})^2=\\|\\overrightarrow{u}\\|^2\\|\\overrightarrow{v}\\|^2	}",get('#norm'));
   </script>
    
   </body>
