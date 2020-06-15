@@ -8,17 +8,17 @@ import Concur.VDom.DOM (node') as D
 import Concur.VDom.Run (runWidgetInDom)
 import Concur.VDom.SVG as S
 import Control.Alt ((<|>))
-import Data.Array (uncons, zipWith, concat, zip, (..))
+import Data.Array (concat, foldr, uncons, zip, zipWith, (..))
 import Data.Foldable (sum)
 import Data.Int (round, toNumber)
 import Data.Maybe (maybe)
-import Data.Sparse.Matrix (Matrix(..), luSolve, (??), transpose, (^), trace, eye, height, diagonalize)
-import Data.Sparse.Polynomial (Polynomial)
+import Data.Sparse.Matrix (Matrix(..), diagonalize, height, luSolve, transpose, (??), (^))
+import Data.Sparse.Polynomial (Polynomial, (?))
 import Data.Tuple.Nested ((/\), type (/\))
 import Effect (Effect)
 import Effect.Unsafe (unsafePerformEffect)
 import Handles (onMouseMove, onMouseDown, onMouseUp) as P
-import Math (cos, sin, atan, sqrt, pi)
+import Math (abs, atan, cos, pi, sin, sqrt)
 import Nodes (text) as D
 import Web.UIEvent.MouseEvent (pageX, pageY, fromEvent)
 
@@ -42,20 +42,6 @@ points2 = [ 150 /\ 150
           ]
 
 type Vector = Matrix Number
-
-faddeev :: Matrix Number -> Polynomial Number
-faddeev a =
-  let n = height a
-      go 0 _ _ p = p
-      go i m c p =
-        let k = n - i + 1
-            am = a * m + ((_ * c) <$> eye n)
-            coef = - trace (a * am) / toNumber k
-        in go (i-1) am coef (p+coef^(i-1))
-  in go n (Matrix {height: n, width: n, coefficients: zero}) 1.0 (1.0^n)
-
-
-test = diagonalize $ Matrix {height:2, width:2, coefficients: 1.0^0^0+2.0^0^1+3.0^1^0+4.0^1^1}
 
 mkMatrix :: Array Coord -> Matrix Number
 mkMatrix ps =
@@ -89,10 +75,14 @@ mkQuadraticMatrix m =
       + (m??[3,0]/2.0)^2^0 + (m??[4,0]/2.0)^2^1 + 1.0^2^2
     }
 
-applyQuadratic :: Quadratic -> Coord -> Number
-applyQuadratic m (i /\ j) =
+fromCoord :: Coord -> Vector
+fromCoord (i /\ j) =
   let x /\ y = toNumber i /\ toNumber j
-      v = Matrix {height: 3, width: 1, coefficients: x^0^0+y^1^0+1.0^2^0}
+  in Matrix {height: 3, width: 1, coefficients: x^0^0+y^1^0+1.0^2^0}
+
+applyQuadratic :: Quadratic -> Coord -> Number
+applyQuadratic m p =
+  let v = fromCoord p
   in (transpose v * m * v)??[0,0]
 
 type Rotation = Matrix Number
@@ -121,6 +111,24 @@ center m =
                                , coefficients: x^0^0+y^1^0+1.0^2^0
                                }
   in (round $ c??[0,0]) /\ (round $ c??[1,0])
+
+coefficients :: forall a. Matrix a -> Polynomial (Polynomial a)
+coefficients (Matrix m) = m.coefficients
+
+toQuadratic :: forall a. Polynomial (Polynomial a) -> Matrix a
+toQuadratic p =
+   Matrix { height: 3
+          , width: 3
+          , coefficients: p
+          }
+
+toColumn :: forall a. Int -> Polynomial a -> Matrix a
+toColumn j p = toQuadratic $ p^j
+
+ellipseFivePoints :: Array Coord -> Quadratic
+ellipseFivePoints points =
+    mkQuadraticMatrix
+                 $ luSolve (mkMatrix points) secondMember
 
 pointSize = 10 :: Int
 
@@ -233,9 +241,74 @@ modelWidget model = do
                     $ makeShape model
   modelWidget newModel
 
+normalizeColumn :: Quadratic -> Quadratic -> Int -> _--Quadratic
+normalizeColumn ref vec j =
+  let sc x y =
+        let app v = transpose v * ref * v
+        in (_ * 0.5) <$> (app (x+y) - app x - app y)
+
+      p = coefficients vec ? j
+      v0 = toColumn 0 p
+      z = Matrix {height:3, width: 1, coefficients: 1.0^2^0}
+      --r0 = (transpose v0 * v0) ?? [0,0]
+      --v1 = (_ * (sqrt $ 1.0 / r0)) <$> v0
+      --r = (sc v1 * ref * v1) ?? [0,0]
+      r = (sc v0 v0 + ((_ * 7000.0) <$> sc z z)) ?? [0,0]
+--  in toColumn j $ (_ * (sqrt $ 1.0 / r)) <$> (coefficients v1 ? 0)
+  in toColumn j $ (_ * (sqrt $ 1.0 / r )) <$> (coefficients v0 ? 0)
+
+interEllipses :: Quadratic -> Quadratic -> _ --Array Coord
+interEllipses k m =
+  let a = recip m * k
+      {val, vec} = diagonalize a
+      nvec = sum $ normalizeColumn m vec <$> 0..(height m - 1)
+  in {val, nvec}
+
+k = ellipseFivePoints points2
+m = ellipseFivePoints points1
+i12 = interEllipses k m
+p1 = (2400) /\ (220)
+n1 =  (recip i12.nvec) * fromCoord p1
+-- n1t = (transpose $ fromCoord p1) * i12.nvec
+
+{-
+kk = Matrix {height:2, width: 2, coefficients:3.0^0^0+(-2.0)^0^1+(-2.0)^1^0+1.0^1^1}
+mm = Matrix {height:2, width: 2, coefficients:1.0^0^0+(-1.0)^0^1+(-1.0)^1^0+2.0^1^1}
+sc x y =
+  let app v = transpose v * mm * v
+  in (_ * 0.5) <$> (app (x+y) - app x - app y)
+
+aa = recip mm * kk
+dd = diagonalize aa
+ref = dd.vec
+v1 = ref ??[0,0]
+v2 = ref ??[0,1]
+v3 = ref  ??[1,0]
+v4 = ref  ??[1,1]
+n1 = Matrix {height:2, width: 1, coefficients: v1^0^0+v3^1^0}
+n2 = Matrix {height:2, width: 1, coefficients: v2^0^0+v4^1^0}
+s1 = sqrt $ (transpose n1 * n1) ??[0,0]
+s2 = sqrt $ (transpose n2 * n2) ?? [0,0]
+r1 = sqrt $ (sc n1 n1) ??[0,0]
+r2 = sqrt $ (sc n2 n2) ?? [0,0]
+u = Matrix {height:2, width: 1, coefficients:3.0^0^0+5.0^1^0}
+
+nvec = Matrix {height:2, width: 2
+     , coefficients: (v1/r1)^0^0+(v2/r2)^0^1
+                    +(v3/r1)^1^0+(v4/r2)^1^1}
+
+v = recip nvec * u
+-}
 main :: Effect Unit
 main = runWidgetInDom "main"
            $ modelWidget { pressed: false
                          , lastPosition: 200 /\ 200
                          }
-                  <|> (D.node' "pre" [D.text $ show $ test])
+                  <|> (D.node' "pre" [D.text
+                    $ (show $ k) <> "\n"
+                          <> (show $ m)<> "\n"
+                          <> (show $ applyQuadratic k p1)<> "\n"
+                          <> (show $ applyQuadratic m p1) <> "\n"
+                          <> (show $ i12) <> "\n"
+                          <> (show $ transpose n1 * n1) <> "\n"
+                           ])

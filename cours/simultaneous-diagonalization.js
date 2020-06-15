@@ -8761,6 +8761,17 @@ var PS = {};
   var eigenValues = function ($191) {
       return Data_Sparse_Polynomial.roots(faddeev($191));
   };
+  var divisionRingMatrix = function (dictEq) {
+      return function (dictDivisionRing) {
+          return function (dictEuclideanRing) {
+              return new Data_DivisionRing.DivisionRing(function () {
+                  return ringMatrix(dictEq)(dictDivisionRing.Ring0());
+              }, function (m) {
+                  return luSolve(dictEq)((dictDivisionRing.Ring0()).Semiring0())(dictDivisionRing.Ring0())(dictEuclideanRing)(m)(eye(dictEq)((dictDivisionRing.Ring0()).Semiring0())(width(m)));
+              });
+          };
+      };
+  };
   var applyPoly = function (dictEq) {
       return function (dictSemiring) {
           return function (v) {
@@ -8824,16 +8835,15 @@ var PS = {};
   };
   exports["diagonalize"] = diagonalize;
   exports["extract"] = extract;
-  exports["eye"] = eye;
   exports["height"] = height;
   exports["luSolve"] = luSolve;
   exports["monoPol"] = monoPol;
-  exports["trace"] = trace;
   exports["transpose"] = transpose;
   exports["showMatrix"] = showMatrix;
   exports["semiringMatrix"] = semiringMatrix;
   exports["functorMatrix"] = functorMatrix;
   exports["ringMatrix"] = ringMatrix;
+  exports["divisionRingMatrix"] = divisionRingMatrix;
 })(PS);
 (function(exports) {
   "use strict";
@@ -8949,6 +8959,7 @@ var PS = {};
   var Control_Alt = $PS["Control.Alt"];
   var Control_Bind = $PS["Control.Bind"];
   var Data_Array = $PS["Data.Array"];
+  var Data_DivisionRing = $PS["Data.DivisionRing"];
   var Data_Eq = $PS["Data.Eq"];
   var Data_EuclideanRing = $PS["Data.EuclideanRing"];
   var Data_Foldable = $PS["Data.Foldable"];
@@ -8969,11 +8980,18 @@ var PS = {};
   var $$Math = $PS["Math"];
   var Nodes = $PS["Nodes"];
   var Web_UIEvent_MouseEvent = $PS["Web.UIEvent.MouseEvent"];                
-  var test = Data_Sparse_Matrix.diagonalize({
-      height: 2,
-      width: 2,
-      coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(2.0)(0))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(3.0)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(4.0)(1))(1))
-  });
+  var toQuadratic = function (p) {
+      return {
+          height: 3,
+          width: 3,
+          coefficients: p
+      };
+  };
+  var toColumn = function (j) {
+      return function (p) {
+          return toQuadratic(Data_Sparse_Matrix.monoPol(p)(j));
+      };
+  };
   var shapeSide = 50;
   var secondMember = {
       coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(-1.0)(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(-1.0)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(-1.0)(2))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(-1.0)(3))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(-1.0)(4))(0)),
@@ -8988,19 +9006,20 @@ var PS = {};
           coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v.value0)(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(-v.value1)(0))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v.value1)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v.value0)(1))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(2))(2))
       };
   };
-  var unCouple = function (m) {
-      var t = 0.5 * $$Math.atan((2.0 * Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 0, 1 ])) / (Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 1, 1 ]) - Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 0, 0 ])));
+  var unCouple = function (m1) {
+      var t = 0.5 * $$Math.atan((2.0 * Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 0, 1 ])) / (Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 1, 1 ]) - Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 0, 0 ])));
       var r = rotation(t);
-      return new Data_Tuple.Tuple(t, Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(r)(m))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(r)));
+      return new Data_Tuple.Tuple(t, Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(r)(m1))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(r)));
   };
   var points2 = [ new Data_Tuple.Tuple(150, 150), new Data_Tuple.Tuple(240, 80), new Data_Tuple.Tuple(270, 120), new Data_Tuple.Tuple(220, 200), new Data_Tuple.Tuple(120, 100) ];
   var points1 = [ new Data_Tuple.Tuple(150, 150), new Data_Tuple.Tuple(240, 80), new Data_Tuple.Tuple(270, 120), new Data_Tuple.Tuple(220, 200), new Data_Tuple.Tuple(160, 250) ];
   var pointSize = 10;
-  var mkQuadraticMatrix = function (m) {
+  var p1 = new Data_Tuple.Tuple(2400, 220);
+  var mkQuadraticMatrix = function (m1) {
       return {
           height: 3,
           width: 3,
-          coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 0, 0 ]))(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 2, 0 ]) / 2.0)(0))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 3, 0 ]) / 2.0)(0))(2)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 2, 0 ]) / 2.0)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 1, 0 ]))(1))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 4, 0 ]) / 2.0)(1))(2)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 3, 0 ]) / 2.0)(2))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m)([ 4, 0 ]) / 2.0)(2))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(2))(2))
+          coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 0, 0 ]))(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 2, 0 ]) / 2.0)(0))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 3, 0 ]) / 2.0)(0))(2)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 2, 0 ]) / 2.0)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 1, 0 ]))(1))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 4, 0 ]) / 2.0)(1))(2)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 3, 0 ]) / 2.0)(2))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(m1)([ 4, 0 ]) / 2.0)(2))(1)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(2))(2))
       };
   };
   var mkMatrix = function (ps) {
@@ -9034,54 +9053,75 @@ var PS = {};
   var get = function (val) {
       return Data_Int.round(Effect_Unsafe.unsafePerformEffect(val));
   };
-  var faddeev = function (a) {
-      var n = Data_Sparse_Matrix.height(a);
-      var go = function ($copy_v) {
-          return function ($copy_v1) {
-              return function ($copy_v2) {
-                  return function ($copy_p) {
-                      var $tco_var_v = $copy_v;
-                      var $tco_var_v1 = $copy_v1;
-                      var $tco_var_v2 = $copy_v2;
-                      var $tco_done = false;
-                      var $tco_result;
-                      function $tco_loop(v, v1, v2, p) {
-                          if (v === 0) {
-                              $tco_done = true;
-                              return p;
-                          };
-                          var k = (n - v | 0) + 1 | 0;
-                          var am = Data_Semiring.add(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(a)(v1))(Data_Functor.map(Data_Sparse_Matrix.functorMatrix)(function (v3) {
-                              return v3 * v2;
-                          })(Data_Sparse_Matrix.eye(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(n)));
-                          var coef = -Data_Sparse_Matrix.trace(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(a)(am)) / Data_Int.toNumber(k);
-                          $tco_var_v = v - 1 | 0;
-                          $tco_var_v1 = am;
-                          $tco_var_v2 = coef;
-                          $copy_p = Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(p)(Data_Sparse_Matrix.monoPol(coef)(v - 1 | 0));
-                          return;
+  var fromCoord = function (v) {
+      var v1 = new Data_Tuple.Tuple(Data_Int.toNumber(v.value0), Data_Int.toNumber(v.value1));
+      return {
+          height: 3,
+          width: 1,
+          coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v1.value0)(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v1.value1)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(2))(0))
+      };
+  };
+  var ellipseFivePoints = function (points) {
+      return mkQuadraticMatrix(Data_Sparse_Matrix.luSolve(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(Data_EuclideanRing.euclideanRingNumber)(mkMatrix(points))(secondMember));
+  };
+  var k = ellipseFivePoints(points2);
+  var m = ellipseFivePoints(points1);
+  var coefficients = function (v) {
+      return v.coefficients;
+  };
+  var normalizeColumn = function (ref) {
+      return function (vec) {
+          return function (j) {
+              var z = {
+                  height: 3,
+                  width: 1,
+                  coefficients: Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(2))(0)
+              };
+              var sc = function (x) {
+                  return function (y) {
+                      var app = function (v) {
+                          return Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(v))(ref))(v);
                       };
-                      while (!$tco_done) {
-                          $tco_result = $tco_loop($tco_var_v, $tco_var_v1, $tco_var_v2, $copy_p);
-                      };
-                      return $tco_result;
+                      return Data_Functor.map(Data_Sparse_Matrix.functorMatrix)(function (v) {
+                          return v * 0.5;
+                      })(Data_Ring.sub(Data_Sparse_Matrix.ringMatrix(Data_Eq.eqNumber)(Data_Ring.ringNumber))(Data_Ring.sub(Data_Sparse_Matrix.ringMatrix(Data_Eq.eqNumber)(Data_Ring.ringNumber))(app(Data_Semiring.add(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(x)(y)))(app(x)))(app(y)));
                   };
               };
+              var p = Data_Sparse_Polynomial.query(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(coefficients(vec))(j);
+              var v0 = toColumn(0)(p);
+            
+              //r0 = (transpose v0 * v0) ?? [0,0]
+              //v1 = (_ * (sqrt $ 1.0 / r0)) <$> v0
+              //r = (sc v1 * ref * v1) ?? [0,0]
+  var r = Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Semiring.add(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(sc(v0)(v0))(Data_Functor.map(Data_Sparse_Matrix.functorMatrix)(function (v) {
+                  return v * 7000.0;
+              })(sc(z)(z))))([ 0, 0 ]);
+              return toColumn(j)(Data_Functor.map(Data_Sparse_Polynomial.functorPoly)(function (v) {
+                  return v * $$Math.sqrt(1.0 / r);
+              })(Data_Sparse_Polynomial.query(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(coefficients(v0))(0)));
           };
       };
-      return go(n)({
-          height: n,
-          width: n,
-          coefficients: Data_Semiring.zero(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))
-      })(1.0)(Data_Sparse_Matrix.monoPol(1.0)(n));
   };
+  var interEllipses = function (k1) {
+      return function (m1) {
+          var a = Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_DivisionRing.recip(Data_Sparse_Matrix.divisionRingMatrix(Data_Eq.eqNumber)(Data_DivisionRing.divisionringNumber)(Data_EuclideanRing.euclideanRingNumber))(m1))(k1);
+          var v = Data_Sparse_Matrix.diagonalize(a);
+          var nvec = Data_Foldable.sum(Data_Foldable.foldableArray)(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Functor.map(Data_Functor.functorArray)(normalizeColumn(m1)(v.vec))(Data_Array.range(0)(Data_Sparse_Matrix.height(m1) - 1 | 0)));
+          return {
+              val: v.val,
+              nvec: nvec
+          };
+      };
+  };
+  var i12 = interEllipses(k)(m);
+  var n1 = Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_DivisionRing.recip(Data_Sparse_Matrix.divisionRingMatrix(Data_Eq.eqNumber)(Data_DivisionRing.divisionringNumber)(Data_EuclideanRing.euclideanRingNumber))(i12.nvec))(fromCoord(p1));
   var closed = function (xs) {
       return Data_Maybe.maybe([  ])(function (v) {
           return Data_Semigroup.append(Data_Semigroup.semigroupArray)(xs)([ v.head ]);
       })(Data_Array.uncons(xs));
   };
-  var center = function (m) {
-      var v = unCouple(m);
+  var center = function (m1) {
+      var v = unCouple(m1);
       var v1 = new Data_Tuple.Tuple(Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.negate(Data_Sparse_Matrix.ringMatrix(Data_Eq.eqNumber)(Data_Ring.ringNumber))(v.value1))([ 0, 2 ]) / Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 0, 0 ]), Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.negate(Data_Sparse_Matrix.ringMatrix(Data_Eq.eqNumber)(Data_Ring.ringNumber))(v.value1))([ 1, 2 ]) / Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 1, 1 ]));
       var r = rotation(v.value0);
       var c = Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(r))({
@@ -9095,10 +9135,10 @@ var PS = {};
       return makePoint(center(mkQuadraticMatrix(Data_Sparse_Matrix.luSolve(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(Data_EuclideanRing.euclideanRingNumber)(mkMatrix(points))(secondMember))));
   };
   var makeEllipse = function (points) {
-      var m = mkQuadraticMatrix(Data_Sparse_Matrix.luSolve(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(Data_EuclideanRing.euclideanRingNumber)(mkMatrix(points))(secondMember));
-      var v = unCouple(m);
+      var m1 = mkQuadraticMatrix(Data_Sparse_Matrix.luSolve(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(Data_EuclideanRing.euclideanRingNumber)(mkMatrix(points))(secondMember));
+      var v = unCouple(m1);
       var g = Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.negate(Data_Sparse_Matrix.ringMatrix(Data_Eq.eqNumber)(Data_Ring.ringNumber))(v.value1))([ 2, 2 ]) + (Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 0, 2 ]) * Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 0, 2 ])) / Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 0, 0 ]) + (Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 1, 2 ]) * Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 1, 2 ])) / Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 1, 1 ]);
-      var v1 = center(m);
+      var v1 = center(m1);
       var v2 = new Data_Tuple.Tuple($$Math.sqrt(g / Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 0, 0 ])), $$Math.sqrt(g / Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(v.value1)([ 1, 1 ])));
       return Concur_VDom_SVG.ellipse(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_SVG.unsafeMkProp(Data_Show.showInt)("cx")(v1.value0), Concur_VDom_SVG.unsafeMkProp(Data_Show.showInt)("cy")(v1.value1), Concur_VDom_SVG.unsafeMkProp(Data_Show.showNumber)("rx")(v2.value0), Concur_VDom_SVG.unsafeMkProp(Data_Show.showNumber)("ry")(v2.value1), Concur_VDom_SVG.fill("none"), Concur_VDom_SVG.stroke("#000000"), Concur_VDom_SVG.strokeWidth(2), Concur_VDom_SVG.transform("rotate(" + (Data_Show.show(Data_Show.showNumber)((-180.0 * v.value0) / $$Math.pi) + (", " + (Data_Show.show(Data_Show.showInt)(v1.value0) + ("," + (Data_Show.show(Data_Show.showInt)(v1.value1) + ")")))))) ])([  ]);
   };
@@ -9132,36 +9172,65 @@ var PS = {};
           return modelWidget(newModel);
       });
   };
+  var applyQuadratic = function (m1) {
+      return function (p) {
+          var v = fromCoord(p);
+          return Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(v))(m1))(v))([ 0, 0 ]);
+      };
+  };
+
+  // n1t = (transpose $ fromCoord p1) * i12.nvec
+  /**
+ * 
+ * kk = Matrix {height:2, width: 2, coefficients:3.0^0^0+(-2.0)^0^1+(-2.0)^1^0+1.0^1^1}
+ * mm = Matrix {height:2, width: 2, coefficients:1.0^0^0+(-1.0)^0^1+(-1.0)^1^0+2.0^1^1}
+ * sc x y =
+ *   let app v = transpose v * mm * v
+ *   in (_ * 0.5) <$> (app (x+y) - app x - app y)
+ * 
+ * aa = recip mm * kk
+ * dd = diagonalize aa
+ * ref = dd.vec
+ * v1 = ref ??[0,0]
+ * v2 = ref ??[0,1]
+ * v3 = ref  ??[1,0]
+ * v4 = ref  ??[1,1]
+ * n1 = Matrix {height:2, width: 1, coefficients: v1^0^0+v3^1^0}
+ * n2 = Matrix {height:2, width: 1, coefficients: v2^0^0+v4^1^0}
+ * s1 = sqrt $ (transpose n1 * n1) ??[0,0]
+ * s2 = sqrt $ (transpose n2 * n2) ?? [0,0]
+ * r1 = sqrt $ (sc n1 n1) ??[0,0]
+ * r2 = sqrt $ (sc n2 n2) ?? [0,0]
+ * u = Matrix {height:2, width: 1, coefficients:3.0^0^0+5.0^1^0}
+ * 
+ * nvec = Matrix {height:2, width: 2
+ *      , coefficients: (v1/r1)^0^0+(v2/r2)^0^1
+ *                     +(v3/r1)^1^0+(v4/r2)^1^1}
+ * 
+ * v = recip nvec * u
+ */  
   var main = Concur_VDom_Run.runWidgetInDom("main")(Control_Alt.alt(Concur_Core_Types.widgetAlt(Data_Monoid.monoidArray))(modelWidget({
       pressed: false,
       lastPosition: new Data_Tuple.Tuple(200, 200)
-  }))(Concur_VDom_DOM["node'"]("pre")(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Nodes.text(Concur_Core_LiftWidget.widgetLiftWidget)(Data_Show.show(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
-      return "val";
+  }))(Concur_VDom_DOM["node'"]("pre")(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Nodes.text(Concur_Core_LiftWidget.widgetLiftWidget)(Data_Show.show(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber))(k) + ("\x0a" + (Data_Show.show(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber))(m) + ("\x0a" + (Data_Show.show(Data_Show.showNumber)(applyQuadratic(k)(p1)) + ("\x0a" + (Data_Show.show(Data_Show.showNumber)(applyQuadratic(m)(p1)) + ("\x0a" + (Data_Show.show(Data_Show.showRecord()(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
+      return "nvec";
   }))(Data_Show.showRecordFieldsCons(new Data_Symbol.IsSymbol(function () {
-      return "vec";
-  }))(Data_Show.showRecordFieldsNil)(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber)))(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber))))(test)) ])));
-  var applyQuadratic = function (m) {
-      return function (v) {
-          var v1 = new Data_Tuple.Tuple(Data_Int.toNumber(v.value0), Data_Int.toNumber(v.value1));
-          var v2 = {
-              height: 3,
-              width: 1,
-              coefficients: Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Semiring.add(Data_Sparse_Polynomial.semiringPoly(Data_Sparse_Polynomial.eqPoly(Data_Eq.eqNumber))(Data_Sparse_Polynomial.semiringPoly(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v1.value0)(0))(0))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(v1.value1)(1))(0)))(Data_Sparse_Matrix.monoPol(Data_Sparse_Matrix.monoPol(1.0)(2))(0))
-          };
-          return Data_Sparse_Matrix.extract(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(v2))(m))(v2))([ 0, 0 ]);
-      };
-  };
+      return "val";
+  }))(Data_Show.showRecordFieldsNil)(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber)))(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber))))(i12) + ("\x0a" + (Data_Show.show(Data_Sparse_Matrix.showMatrix(Data_Show.showNumber)(Data_Semiring.semiringNumber)(Data_Eq.eqNumber))(Data_Semiring.mul(Data_Sparse_Matrix.semiringMatrix(Data_Eq.eqNumber)(Data_Semiring.semiringNumber))(Data_Sparse_Matrix.transpose(Data_Eq.eqNumber)(Data_Semiring.semiringNumber)(Data_Ring.ringNumber)(n1))(n1)) + "\x0a"))))))))))) ])));
   exports["points1"] = points1;
   exports["points2"] = points2;
-  exports["faddeev"] = faddeev;
-  exports["test"] = test;
   exports["mkMatrix"] = mkMatrix;
   exports["secondMember"] = secondMember;
   exports["mkQuadraticMatrix"] = mkQuadraticMatrix;
+  exports["fromCoord"] = fromCoord;
   exports["applyQuadratic"] = applyQuadratic;
   exports["rotation"] = rotation;
   exports["unCouple"] = unCouple;
   exports["center"] = center;
+  exports["coefficients"] = coefficients;
+  exports["toQuadratic"] = toQuadratic;
+  exports["toColumn"] = toColumn;
+  exports["ellipseFivePoints"] = ellipseFivePoints;
   exports["pointSize"] = pointSize;
   exports["makePoint"] = makePoint;
   exports["makePoints"] = makePoints;
@@ -9174,6 +9243,13 @@ var PS = {};
   exports["makeShape"] = makeShape;
   exports["get"] = get;
   exports["modelWidget"] = modelWidget;
+  exports["normalizeColumn"] = normalizeColumn;
+  exports["interEllipses"] = interEllipses;
+  exports["k"] = k;
+  exports["m"] = m;
+  exports["i12"] = i12;
+  exports["p1"] = p1;
+  exports["n1"] = n1;
   exports["main"] = main;
 })(PS);
 PS["Main"].main();
