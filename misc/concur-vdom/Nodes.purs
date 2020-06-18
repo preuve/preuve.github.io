@@ -31,6 +31,12 @@ p = D.node "p"
 p' :: D.El'
 p' = D.node' "p"
 
+label :: D.El
+label = D.node "label"
+
+label' :: D.El'
+label' = D.node' "label"
+
 type Leaf m a = forall m a. MultiAlternative m => ShiftMap (Widget HTML) m => Array (Props Prop a) -> m a
 
 hr :: forall m a. Leaf m a

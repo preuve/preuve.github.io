@@ -120,4 +120,4 @@ fetchWidget = do
 
 main :: Effect Unit
 main = do
-  runWidgetInDom "main" $ fetchWidget -- inputWidget2 {currentText: "df", focusCount: 0} -- timerWidget 1500.0 -- 
+  runWidgetInDom "main" $ inputWidget2 {currentText: "df", focusCount: 0} -- timerWidget 1500.0 -- fetchWidget -- 
