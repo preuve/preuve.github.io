@@ -127,7 +127,7 @@ let additions =
       { concur-vdom =
           { dependencies = [ "concur-react" ]
           , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
-          , version = "v0.0.3"
+          , version = "v0.0.4"
           }
       }
 

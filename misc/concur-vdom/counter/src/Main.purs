@@ -6,8 +6,8 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Concur.Core (Widget)
-import Nodes as D
-import Handles as P
+import Concur.VDom.DOM as D
+import Concur.VDom.Props as P
 import Concur.VDom (HTML, runWidgetInDom)
 import Control.Alt ((<|>))
 import Control.MultiAlternative (orr)

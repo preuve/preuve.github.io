@@ -13,8 +13,8 @@ import Data.Traversable (traverse)
 import Concur.Core (Widget)
 import Concur.Core.Types (andd)
 import Concur.VDom (HTML)
-import Nodes (text, div', button, input) as D
-import Handles as P
+import Concur.VDom.DOM (text, div', button, input) as D
+import Concur.VDom.Props as P
 import Concur.VDom.Run (runWidgetInDom)
 import Control.Alt ((<|>))
 import Control.Monad.Rec.Class (forever)
@@ -120,4 +120,4 @@ fetchWidget = do
 
 main :: Effect Unit
 main = do
-  runWidgetInDom "main" $ inputWidget2 {currentText: "df", focusCount: 0} -- timerWidget 1500.0 -- fetchWidget -- 
+  runWidgetInDom "main" $ fetchWidget -- inputWidget2 {currentText: "df", focusCount: 0} -- timerWidget 1500.0 -- 

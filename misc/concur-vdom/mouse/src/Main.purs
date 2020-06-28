@@ -5,7 +5,7 @@ import Prelude
 import Concur.Core (Widget)
 --import Concur.Core.FRP (Signal, dyn, loopS, loopW)
 import Concur.VDom (HTML)
-import Handles as P
+import Concur.VDom.Props as P
 import Concur.VDom.Run (runWidgetInDom)
 import Concur.VDom.SVG as S
 import Data.Tuple.Nested ((/\), type (/\))

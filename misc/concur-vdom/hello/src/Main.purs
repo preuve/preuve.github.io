@@ -5,8 +5,8 @@ import Prelude
 import Effect (Effect)
 import Concur.Core (Widget)
 import Concur.VDom (HTML)
-import Handles as P
-import Nodes (text, div', button, button') as D
+import Concur.VDom.Props as P
+import Concur.VDom.DOM (text, div', button, button') as D
 import Concur.VDom.Run (runWidgetInDom)
 import Control.Alt ((<|>))
 import Control.MultiAlternative (orr)

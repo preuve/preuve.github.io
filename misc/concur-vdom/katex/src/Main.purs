@@ -7,9 +7,9 @@ import Concur.VDom (HTML)
 import Concur.VDom.Run (runWidgetInDom)
 import Effect (Effect)
 import Effect.Class (liftEffect)
-import Handles (dangerouslySetInnerHTML, onChange, attr, unsafeTextContent) as P
+import Concur.VDom.Props (dangerouslySetInnerHTML, onChange, attr, unsafeTextContent) as P
 import KaTeX (equation)
-import Nodes as D
+import Concur.VDom.DOM as D
 
 type State = {text :: String}
 

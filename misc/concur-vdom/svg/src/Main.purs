@@ -5,7 +5,7 @@ import Prelude
 import Concur.Core (Widget)
 import Concur.Core.FRP (Signal, dyn, loopS, loopW)
 import Concur.VDom (HTML)
-import Handles as P
+import Concur.VDom.Props as P
 import Concur.VDom.Run (runWidgetInDom)
 import Concur.VDom.SVG as S
 import Data.Array (reverse, (:))
@@ -22,7 +22,7 @@ import Effect.Aff.Class (liftAff)
 tickTime = 500.0 :: Number
 startCoord = 300 /\ 300 :: Int /\ Int
 stepSize = 2 :: Int
-iterations = 13 :: Int
+iterations = 11 :: Int
 
 data Dir
   = Up
@@ -123,9 +123,7 @@ timer init =
     
 signal :: Signal HTML Model
 signal =
-  loopS newModel \model -> do
-    model' <- timer model
-    svgLines model'
+  loopS newModel $ (svgLines =<< _) <<< timer 
     
 main :: Effect Unit
 main = runWidgetInDom "main" $ dyn signal

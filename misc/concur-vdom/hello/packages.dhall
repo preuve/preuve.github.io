@@ -131,7 +131,7 @@ let additions =
       , repo =
           "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
       , version =
-          "v0.0.3"
+          "v0.0.4"
       }
   }
 in  upstream // overrides // additions

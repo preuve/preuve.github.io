@@ -5,8 +5,8 @@ import Prelude
 import Effect (Effect)
 import Concur.Core (Widget)
 import Concur.VDom (HTML)
-import Nodes (text, div', button, input) as D
-import Handles as P
+import Concur.VDom.DOM (text, div', button, input) as D
+import Concur.VDom.Props as P
 import Concur.VDom.Run (runWidgetInDom)
 import Concur.Core.Types (andd)
 import Data.Traversable (traverse)

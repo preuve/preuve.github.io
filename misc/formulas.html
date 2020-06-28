@@ -30,6 +30,7 @@
     <div id="matrix"></div>
     <div id="rotation"></div>
     <div id="norm"></div>
+    <div id="pi"></div>
     
            
     <script>
@@ -46,6 +47,7 @@
     	katex.render("\\displaystyle{\\tan(2\\theta)=\\dfrac{c}{b-a}\\Rightarrow\\left(\\begin{array}{ccc}\\cos^2(\\theta)&\\sin^2(\\theta)&-\\sin(2\\theta)\\\\ \\sin^2(\\theta)&\\cos^2(\\theta)&\\sin(2\\theta)\\\\ -\\tan(2\\theta)&\\tan(2\\theta)&0\\end{array}\\right)\\left(\\begin{array}{c}a\\\\b\\\\c \\end{array}\\right)=\\left(\\begin{array}{c}a\\\\b\\\\c\\\\ \\end{array}\\right)}",get('#matrix'));
     	katex.render("\\displaystyle{Rot(\\omega_2,\\theta_2)\\circ Rot(\\omega_1,\\theta_1)=Rot(\\omega,\\theta_1+\\theta_2})\\;\\mathrm{avec}\\;\\omega=\\dfrac{\\omega_2+\\mathrm{e}^{i\\theta_2}(\\omega_1-\\omega_2)-\\mathrm{e}^{i(\\theta_1+\\theta_2)}\\omega_1}{1-\\mathrm{e}^{i(\\theta_1+\\theta_2)}}",get('#rotation'));
     katex.render("\\displaystyle{\\det(\\overrightarrow{u},\\overrightarrow{v})^2+(\\overrightarrow{u}\\bullet\\overrightarrow{v})^2=\\|\\overrightarrow{u}\\|^2\\|\\overrightarrow{v}\\|^2	}",get('#norm'));
+   katex.render("\\displaystyle{\\left\\{\\begin{array}{lcl}d_0&=&0 \\\\ d_{n+1}&=&\\sqrt{2+d_n} \\\\ p_0&=&2 \\\\ p_{n+1}&=&p_n \\dfrac{2}{\\sqrt{2+d_n}} \\end{array}\\right. \\Rightarrow \\pi-p_{24}<1e^{-14}}",get('#pi'));
   </script>
    
   </body>

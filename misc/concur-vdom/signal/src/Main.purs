@@ -5,8 +5,8 @@ import Prelude
 import Concur.Core (Widget)
 import Concur.Core.FRP (Signal, step, dyn, display, loopS, loopW)
 import Concur.VDom (HTML)
-import Nodes (text, div', button, div_) as D
-import Handles as P
+import Concur.VDom.DOM (text, div', button, div_) as D
+import Concur.VDom.Props as P
 import Concur.VDom.Run (runWidgetInDom)
 import Control.Alt ((<|>))
 import Data.Time.Duration (Milliseconds(..))

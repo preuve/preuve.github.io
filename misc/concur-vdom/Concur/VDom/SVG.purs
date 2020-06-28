@@ -31,6 +31,15 @@ ellipse = D.el' (\p _ -> mkHTMLNode $
                           p  
                           [])
 
+path :: D.El
+path = D.el' (\p _ -> mkHTMLNode $ 
+                  H.Elem  (Just $ H.Namespace svgNS) 
+                          (H.ElemName "path") 
+                          p  
+                          [])
+ 
+
+
 -- | Construct a custom key value attr
 attr :: forall a. String -> String -> Props P.Prop a
 attr s v = PrimProp (P.Attribute Nothing s v)
@@ -61,6 +70,9 @@ stroke = attr "stroke"
 
 fill :: forall a. String -> Props P.Prop a
 fill = attr "fill"
+
+d :: forall a. String -> Props P.Prop a
+d = attr "d"
 
 transform :: forall a. String -> Props P.Prop a
 transform = attr "transform"
