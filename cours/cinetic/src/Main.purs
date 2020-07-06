@@ -3,12 +3,13 @@ module Main where
 import Prelude
 
 import Concur.Core (Widget)
-import Concur.Core.FRP (Signal, dyn, loopS, loopW, display, step)
+import Concur.Core.FRP (dyn, loopW, display)
 import Concur.VDom (HTML)
 import Concur.VDom.DOM (text) as D
 import Concur.VDom.Props as P
 import Concur.VDom.Run (runWidgetInDom)
 import Concur.VDom.SVG as S
+import Control.Alt ((<|>))
 import Data.Array (concat, uncons, zipWith)
 import Data.Int (toNumber, round)
 import Data.Maybe (maybe)
@@ -21,20 +22,12 @@ import Math (sqrt)
 import Shape (Coord, Shape, evolve, toDrawable, toDynamicState)
 import Web.UIEvent.MouseEvent (pageX, pageY, fromEvent)
 
-incrementTicker :: Model -> Signal HTML Model
-incrementTicker init = loopW init $ \m -> do
-  liftAff $ delay $ Milliseconds 100.0
-  pure m {tick = m.tick + 10}
-
-incrementTicker' :: Model -> Signal HTML Model
-incrementTicker' init = loopW init $ \m -> do
+ticker :: Model -> Widget HTML Model
+ticker m = do
   liftAff $ delay $ Milliseconds 50.0
-  pure m {tick' = m.tick' + 12}
-
-evolveTicker :: Model -> Signal HTML Model
-evolveTicker init = loopW init $ \m -> do
-  liftAff $ delay $ Milliseconds 50.0
-  pure m {shapes = evolve m.shapes}
+  case m.baton of
+    0 -> pure $ m {tick = m.tick + 10, baton = 1}
+    _ -> pure $ m {shapes = evolve m.shapes, baton = 0}
 
 type Model
   = { pressed :: Boolean
@@ -42,7 +35,7 @@ type Model
     , lastReferencePosition :: Coord
     , lastDependantPosition :: Coord
     , tick :: Int
-    , tick' :: Int
+    , baton :: Int
     }
 
 makeLine :: forall a. Coord -> Coord -> Widget HTML a
@@ -67,10 +60,9 @@ makeLines xs =
         (\ {head, tail} -> zipWith makeLine xs tail)
         (uncons xs)
 
-svgLines :: Model -> Signal HTML Model
-svgLines model =
-  step model $ do
-    new <- S.svg
+svgLines :: Model -> Widget HTML Model
+svgLines model = do
+  S.svg
       [ S.width "500"
       , S.height "500"
       , (\ev ->
@@ -83,9 +75,9 @@ svgLines model =
                        p /\ q = (p0 - a0) /\ (q0 - b0)
                        den2 = toNumber $ (a' - p) * (a' - p) + (b' - q) * (b' - q)
                        x = a0 + a' - (round $ (shapeSide * (toNumber $ a' - p)) / sqrt den2)
-                       y = b0 + b' -  (round $ (shapeSide * (toNumber $ b' - q)) / sqrt den2)
+                       y = b0 + b' - (round $ (shapeSide * (toNumber $ b' - q)) / sqrt den2)
                      in model { lastReferencePosition = a'0 /\ b'0
-                              , lastDependantPosition = (x+model.tick) /\ y
+                              , lastDependantPosition = x /\ y
                               }
                 )
                 (fromEvent ev)
@@ -95,51 +87,12 @@ svgLines model =
       ]
             $ [makeLine model.lastReferencePosition model.lastDependantPosition]
             <> (concat $ (makeLines <<< closed <<< toDrawable) <$> model.shapes)
-    pure $ pure new
 
-modelWidget :: Model -> Signal HTML Model
-modelWidget m = loopS m $ \model' -> do
-   m' <- incrementTicker model'
-   m'' <- incrementTicker' m'
-   display $ D.text $ show m''.tick <> "   "
-   display $ D.text $ show m''.tick'
-   pure m''{tick = m''.tick}
-   --modelWidget model'
+modelWidget :: Model -> Widget HTML Model
+modelWidget model = dyn do
+  m <- loopW model $ \ m' -> ticker m' <|> svgLines m'
 
-{-  m' <- incrementTicker  model'
-  m'' <- evolveTicker m'
-
-  display $ D.text $ show m''.tick
-  svgLines m''-- {tick = n}
--}
-
-{-  loopW model'{tick = n} \model -> do
-     newModel <- S.svg
-              [ S.width "500"
-              , S.height "500"
-              , (\ev ->
-                  maybe model{shapes = sh}
-                        (\mouse ->
-                           let a'0 /\ b'0 = pageX mouse /\ pageY mouse
-                               p0 /\ q0 = model.lastDependantPosition
-                               a0 /\ b0 = model.lastReferencePosition
-                               a' /\ b' = (a'0 - a0) /\ (b'0 - b0)
-                               p /\ q = (p0 - a0) /\ (q0 - b0)
-                               den2 = toNumber $ (a' - p) * (a' - p) + (b' - q) * (b' - q)
-                               x = a0 + a' - (round $ (shapeSide * (toNumber $ a' - p)) / sqrt den2)
-                               y = b0 + b' -  (round $ (shapeSide * (toNumber $ b' - q)) / sqrt den2)
-                             in model { lastReferencePosition = a'0 /\ b'0
-                                      , lastDependantPosition = (x+model.tick) /\ y
-                                      }
-                        )
-                        (fromEvent ev)
-                )  <$> P.onMouseMove
-              , model { pressed = true} <$ P.onMouseDown
-              , model { pressed = false } <$ P.onMouseUp
-              ]
-                    $ [makeLine model.lastReferencePosition model.lastDependantPosition]
-                    <> (concat $ (makeLines <<< closed <<< toDrawable) <$> model.shapes)
-     pure newModel{shapes = sh}-}
+  display $ D.text $ show m.tick
 
 shapeSide = 20.0 :: Number
 
@@ -161,10 +114,10 @@ shapesInit = [
 
 main :: Effect Unit
 main = runWidgetInDom "main"
-           $ dyn $ modelWidget { pressed: false
+           $ modelWidget { pressed: false
                          , lastReferencePosition: 200 /\ 200
                          , lastDependantPosition: 250 /\ 200
                          , tick: 0
-                         , tick': 0
                          , shapes: shapesInit
+                         , baton: 0
                          }
