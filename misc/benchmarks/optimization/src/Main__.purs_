@@ -1,0 +1,140 @@
+module Main where
+
+import Prelude
+import Numerical.AD
+import Data.Ord(abs)
+
+import Effect (Effect)
+import Effect.Console (logShow)
+import Partial.Unsafe(unsafePartial)
+import Data.Array(head, all, zip, length, (:), (!!))
+import Data.Maybe(fromJust)
+import Data.Tuple(Tuple(..))
+import Data.Foldable(foldr, foldl)
+import Data.Ord(max,min)
+
+test :: DVector -> D Number
+test = unsafePartial $ 
+   \ [x, y] -> 
+        d 1.0 / (d 1.0 + (x - d 4.0)^2 + (y - d 3.0)^2)  
+      - d 1.0 / (d 1.0 + (x - d 2.0)^2 + (y - d 1.0)^2)
+
+{-
+
+max{1/(1 + (x - 4)^2 + (y - 3)^2) - 1/(1 + (x - 2)^2 + (y - 1)^2)}≈0.890072705792000238448214318 at (x, y)≈(4.024003794111556761553737144, 3.024003794111556761553737144)
+
+min{1/(1 + (x - 4)^2 + (y - 3)^2) - 1/(1 + (x - 2)^2 + (y - 1)^2)}≈-0.890072705792000238448214318 at (x, y)≈(1.975996205888443238446262856, 0.975996205888443238446262856)
+
+-}
+
+precision = d 10000.0 :: D Number
+
+rmin :: D Number -> D Number -> D Number
+rmin x y = x + (y - x) / (d 1.0 + exp (precision * (y - x)))
+
+rmax :: D Number -> D Number -> D Number
+rmax x y = - rmin (-x) (-y)
+
+notes :: Array (Array Number)
+notes = 
+ [[7.00,13.00,11.50,16.00]
+ ,[10.00,19.00,13.50,20.00]
+ ,[12.00,18.00,16.25,20.00]
+ ,[17.00,16.00,16.00,10.00]
+ ,[10.00,16.00,12.00,20.00]
+ ,[16.00,18.00,8.25,20.00]
+ ,[6.00,12.00,13.50,17.00]
+ ,[15.00,10.00,15.50,20.00]
+ ,[13.00,14.00,13.00,18.00]
+ ,[10.00,13.00,14.00,15.00]
+ ,[4.00,14.00,6.25,12.00]
+ ,[10.00,1.00,6.75,16.00]
+ ,[11.00,9.00,12.00,20.00]
+ ,[6.00,10.00,3.00,20.00]
+ ,[4.00,11.00,12.25,20.00]
+ ,[10.00,18.00,14.50,20.00]
+ ,[9.00,4.00,5.00,18.00]
+ ,[10.00,17.00,11.50,20.00]
+ ,[6.00,11.00,5.00,8.00]
+ ,[8.00,13.00,12.75,13.00]
+ ]
+       
+nstuds = length notes :: Int
+nworks = length (unsafePartial $ fromJust $ head notes) :: Int
+
+minAvg :: DVector -> D Number
+minAvg = unsafePartial $ \ ctail ->
+  let coefs = (d 1.0 - (foldr (+) zero ctail)) : ctail
+      avgs = (\stud -> foldr (+) zero $ coefs :*: stud) <$> ((d <$> _) <$> notes)
+   in foldl rmin (unsafePartial $ fromJust $ head avgs) avgs
+
+maxAvg :: DVector -> D Number
+maxAvg = unsafePartial $ \ ctail ->
+  let coefs = (d 1.0 - (foldr (+) zero ctail)) : ctail
+      avgs = (\stud -> foldr (+) zero $ coefs :*: stud) <$> ((d <$> _) <$> notes)
+   in foldl rmax (unsafePartial $ fromJust $ head avgs) avgs
+
+avgs :: DVector -> Array (D Number)
+avgs = unsafePartial $ \ ctail ->
+  let coefs = (d 1.0 - (foldr (+) zero ctail)) : ctail
+   in (\stud -> foldr (+) zero $ coefs :*: stud) <$> ((d <$> _) <$> notes)
+
+epsilon = d 0.5 :: D Number 
+delta = d 1e-8 :: D Number 
+
+data Mode = Minimize | Maximize
+derive instance eqMode :: Eq Mode
+
+type DVector = Array (D Number)
+
+optimize :: Mode 
+         -> (DVector -> D Number) 
+         -> DVector 
+         -> Constraint 
+         -> DVector
+optimize mode f x0 cnstr = 
+  let sign = case mode of
+        Minimize -> d (-1.0)
+        Maximize -> d 1.0
+      D diff0 = diffs f x0
+      x1 = cnstr $ (x0 :+: sign .*: epsilon .*: (map d $ diff0.dual))
+      D diff1 = diffs f x1
+  in if all (_ < delta) ((\ (Tuple u0 u1) -> abs((u1-u0)/u0)) <$> zip x0 x1) 
+        || (mode == Minimize && diff0.value < diff1.value)
+        || (mode == Maximize && diff0.value > diff1.value)
+     then x0
+     else optimize mode f x1 cnstr
+
+minimize :: (DVector -> D Number) -> DVector -> Constraint -> DVector
+minimize = optimize Minimize
+
+maximize :: (DVector -> D Number) -> DVector -> Constraint -> DVector
+maximize = optimize Maximize
+
+type Constraint = DVector -> DVector
+
+free :: Constraint
+free = identity
+
+tailWeights :: Constraint
+tailWeights xs  =
+  let probs = (\x -> min (max x $ d 0.2) (d 0.8)) <$> xs
+      sprobs = foldr (+) zero probs
+    in if sprobs > d 0.8
+       then (_ * d 0.8) <$> (_ / sprobs) <$> probs
+       else probs
+
+main :: Effect Unit
+main = do
+  logShow $ diffs (unsafePartial $ \[x,y]-> (x+one)/(y-one)) [d 2.0, d 5.0] == D {value:0.75,dual:[0.25,-0.1875]}
+  logShow $ diffs (unsafePartial $ \[x,y]-> x*x*x+y*y+x*y) [d 2.0, d 5.0] == D {value:43.0,dual:[17.0,12.0]}
+  logShow $ atanh $ d 0.4
+  logShow $ tanh $ d 0.42364893019360184
+  logShow $ maximize test [d 2.5, d 2.5] free
+  logShow $ minimize test [d 2.5, d 2.5] free
+  logShow $ maximize minAvg [d 0.0, d 0.5, d 0.2] tailWeights
+  logShow $ maximize minAvg [d 0.0, d 0.0, d 0.33] tailWeights
+  logShow $ maximize minAvg [d 0.33, d 0.33, d 0.2] tailWeights
+  logShow $ minAvg [d 0.35, d 0.15, d 0.3]
+  logShow $ maxAvg [d 0.35, d 0.15, d 0.3]
+  logShow $ avgs [d 0.35, d 0.15, d 0.3]
