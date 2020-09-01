@@ -1,0 +1,14 @@
+.frame {
+  display: flex;
+  justify-content: space-around;
+ }
+ 
+ div {
+       padding: 4px;
+        margin: 2px;
+ }
+ 
+ #main {
+            border: 5px solid purple;
+ }
+ 
