@@ -37,9 +37,14 @@ path = D.el' (\p _ -> mkHTMLNode $
                           (H.ElemName "path") 
                           p  
                           [])
+
+text :: D.El
+text = D.el' (\p c -> mkHTMLNode $ 
+                  H.Elem  (Just $ H.Namespace svgNS) 
+                          (H.ElemName "text") 
+                          p  
+                          (unHTML c))
  
-
-
 -- | Construct a custom key value attr
 attr :: forall a. String -> String -> Props P.Prop a
 attr s v = PrimProp (P.Attribute Nothing s v)
@@ -73,6 +78,9 @@ fill = attr "fill"
 
 d :: forall a. String -> Props P.Prop a
 d = attr "d"
+
+style :: forall a. String -> Props P.Prop a
+style = attr "style"
 
 transform :: forall a. String -> Props P.Prop a
 transform = attr "transform"
