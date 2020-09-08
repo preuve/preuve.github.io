@@ -1,0 +1,16 @@
+
+let additions =
+      { concur-vdom =
+          { dependencies = [ "concur-react" ]
+          , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
+          , version = "v0.0.7"
+          }
+      }
+
+
+cd src 
+ln -s ../../../../misc/concur-vdom/Concur/ Concur
+ln -s ../../../../data/common/KaTeX/KaTeX.purs KaTeX.purs
+ln -s ../../../../data/common/KaTeX/KaTeX.js KaTeX.js
+ln -s ../../../../data/common/Rand.purs Rand.purs
+ln -s ../../../../data/common/Article.purs Article.purs
