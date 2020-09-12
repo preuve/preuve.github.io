@@ -6606,9 +6606,9 @@ var PS = {};
       };
   };
   var nodeBuilder = function (s) {
-      return function (ps) {
+      return function (prop) {
           return function (c) {
-              return Concur_VDom_Types.mkHTMLNode(new Halogen_VDom_Types.Elem(Data_Maybe.Nothing.value, s, ps, Concur_VDom_Types.unHTML(c)));
+              return Concur_VDom_Types.mkHTMLNode(new Halogen_VDom_Types.Elem(Data_Maybe.Nothing.value, s, prop, Concur_VDom_Types.unHTML(c)));
           };
       };
   };

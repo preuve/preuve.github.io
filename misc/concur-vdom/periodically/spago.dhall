@@ -7,6 +7,7 @@ You can edit this file as you like.
   [ "concur-vdom"
   , "console"
   , "effect"
+  , "geometry-plane"
   , "halogen-vdom"
   , "psci-support"
   , "record-extra"

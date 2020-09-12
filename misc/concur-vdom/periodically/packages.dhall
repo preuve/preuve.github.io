@@ -119,17 +119,11 @@ let additions =
 
 
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20200716/packages.dhall sha256:c4683b4c4da0fd33e0df86fc24af035c059270dd245f68b79a7937098f6c6542
-
-let overrides = {=}
-
-let additions =
-      { concur-vdom =
+      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20200909/packages.dhall sha256:b899488adf6f02a92bbaae88039935bbc61bcba4cf4462f6d915fc3d0e094604
+  with concur-vdom =
           { dependencies = [ "concur-react" ]
           , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
-          , version = "v0.0.4"
+          , version = "v0.0.9"
           }
-      }
-
-
-in  upstream // overrides // additions
+ 
+in  upstream

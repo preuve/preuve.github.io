@@ -11,8 +11,8 @@ import Effect (Effect)
 import Concur.VDom.Props (onChange, unsafeTargetValue, onKeyEnter, attr, autoFocus) as P
 import Concur.VDom.DOM as D
 import Concur.VDom.SVG as S
-import Concur.VDom.SVG.Geometry (circle, length, point, segment, vector, normalTo, halfline, rename, meets, middle, line, arc, rightangle)
-import Concur.VDom.SVG.Render(class Render, render', defaultContext)
+import Data.Geometry.Plane (circle, length, point, segment, vector, normalTo, halfline, rename, meets, middle, line, arc, rightangle)
+import Concur.VDom.GeometryRender(class Render, render', defaultContext)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Ord (abs)
 import Partial.Unsafe(unsafePartial)

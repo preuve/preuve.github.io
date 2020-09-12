@@ -11,14 +11,24 @@ import Control.Monad.State(State, runState)
 import Control.Monad.State.Class(class MonadState, modify)
 import Control.Monad.State.Class(get) as Control
 
-import Data.Array(snoc)
+import Data.Array(snoc, elemIndex, (:), (..), length)
 import Data.Int (round)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromJust)
 import Data.Tuple (fst)
+import Data.Foldable (foldr)
 
 import Effect.Class (liftEffect)
 import Global (readFloat, isNaN)
 import KaTeX (equation, inline) as KaTeX
+
+import Partial.Unsafe(unsafePartial)
+      
+-- | inverses a permutation of [0,1,..,n-1] 
+invPerm :: Array Int -> Array Int
+invPerm ps = 
+  foldr (\i acc -> 
+    (unsafePartial $ fromJust 
+    $ elemIndex i ps) : acc) [] $ 0..(length ps - 1)
 
 validateInput :: Maybe String -> Maybe Int
 validateInput (Just inp) =

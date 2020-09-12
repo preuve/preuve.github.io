@@ -10,8 +10,8 @@ import Concur.VDom.Run (runWidgetInDom)
 import Concur.VDom.Props (onChange, unsafeTargetValue, onKeyEnter, attr, autoFocus) as P
 import Concur.VDom.DOM as D
 import Concur.VDom.SVG as S
-import Concur.VDom.SVG.Geometry (circle, length, point, rightangle, segment, vector)
-import Concur.VDom.SVG.Render(class Render, render', defaultContext)
+import Data.Geometry.Plane (circle, length, point, rightangle, segment, vector)
+import Concur.VDom.GeometryRender(class Render, render', defaultContext)
 import Data.Array (replicate, (!!))
 import Data.Array (length) as Array
 import Data.Foldable (foldr)
