@@ -5312,6 +5312,7 @@ var PS = {};
           return new Concur_Core_Props.PrimProp(new Concur_VDom_Props_Internal.Property(s, Concur_VDom_Props_Internal.propValue(v)));
       };
   };
+  var size = prop("size");
   var value = prop("value");
   var isEnterEvent = function (e) {
       return e.keyCode === 13;
@@ -5335,6 +5336,7 @@ var PS = {};
   exports["onKeyEnter"] = onKeyEnter;
   exports["unsafeTargetValue"] = unsafeTargetValue;
   exports["autoFocus"] = autoFocus;
+  exports["size"] = size;
   exports["dangerouslySetInnerHTML"] = dangerouslySetInnerHTML;
   exports["attr"] = attr;
 })(PS);
@@ -5950,8 +5952,8 @@ var PS = {};
   var validateInput = function (v) {
       if (v instanceof Data_Maybe.Just) {
           var r = Global.readFloat(v.value0);
-          var $5 = Global["isNaN"](r);
-          if ($5) {
+          var $6 = Global["isNaN"](r);
+          if ($6) {
               return Data_Maybe.Nothing.value;
           };
           return Data_Maybe.Just.create(Data_Int.round(r));
@@ -8695,7 +8697,7 @@ var PS = {};
   "use strict";
   $PS["Rand"] = $PS["Rand"] || {};
   var exports = $PS["Rand"];
-  var Data_EuclideanRing = $PS["Data.EuclideanRing"];        
+  var Data_EuclideanRing = $PS["Data.EuclideanRing"];
   var middle = function (nn) {
       var n3$prime = Data_EuclideanRing.mod(Data_EuclideanRing.euclideanRingInt)(nn)(1000000);
       var n3 = nn - (Data_EuclideanRing.div(Data_EuclideanRing.euclideanRingInt)(nn - n3$prime | 0)(1000000) * 1000000 | 0) | 0;
@@ -8840,7 +8842,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return a;
       };
-      throw new Error("Failed pattern match at Main (line 278, column 3 - line 291, column 26): " + [ Data_Unit.unit.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 279, column 3 - line 292, column 26): " + [ Data_Unit.unit.constructor.name ]);
   };
   var symy = function (a) {
       if (a === m5pi_6) {
@@ -8882,7 +8884,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return a;
       };
-      throw new Error("Failed pattern match at Main (line 296, column 3 - line 309, column 26): " + [ Data_Unit.unit.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 297, column 3 - line 310, column 26): " + [ Data_Unit.unit.constructor.name ]);
   };
   var fpi_4 = "\\frac{5\\pi}{4}";
   var fpi_3 = "\\frac{4\\pi}{3}";
@@ -9054,7 +9056,7 @@ var PS = {};
       if (Data_Boolean.otherwise) {
           return a;
       };
-      throw new Error("Failed pattern match at Main (line 321, column 3 - line 328, column 26): " + [ Data_Unit.unit.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 322, column 3 - line 329, column 26): " + [ Data_Unit.unit.constructor.name ]);
   };
   var sixths = [ {
       exact: "\\frac{-13\\pi}{6}",
@@ -9202,7 +9204,7 @@ var PS = {};
   var body = function (st) {
       return Concur_Core_FRP.dyn(Concur_Core_Types.widgetMonad)(Control_Bind.discard(Control_Bind.discardUnit)(Control_Cofree.bindCofree(Concur_Core_Types.widgetAlternative(Data_Monoid.monoidArray)))(Concur_Core_FRP.display(Concur_VDom_DOM.text(Concur_Core_LiftWidget.widgetLiftWidget)("Enonc\xe9 n\xb0 ")))(function () {
           return Control_Bind.bind(Control_Cofree.bindCofree(Concur_Core_Types.widgetAlternative(Data_Monoid.monoidArray)))(Concur_Core_FRP.debounce(Concur_Core_Types.widgetMonad)(Concur_Core_Types.widgetAlt(Data_Monoid.monoidArray))(Concur_Core_Types.widgetMonadAff(Data_Monoid.monoidArray))(50.0)(st)(function (s) {
-              return Concur_VDom_DOM.input(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_Props.autoFocus(true), Data_Functor.map(Concur_Core_Props.functorProps)(Data_Functor.map(Data_Functor.functorFn)(function (x) {
+              return Concur_VDom_DOM.input(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_Props.size(6), Concur_VDom_Props.autoFocus(true), Data_Functor.map(Concur_Core_Props.functorProps)(Data_Functor.map(Data_Functor.functorFn)(function (x) {
                   return {
                       seed: Data_Functor.map(Data_Maybe.functorMaybe)(Data_Show.show(Data_Show.showInt))(Article.validateInput(new Data_Maybe.Just(x))),
                       enabled: false
