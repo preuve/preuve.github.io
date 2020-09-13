@@ -5557,6 +5557,7 @@ var PS = {};
           return new Concur_Core_Props.PrimProp(new Concur_VDom_Props_Internal.Property(s, Concur_VDom_Props_Internal.propValue(v)));
       };
   };
+  var size = prop("size");
   var value = prop("value");
   var isEnterEvent = function (e) {
       return e.keyCode === 13;
@@ -5580,6 +5581,7 @@ var PS = {};
   exports["onKeyEnter"] = onKeyEnter;
   exports["unsafeTargetValue"] = unsafeTargetValue;
   exports["autoFocus"] = autoFocus;
+  exports["size"] = size;
   exports["dangerouslySetInnerHTML"] = dangerouslySetInnerHTML;
   exports["attr"] = attr;
 })(PS);
@@ -7409,7 +7411,7 @@ var PS = {};
   var body = function (st) {
       return Concur_Core_FRP.dyn(Concur_Core_Types.widgetMonad)(Control_Bind.discard(Control_Bind.discardUnit)(Control_Cofree.bindCofree(Concur_Core_Types.widgetAlternative(Data_Monoid.monoidArray)))(Concur_Core_FRP.display(Concur_VDom_DOM.text(Concur_Core_LiftWidget.widgetLiftWidget)("Enonc\xe9 n\xb0 ")))(function () {
           return Control_Bind.bind(Control_Cofree.bindCofree(Concur_Core_Types.widgetAlternative(Data_Monoid.monoidArray)))(Concur_Core_FRP.debounce(Concur_Core_Types.widgetMonad)(Concur_Core_Types.widgetAlt(Data_Monoid.monoidArray))(Concur_Core_Types.widgetMonadAff(Data_Monoid.monoidArray))(50.0)(st)(function (s) {
-              return Concur_VDom_DOM.input(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_Props.autoFocus(true), Data_Functor.map(Concur_Core_Props.functorProps)(Data_Functor.map(Data_Functor.functorFn)(function (x) {
+              return Concur_VDom_DOM.input(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_Props.size(6), Concur_VDom_Props.autoFocus(true), Data_Functor.map(Concur_Core_Props.functorProps)(Data_Functor.map(Data_Functor.functorFn)(function (x) {
                   return {
                       seed: Data_Functor.map(Data_Maybe.functorMaybe)(Data_Show.show(Data_Show.showInt))(Article.validateInput(new Data_Maybe.Just(x))),
                       enabled: false

@@ -7,7 +7,7 @@ import Concur.Core (Widget)
 import Concur.Core.FRP (dyn, display, debounce)
 import Concur.VDom (HTML)
 import Concur.VDom.Run (runWidgetInDom)
-import Concur.VDom.Props (onChange, unsafeTargetValue, onKeyEnter, attr, autoFocus) as P
+import Concur.VDom.Props (onChange, unsafeTargetValue, onKeyEnter, attr, autoFocus, size) as P
 import Concur.VDom.DOM as D
 
 import Data.Array (replicate, length, sort, (:), catMaybes, all, (..), slice, zipWith)
@@ -142,7 +142,8 @@ body st = dyn $ do
   display $ D.text "Enoncé n° "
   newState <- debounce 50.0 st $ 
                 \s -> D.input 
-                        [ P.autoFocus true
+                        [ P.size 6
+                        , P.autoFocus true
                         , (\ x -> { seed: show <$> (validateInput $ Just x)
                                   , enabled: false
                                   }
