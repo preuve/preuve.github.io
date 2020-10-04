@@ -3,15 +3,20 @@ module Article where
 import Prelude
 
 import Concur.Core (Widget)
+import Concur.Core.Props (Props)
 import Concur.VDom (HTML)
 import Concur.VDom.DOM as D
 import Concur.VDom.Props (dangerouslySetInnerHTML) as P
+import Concur.VDom.Props.Internal (Prop)
+import Concur.VDom.SVG as S
 
 import Control.Monad.State(State, runState)
 import Control.Monad.State.Class(class MonadState, modify)
 import Control.Monad.State.Class(get) as Control
 
 import Data.Array(snoc, elemIndex, (:), (..), length)
+import Data.Geometry.Plane (Point, point, segment, vector, scale, (<+|), cosAngle, middle, abs, ord, normalTo, normalized)
+
 import Data.Int (round)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Tuple (fst)
@@ -21,8 +26,26 @@ import Effect.Class (liftEffect)
 import Global (readFloat, isNaN)
 import KaTeX (equation, inline) as KaTeX
 
+import Math (acos, pi)
+
 import Partial.Unsafe(unsafePartial)
-      
+
+measure :: forall a. Point -> Point -> Number -> Array (Props Prop a)
+measure p q howFar =
+    let grow = (ord q - ord p) * (abs q - abs p) > 0.0
+        v = vector p q
+        n = normalTo v
+        a = round $ (_ / pi) $ (_ * 180.0) $ acos $ cosAngle v $ vector (point "" 0.0 0.0) (point "" 1.0 0.0)
+        mid = middle "" (segment p q Nothing) <+| scale howFar (normalized n)
+        x = round $ abs mid
+        y = round $ ord mid
+        pos = show x  <> "," <> show y
+    in  [ S.attr "x" (show x)
+        , S.attr "y" (show y)
+        , S.transform $ "rotate(" <> (show $ if grow then a else -a) <> "," <> pos <> ") "
+        ]
+             
+
 -- | inverses a permutation of [0,1,..,n-1] 
 invPerm :: Array Int -> Array Int
 invPerm ps = 
