@@ -331,9 +331,6 @@ initialState = { seed: Nothing
                } :: State
 
    
-spacex :: Int -> String 
-spacex n = foldr (<>) "" $ replicate n "\\;"
-
 header :: forall a. Widget HTML a
 header = D.div' $ fromIncremental $ do
   setTitle "Devoir 2 : Second degré"
