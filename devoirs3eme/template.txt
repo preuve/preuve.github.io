@@ -14,3 +14,7 @@ cd src
 ln -s ../../../../data/common/KaTeX KaTeX
 ln -s ../../../../data/common/Rand.purs Rand.purs
 ln -s ../../../../data/common/Article.purs Article.purs
+
+spago install geometry-plane
+spago install concur-vdom
+spago install halogen-vdom
