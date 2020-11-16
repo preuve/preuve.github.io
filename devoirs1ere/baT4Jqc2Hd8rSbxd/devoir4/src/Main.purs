@@ -58,19 +58,6 @@ ptot pa pab panb e =
        [Nothing, Just ab, Just anb] -> Just $ insert pa (ab + anb) e
        otherwise -> Nothing
 
-dep :: Key -> Key -> Key -> Key -> Experience -> Maybe Experience
-dep pa pb pgab pgnab e = 
-  case [lookup pa e, lookup pb e, lookup pgab e, lookup pgnab e] of
-       [Just a, Just b, Just gab, Nothing] -> 
-          Just $ insert pgnab ((b-gab*a)/(fromInt 1 -a)) e
-       [Just a, Just b, Nothing, Just gnab] -> 
-          Just $ insert pgab ((b-gnab*(fromInt 1 - a))/a) e
-       [Just a, Nothing, Just gab, Just gnab] -> 
-          Just $ insert pb (gab*a+gnab*(fromInt 1 - a)) e
-       [Nothing, Just b, Just gab, Just gnab] -> 
-          Just $ insert pa ((b-gnab)/(gab-gnab)) e
-       otherwise -> Nothing
-
 complete :: Experience -> Experience
 complete e =
   let rules = [ contr "pA" "pnA"
@@ -91,7 +78,7 @@ complete e =
               , ptot "pnA" "pnAB" "pnAnB"
               , ptot "pB" "pAB" "pnAB"
               , ptot "pnB" "pAnB" "pnAnB"
-              , dep "pA" "pB" "pgAB" "pgnAB"]
+              ]
       f xs = 
         case uncons xs of
              Nothing -> e

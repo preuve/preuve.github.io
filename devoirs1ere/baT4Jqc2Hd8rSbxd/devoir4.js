@@ -9344,7 +9344,7 @@ var PS = {};
           if (v instanceof Data_Maybe.Nothing) {
               return "";
           };
-          throw new Error("Failed pattern match at Main (line 156, column 9 - line 158, column 27): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 143, column 9 - line 145, column 27): " + [ v.constructor.name ]);
       };
   };
   var tree = function (e) {
@@ -9371,7 +9371,7 @@ var PS = {};
                   if (v instanceof Data_Maybe.Nothing) {
                       return "";
                   };
-                  throw new Error("Failed pattern match at Main (line 180, column 9 - line 182, column 25): " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 167, column 9 - line 169, column 25): " + [ v.constructor.name ]);
               };
           };
       };
@@ -9439,39 +9439,15 @@ var PS = {};
           };
       };
   };
-  var dep = function (pa) {
-      return function (pb) {
-          return function (pgab) {
-              return function (pgnab) {
-                  return function (e) {
-                      var $39 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pb)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pgab)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pgnab)(e) ];
-                      if ($39.length === 4 && ($39[0] instanceof Data_Maybe.Just && ($39[1] instanceof Data_Maybe.Just && ($39[2] instanceof Data_Maybe.Just && $39[3] instanceof Data_Maybe.Nothing)))) {
-                          return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pgnab)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[1].value0)(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[2].value0)($39[0].value0)))(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[0].value0)))(e));
-                      };
-                      if ($39.length === 4 && ($39[0] instanceof Data_Maybe.Just && ($39[1] instanceof Data_Maybe.Just && ($39[2] instanceof Data_Maybe.Nothing && $39[3] instanceof Data_Maybe.Just)))) {
-                          return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pgab)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[1].value0)(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[3].value0)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[0].value0))))($39[0].value0))(e));
-                      };
-                      if ($39.length === 4 && ($39[0] instanceof Data_Maybe.Just && ($39[1] instanceof Data_Maybe.Nothing && ($39[2] instanceof Data_Maybe.Just && $39[3] instanceof Data_Maybe.Just)))) {
-                          return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pb)(Data_Semiring.add(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[2].value0)($39[0].value0))(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[3].value0)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[0].value0))))(e));
-                      };
-                      if ($39.length === 4 && ($39[0] instanceof Data_Maybe.Nothing && ($39[1] instanceof Data_Maybe.Just && ($39[2] instanceof Data_Maybe.Just && $39[3] instanceof Data_Maybe.Just)))) {
-                          return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[1].value0)($39[3].value0))(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($39[2].value0)($39[3].value0)))(e));
-                      };
-                      return Data_Maybe.Nothing.value;
-                  };
-              };
-          };
-      };
-  };
   var contr = function (pa) {
       return function (pna) {
           return function (e) {
-              var $68 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pna)(e) ];
-              if ($68.length === 2 && ($68[0] instanceof Data_Maybe.Just && $68[1] instanceof Data_Maybe.Nothing)) {
-                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pna)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($68[0].value0))(e));
+              var $39 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pna)(e) ];
+              if ($39.length === 2 && ($39[0] instanceof Data_Maybe.Just && $39[1] instanceof Data_Maybe.Nothing)) {
+                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pna)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[0].value0))(e));
               };
-              if ($68.length === 2 && ($68[0] instanceof Data_Maybe.Nothing && $68[1] instanceof Data_Maybe.Just)) {
-                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($68[1].value0))(e));
+              if ($39.length === 2 && ($39[0] instanceof Data_Maybe.Nothing && $39[1] instanceof Data_Maybe.Just)) {
+                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[1].value0))(e));
               };
               return Data_Maybe.Nothing.value;
           };
@@ -9481,15 +9457,15 @@ var PS = {};
       return function (pi) {
           return function (pr) {
               return function (e) {
-                  var $75 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pc)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pi)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pr)(e) ];
-                  if ($75.length === 3 && ($75[0] instanceof Data_Maybe.Just && ($75[1] instanceof Data_Maybe.Just && $75[2] instanceof Data_Maybe.Nothing))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pr)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($75[1].value0)($75[0].value0))(e));
+                  var $46 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pc)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pi)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pr)(e) ];
+                  if ($46.length === 3 && ($46[0] instanceof Data_Maybe.Just && ($46[1] instanceof Data_Maybe.Just && $46[2] instanceof Data_Maybe.Nothing))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pr)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($46[1].value0)($46[0].value0))(e));
                   };
-                  if ($75.length === 3 && ($75[0] instanceof Data_Maybe.Just && ($75[1] instanceof Data_Maybe.Nothing && $75[2] instanceof Data_Maybe.Just))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pi)(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($75[0].value0)($75[2].value0))(e));
+                  if ($46.length === 3 && ($46[0] instanceof Data_Maybe.Just && ($46[1] instanceof Data_Maybe.Nothing && $46[2] instanceof Data_Maybe.Just))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pi)(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($46[0].value0)($46[2].value0))(e));
                   };
-                  if ($75.length === 3 && ($75[0] instanceof Data_Maybe.Nothing && ($75[1] instanceof Data_Maybe.Just && $75[2] instanceof Data_Maybe.Just))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pc)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($75[1].value0)($75[2].value0))(e));
+                  if ($46.length === 3 && ($46[0] instanceof Data_Maybe.Nothing && ($46[1] instanceof Data_Maybe.Just && $46[2] instanceof Data_Maybe.Just))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pc)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($46[1].value0)($46[2].value0))(e));
                   };
                   return Data_Maybe.Nothing.value;
               };
@@ -9497,7 +9473,7 @@ var PS = {};
       };
   };
   var complete = function (e) {
-      var rules = [ contr("pA")("pnA"), contr("pB")("pnB"), contr("pgAB")("pgAnB"), contr("pgnAB")("pgnAnB"), contr("pgBA")("pgBnA"), contr("pgnBA")("pgnBnA"), cond("pgAB")("pAB")("pA"), cond("pgAnB")("pAnB")("pA"), cond("pgnAB")("pnAB")("pnA"), cond("pgnAnB")("pnAnB")("pnA"), cond("pgBA")("pAB")("pB"), cond("pgBnA")("pnAB")("pB"), cond("pgnBA")("pAnB")("pnB"), cond("pgnBnA")("pnAnB")("pnB"), ptot("pA")("pAB")("pAnB"), ptot("pnA")("pnAB")("pnAnB"), ptot("pB")("pAB")("pnAB"), ptot("pnB")("pAnB")("pnAnB"), dep("pA")("pB")("pgAB")("pgnAB") ];
+      var rules = [ contr("pA")("pnA"), contr("pB")("pnB"), contr("pgAB")("pgAnB"), contr("pgnAB")("pgnAnB"), contr("pgBA")("pgBnA"), contr("pgnBA")("pgnBnA"), cond("pgAB")("pAB")("pA"), cond("pgAnB")("pAnB")("pA"), cond("pgnAB")("pnAB")("pnA"), cond("pgnAnB")("pnAnB")("pnA"), cond("pgBA")("pAB")("pB"), cond("pgBnA")("pnAB")("pB"), cond("pgnBA")("pAnB")("pnB"), cond("pgnBnA")("pnAnB")("pnB"), ptot("pA")("pAB")("pAnB"), ptot("pnA")("pnAB")("pnAnB"), ptot("pB")("pAB")("pnAB"), ptot("pnB")("pAnB")("pnAnB") ];
       var f = function ($copy_xs) {
           var $tco_done = false;
           var $tco_result;
@@ -9517,9 +9493,9 @@ var PS = {};
                       $copy_xs = v.value0.tail;
                       return;
                   };
-                  throw new Error("Failed pattern match at Main (line 99, column 16 - line 101, column 36): " + [ v1.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 86, column 16 - line 88, column 36): " + [ v1.constructor.name ]);
               };
-              throw new Error("Failed pattern match at Main (line 96, column 9 - line 101, column 36): " + [ v.constructor.name ]);
+              throw new Error("Failed pattern match at Main (line 83, column 9 - line 88, column 36): " + [ v.constructor.name ]);
           };
           while (!$tco_done) {
               $tco_result = $tco_loop($copy_xs);
@@ -9575,7 +9551,7 @@ var PS = {};
               $copy_r = nextRand;
               return;
           };
-          throw new Error("Failed pattern match at Main (line 142, column 7 - line 146, column 50): " + [ Data_Unit.unit.constructor.name ]);
+          throw new Error("Failed pattern match at Main (line 129, column 7 - line 133, column 50): " + [ Data_Unit.unit.constructor.name ]);
       };
       while (!$tco_done) {
           $tco_result = $tco_loop($copy_r);
@@ -9596,8 +9572,8 @@ var PS = {};
                   var $tco_result;
                   function $tco_loop(r, s) {
                       var t = Rand.rand(s);
-                      var $98 = modMaj(t.val) === modMaj(r.val) || modMaj(t.val) === modMaj(s.val);
-                      if ($98) {
+                      var $69 = modMaj(t.val) === modMaj(r.val) || modMaj(t.val) === modMaj(s.val);
+                      if ($69) {
                           $tco_var_r = s;
                           $copy_s = t;
                           return;
@@ -9616,8 +9592,8 @@ var PS = {};
               var $tco_result;
               function $tco_loop(r) {
                   var s = Rand.rand(r);
-                  var $99 = modMaj(s.val) === modMaj(r.val);
-                  if ($99) {
+                  var $70 = modMaj(s.val) === modMaj(r.val);
+                  if ($70) {
                       $copy_r = s;
                       return;
                   };
@@ -9635,8 +9611,8 @@ var PS = {};
           var v1 = randProba(v.nextRand);
           var v2 = randProba(v1.nextRand);
           var e = setWithIndex(modMaj(r1.val))(v.probability)(setWithIndex(modMaj(r2.val))(v1.probability)(setWithIndex(modMaj(r3.val))(v2.probability)(Data_Map_Internal.empty)));
-          var $103 = validExperience(complete(e));
-          if ($103) {
+          var $74 = validExperience(complete(e));
+          if ($74) {
               $tco_done = true;
               return {
                   experience: e,
@@ -9671,15 +9647,15 @@ var PS = {};
                   seed: odd * odd | 0
               });
               return Concur_Core_FRP.display(Concur_VDom_DOM["div'"](Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)((function () {
-                  var $110 = !newState.enabled;
-                  if ($110) {
+                  var $81 = !newState.enabled;
+                  if ($81) {
                       return [  ];
                   };
                   return Article.fromIncremental(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.nl)(function () {
                       var r1 = Rand.rand(r0);
                       var prob = function (e) {
-                          var $111 = Data_Maybe.fromMaybe(0)(Article.validateInput(newState.seed)) < 0;
-                          if ($111) {
+                          var $82 = Data_Maybe.fromMaybe(0)(Article.validateInput(newState.seed)) < 0;
+                          if ($82) {
                               return tree(complete(e));
                           };
                           return tree(e);
@@ -9714,7 +9690,6 @@ var PS = {};
   exports["cond"] = cond;
   exports["contr"] = contr;
   exports["ptot"] = ptot;
-  exports["dep"] = dep;
   exports["complete"] = complete;
   exports["primes"] = primes;
   exports["avgNbFactors"] = avgNbFactors;
