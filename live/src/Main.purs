@@ -2,85 +2,93 @@ module Main where
 
 import Prelude
 
-import Concur.Core (Widget)
-import Concur.VDom (HTML)
-import Concur.VDom.GeometryRender (Context, render')
-import Concur.VDom.Run (runWidgetInDom)
-import Concur.VDom.Props (onMouseDown, onMouseMove, onMouseUp) as P
-import Concur.VDom.SVG as S
-import Data.Geometry.Plane (Point, Segment, point, segment)
-import Data.Maybe (Maybe (..), maybe)
+import Color (rgb)
+import Control.Alt (alt)
 import Data.Int (toNumber)
+import Data.List (List(..),  (:))
+import Data.Maybe (Maybe (..), maybe)
 import Effect (Effect)
-import Web.UIEvent.MouseEvent ( pageX, pageY, fromEvent)
+import FRP.Event.Mouse(Mouse, down, up, move, getMouse, withPosition)
+import FRP.Behavior (Behavior, animate, unfold)
+import Graphics.Canvas (Context2D, getCanvasElementById, getContext2D
+                       , getCanvasHeight, getCanvasWidth
+                       , setCanvasHeight, setCanvasWidth
+                       ,lineTo, moveTo, strokePath, beginPath, closePath, stroke)
 
-type State =  { marks :: Array Segment 
-              , wasPressed :: Maybe Point
-              } 
+type Point = { x :: Number, y :: Number }
 
-context :: Context
-context = { stroke: "#000"
-          , strokeWidth: 1.5
-          , fill: "#00000000"
-          , fontStyle: "italic 15px arial, sans-serif"
-          , textFill: "#000"
-          }
+type State =  { marks :: Effect (Effect Unit)
+                          , wasPressed :: Maybe Point
+                          } 
 
-toText :: forall a. State -> Array (Widget HTML a)
-toText { marks } =
-  render' context marks
+initialState = { marks: pure (pure unit)
+                           , wasPressed: Nothing
+                           } :: State
+
+renderState :: State -> Effect Unit
+renderState {  marks } = do 
+                                                   _ <- marks
+                                                   pure unit
+  --let black = outlineColor $ rgb 0 0 0
+     --in outlined black marks
+   
+scene ::  { w :: Number, h :: Number } -> Mouse -> Context2D -> Behavior (Effect Unit)
+scene { w, h } mouse ctx = renderState <$> state
+ where
+   state :: Behavior State
+   state = unfold 
+      (\action st -> 
+        case action of
+          EndWord -> st { wasPressed = Nothing }
+          StartWord p -> st { wasPressed = Just p }
+          Write isPressed ->  
+            st { marks =  maybe st.marks 
+                                                  (\was -> pure $ strokePath ctx $ do
+                                                                                moveTo ctx  was.x was.y 
+                                                                                lineTo ctx isPressed.x isPressed.y
+                                                                                closePath ctx
+                                                                                
+                                                                        -- st.marks
+                                                           
+                                                        
+                                                  )
+                                                 st.wasPressed
+                       , wasPressed = maybe Nothing 
+                                                  (const $ Just isPressed)
+                                                  st.wasPressed
+                       }
+          Wait -> st
+       )      ( ((StartWord <<< safePos) <$> withPosition mouse down)  
+      `alt` (EndWord <$ up) 
+      `alt` ((Write <<< number2) <$> move mouse) )
+         initialState
+
+data Action = Wait
+                          | EndWord 
+                          | StartWord Point
+                          | Write Point
   
-liveWidget :: State -> Widget HTML State
-liveWidget state = do
-  let fromMouse mouse = point "" (toNumber $ pageX mouse) 
-                                  (toNumber $ pageY mouse) 
-      wordStart ev =
-        maybe state 
-              (\ mouse -> 
-                state { wasPressed = 
-                          Just $ fromMouse mouse
-                      }
-              )
-              $ fromEvent ev
-              
-      isWriting ev = 
-        maybe state 
-              (\ mouse ->
-                let isPressed = fromMouse mouse
-                in state { marks = 
-                            maybe state.marks 
-                                  (\was -> state.marks 
-                                          <> [ segment was isPressed Nothing ]
-                                  )
-                                  state.wasPressed
-                         , wasPressed = maybe Nothing 
-                                              (const $ Just isPressed)
-                                              state.wasPressed
-                         }
-                )
-                $ fromEvent ev
-                
-      wordEnd = state { wasPressed = Nothing }
-                            
-        
-  newState <- S.svg 
-    [ S.attr "position" "fixed"
-    , S.attr "top" "0"
-    , S.attr "left" "0"
-    , S.width "100%"
-    , S.height "100%"
-    , S.attr "viewBox" "0 0 3000 3000"
-    , isWriting <$> P.onMouseMove
-    , wordStart <$> P.onMouseDown
-    , wordEnd  <$ P.onMouseUp  
-    ] $ toText state
-  liveWidget newState
-    
-initialState = { marks: [] 
-               , wasPressed: Nothing
-               } :: State
+number2 ::  { x :: Int, y :: Int} ->  { x :: Number, y :: Number}
+number2  { x: x', y: y'} =  {x: toNumber x', y: toNumber y'}
+
+safePos :: forall r. { pos :: Maybe { x :: Int, y :: Int} | r} -> { x :: Number, y :: Number}
+safePos {pos: Nothing} = {x: 0.0, y: 0.0}
+safePos {pos: Just p } = number2 p
 
 main :: Effect Unit
-main = runWidgetInDom "main"
-          $ liveWidget initialState
-
+main = do
+  mcanvas <- getCanvasElementById "canvas"
+  case mcanvas of
+    Just canvas -> do
+          ctx <- getContext2D canvas
+          --_ <- setCanvasWidth canvas 320.0
+          --_ <- setCanvasHeight canvas 512.0
+          w <- getCanvasWidth canvas
+          h <- getCanvasHeight canvas
+          mouse <- getMouse
+          _  <- animate (scene { w, h } mouse ctx) identity
+          pure unit
+    _ -> pure unit
+  pure unit
+  
+  

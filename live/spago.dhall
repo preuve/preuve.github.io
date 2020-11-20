@@ -4,8 +4,10 @@ You can edit this file as you like.
 -}
 { name = "my-project"
 , dependencies =
-  [ "concur-vdom"
+  [ "behaviors"
+  , "concur-vdom"
   , "console"
+  , "drawing"
   , "effect"
   , "geometry-plane"
   , "halogen-vdom"
