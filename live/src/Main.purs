@@ -2,51 +2,75 @@ module Main where
 
 import Prelude
 
-import Color (lighten)
-import Color.Scheme.MaterialDesign (blueGrey)
+import Color (rgb)
 import Data.Int (toNumber)
-import Data.Maybe (fromJust, maybe)
+import Data.Maybe (Maybe (..), maybe)
 import Data.Set (Set, isEmpty)
 import Effect (Effect)
-import FRP.Behavior (Behavior, animate)
-import FRP.Behavior.Mouse (buttons)
-import FRP.Behavior.Mouse as Mouse
+import FRP.Behavior (Behavior, animate, fixB)
+import FRP.Behavior.Mouse (buttons, position) as Mouse
 import FRP.Event.Mouse (Mouse, getMouse)
-import Graphics.Canvas (getCanvasElementById, getCanvasHeight, getCanvasWidth, getContext2D, setCanvasHeight, setCanvasWidth)
-import Graphics.Drawing (Drawing, circle, lineWidth, outlineColor, outlined, render, scale, translate)
-import Partial.Unsafe (unsafePartial)
+import Graphics.Canvas (getCanvasElementById, getCanvasHeight, getCanvasWidth, getContext2D)
+import Graphics.Drawing (Drawing, path, lineWidth, outlineColor, outlined, render, scale)
+import Web.HTML (window)
+import Web.HTML.Window (innerHeight,innerWidth)
 
-type Circle = { x :: Number, y :: Number}
+type Coord = { x :: Number, y :: Number}
 
-scene :: Mouse -> { w :: Number, h :: Number } -> Behavior Drawing
-scene mouse { w, h } = renderCircle <$> buttons mouse <*> disk where
+defaultCoord :: Coord
+defaultCoord = { x: 0.0, y: 0.0 }
+
+type Segment = { from :: Coord, to :: Coord }
+
+defaultSegment :: Segment
+defaultSegment = { from: defaultCoord, to: defaultCoord }
+
+scene :: Mouse -> Coord -> Coord -> Behavior Drawing
+scene mouse { x: cw, y: ch } { x: ww, y: wh } = 
+  renderSegment <$> Mouse.buttons mouse <*> segment where
   
-  scaleFactor :: Number
-  scaleFactor = max w h / 16.0
+  scaleX :: Number
+  scaleX = cw /ww
 
-  renderCircle :: Set Int -> Circle -> Drawing
-  renderCircle bs { x, y} =
+  scaleY :: Number
+  scaleY = ch / wh 
+
+  renderSegment :: Set Int -> Segment-> Drawing
+  renderSegment bs { from, to } =
     let cursor =
-          scale scaleFactor scaleFactor <<< translate x y <<< scale 1.0 1.0 $
+          scale scaleX scaleY $
             outlined
-              (outlineColor (lighten (0.2 + 1.0 * 0.2) blueGrey) <> lineWidth ((1.0 + 1.0 * 2.0) / scaleFactor))
-              (circle 0.0 0.0 0.5)
+              (outlineColor (rgb 0 0 0) <> lineWidth (1.5))
+              (path [from, to])
      in if isEmpty bs then mempty
         else cursor
+        
+  segment :: Behavior Segment
+  segment = fixB defaultSegment $ \ seg -> toSegment <$> coord <*> seg where
+    toSegment c s = { from: s.to, to: c.from }
 
-  disk :: Behavior Circle
-  disk = toCircle <$> Mouse.position mouse where
-    toCircle m  = maybe {x:0.0,y:0.0} (\{x,y}->{x:toNumber x / scaleFactor,y:toNumber y / scaleFactor}) m
+  coord :: Behavior Segment
+  coord = fromCoord <$> Mouse.position mouse where
+    fromCoord = maybe defaultSegment $ \ { x, y } -> 
+      { from: { x: toNumber x / scaleX
+              , y: toNumber y / scaleY}
+      , to: defaultCoord
+      }
 
 main :: Effect Unit
 main = do
+  win <- window
+  wh <- innerHeight win
+  ww <- innerWidth win
   mcanvas <- getCanvasElementById "canvas"
-  let canvas = unsafePartial (fromJust mcanvas)
-  ctx <- getContext2D canvas
-  w <- getCanvasWidth canvas
-  h <- getCanvasHeight canvas
-  _ <- setCanvasWidth canvas w
-  _ <- setCanvasHeight canvas h
-  mouse <- getMouse
-  _ <- animate (scene mouse { w, h }) (render ctx)
-  pure unit
+  case mcanvas of
+    Nothing -> pure unit
+    Just canvas -> do
+        ctx <- getContext2D canvas
+        cw <- getCanvasWidth canvas
+        ch <- getCanvasHeight canvas
+        mouse <- getMouse
+        _ <- animate (scene mouse { x: cw, y: ch } 
+                                  { x: toNumber ww, y: toNumber wh }) 
+                                  (render ctx)
+        pure unit
