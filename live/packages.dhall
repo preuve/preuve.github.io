@@ -105,13 +105,7 @@ in  upstream
 -------------------------------
 -}
 
-
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20200909/packages.dhall sha256:b899488adf6f02a92bbaae88039935bbc61bcba4cf4462f6d915fc3d0e094604
-  with concur-vdom =
-          { dependencies = [ "concur-react" ]
-          , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
-          , version = "v0.0.9"
-          }
- 
+      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20201021/packages.dhall sha256:55ebdbda1bd6ede4d5307fbc1ef19988c80271b4225d833c8d6fb9b6fb1aa6d8
+
 in  upstream

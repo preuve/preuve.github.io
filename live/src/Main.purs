@@ -2,93 +2,51 @@ module Main where
 
 import Prelude
 
-import Color (rgb)
-import Control.Alt (alt)
+import Color (lighten)
+import Color.Scheme.MaterialDesign (blueGrey)
 import Data.Int (toNumber)
-import Data.List (List(..),  (:))
-import Data.Maybe (Maybe (..), maybe)
+import Data.Maybe (fromJust, maybe)
+import Data.Set (Set, isEmpty)
 import Effect (Effect)
-import FRP.Event.Mouse(Mouse, down, up, move, getMouse, withPosition)
-import FRP.Behavior (Behavior, animate, unfold)
-import Graphics.Canvas (Context2D, getCanvasElementById, getContext2D
-                       , getCanvasHeight, getCanvasWidth
-                       , setCanvasHeight, setCanvasWidth
-                       ,lineTo, moveTo, strokePath, beginPath, closePath, stroke)
+import FRP.Behavior (Behavior, animate)
+import FRP.Behavior.Mouse (buttons)
+import FRP.Behavior.Mouse as Mouse
+import FRP.Event.Mouse (Mouse, getMouse)
+import Graphics.Canvas (getCanvasElementById, getCanvasHeight, getCanvasWidth, getContext2D, setCanvasHeight, setCanvasWidth)
+import Graphics.Drawing (Drawing, circle, lineWidth, outlineColor, outlined, render, scale, translate)
+import Partial.Unsafe (unsafePartial)
 
-type Point = { x :: Number, y :: Number }
+type Circle = { x :: Number, y :: Number}
 
-type State =  { marks :: Effect (Effect Unit)
-                          , wasPressed :: Maybe Point
-                          } 
-
-initialState = { marks: pure (pure unit)
-                           , wasPressed: Nothing
-                           } :: State
-
-renderState :: State -> Effect Unit
-renderState {  marks } = do 
-                                                   _ <- marks
-                                                   pure unit
-  --let black = outlineColor $ rgb 0 0 0
-     --in outlined black marks
-   
-scene ::  { w :: Number, h :: Number } -> Mouse -> Context2D -> Behavior (Effect Unit)
-scene { w, h } mouse ctx = renderState <$> state
- where
-   state :: Behavior State
-   state = unfold 
-      (\action st -> 
-        case action of
-          EndWord -> st { wasPressed = Nothing }
-          StartWord p -> st { wasPressed = Just p }
-          Write isPressed ->  
-            st { marks =  maybe st.marks 
-                                                  (\was -> pure $ strokePath ctx $ do
-                                                                                moveTo ctx  was.x was.y 
-                                                                                lineTo ctx isPressed.x isPressed.y
-                                                                                closePath ctx
-                                                                                
-                                                                        -- st.marks
-                                                           
-                                                        
-                                                  )
-                                                 st.wasPressed
-                       , wasPressed = maybe Nothing 
-                                                  (const $ Just isPressed)
-                                                  st.wasPressed
-                       }
-          Wait -> st
-       )      ( ((StartWord <<< safePos) <$> withPosition mouse down)  
-      `alt` (EndWord <$ up) 
-      `alt` ((Write <<< number2) <$> move mouse) )
-         initialState
-
-data Action = Wait
-                          | EndWord 
-                          | StartWord Point
-                          | Write Point
+scene :: Mouse -> { w :: Number, h :: Number } -> Behavior Drawing
+scene mouse { w, h } = renderCircle <$> buttons mouse <*> disk where
   
-number2 ::  { x :: Int, y :: Int} ->  { x :: Number, y :: Number}
-number2  { x: x', y: y'} =  {x: toNumber x', y: toNumber y'}
+  scaleFactor :: Number
+  scaleFactor = max w h / 16.0
 
-safePos :: forall r. { pos :: Maybe { x :: Int, y :: Int} | r} -> { x :: Number, y :: Number}
-safePos {pos: Nothing} = {x: 0.0, y: 0.0}
-safePos {pos: Just p } = number2 p
+  renderCircle :: Set Int -> Circle -> Drawing
+  renderCircle bs { x, y} =
+    let cursor =
+          scale scaleFactor scaleFactor <<< translate x y <<< scale 1.0 1.0 $
+            outlined
+              (outlineColor (lighten (0.2 + 1.0 * 0.2) blueGrey) <> lineWidth ((1.0 + 1.0 * 2.0) / scaleFactor))
+              (circle 0.0 0.0 0.5)
+     in if isEmpty bs then mempty
+        else cursor
+
+  disk :: Behavior Circle
+  disk = toCircle <$> Mouse.position mouse where
+    toCircle m  = maybe {x:0.0,y:0.0} (\{x,y}->{x:toNumber x / scaleFactor,y:toNumber y / scaleFactor}) m
 
 main :: Effect Unit
 main = do
   mcanvas <- getCanvasElementById "canvas"
-  case mcanvas of
-    Just canvas -> do
-          ctx <- getContext2D canvas
-          --_ <- setCanvasWidth canvas 320.0
-          --_ <- setCanvasHeight canvas 512.0
-          w <- getCanvasWidth canvas
-          h <- getCanvasHeight canvas
-          mouse <- getMouse
-          _  <- animate (scene { w, h } mouse ctx) identity
-          pure unit
-    _ -> pure unit
+  let canvas = unsafePartial (fromJust mcanvas)
+  ctx <- getContext2D canvas
+  w <- getCanvasWidth canvas
+  h <- getCanvasHeight canvas
+  _ <- setCanvasWidth canvas w
+  _ <- setCanvasHeight canvas h
+  mouse <- getMouse
+  _ <- animate (scene mouse { w, h }) (render ctx)
   pure unit
-  
-  

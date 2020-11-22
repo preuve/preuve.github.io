@@ -1,15 +1,8 @@
-
-
 var canvas = document.querySelector("#canvas");
 var ctx = canvas.getContext("2d");
-//ctx.strokeStyle = "black";
 ctx.lineWidth = 1;
 var wasPressed = false;
-var x = 0;
-var y = 0;
-
-width = window.innerWidth;
-height = window.innerHeight;
+var pos = {x: 0, y: 0};
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
@@ -19,25 +12,22 @@ function getMousePos(canvas, evt) {
     };
 }
                 
- window.addEventListener('mousemove', function (e) {
+window.addEventListener('mousemove', function (e) {
     if(wasPressed){
       ctx.beginPath();     
-          ctx.moveTo(x, y);    
-          pos = getMousePos(canvas, e); 
-          x = pos.x;
-          y = pos.y;
-          ctx.lineTo(x, y); 
-          ctx.stroke();       
+      ctx.moveTo(pos.x, pos.y);    
+      pos = getMousePos(canvas, e); 
+      ctx.lineTo(pos.x, pos.y); 
+      ctx.closePath();   
+      ctx.stroke();       
     }
- })
+})
 
 window.addEventListener('mousedown', function (e) {
   wasPressed = true;
-   pos = getMousePos(canvas, e); 
-    x = pos.x;
-    y = pos.y;
- })
+  pos = getMousePos(canvas, e); 
+})
  
- window.addEventListener('mouseup', function (e) {
+window.addEventListener('mouseup', function (e) {
   wasPressed = false;
-  })
+})
