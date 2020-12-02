@@ -149,23 +149,21 @@ infixr 6 print as °
 tree :: forall a. Experience  -> Array (Widget HTML a)
 tree e = 
 -- https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
-  let root = point "" 12.0 175.0
-      nodeA = point "" 100.0 92.0
-      nodeA' = point "" 100.0 244.0
-      startA = point "" 126.0 80.0
-      endAB = point "" 202.0 24.0
-      endAB' = point "" 202.0 136.0
-      startA' = point "" 126.0 264.0
-      endA'B = point "" 202.0 208.0
-      endA'B' = point "" 202.0 320.0
+  let o = { x: 9.0, y: 27.0}
+      dot {x, y} = point "" x y
+      root = dot { x: o.x, y: o.y + 151.0 }
+      nodeA = dot { x: o.x + 88.0, y: o.y + 68.0 }
+      nodeA' = dot { x: o.x + 88.0, y: o.y + 220.0 }
+      startA = dot { x: o.x + 122.0, y: o.y + 60.0 }
+      endAB = dot { x: o.x + 188.0, y: o.y}
+      endAB' =  dot { x: o.x + 188.0, y: o.y + 112.0 }
+      startA' =  dot { x: o.x + 122.0, y: o.y + 244.0 }
+      endA'B =  dot { x: o.x + 188.0, y: o.y + 184.0 }
+      endA'B' = dot { x: o.x + 188.0, y: o.y + 296.0 }
 
-      frameTL = point "" 0.0 0.0
-      frameTR = point "" 490.0 0.0
-      frameBR = point "" 490.0 350.0
-      frameBL = point "" 0.0 350.0
       dress str x k = 
         case lookup k x of
-           Just v -> "&&&" <> str <> showFraction v <> " \\\\"
+           Just v -> "\\quad " <> str <> showFraction v 
            Nothing -> "" 
       pB' = dress "P(B)=" e "pB"
       pnB' = dress "P(\\overline{B})=" e "pnB"
@@ -189,36 +187,28 @@ tree e =
               , S.attr "style" "position: absolute; " 
               ] $
               render' context 
-                [ segment frameTL frameTR Nothing
-                , segment frameTR frameBR Nothing
-                , segment frameBR frameBL Nothing
-                , segment frameBL frameTL Nothing
-
-                , segment root nodeA Nothing
+                [ segment root nodeA Nothing
                 , segment root nodeA' Nothing 
                 , segment startA endAB  Nothing
                 , segment startA endAB'  Nothing
                 , segment startA' endA'B  Nothing
                 , segment startA' endA'B'  Nothing
                 ]
-      m $ "\\begin{array}{ccccccccc} & & & & & & & & B \\\\ "
-          <> "& & & & & " <> e°"pgAB" <> " \\\\ \\\\ "
-          <> "& & & & A \\\\ "
-          <> "&" <> e°"pA" <> " \\\\ "
-          <> "& & & & &" <> e°"pgAnB" <> " \\\\ "
-          <> "& & & & & & & &" <> "\\overline{B} \\\\ "
-          <> "\\cdot \\\\ "
-          <> "& & & & & & & &" <> "B \\\\ "
-          <> "& & & & & " <> e°"pgnAB" <> " \\\\ "
-          <> "&" <> e°"pnA" <> " \\\\ "
-          <> "& & & & \\overline{A} \\\\ \\\\"
+      m $ "\\boxed{\\begin{array}{cccccccccccl} & & & & & & & & B \\\\ "
+          <> "& & & & & " <> e°"pgAB"<> "&&&&&&" <> pB'  <> " \\\\" 
+          <> " \\\\ "
+          <> "& & & & A "<> "&&&&&&&" <> pnB' <> "\\\\ "
+          <> "&" <> e°"pA" <> "&&&&&&&&&&" <> pAB' <> " \\\\ "
+          <> "& & & & &" <> e°"pgAnB" <> "&&&&&&" <> pAnB' <> " \\\\ "
+          <> "& & & & & & & &" <> "\\overline{B} " <> "&&&" <> pnAB' <> "\\\\ "
+          <> "\\cdot " <> "&&&&&&&&&&&" <> pnAnB' <> "\\\\ "
+          <> "& & & & & & & &" <> "B " <> "&&&" <> pgBA' <> "\\\\ "
+          <> "& & & & & " <> e°"pgnAB" <> "&&&&&&" <> pgBnA' <> " \\\\ "
+          <> "&" <> e°"pnA" <> "&&&&&&&&&&" <> pgnBA' <> " \\\\ "
+          <> "& & & & \\overline{A}" <> "&&&&&&&" <> pgnBnA' <>  "\\\\ " 
+          <> " \\\\"
           <> "& & & & & " <> e°"pgnAnB" <> " \\\\ "
-          <> "& & & & & & & & \\overline{B} \\end{array}"
-      m $ "\\begin{array}{llllllllllll}" <> pB' <> pnB' 
-                                   <> pAB' <> pAnB' <> pnAB' <> pnAnB' 
-                                   <> pgBA' <> pgBnA' <> pgnBA' <> pgnBnA' 
-                                   <> "\\\\ & & & & & & & & & & & & \\\\" 
-                                   <>"\\end{array}"
+          <> "& & & & & & & & \\overline{B} \\end{array}}"
       get
 
 exercice :: Key -> Key -> Key -> Experience -> Experience 

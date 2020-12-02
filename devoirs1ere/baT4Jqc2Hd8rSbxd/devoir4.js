@@ -9256,8 +9256,8 @@ var PS = {};
       return Data_Array.length(vs) === 16 && Data_Foldable.all(Data_Foldable.foldableArray)(Data_HeytingAlgebra.heytingAlgebraBoolean)(valid)(vs);
   };
   var showFraction = function (f) {
-      var $15 = Data_Ratio.denominator(f) === 1;
-      if ($15) {
+      var $16 = Data_Ratio.denominator(f) === 1;
+      if ($16) {
           return Data_Show.show(Data_Show.showInt)(Data_Ratio.numerator(f));
       };
       return "\\frac{" + (Data_Show.show(Data_Show.showInt)(Data_Ratio.numerator(f)) + ("}{" + (Data_Show.show(Data_Show.showInt)(Data_Ratio.denominator(f)) + "}")));
@@ -9320,15 +9320,15 @@ var PS = {};
       return function (pab) {
           return function (panb) {
               return function (e) {
-                  var $17 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pab)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(panb)(e) ];
-                  if ($17.length === 3 && ($17[0] instanceof Data_Maybe.Just && ($17[1] instanceof Data_Maybe.Just && $17[2] instanceof Data_Maybe.Nothing))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(panb)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($17[0].value0)($17[1].value0))(e));
+                  var $18 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pab)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(panb)(e) ];
+                  if ($18.length === 3 && ($18[0] instanceof Data_Maybe.Just && ($18[1] instanceof Data_Maybe.Just && $18[2] instanceof Data_Maybe.Nothing))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(panb)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($18[0].value0)($18[1].value0))(e));
                   };
-                  if ($17.length === 3 && ($17[0] instanceof Data_Maybe.Just && ($17[1] instanceof Data_Maybe.Nothing && $17[2] instanceof Data_Maybe.Just))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pab)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($17[0].value0)($17[2].value0))(e));
+                  if ($18.length === 3 && ($18[0] instanceof Data_Maybe.Just && ($18[1] instanceof Data_Maybe.Nothing && $18[2] instanceof Data_Maybe.Just))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pab)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($18[0].value0)($18[2].value0))(e));
                   };
-                  if ($17.length === 3 && ($17[0] instanceof Data_Maybe.Nothing && ($17[1] instanceof Data_Maybe.Just && $17[2] instanceof Data_Maybe.Just))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_Semiring.add(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($17[1].value0)($17[2].value0))(e));
+                  if ($18.length === 3 && ($18[0] instanceof Data_Maybe.Nothing && ($18[1] instanceof Data_Maybe.Just && $18[2] instanceof Data_Maybe.Just))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_Semiring.add(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($18[1].value0)($18[2].value0))(e));
                   };
                   return Data_Maybe.Nothing.value;
               };
@@ -9348,30 +9348,21 @@ var PS = {};
       };
   };
   var tree = function (e) {
-      var startA$prime = Data_Geometry_Plane.point("")(126.0)(264.0);
-      var startA = Data_Geometry_Plane.point("")(126.0)(80.0);
-      var root = Data_Geometry_Plane.point("")(12.0)(175.0);
-      var nodeA$prime = Data_Geometry_Plane.point("")(100.0)(244.0);
-      var nodeA = Data_Geometry_Plane.point("")(100.0)(92.0);
-      var frameTR = Data_Geometry_Plane.point("")(490.0)(0.0);
-      var frameTL = Data_Geometry_Plane.point("")(0.0)(0.0);
-      var frameBR = Data_Geometry_Plane.point("")(490.0)(350.0);
-      var frameBL = Data_Geometry_Plane.point("")(0.0)(350.0);
-      var endAB$prime = Data_Geometry_Plane.point("")(202.0)(136.0);
-      var endAB = Data_Geometry_Plane.point("")(202.0)(24.0);
-      var endA$primeB$prime = Data_Geometry_Plane.point("")(202.0)(320.0);
-      var endA$primeB = Data_Geometry_Plane.point("")(202.0)(208.0);
+      var o = {
+          x: 9.0,
+          y: 27.0
+      };
       var dress = function (str) {
           return function (x) {
               return function (k) {
                   var v = Data_Map_Internal.lookup(Data_Ord.ordString)(k)(x);
                   if (v instanceof Data_Maybe.Just) {
-                      return "&&&" + (str + (showFraction(v.value0) + " \\\\"));
+                      return "\\quad " + (str + showFraction(v.value0));
                   };
                   if (v instanceof Data_Maybe.Nothing) {
                       return "";
                   };
-                  throw new Error("Failed pattern match at Main (line 167, column 9 - line 169, column 25): " + [ v.constructor.name ]);
+                  throw new Error("Failed pattern match at Main (line 165, column 9 - line 167, column 25): " + [ v.constructor.name ]);
               };
           };
       };
@@ -9385,6 +9376,45 @@ var PS = {};
       var pnAB$prime = dress("P(\\overline{A}\\cap B)=")(e)("pnAB");
       var pnAnB$prime = dress("P(\\overline{A}\\cap\\overline{B})=")(e)("pnAnB");
       var pnB$prime = dress("P(\\overline{B})=")(e)("pnB");
+      var dot = function (v) {
+          return Data_Geometry_Plane.point("")(v.x)(v.y);
+      };
+      var endA$primeB = dot({
+          x: o.x + 188.0,
+          y: o.y + 184.0
+      });
+      var endA$primeB$prime = dot({
+          x: o.x + 188.0,
+          y: o.y + 296.0
+      });
+      var endAB = dot({
+          x: o.x + 188.0,
+          y: o.y
+      });
+      var endAB$prime = dot({
+          x: o.x + 188.0,
+          y: o.y + 112.0
+      });
+      var nodeA = dot({
+          x: o.x + 88.0,
+          y: o.y + 68.0
+      });
+      var nodeA$prime = dot({
+          x: o.x + 88.0,
+          y: o.y + 220.0
+      });
+      var root = dot({
+          x: o.x,
+          y: o.y + 151.0
+      });
+      var startA = dot({
+          x: o.x + 122.0,
+          y: o.y + 60.0
+      });
+      var startA$prime = dot({
+          x: o.x + 122.0,
+          y: o.y + 244.0
+      });
       var context = {
           stroke: "#000",
           strokeWidth: 1.5,
@@ -9392,11 +9422,9 @@ var PS = {};
           fontStyle: "italic 15px arial, sans-serif",
           textFill: "#000"
       };
-      return Article.fromIncremental(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.put(Control_Monad_State_Trans.functorStateT(Data_Identity.functorIdentity))(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(Concur_VDom_SVG.svg(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_SVG.width("500"), Concur_VDom_SVG.height("400"), Concur_VDom_SVG.attr("style")("position: absolute; ") ])(Concur_VDom_GeometryRender["render'"](Concur_VDom_GeometryRender.renderSequence(Concur_VDom_GeometryRender.renderSegment))(context)([ Data_Geometry_Plane.segment(frameTL)(frameTR)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(frameTR)(frameBR)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(frameBR)(frameBL)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(frameBL)(frameTL)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(root)(nodeA)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(root)(nodeA$prime)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA)(endAB)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA)(endAB$prime)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA$prime)(endA$primeB)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA$prime)(endA$primeB$prime)(Data_Maybe.Nothing.value) ]))))(function () {
-          return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.m("\\begin{array}{ccccccccc} & & & & & & & & B \\\\ " + ("& & & & & " + (print(e)("pgAB") + (" \\\\ \\\\ " + ("& & & & A \\\\ " + ("&" + (print(e)("pA") + (" \\\\ " + ("& & & & &" + (print(e)("pgAnB") + (" \\\\ " + ("& & & & & & & &" + ("\\overline{B} \\\\ " + ("\\cdot \\\\ " + ("& & & & &\xa0& & &" + ("B \\\\ " + ("& & & & & " + (print(e)("pgnAB") + (" \\\\ " + ("&" + (print(e)("pnA") + (" \\\\ " + ("& & & & \\overline{A} \\\\ \\\\" + ("& & & & & " + (print(e)("pgnAnB") + (" \\\\ " + "& & & & & & & & \\overline{B} \\end{array}")))))))))))))))))))))))))))(function () {
-              return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.m("\\begin{array}{llllllllllll}" + (pB$prime + (pnB$prime + (pAB$prime + (pAnB$prime + (pnAB$prime + (pnAnB$prime + (pgBA$prime + (pgBnA$prime + (pgnBA$prime + (pgnBnA$prime + ("\\\\ & & & & & & & & & & & & \\\\" + "\\end{array}")))))))))))))(function () {
-                  return Article.get(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity));
-              });
+      return Article.fromIncremental(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.put(Control_Monad_State_Trans.functorStateT(Data_Identity.functorIdentity))(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity))(Concur_VDom_SVG.svg(Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)([ Concur_VDom_SVG.width("500"), Concur_VDom_SVG.height("400"), Concur_VDom_SVG.attr("style")("position: absolute; ") ])(Concur_VDom_GeometryRender["render'"](Concur_VDom_GeometryRender.renderSequence(Concur_VDom_GeometryRender.renderSegment))(context)([ Data_Geometry_Plane.segment(root)(nodeA)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(root)(nodeA$prime)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA)(endAB)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA)(endAB$prime)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA$prime)(endA$primeB)(Data_Maybe.Nothing.value), Data_Geometry_Plane.segment(startA$prime)(endA$primeB$prime)(Data_Maybe.Nothing.value) ]))))(function () {
+          return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.m("\\boxed{\\begin{array}{cccccccccccl} & & & & & & & & B \\\\ " + ("& & & & & " + (print(e)("pgAB") + ("&&&&&&" + (pB$prime + (" \\\\" + (" \\\\ " + ("& & & & A " + ("&&&&&&&" + (pnB$prime + ("\\\\ " + ("&" + (print(e)("pA") + ("&&&&&&&&&&" + (pAB$prime + (" \\\\ " + ("& & & & &" + (print(e)("pgAnB") + ("&&&&&&" + (pAnB$prime + (" \\\\ " + ("& & & & & & & &" + ("\\overline{B} " + ("&&&" + (pnAB$prime + ("\\\\ " + ("\\cdot " + ("&&&&&&&&&&&" + (pnAnB$prime + ("\\\\ " + ("& & & & &\xa0& & &" + ("B " + ("&&&" + (pgBA$prime + ("\\\\ " + ("& & & & & " + (print(e)("pgnAB") + ("&&&&&&" + (pgBnA$prime + (" \\\\ " + ("&" + (print(e)("pnA") + ("&&&&&&&&&&" + (pgnBA$prime + (" \\\\ " + ("& & & & \\overline{A}" + ("&&&&&&&" + (pgnBnA$prime + ("\\\\ " + (" \\\\" + ("& & & & & " + (print(e)("pgnAnB") + (" \\\\ " + "& & & & & & & & \\overline{B} \\end{array}}"))))))))))))))))))))))))))))))))))))))))))))))))))))))(function () {
+              return Article.get(Control_Monad_State_Trans.monadStateStateT(Data_Identity.monadIdentity));
           });
       }));
   };
@@ -9442,12 +9470,12 @@ var PS = {};
   var contr = function (pa) {
       return function (pna) {
           return function (e) {
-              var $39 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pna)(e) ];
-              if ($39.length === 2 && ($39[0] instanceof Data_Maybe.Just && $39[1] instanceof Data_Maybe.Nothing)) {
-                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pna)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[0].value0))(e));
+              var $43 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pa)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pna)(e) ];
+              if ($43.length === 2 && ($43[0] instanceof Data_Maybe.Just && $43[1] instanceof Data_Maybe.Nothing)) {
+                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pna)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($43[0].value0))(e));
               };
-              if ($39.length === 2 && ($39[0] instanceof Data_Maybe.Nothing && $39[1] instanceof Data_Maybe.Just)) {
-                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($39[1].value0))(e));
+              if ($43.length === 2 && ($43[0] instanceof Data_Maybe.Nothing && $43[1] instanceof Data_Maybe.Just)) {
+                  return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pa)(Data_Ring.sub(Data_Ratio.ringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))(Data_Rational.fromInt(1))($43[1].value0))(e));
               };
               return Data_Maybe.Nothing.value;
           };
@@ -9457,15 +9485,15 @@ var PS = {};
       return function (pi) {
           return function (pr) {
               return function (e) {
-                  var $46 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pc)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pi)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pr)(e) ];
-                  if ($46.length === 3 && ($46[0] instanceof Data_Maybe.Just && ($46[1] instanceof Data_Maybe.Just && $46[2] instanceof Data_Maybe.Nothing))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pr)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($46[1].value0)($46[0].value0))(e));
+                  var $50 = [ Data_Map_Internal.lookup(Data_Ord.ordString)(pc)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pi)(e), Data_Map_Internal.lookup(Data_Ord.ordString)(pr)(e) ];
+                  if ($50.length === 3 && ($50[0] instanceof Data_Maybe.Just && ($50[1] instanceof Data_Maybe.Just && $50[2] instanceof Data_Maybe.Nothing))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pr)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($50[1].value0)($50[0].value0))(e));
                   };
-                  if ($46.length === 3 && ($46[0] instanceof Data_Maybe.Just && ($46[1] instanceof Data_Maybe.Nothing && $46[2] instanceof Data_Maybe.Just))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pi)(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($46[0].value0)($46[2].value0))(e));
+                  if ($50.length === 3 && ($50[0] instanceof Data_Maybe.Just && ($50[1] instanceof Data_Maybe.Nothing && $50[2] instanceof Data_Maybe.Just))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pi)(Data_Semiring.mul(Data_Ratio.semiringRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($50[0].value0)($50[2].value0))(e));
                   };
-                  if ($46.length === 3 && ($46[0] instanceof Data_Maybe.Nothing && ($46[1] instanceof Data_Maybe.Just && $46[2] instanceof Data_Maybe.Just))) {
-                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pc)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($46[1].value0)($46[2].value0))(e));
+                  if ($50.length === 3 && ($50[0] instanceof Data_Maybe.Nothing && ($50[1] instanceof Data_Maybe.Just && $50[2] instanceof Data_Maybe.Just))) {
+                      return Data_Maybe.Just.create(Data_Map_Internal.insert(Data_Ord.ordString)(pc)(Data_EuclideanRing.div(Data_Ratio.euclideanRingRatio(Data_Ord.ordInt)(Data_EuclideanRing.euclideanRingInt))($50[1].value0)($50[2].value0))(e));
                   };
                   return Data_Maybe.Nothing.value;
               };
@@ -9572,8 +9600,8 @@ var PS = {};
                   var $tco_result;
                   function $tco_loop(r, s) {
                       var t = Rand.rand(s);
-                      var $69 = modMaj(t.val) === modMaj(r.val) || modMaj(t.val) === modMaj(s.val);
-                      if ($69) {
+                      var $73 = modMaj(t.val) === modMaj(r.val) || modMaj(t.val) === modMaj(s.val);
+                      if ($73) {
                           $tco_var_r = s;
                           $copy_s = t;
                           return;
@@ -9592,8 +9620,8 @@ var PS = {};
               var $tco_result;
               function $tco_loop(r) {
                   var s = Rand.rand(r);
-                  var $70 = modMaj(s.val) === modMaj(r.val);
-                  if ($70) {
+                  var $74 = modMaj(s.val) === modMaj(r.val);
+                  if ($74) {
                       $copy_r = s;
                       return;
                   };
@@ -9611,8 +9639,8 @@ var PS = {};
           var v1 = randProba(v.nextRand);
           var v2 = randProba(v1.nextRand);
           var e = setWithIndex(modMaj(r1.val))(v.probability)(setWithIndex(modMaj(r2.val))(v1.probability)(setWithIndex(modMaj(r3.val))(v2.probability)(Data_Map_Internal.empty)));
-          var $74 = validExperience(complete(e));
-          if ($74) {
+          var $78 = validExperience(complete(e));
+          if ($78) {
               $tco_done = true;
               return {
                   experience: e,
@@ -9647,15 +9675,15 @@ var PS = {};
                   seed: odd * odd | 0
               });
               return Concur_Core_FRP.display(Concur_VDom_DOM["div'"](Concur_Core_Types.widgetMultiAlternative(Data_Monoid.monoidArray))(Concur_Core_Types.widgetShiftMap)((function () {
-                  var $81 = !newState.enabled;
-                  if ($81) {
+                  var $85 = !newState.enabled;
+                  if ($85) {
                       return [  ];
                   };
                   return Article.fromIncremental(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_State_Trans.bindStateT(Data_Identity.monadIdentity))(Article.nl)(function () {
                       var r1 = Rand.rand(r0);
                       var prob = function (e) {
-                          var $82 = Data_Maybe.fromMaybe(0)(Article.validateInput(newState.seed)) < 0;
-                          if ($82) {
+                          var $86 = Data_Maybe.fromMaybe(0)(Article.validateInput(newState.seed)) < 0;
+                          if ($86) {
                               return tree(complete(e));
                           };
                           return tree(e);
