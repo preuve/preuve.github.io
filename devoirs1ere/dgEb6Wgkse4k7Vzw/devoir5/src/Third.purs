@@ -3,13 +3,13 @@ module Third where
 import Prelude
 import Data.Maybe(fromJust)
 import Data.Array((!!),length,take)
-import DOM.Editor as DOM
-import Effect(Effect)
-import KaTeX ( newline, raw, render
-             , bold, equation)
 import Rand(Rand, unsort)
 import Partial.Unsafe(unsafePartial)
-import Data.FoldableWithIndex(forWithIndex_, foldMapWithIndex)
+import Data.FoldableWithIndex(foldMapWithIndex)
+import Article (fromIncremental, get, t, b, m, nl, put, equation)
+import Concur.Core (Widget)
+import Concur.VDom (HTML)
+import Concur.VDom.DOM as D
 
 problems :: Array { domain :: String
                   , inequation :: String
@@ -28,32 +28,29 @@ problems = [{ domain: "\\mathbb{R} \\backslash \\{1;2\\}"
             }
            ] 
 
-exo1 :: Rand -> DOM.Document -> Boolean -> Effect Unit
-exo1 r doc mode = pure unit
-
-exo2 :: Rand -> DOM.Document -> Boolean -> Effect Unit
-exo2 r doc mode = pure unit
-
-third :: Rand -> DOM.Document -> Boolean -> Effect Unit
-third r doc mode = 
-  do
+third :: forall  a. Rand -> Boolean -> Widget HTML a
+third r mode = 
+  D.div' $ fromIncremental do
         let chosen_indices = unsort (length problems) r
         let chosen_problems = 
               take 2 $ (\i -> 
                    unsafePartial $ fromJust 
                                  $ problems !! i) <$> chosen_indices
-        forWithIndex_ chosen_problems (\i p -> do
-            bold $ (show $ i+1) <> "••◦"
-            raw " Résoudre dans "
-            render p.domain
-            raw " :"
-            newline
-            equation p.inequation)
+        put $ D.div' $ foldMapWithIndex  (\i p -> fromIncremental do
+            b $ (show $ i+1) <> "••◦"
+            t " Résoudre dans "
+            m p.domain
+            t " :"
+            nl
+            equation p.inequation
+            get
+            ) chosen_problems
         
         if mode 
-         then render $ "réponses: " <> foldMapWithIndex (\i p -> 
-                " " <> show (i+1) 
-                    <> ") " 
-                    <> p.answer 
-                    <> "\\quad") chosen_problems
-         else pure unit
+          then m $ "réponses: " <> foldMapWithIndex (\i p -> 
+                  " " <> show (i+1) 
+                      <> ") " 
+                      <> p.answer 
+                      <> "\\quad") chosen_problems
+          else pure unit
+        get

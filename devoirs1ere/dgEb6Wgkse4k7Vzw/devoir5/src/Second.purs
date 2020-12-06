@@ -1,15 +1,16 @@
 module Second where
 
 import Prelude
+
 import Data.Maybe(fromJust)
 import Data.Array((!!),length,take)
-import DOM.Editor as DOM
-import Effect(Effect)
-import KaTeX (newline, raw, render
-             , bold, emph)
 import Rand(Rand, unsort)
-import Partial.Unsafe(unsafePartial)
-import Data.FoldableWithIndex(forWithIndex_, foldMapWithIndex)
+import Data.FoldableWithIndex(foldMapWithIndex)
+import Article (fromIncremental, get, t, b, m, em, nl, put)
+import Concur.Core (Widget)
+import Concur.VDom (HTML)
+import Concur.VDom.DOM as D
+import Partial.Unsafe (unsafePartial)
 
 problems :: Array {q :: String
                   , a :: String
@@ -30,39 +31,44 @@ problems = [{q: "La probabilité que le lecteur choisisse un roman policier est"
            ]
            
 
-exo1 :: Rand -> DOM.Document -> Boolean -> Effect Unit
-exo1 r doc mode = do
-  emph "Cet exercice est un questionnaire à choix multiple. Pour chaque question, une seule des réponses proposées est correcte. Une bonne réponse rapporte 1 point, une mauvaise réponse enlève 1 point tant que la note globale reste positive. Une absence de réponse n'apporte et n'enlève aucun point. Aucune justification n'est exigée."
-  newline
-  raw "Un lecteur d'une bibliothèque est passionné de romans policiers et de biographies. Cette bibliothèque lui propose 150 romans policiers et 50 biographies."
-  newline
-  raw "40% des écrivains de romans policiers sont français et 70% des écrivains de biographies sont français."
-  newline
-  raw "Le lecteur choisit un livre au hasard parmi les 200 ouvrages."
-  newline
-  newline
+exo1 :: forall a. Rand -> Boolean -> Widget HTML a
+exo1 r mode = D.div' $ fromIncremental do
+  em "Cet exercice est un questionnaire à choix multiple. Pour chaque question, une seule des réponses proposées est correcte. Une bonne réponse rapporte 1 point, une mauvaise réponse enlève 1 point tant que la note globale reste positive. Une absence de réponse n'apporte et n'enlève aucun point. Aucune justification n'est exigée."
+  nl
+  t "Un lecteur d'une bibliothèque est passionné de romans policiers et de biographies. Cette bibliothèque lui propose 150 romans policiers et 50 biographies."
+  nl
+  t "40% des écrivains de romans policiers sont français et 70% des écrivains de biographies sont français."
+  nl
+  t "Le lecteur choisit un livre au hasard parmi les 200 ouvrages."
+  nl
+  nl
+  
   let chosen_indices = unsort (length problems) r
-  let chosen_problems = 
+      chosen_problems = 
          take 5 $ (\i -> unsafePartial $ fromJust 
                                        $ problems !! i) <$> chosen_indices
-  forWithIndex_ chosen_problems (\i p -> do
-                    bold $ (show $ i+1) <> ". "
-                    raw $ p.q <> " :"
-                    newline
-                    newline
-                    raw "(a) "
-                    render p.a
-                    render "\\quad\\quad"
-                    raw "(b) "
-                    render p.b
-                    render "\\quad\\quad"
-                    raw "(c) " 
-                    render p.c
-                    newline
-                    newline)
+  put $ D.div' $  foldMapWithIndex  (\i p -> fromIncremental  do
+                    b $ (show $ i+1) <> ". "
+                    t $ p.q <> " :"
+                    nl
+                    nl
+                    t "(a) "
+                    m p.a
+                    m "\\quad\\quad"
+                    t "(b) "
+                    m p.b
+                    m "\\quad\\quad"
+                    t "(c) " 
+                    m p.c
+                    nl
+                    nl
+                    get
+                    ) chosen_problems
+  
   if mode 
-    then raw $ "réponses: " <> foldMapWithIndex (\i a -> " " <> show (i+1) <> ") ("<> a.r <> ")") chosen_problems
+    then t $ "réponses: " <> foldMapWithIndex (\i a -> " " <> show (i+1) <> ") ("<> a.r <> ")") chosen_problems
     else pure unit
+  get
    
-second :: Rand -> DOM.Document -> Boolean -> Effect Unit
+second :: forall a. Rand -> Boolean -> Widget HTML a
 second = exo1
