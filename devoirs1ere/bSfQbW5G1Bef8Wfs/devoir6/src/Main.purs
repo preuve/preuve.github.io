@@ -39,7 +39,6 @@ nth xs n = case xs Array.!! n of
 
 infixr 6 nth as !!
 
-
 body :: State -> Widget HTML State
 body st = dyn $ do
   display $ D.text "Enoncé n° "
@@ -113,5 +112,3 @@ main :: Effect Unit
 main = runWidgetInDom "main"
            $ article initialState
 
-
- 
