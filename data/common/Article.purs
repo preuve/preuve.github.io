@@ -6,7 +6,7 @@ import Concur.Core (Widget)
 import Concur.Core.Props (Props)
 import Concur.VDom (HTML)
 import Concur.VDom.DOM as D
-import Concur.VDom.Props (dangerouslySetInnerHTML) as P
+import Concur.VDom.Props (dangerouslySetInnerHTML, attr) as P
 import Concur.VDom.Props.Internal (Prop)
 import Concur.VDom.SVG as S
 
@@ -29,6 +29,18 @@ import KaTeX (equation, inline) as KaTeX
 import Math (acos, pi)
 
 import Partial.Unsafe(unsafePartial)
+
+openSection :: forall a. String -> String -> IncrementalArrayLine a
+openSection title points =
+  put $ D.div' 
+          [ D.div [P.attr "style" "margin: 0; display: flex; justify-content: space-between"]
+              [ D.label [P.attr "style" "font-size: 24px; font-weight: 700;"]  [D.text title]
+              , D.label [P.attr "style" "font-size: 16px; font-weight: 700;"] [D.text points]
+              ]
+          , D.hr'
+          ]
+
+
 
 measure :: forall a. Point -> Point -> Number -> Array (Props Prop a)
 measure p q howFar =
