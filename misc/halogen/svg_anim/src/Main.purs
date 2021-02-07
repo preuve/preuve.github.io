@@ -1,24 +1,37 @@
 module Main where
 
 import Prelude
+
+import Control.Monad.Rec.Class (forever)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
+import Effect.Aff (Milliseconds(..))
+import Effect.Aff as Aff
+import Effect.Aff.Class (class MonadAff)
+import Effect.Exception (error)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
+import Halogen.Query.EventSource (EventSource)
+import Halogen.Query.EventSource (Finalizer(..), affEventSource, emit) as EventSource
 import Halogen.VDom.Driver (runUI)
 import Halogen.Svg.Elements (svg, circle, line, path, rect, text)
 import Halogen.Svg.Attributes (cx, cy, d, dominant_baseline, fill, height, r,
   stroke, strokeWidth, text_anchor, transform, viewBox, width, x, x1, x2, y, y1,
   y2, D(Abs), Command(M, L), Color(RGB), TextAnchor(AnchorMiddle),
   Baseline(Central), Transform(Rotate))
-{- We import a lot of functions from Halogen.Svg.Attributes which makes the SVG
-   code below cleaner. You may prefer to import with
-      `import Halogen.Svg.Attributes as SA`
-   and then prefix all calls with `SA.`
--}
+import Math (pi)
+
+timer :: forall m. MonadAff m => Action -> Number -> EventSource m Action
+timer act period = EventSource.affEventSource \emitter -> do
+  fiber <- Aff.forkAff $ forever do
+    Aff.delay $ Milliseconds period
+    EventSource.emit emitter act
+
+  pure $ EventSource.Finalizer do
+    Aff.killFiber (error "Event source finalized") fiber
 
 main :: Effect Unit
 main =
@@ -26,32 +39,55 @@ main =
     body <- HA.awaitBody
     void $ runUI page unit body
 
-page ∷ forall m. Monad m => H.Component HH.HTML (Const Void) Unit Void m 
+page ∷ forall m. MonadAff m => H.Component HH.HTML (Const Void) Unit Void m 
 page = 
   H.mkComponent 
     { initialState
     , eval: H.mkEval $ H.defaultEval
-      { handleAction = handleAction 
+      { initialize = Just Initialize
+      , handleAction = handleAction 
       }
     , render
     }
 
 data Action
-  = UpdateRadius
+  = Initialize
+  | UpdateRadius
+  | Tick1
+  | Tick2
 
-type State = { radius :: Number }
+type State = 
+  { radius :: Number 
+  , angle1 :: Number
+  , angle2 :: Number
+  }
 
 initialState ∷ Unit -> State
 initialState n = 
   { radius: 40.0
+  , angle1: 0.0
+  , angle2: 0.0
   }
 
+freq1 = 50.0 :: Number
+freq2 = 12.5 :: Number
+
 handleAction :: forall m
-  .  Monad m 
+  .  MonadAff m 
   => Action -> H.HalogenM State Action () Void m Unit
+handleAction ( Initialize ) = do
+  void $ H.subscribe $ timer Tick1 freq1
+  void $ H.subscribe $ timer Tick2 freq2
+  
 handleAction ( UpdateRadius ) = do
   st <- H.get
   H.modify_ _{radius = st.radius + 5.0}
+
+handleAction ( Tick1 ) =
+  H.modify_ \state -> state { angle1 = state.angle1 + 15.0 }
+  
+handleAction ( Tick2 ) =
+  H.modify_ \state -> state { angle2 = state.angle2 + 15.0 }
   
 render :: forall m. State -> H.ComponentHTML Action () m
 render state = do
@@ -76,6 +112,10 @@ render state = do
               , height 40.0
               , fill $ Just $ RGB 0 120 0
               , stroke $ Just $ RGB 0 0 0
+              , transform $ [ Rotate (state.angle1 * pi / 180.0) 130.0 130.0 
+                            , Rotate (state.angle2 * pi / 180.0) 100.0 10.0 
+                            ]
+              
               ]
           , line
               [ x1 20.0
