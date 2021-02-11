@@ -102,7 +102,7 @@ render state = do
               [ cx 50.0
               , cy 50.0
               , r state.radius
-              , fill $ Just $ RGB 255 0 0
+              , fill $ Just $ RGB 255 255 0
               , stroke $ Just $ RGB 0 0 0
               ]
           , rect
