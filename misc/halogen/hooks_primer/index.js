@@ -7132,8 +7132,14 @@ var PS = {};
   var Data_Maybe = $PS["Data.Maybe"];
   var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
   var element = Halogen_HTML_Core.element(Data_Maybe.Nothing.value);
+  var label = element("label");
+  var label_ = label([  ]);  
   var p = element("p");
-  var p_ = p([  ]);
+  var p_ = p([  ]);  
+  var div = element("div");
+  var div_ = div([  ]);
+  exports["div_"] = div_;
+  exports["label_"] = label_;
   exports["p_"] = p_;
 })(PS);
 (function($PS) {
@@ -9278,7 +9284,7 @@ var PS = {};
   var Halogen_VDom_Driver = $PS["Halogen.VDom.Driver"];                
   var page = Halogen_Hooks_Component.component(function (v) {
       return function (v1) {
-          return Halogen_Hooks.pure(Halogen_Hooks_Hook.ixApplicativeIndexed)(Halogen_HTML_Elements.p_([ Halogen_HTML_Core.text("Minimal component") ]));
+          return Halogen_Hooks.pure(Halogen_Hooks_Hook.ixApplicativeIndexed)(Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.label_([ Halogen_HTML_Core.text("minimal component") ]), Halogen_HTML_Elements.p_([ Halogen_HTML_Core.text("can have multiple tags") ]) ]));
       };
   });
   var main = Halogen_Aff_Util.runHalogenAff(Control_Bind.bind(Effect_Aff.bindAff)(Halogen_Aff_Util.awaitBody)(Halogen_VDom_Driver.runUI(page)(Data_Unit.unit)));

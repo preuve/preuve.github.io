@@ -13,10 +13,13 @@ import Halogen.HTML.Events as HE
 import Halogen.VDom.Driver (runUI)
 import Halogen.HTML.Properties as HP
 
-page :: forall m. H.Component HH.HTML (Const Void) Unit Void m 
+--page :: forall m. H.Component HH.HTML (Const Void) Unit Void m 
 page = Hooks.component \_ _ -> Hooks.do
- Hooks.pure do
-    HH.p_ [ HH.text "Minimal component"]
+  Hooks.pure do
+    HH.div_ 
+      [ HH.label_ [ HH.text "minimal component"]
+      , HH.p_ [ HH.text "can have multiple tags"]
+      ]
 
 main :: Effect Unit
 main = HA.runHalogenAff $

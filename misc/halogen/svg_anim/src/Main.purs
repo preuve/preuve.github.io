@@ -69,8 +69,8 @@ initialState n =
   , angle2: 0.0
   }
 
-freq1 = 50.0 :: Number
-freq2 = 12.5 :: Number
+freq1 = 5.0 :: Number
+freq2 = 1.5 :: Number
 
 handleAction :: forall m
   .  MonadAff m 
@@ -84,10 +84,10 @@ handleAction ( UpdateRadius ) = do
   H.modify_ _{radius = st.radius + 5.0}
 
 handleAction ( Tick1 ) =
-  H.modify_ \state -> state { angle1 = state.angle1 + 15.0 }
+  H.modify_ \state -> state { angle1 = state.angle1 + 50.0 }
   
 handleAction ( Tick2 ) =
-  H.modify_ \state -> state { angle2 = state.angle2 + 15.0 }
+  H.modify_ \state -> state { angle2 = state.angle2 + 50.0 }
   
 render :: forall m. State -> H.ComponentHTML Action () m
 render state = do

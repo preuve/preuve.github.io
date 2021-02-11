@@ -9010,8 +9010,8 @@ var PS = {};
           angle2: 0.0
       };
   };
-  var freq2 = 12.5;
-  var freq1 = 50.0;
+  var freq2 = 1.5;
+  var freq1 = 5.0;
   var handleAction = function (dictMonadAff) {
       return function (v) {
           if (v instanceof Initialize) {
@@ -9041,7 +9041,7 @@ var PS = {};
                           $12[$13] = state[$13];
                       };
                   };
-                  $12.angle1 = state.angle1 + 15.0;
+                  $12.angle1 = state.angle1 + 50.0;
                   return $12;
               });
           };
@@ -9053,7 +9053,7 @@ var PS = {};
                           $15[$16] = state[$16];
                       };
                   };
-                  $15.angle2 = state.angle2 + 15.0;
+                  $15.angle2 = state.angle2 + 50.0;
                   return $15;
               });
           };
