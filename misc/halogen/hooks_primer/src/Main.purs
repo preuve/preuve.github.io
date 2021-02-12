@@ -7,7 +7,6 @@ import Data.Const (Const)
 import Data.Maybe (Maybe(..))
 import Data.Tuple.Nested ((/\))
 import Effect (Effect)
-import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Aff (Milliseconds(..))
 import Effect.Aff as Aff
 import Effect.Aff.Class (class MonadAff)
@@ -17,29 +16,31 @@ import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 --import Halogen.HTML.Properties as HP
-import Halogen.Query.EventSource (EventSource)
 import Halogen.Query.EventSource (Finalizer(..), affEventSource, emit) as EventSource
 import Halogen.Hooks as Hooks
 import Halogen.VDom.Driver (runUI)
 
---page :: forall m. MonadAff m => H.Component HH.HTML (Const Void) Unit Void m 
+page :: forall m. MonadAff m => H.Component HH.HTML (Const Void) Unit Void m 
 page = Hooks.component \_ _ -> Hooks.do
   count /\ countId <- Hooks.useState 0
-  tick /\ tickId <- Hooks.useState false
+  tick /\ tickId <- Hooks.useState 0
   
   Hooks.useLifecycleEffect do
     
-    _ <- Hooks.subscribe do
+    subId <- Hooks.subscribe do
       EventSource.affEventSource \emitter -> do
         fiber <- Aff.forkAff $ forever do
           Aff.delay $ Milliseconds 500.0
-          --EventSource.emit emitter act
-          _ <-  Hooks.put tickId (not tick)
-          pure mempty
-
+          EventSource.emit emitter do
+              t <- Hooks.get tickId
+              Hooks.put tickId (t + 1)
+          
         pure $ EventSource.Finalizer do
           void $ Aff.killFiber (error "Event source finalized") fiber
-    pure mempty    
+    
+    pure $ Just do
+      Hooks.unsubscribe subId
+             
 
   Hooks.pure do
     HH.div_ 
