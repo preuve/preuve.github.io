@@ -40,8 +40,9 @@ page = Hooks.component \_ _ -> Hooks.do
     
     pure $ Just do
       Hooks.unsubscribe subId
-             
-
+            
+  useTick countId { tick }
+                                
   Hooks.pure do
     HH.div_ 
       [ HH.label_ [ HH.text "minimal component" ]
@@ -50,6 +51,10 @@ page = Hooks.component \_ _ -> Hooks.do
                   [ HH.text $ show count] 
       , HH.label_ [ HH.text $ show tick ]
       ]
+  where
+    useTick countId deps@{ tick } = Hooks.captures deps Hooks.useTickEffect do
+                              pure $ Just do
+                                Hooks.put countId tick
 
 main :: Effect Unit
 main = HA.runHalogenAff $
