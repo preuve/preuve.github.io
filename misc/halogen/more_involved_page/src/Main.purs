@@ -46,7 +46,7 @@ data Action
   | GotoGreetStage GreetStage
 
 
-page ∷ forall m. H.Component HH.HTML (Const Void) Unit Void m 
+page ∷ forall m. H.Component (Const Void) Unit Void m 
 page = 
     H.mkComponent { initialState: const initialState
                   , render
@@ -54,10 +54,8 @@ page =
                     { handleAction = handleAction }
                   }
 
-
 initialState ∷ State
 initialState = { stage : AskName { name : Nothing } }
-
 
 handleAction :: forall m. Action -> H.HalogenM State Action () Void m Unit
 handleAction ( UpdateName stage newName ) = 
@@ -77,18 +75,15 @@ handleAction ( SetPlanet stage newPlanet ) =
 handleAction (GotoPlanetStage stage) = 
     H.modify_ _{ stage = AskPlanet stage }
 
-
 handleAction (GotoGreetStage stage ) =
     H.modify_ _{ stage = Greet stage } 
-
-
 
 renderNextButton :: forall m. Maybe Action -> H.ComponentHTML Action () m
 renderNextButton action =
   HH.button
   ( case action of
       Nothing -> [ HP.disabled true ]
-      Just action' -> [ HE.onClick <<< const $ Just action' ] )
+      Just action' -> [ HE.onClick $ const action' ] )
   [ HH.text "Next >" ]
 
 
@@ -96,7 +91,7 @@ render :: forall m. State -> H.ComponentHTML Action () m
 render { stage: AskName stage } = 
     HH.div_ [ HH.p_ [ HH.text "What is your name?" ]
             , HH.input [ HP.type_ HP.InputText
-                       , HE.onValueInput $ Just <<< UpdateName stage
+                       , HE.onValueInput $ UpdateName stage
                        ]
             , renderNextButton $ makeNextStage <$> stage.name
             ]
@@ -116,7 +111,8 @@ render { stage: AskPlanet stage } =
       makeButton planet =
         HH.div_  [ HH.input [ HP.type_ HP.InputRadio
                             , HP.checked $ stage.planet == Just planet
-                            , HE.onChecked <<< const <<< Just $ SetPlanet stage planet ]
+                            , HE.onChecked $ const $ SetPlanet stage planet 
+                            ]
                  , HH.label_ [ HH.text $ show planet ]
                  ]
           

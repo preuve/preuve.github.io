@@ -21,7 +21,7 @@ main = HA.runHalogenAff do
          let
            changeRoute route = launchAff_ $
                                io.query $
-                               H.tell $
+                               H.mkTell $
                                Parent.ChangeRoute route
 
          H.liftEffect $ R.router changeRoute

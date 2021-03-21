@@ -4,11 +4,11 @@ import Prelude
 
 import Children as Children
 import Data.Maybe (Maybe(..))
-import Data.Symbol (SProxy(..))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Router as R
+import Type.Proxy (Proxy(..))
 
 
 type ChildSlots = ( roast :: Children.Slot Unit
@@ -16,14 +16,14 @@ type ChildSlots = ( roast :: Children.Slot Unit
                   , salad :: Children.Slot Unit
                   )
 
-_roast :: SProxy "roast"
-_roast = SProxy
+_roast :: Proxy "roast"
+_roast = Proxy
 
-_chips :: SProxy "chips"
-_chips = SProxy
+_chips :: Proxy "chips"
+_chips = Proxy
 
-_salad :: SProxy "salad"
-_salad = SProxy
+_salad :: Proxy "salad"
+_salad = Proxy
 
 
 type State = { currentRoute :: R.Route }
@@ -32,7 +32,7 @@ data Query a = ChangeRoute R.Route a
 
 type Input = R.Route
 
-page :: forall m. H.Component HH.HTML Query Input Void m
+page :: forall m. H.Component Query Input Void m
 page = H.mkComponent { initialState
                      , render
                      , eval : H.mkEval $ H.defaultEval

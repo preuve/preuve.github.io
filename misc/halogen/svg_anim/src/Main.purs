@@ -8,30 +8,27 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Milliseconds(..))
 import Effect.Aff as Aff
-import Effect.Aff.Class (class MonadAff)
-import Effect.Exception (error)
+import Effect.Aff.Class (class MonadAff, liftAff)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
-import Halogen.Query.EventSource (EventSource)
-import Halogen.Query.EventSource (Finalizer(..), affEventSource, emit) as EventSource
+import Halogen.Subscription as HS
 import Halogen.VDom.Driver (runUI)
 import Halogen.Svg.Elements (svg, circle, line, path, rect, text)
 import Halogen.Svg.Attributes (cx, cy, d, dominant_baseline, fill, height, r,
   stroke, strokeWidth, text_anchor, transform, viewBox, width, x, x1, x2, y, y1,
-  y2, D(Abs), Command(M, L), Color(RGB), TextAnchor(AnchorMiddle),
+  y2, CommandPositionReference(Abs), m, l, Color(RGB), TextAnchor(AnchorMiddle),
   Baseline(Central), Transform(Rotate))
 import Math (pi)
 
-timer :: forall m. MonadAff m => Action -> Number -> EventSource m Action
-timer act period = EventSource.affEventSource \emitter -> do
-  fiber <- Aff.forkAff $ forever do
-    Aff.delay $ Milliseconds period
-    EventSource.emit emitter act
-
-  pure $ EventSource.Finalizer do
-    Aff.killFiber (error "Event source finalized") fiber
+timer :: forall m. MonadAff m => Action -> Number -> H.HalogenM State Action () Void m Unit
+timer act period = do
+  { emitter, listener } <- H.liftEffect HS.create
+  subId <- H.subscribe emitter
+  void $ H.fork $ forever do
+        void $ liftAff $ Aff.delay $ Milliseconds period
+        H.liftEffect $ HS.notify listener act
 
 main :: Effect Unit
 main =
@@ -39,7 +36,7 @@ main =
     body <- HA.awaitBody
     void $ runUI page unit body
 
-page ∷ forall m. MonadAff m => H.Component HH.HTML (Const Void) Unit Void m 
+page ∷ forall m. MonadAff m => H.Component (Const Void) Unit Void m 
 page = 
   H.mkComponent 
     { initialState
@@ -76,8 +73,8 @@ handleAction :: forall m
   .  MonadAff m 
   => Action -> H.HalogenM State Action () Void m Unit
 handleAction ( Initialize ) = do
-  void $ H.subscribe $ timer Tick1 freq1
-  void $ H.subscribe $ timer Tick2 freq2
+  timer Tick1 freq1
+  timer Tick2 freq2
   
 handleAction ( UpdateRadius ) = do
   st <- H.get
@@ -96,7 +93,7 @@ render state = do
           , width 400.0
           , height 400.0
           , HE.onMouseDown (\mouseev -> 
-                        Just UpdateRadius)
+                        UpdateRadius)
           ]
           [ circle
               [ cx 50.0
@@ -115,7 +112,6 @@ render state = do
               , transform $ [ Rotate (state.angle1 * pi / 180.0) 130.0 130.0 
                             , Rotate (state.angle2 * pi / 180.0) 100.0 10.0 
                             ]
-              
               ]
           , line
               [ x1 20.0
@@ -127,13 +123,13 @@ render state = do
               ]
           , path
               [ d
-                  [ Abs (M 200.0 40.0)
-                  , Abs (L 240.0 40.0)
-                  , Abs (L 240.0 80.0)
-                  , Abs (L 280.0 80.0)
-                  , Abs (L 280.0 120.0)
-                  , Abs (L 320.0 120.0)
-                  , Abs (L 320.0 160.0)
+                 [ m Abs 200.0 40.0
+                  , l Abs 240.0 40.0
+                  , l Abs 240.0 80.0
+                  , l Abs 280.0 80.0
+                  , l Abs 280.0 120.0
+                  , l Abs 320.0 120.0
+                  , l Abs 320.0 160.0
                   ]
               , fill Nothing
               , stroke $ Just $ RGB 255 0 0

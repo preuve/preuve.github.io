@@ -20,7 +20,7 @@ import Web.DOM.ParentNode (QuerySelector(..))
 
 type HM m = Hooks.HookM m Unit  
 
-contentComponent :: forall q i o m. H.Component HH.HTML q i o m
+contentComponent :: forall q i o m. H.Component q i o m
 contentComponent = Hooks.component \_ _ -> Hooks.do
 
   Hooks.pure do
@@ -30,7 +30,7 @@ contentComponent = Hooks.component \_ _ -> Hooks.do
 seq :: String
 seq = fold $ (\ n -> "\\f00" <> show n <> "\n") <$> 0 Array... 9
 
-styleComponent :: forall q i o m. H.Component HH.HTML q i o m
+styleComponent :: forall q i o m. H.Component q i o m
 styleComponent = Hooks.component \_ _ -> Hooks.do
   Hooks.pure do
     HC.stylesheet $ body ? do
@@ -41,7 +41,7 @@ styleComponent = Hooks.component \_ _ -> Hooks.do
                           fontFamily ["Font Awesome 5 Free"] $ NonEmpty.singleton sansSerif
                           key (Key $ Plain "content") 
                             $ "'" <> seq <> "'"
-scriptComponent :: forall q i o m. H.Component HH.HTML q i o m
+scriptComponent :: forall q i o m. H.Component q i o m
 scriptComponent = Hooks.component \_ _ -> Hooks.do
   Hooks.pure do
     HH.script

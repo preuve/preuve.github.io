@@ -31,7 +31,7 @@ data Action
   = UpdateMessage String
   | SubmitMessage
 
-control :: forall m. H.Component HH.HTML Query Input Message m
+control :: forall m. H.Component Query Input Message m
 control =
   H.mkComponent { initialState
                 , render
@@ -70,8 +70,8 @@ handleQuery ( CountMessages k ) = do
 render :: forall m. State -> H.ComponentHTML Action () m
 render { received, message } =
     HH.div_ [ HH.input [ HP.value message
-                       , HE.onValueChange $ Just <<< UpdateMessage ]
-            , HH.button [ HE.onClick $ const $ Just SubmitMessage ]
+                       , HE.onValueChange UpdateMessage ]
+            , HH.button [ HE.onClick $ const $ SubmitMessage ]
                           [ HH.text "Send" ] 
             , HH.ul_ $ renderReceived <$> received
 

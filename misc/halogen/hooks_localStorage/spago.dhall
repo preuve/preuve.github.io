@@ -10,7 +10,7 @@ You can edit this file as you like.
   , "halogen-hooks"
   , "profunctor-lenses"
   , "psci-support"
-  , "simple-json"
+  , "variant"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

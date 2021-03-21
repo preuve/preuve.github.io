@@ -11,7 +11,7 @@ type Slot = H.Slot (Const Void) Void
 
 
 -- Very simple component for roast potatoes
-roast :: forall m.  H.Component HH.HTML (Const Void) Unit Void m
+roast :: forall m.  H.Component (Const Void) Unit Void m
 roast =
   H.mkComponent { initialState: const unit
                 , render: renderRoast
@@ -25,7 +25,7 @@ renderRoast _ = HH.ul_ [ HH.li_ [ HH.text "Adrianne" ]
 
 
 -- Very simple component for chips
-chips :: forall m.  H.Component HH.HTML (Const Void) Unit Void m
+chips :: forall m.  H.Component (Const Void) Unit Void m
 chips =
   H.mkComponent { initialState: const unit
                 , render: renderChips
@@ -40,7 +40,7 @@ renderChips _ = HH.ul_ [ HH.li_ [ HH.text "Maris Piper" ]
 
 
 -- Very simple component for salad potatos
-salad :: forall m.  H.Component HH.HTML (Const Void) Unit Void m
+salad :: forall m.  H.Component (Const Void) Unit Void m
 salad =
   H.mkComponent { initialState: const unit
                 , render: renderSalad

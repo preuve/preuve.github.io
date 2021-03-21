@@ -2,7 +2,6 @@ module Main where
 
 import Prelude
 import Data.Const (Const)
-import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Halogen as H
 import Halogen.Aff as HA
@@ -15,7 +14,7 @@ type State = { name ∷ String }
 
 data Action = UpdateName String
 
-page ∷ forall m. H.Component HH.HTML (Const Void) Unit Void m 
+page ∷ forall m. H.Component (Const Void) Unit Void m 
 page = 
     H.mkComponent { initialState: const initialState
                   , render
@@ -34,7 +33,7 @@ render :: forall m. State -> H.ComponentHTML Action () m
 render state =
     HH.div_ [ HH.p_ [ HH.text "What is your name?" ]
             , HH.input [ HP.type_ HP.InputText
-                       , HE.onValueInput $ Just <<< UpdateName
+                       , HE.onValueInput UpdateName
                        ]
             , hello
             ]

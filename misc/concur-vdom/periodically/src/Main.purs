@@ -4,10 +4,11 @@ import Prelude
 
 import Concur.Core.FRP (Signal, hold, dyn, display, loopS)
 import Concur.Core.Types (Widget)
-import Concur.VDom (HTML)
-import Concur.VDom.DOM (div') as D
-import Concur.VDom.Run (runWidgetInDom)
-import Concur.VDom.SVG as S
+import Concur.React (HTML)
+import Concur.React.DOM (div') as D
+import Concur.React.Props as P
+import Concur.React.Run (runWidgetInDom)
+import Concur.React.SVG as S
 import Data.Array (elem, filter, fromFoldable, length)
 import Data.Int (round, toNumber)
 import Data.Map (Map, empty, insert, values, lookup)
@@ -23,8 +24,11 @@ import Prim.Row (class Cons, class Lacks)
 import Prim.RowList (Cons, Nil)
 import Record (delete, get)
 import Record (insert) as Record
-import Record.Extra (class Keys, class MapRecord, class SequenceRecord, class ZipRecord, keys, mapRecord, sequenceRecord, zipRecord)
-import Type.Prelude (class IsSymbol, class RowToList, RLProxy(RLProxy), SProxy(SProxy), reflectSymbol)
+import Record.Extra (class Keys, class MapRecord, class SequenceRecord
+                  , class ZipRecord, keys, mapRecord, sequenceRecord, zipRecord)
+import Type.Prelude (class IsSymbol, class RowToList
+                   , reflectSymbol)
+import Type.Proxy(Proxy(..))
 
 -- | Geometric SVG Setup
 
@@ -48,11 +52,11 @@ nextColor _ = black
 
 line :: forall a. Line ->  Widget HTML a
 line {ptA: x1/\y1, ptB: x2/\y2, color} =
-  S.line  [ S.unsafeMkProp "x1" x1
-          , S.unsafeMkProp "y1" y1
-          , S.unsafeMkProp "x2" x2
-          , S.unsafeMkProp "y2" y2
-          , S.stroke color
+  S.line  [ P.unsafeMkProp "x1" x1
+          , P.unsafeMkProp "y1" y1
+          , P.unsafeMkProp "x2" x2
+          , P.unsafeMkProp "y2" y2
+          , P.stroke color
           ]
         []
 
@@ -95,7 +99,7 @@ lines color t0 pt1 a1 =
 
 class ToMap row list a | list → row
   where
-    toMapImpl ∷ RLProxy list → Record row → Map String a
+    toMapImpl ∷ Proxy list → Record row → Map String a
 
 instance toMapNil ∷ ToMap () Nil a where
   toMapImpl _ _ = empty
@@ -110,9 +114,9 @@ instance toMapCons ∷
   )
   ⇒ ToMap row (Cons l a list') a where
   toMapImpl _ record =
-    insert key value (toMapImpl (RLProxy ∷ RLProxy list') record')
+    insert key value (toMapImpl (Proxy ∷ Proxy list') record')
     where
-      keyS = SProxy ∷ SProxy l
+      keyS = Proxy ∷ Proxy l
       key = reflectSymbol keyS
       value = get keyS record
       record' :: Record row'
@@ -123,7 +127,7 @@ toMap ∷ ∀ row list a
    ⇒ ToMap row list a
    ⇒ Record row
    → Map String a
-toMap = toMapImpl (RLProxy :: RLProxy list)
+toMap = toMapImpl (Proxy :: Proxy list)
 
 minPos :: forall p ps
    . RowToList p ps
@@ -185,8 +189,8 @@ trim period onset =
      /\ m
 
 class RecordApplyWithLabels fs rf xs rx ry | -> ry where
-  recordApplyImpl :: Number -> Array String -> RLProxy fs -> Record rf
-                          -> RLProxy xs -> Record rx -> Record ry
+  recordApplyImpl :: Number -> Array String -> Proxy fs -> Record rf
+                          -> Proxy xs -> Record rx -> Record ry
 
 instance applyNil
   :: RecordApplyWithLabels Nil rf Nil ry ry where
@@ -204,11 +208,11 @@ instance applyCons ::
   ) => RecordApplyWithLabels (Cons k (xtyp -> Number -> Aff xtyp) fst) rf
                  (Cons k xtyp xst) rx ry where
   recordApplyImpl n keys fs recf xs recx =
-    let key = SProxy :: SProxy k
+    let key = Proxy :: Proxy k
         nextf = delete key recf :: Record rft
         nextx = delete key recx :: Record rxt
-        itr = recordApplyImpl n keys (RLProxy :: RLProxy fst) nextf
-                           (RLProxy :: RLProxy xst) nextx :: Record ryt
+        itr = recordApplyImpl n keys (Proxy :: Proxy fst) nextf
+                           (Proxy :: Proxy xst) nextx :: Record ryt
     in Record.insert key
               (if (reflectSymbol key) `elem` keys
                   then
@@ -228,8 +232,8 @@ recordApplyWithLabels
 recordApplyWithLabels n keys recf recx =
   recordApplyImpl n
                   keys
-                  (RLProxy :: RLProxy fs) recf
-                  (RLProxy :: RLProxy xs) recx
+                  (Proxy :: Proxy fs) recf
+                  (Proxy :: Proxy xs) recx
 
 periodically
   :: forall r z zs p seq mss ms ps affss affs s ss f fs
@@ -328,8 +332,8 @@ widget3 = dyn $ do
                       } model
 
     display $ D.div'
-      [S.svg [ S.width "500"
-              , S.height "500"
+      [S.svg [ P.width "500"
+              , P.height "500"
               ]
         $ lines m.sample.c m.sample.t (100/\200) m.sample.r
       ]

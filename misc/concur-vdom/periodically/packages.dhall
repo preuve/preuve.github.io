@@ -116,14 +116,12 @@ let additions =
   }
 -------------------------------
 -}
-
-
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20200909/packages.dhall sha256:b899488adf6f02a92bbaae88039935bbc61bcba4cf4462f6d915fc3d0e094604
-  with concur-vdom =
-          { dependencies = [ "concur-react" ]
-          , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
-          , version = "v0.0.9"
-          }
- 
+      https://github.com/purescript/package-sets/releases/download/psc-0.14.0-20210304/packages.dhall sha256:c88151fe7c05f05290224c9c1ae4a22905060424fb01071b691d3fe2e5bad4ca
+      with concur-vdom =
+        { dependencies = [ "concur-react" ]
+        , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
+        , version = "v0.0.9"
+        }
+
 in  upstream
