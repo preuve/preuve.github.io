@@ -13,7 +13,12 @@
     <script src="ellipse.js">
     </script>
     <button id="plus">+</button>
-    <svg id="drawing" width="800"" height="600"" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"  onmousedown="startDrag(event)"  onmousemove="drag(event)" onmouseup="endDrag(event)">
+    <svg id="drawing" width="800"" height="600"" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"  onmousedown="startDrag(event)"  onmousemove="drag(event)" onmouseup="endDrag(event)" 
+ontouchstart="startDrag(event)" 
+ontouchmove="drag(event)" 
+ontouchend="endDrag(event)" 
+ontouchleave="endDrag(event)" 
+ontouchcancel="endDrag(event)">
       <rect width="800" height="600" fill="#eee"/>
       <line id="lineAB" x1="130" y1="100" x2="100" y2="130" stroke="black" stroke-width="4"/>
       <line id="lineAC" x1="130" y1="100" x2="130" y2="70" stroke="black" stroke-width="4"/>

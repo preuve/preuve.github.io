@@ -18,6 +18,7 @@ var selectedElement, offset, transform, svg;
 function getMousePosition(evt) {
 	svg = document.getElementById("drawing");
 	var CTM = svg.getScreenCTM();
+	if(evt.touches) {evt = evt.touches[0];}
 	return {
 	  x: (evt.clientX - CTM.e) / CTM.a,
 	  y: (evt.clientY - CTM.f) / CTM.d
