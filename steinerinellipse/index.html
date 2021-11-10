@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ellipse</title>
+  </head>
+  <style>
+    .draggable {
+        cursor:move
+    }
+  </style>
+  <body>
+    <script src="ellipse.js">
+    </script>
+    <button id="plus">+</button>
+    <svg id="drawing" width="800"" height="600"" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"  onmousedown="startDrag(event)"  onmousemove="drag(event)" onmouseup="endDrag(event)">
+      <rect width="800" height="600" fill="#eee"/>
+      <line id="lineAB" x1="130" y1="100" x2="100" y2="130" stroke="black" stroke-width="4"/>
+      <line id="lineAC" x1="130" y1="100" x2="130" y2="70" stroke="black" stroke-width="4"/>
+      <line id="lineBC" x1="100" y1="130" x2="130" y2="70" stroke="black" stroke-width="4"/>
+      <ellipse id="ellipse" cx="100" cy="100" rx="30" ry="130" transform="rotate(0)" fill="none" stroke="black" stroke-width="4" />
+    <circle id="pointA" cx="130" cy="100" r="5" class="draggable" />
+    <circle id="pointB" cx="100" cy="130" r="5" class="draggable"/>
+    <circle id="pointC" cx="130" cy="70" r="5" class="draggable"/>
+    
+    <circle id="pointAA" cx="115" cy="100" r="5" class="draggable" />
+    <circle id="pointBB" cx="130" cy="85" r="5" class="draggable"/>
+    <circle id="pointCC" cx="115" cy="115" r="5" class="draggable"/>
+    
+    <circle id="pointS" cx="120" cy="100" r="5" class="draggable"/>
+    
+    <circle id="pointF1" cx="120" cy="100" r="5" class="draggable"/>
+    <circle id="pointF2" cx="120" cy="100" r="5" class="draggable"/>
+    </svg>
+    
+   
+    <div>
+      <label for="slider-cx">CX</label>:
+      <input id="slider-cx" type="range" min="1" max="800" value="20" oninput="shapeSlider(this, 'cx')"/>
+    </div>
+    <div>
+      <label for="slider-cy">CY</label>:
+      <input id="slider-cy" type="range" min="1" max="600" value="10" oninput="shapeSlider(this, 'cy')"/>
+  </div>
+    <div>
+      <label for="slider-ry">RX</label>:
+      <input id="slider-rx" type="range" min="1" max="400" value="20" oninput="shapeSlider(this, 'rx')"/>
+    </div>
+    <div>
+      <label for="slider-rx">RY</label>:
+      <input id="slider-ry" type="range" min="1" max="300" value="10" oninput="shapeSlider(this, 'ry')"/>
+  </div>
+    <div>
+      <label for="slider-a">a</label>:
+      <input id="slider-a" type="range" min="1" max="180" value="10" oninput="rotEllipseSlider(this)"/>
+  </div>
+    <div>
+      <label for="slider-b">b</label>:
+      <input id="slider-b" type="range" min="1" max="180" value="10" oninput="rotAprimeSlider(this)"/>
+  </div>
+    <div>
+      <label for="slider-c">c</label>:
+      <input id="slider-c" type="range" min="1" max="180" value="10" oninput="rotBprimeSlider(this)"/>
+  </div>
+   </body>
+</html>
