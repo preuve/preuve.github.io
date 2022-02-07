@@ -1,0 +1,17 @@
+ <svg xmlns="http://www.w3.org/2000/svg"
+  width="400" height="100" viewBox="0 0 400 100">
+  <defs>
+    <marker id="chevron"
+      viewBox="0 0 20 20" refX="10" refY="10" 
+      markerUnits="userSpaceOnUse"
+      markerWidth="20" markerHeight="20"
+      orient="auto" fill="#49f">
+      <path d="M0 0 10 0 20 10 10 20 0 20 10 10Z" />
+    </marker>
+  </defs>
+  <path d="M40 50 60 59.57 80 67.68 100 73.1 120 75 140 73.1 160 67.68 180 59.57 200 50 220 40.43 240 32.32 260 26.9 280 25 300 26.9 320 32.32 340 40.43 360 50"
+        fill="none" stroke="none"
+        marker-start="url(#chevron)"
+        marker-mid="url(#chevron)"
+        marker-end="url(#chevron)" />
+</svg>

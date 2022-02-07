@@ -1,0 +1,19 @@
+ <svg xmlns="http://www.w3.org/2000/svg" xml:lang="en" width="100%" height="100%">
+ <defs>
+   <path id="le-path" d="M -20 0 l -10 17.321 l -10 17.321 l -10 17.321 l -20 0 l 10 17.321 l 20 0 l 10 -17.321 l 10 -17.321 l 10 -17.321 l 20 0 l -10 -17.321 Z" stroke="black" stroke-width="6" fill="white" />
+   <g id="all-paths">
+     <use href="#le-path" transform="rotate(0)" />
+     <use href="#le-path" transform="translate(60 69.282) rotate(60)" />
+     <use href="#le-path" transform="translate(30 51.962) rotate(120)" />
+   </g>
+   <pattern id="alotofs" x="0" y="0" width="180" height="104" patternUnits="userSpaceOnUse">
+     <use href="#all-paths" />
+     <use href="#all-paths" transform="translate(90 51.962)" />
+     <use href="#all-paths" transform="translate(180 0)" />
+     <use href="#all-paths" transform="translate(90 -51.962)" />
+     <use href="#all-paths" transform="translate(0 103.923)" />
+     <use href="#all-paths" transform="translate(180 103.923)"/>
+   </pattern>
+ </defs>
+ <rect x="0" y="0" width="100%" height="100%" fill="url(#alotofs)"></rect>
+</svg>

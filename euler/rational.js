@@ -24,78 +24,6 @@ let sqrt = function (a) {
     return b;
 };
 
-class EgyptianSolver {
-    u;
-    t;
-    n;
-    list;
-    running;
-    div;
-    vars;
-
-    constructor(n,t) {
-        this.u = Array.from({length: t-1}, (_,__) => 1n);
-        //this.u[0]=1n;
-        this.div = Array.from({length: t});
-        this.vars = Array.from({length: t});
-        this.t = t;
-        this.n = n;
-        this.list = [];
-        this.running = t-2;
-    }
-
-    done() {
-        return this.u[0] > BigInt(this.t - 1) *  this.n; 
-    }
-
-    solutions() {
-        return this.list;
-    }
-
-    progress(better) {
-        var h, hu, q, mul, deno, cpt;
-        this.vars[0] = this.n + this.u[0];
-        cpt = 1;
-        this.div[0] = this.n;
-        mul = 1n;
-
-        for (let i=0; i<this.t-1; i++) {
-            mul *= this.u[i];
-            deno = this.div[i] + this.u[i];
-            h = this.div[i] * deno;
-            this.div[i+1] = h;
-            hu = h + (i == this.t-2 ? 0n : this.u[i+1]);
-            q = hu / mul;
-            if (hu % mul != 0n || q <= this.vars[i]) continue;
-            this.vars[cpt] = q;
-            cpt++;
-        }
-        if(this.running>=0 
-            && this.u[this.running] 
-                <= BigInt(this.t-1-this.running) * this.div[this.running]) {
-            if(cpt == this.t) {
-                this.list.push([...this.vars]);
-                if(this.vars[this.t-1] < better) {
-                    console.log(this.vars);
-                    better = this.vars[this.t-1];
-                }
-            }
-        }
-        else {
-            while(this.running>0 
-                && this.u[this.running] 
-                    > BigInt(this.t-1-this.running) * this.div[this.running]) 
-                this.running--;
-            this.u[this.running]++;
-            for (let i = this.running+1; i < this.t-1; i++) this.u[i] = 1n;
-            this.running = this.t-2;
-            this.u[this.running]--;
-        }
-        this.u[this.running]++;
-        return better;
-    }
-}
-
 class Rational {
     numerator;
     denominator;
@@ -153,21 +81,110 @@ class Rational {
     sqrt() {
         return new Rational (sqrt(this.numerator), sqrt(this.denominator));
     }
+    
+    equals(that) {
+        return this.sub(that).numerator == 0n;
+    }
 
-    // fraction m/n as sum of t natural inverses
+    // fraction p/q as sum of t natural inverses
     egyptian(t) {
-        let m = this.numerator;
-        let n = this.denominator;
+        let p = this.numerator;
+        let q = this.denominator;
 
-        // first : find the t-terms sums of 1/n
-        let solver = new EgyptianSolver(n,t);
-        var better = Infinity;
-        while (!solver.done()) better = solver.progress(better);
-        let sums = solver.solutions();
+        // first : find the t-terms sums of 1/q
+        let sums = egyptianSearch(q,t);
 
         // then : divide by m those which can be
         return sums
-            .filter(arr => arr.every(x => x%m == 0n && x != m))
-            .map(arr => arr.map(x => x/m));
+            .filter(arr => arr.every(x => x%p == 0n && x != p))
+            .map(arr => arr.map(x => x/p));
     }
 }
+
+var getAllSubsets = (nums) => {
+  const subsets = [[]];
+  for (n of nums) {
+    subsets.map((el) => {
+      subsets.push([...el, n]);
+    });
+  }
+  return subsets;
+};
+
+// unordered partitions of integer n into sums of integers
+var partitions = (n) => {
+    let ps = [];
+    for (let p = 0; p < 2 ** (n-1); p++) {
+        let bits = p.toString(2).padStart(n, '0').padEnd(n+1, '0');
+        let partition = [];
+        let b = 0;
+        let i = 1;
+        while(i < bits.length) {
+            if(bits[i] == 0) {
+                partition.push(BigInt(i-b));
+                b = i;
+            }
+            i++;
+        }
+        ps.push(partition);
+    }
+    return ps;
+};
+
+var cumul = (v) => {
+    let a = v.reduce((acc,x) => {return {s:acc.s+x, arr:acc.arr.concat([acc.s+x]) };}, {s:0n, arr:[]});
+    return a.arr;
+};
+
+var bruteForceEgyptian = (q, inf, sup) => {
+    let es = [];
+    for (let p of partitions(sup-inf)) {
+        let e = cumul(p).map(x=> x + BigInt(inf));
+        if (e.reduce((sum, i) => sum.add(new Rational(1n, i)), new Rational(0n, 1n)).equals(q)) {
+            es.push(e);
+        }
+    }
+    return es;
+};
+
+
+
+var egyptianSearch = (q,t) => {
+    var delta = Array.from({length: t-1}, (_,__) => 1n);
+    var sol = [];
+    var running = t-2;
+    
+    while (delta[0] < BigInt(t - 1) *  q) {
+         var lastD = q, d = q, mulD = q, mulDs = [q];
+         var lastDelta = 1n, mulDelta = 1n;
+         let del;
+         let denos = [];
+         for (let i=1; i<t+1; i++) {
+             if(i==t)del=0n;else del=delta[i-1];
+             d = del + mulD;
+             mulD *= d;
+             mulDs.push(mulD);
+             if (lastDelta * lastD >= d) continue;
+             if (d % mulDelta != 0n) continue;
+             denos.push(d/mulDelta);
+             lastD = d;
+             lastDelta = del;
+             mulDelta *= del;
+         }
+
+        if(delta[running] <= BigInt(t-1-running) * mulDs[running]) { 
+            if(denos.length == t) sol.push(denos);
+        }
+        else if(running>0){
+            do { 
+                running--;
+                delta[running]++;
+                for (let i = running+1; i < t-1; i++) delta[i] = 1n;
+            } while(delta[running] > BigInt(t-1-running)*mulDs[running]);
+            running = t-2;
+            delta[running]--;
+        }
+         delta[running]++;
+    }
+    return sol;
+} 

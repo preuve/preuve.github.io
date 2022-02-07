@@ -1,0 +1,86 @@
+ <svg id="svg" xmlns="http://www.w3.org/2000/svg" width="200" height="1200" 
+     style="background-color: #000;" viewBox="-50 -50 100 1250">
+    <defs id="defs">
+   </defs>
+
+    <script type="text/javascript"><![CDATA[
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.getElementById('svg');
+    const defs = document.getElementById('defs');
+    const line = (pt1, pt2) => {
+        return [ pt2[1]-pt1[1], 
+                 pt1[0]-pt2[0], 
+                     pt2[0]*pt1[1]-pt1[0]*pt2[1] ];
+    };
+      
+    const dist = (pt1,pt2) => 
+      Math.sqrt((pt1[0]-pt2[0])**2+(pt1[1]-pt2[1])**2);
+
+    const aUnitVectorFrom = (l) => {
+        let v = [-l[1], l[0]];
+        let d = dist(v,[0,0]);
+        return [v[0]/d, v[1]/d];
+    };
+
+    const inter = (line1, line2) => {
+        var denom = line1[0] * line2[1] - line1[1] * line2[0];
+        return [ (line2[2] * line1[1] - line2[1] * line1[2]) / denom,
+              (line2[0] * line1[2] - line2[2] * line1[0]) / denom ];
+    };
+ 
+    const proj = (l, p) => {
+        let v = aUnitVectorFrom(l);
+        let vp = [-v[1],v[0]];
+        let q = [p[0]+vp[0],p[1]+vp[1]];
+        return inter(l,line(p,q));
+    };
+
+    const gradientParams = (p1,l2,arr,thick) => {
+        let v = aUnitVectorFrom(line(p1,proj(l2,p1)));
+        let p2 = [p1[0]+thick*v[0], p1[1]+thick*v[1]];
+        return {x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1]};
+    };
+    
+    const radius = 50;
+    const a = j => Array.from({length:12}, (_,i)=>
+        [ radius+radius*Math.cos((j+i)*2*Math.PI/12),
+            100*j+radius*Math.sin((j+i)*2*Math.PI/12) ]);
+            
+    const poly = j => {
+        var p = document.createElementNS(ns, "polygon");
+        var pts = a(j);
+        var pa = pts[0];
+        var pb = inter(line(pts[1],pts[6]),line(pts[0],pts[2]));
+        var pc = pts[6];
+        var pd = inter(line(pts[6],pts[9]),line(pts[0],pts[7]));
+        p.setAttributeNS(null, "points", `
+            ${pa[0]},${pa[1]} 
+            ${pb[0]},${pb[1]} 
+            ${pc[0]},${pc[1]} 
+            ${pd[0]},${pd[1]} `);
+        
+        var g = document.createElementNS(ns, "linearGradient");
+        g.setAttributeNS(null, "id", `grad${j}`);
+        g.setAttributeNS(null, "gradientUnits", "userSpaceOnUse");
+        var attrs = gradientParams(pa,line(pc,pb),[pa,pb,pc,pd],20);
+        g.setAttributeNS(null, "x1", attrs.x1);
+        g.setAttributeNS(null, "y1", attrs.y1);
+        g.setAttributeNS(null, "x2", attrs.x2);
+        g.setAttributeNS(null, "y2", attrs.y2);
+        var s0 = document.createElementNS(ns, "stop");
+        s0.setAttributeNS(null, "offset", "0%");
+        s0.setAttributeNS(null, "stop-color", "#fff");
+        g.appendChild(s0);
+        var s1 = document.createElementNS(ns, "stop");
+        s1.setAttributeNS(null, "offset", "100%");
+        s1.setAttributeNS(null, "stop-color", "#000");
+        g.appendChild(s1);
+        defs.appendChild(g);
+        p.setAttributeNS(null, "fill", `url(#grad${j})`);
+        svg.appendChild(p);
+    }
+    
+    Array.from({length:12}, (_,i)=>i).forEach(i=>poly(i));
+    
+    ]]></script>
+ </svg> 

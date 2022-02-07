@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:lang="en" viewBox="-1000 -600 2000 1200">
+<path id="path" d="M-700,0 a700,480 0 1,1 1400,0a700,480 0 1,1 -1400,0" style="stroke: #00f;stroke-width:20; fill: none;">
+</path>
+<circle r="20" fill="red" id="circ">
+<animateMotion begin="0s" dur="10s" end="3s" rotate="auto" fill="freeze" >
+<mpath href="#path"></mpath>
+</animateMotion>
+</circle>
+</svg>

@@ -1,0 +1,351 @@
+ SVG elements by category
+ 
+ Animation elements
+ <animate>, <animateMotion>, <animateTransform>, <discard>, <mpath>, <set>
+ 
+ Basic shapes
+ <circle>, <ellipse>, <line>, <polygon>, <polyline>, <rect>
+ 
+ Container elements
+ <a>, <defs>, <g>, <marker>, <mask>, <pattern>, <svg>, <switch>, <symbol>
+ 
+ Descriptive elements
+ <desc>, <metadata>, <title>
+ 
+ Filter primitive elements
+ <feBlend>, <feColorMatrix>, <feComponentTransfer>, <feComposite>, <feConvolveMatrix>, <feDiffuseLighting>, <feDisplacementMap>, <feDropShadow>, <feFlood>,<feFuncA>, <feFuncB>, <feFuncG>, <feFuncR>,<feGaussianBlur>, <feImage>, <feMerge>, <feMergeNode>, <feMorphology>, <feOffset>, <feSpecularLighting>, <feTile>, <feTurbulence>
+ 
+ Gradient elements
+ <linearGradient>, <radialGradient>, <stop>
+ 
+ Graphics elements
+ <circle>, <ellipse>, <image>, <line>, <path>, <polygon>, <polyline>, <rect>, <text>, <use>
+ 
+ Graphics referencing elements
+ <use>
+ 
+ Light source elements
+ <feDistantLight>, <fePointLight>, <feSpotLight>
+ 
+ Never-rendered elements
+ <clipPath>, <defs>, <hatch>, <linearGradient>, <marker>, <mask>, <metadata>, <pattern>, <radialGradient>, <script>, <style>, <symbol>, <title>
+ 
+ Paint server elements
+ <hatch>, <linearGradient>, <pattern>, <radialGradient>, <solidcolor>
+ 
+ Renderable elements
+ <a>, <circle>, <ellipse>, <foreignObject>, <g>, <image>, <line>, <path>, <polygon>, <polyline>, <rect>, <svg>, <switch>, <symbol>, <text>, <textPath>, <tspan>, <use>
+ 
+ Note: The SVG 2 spec requires that any unknown elements be treated as <g> for the purpose of rendering.
+ 
+ Shape elements
+ <circle>, <ellipse>, <line>, <path>, <polygon>, <polyline>, <rect>
+ 
+ Structural elements
+ <defs>, <g>, <svg>, <symbol>, <use>
+ 
+ Text content elements
+ <textPath>, <text>, <tspan>
+ 
+ Text content child elements
+ <textPath>, <tspan>
+ 
+ Uncategorized elements
+ <clipPath>, <filter>, <foreignObject>, <hatchpath>, <script>, <style>, <view>
+ 
+ 
+SVG attributes A to Z
+A
+
+    accumulate
+    additive
+    alignment-baseline
+    amplitude
+    attributeName
+    azimuth
+
+B
+
+    baseFrequency
+    baseline-shift
+    begin
+    bias
+    by
+
+C
+
+    calcMode
+    class
+    clipPathUnits
+    clip-path
+    clip-rule
+    color
+    color-interpolation
+    color-interpolation-filters
+    crossorigin
+    cursor
+    cx
+    cy
+
+D
+
+    d
+    decelerate
+    diffuseConstant
+    direction
+    display
+    divisor
+    dominant-baseline
+    dur
+    dx
+    dy
+
+E
+
+    edgeMode
+    elevation
+    end
+    exponent
+
+F
+
+    fill
+    fill-opacity
+    fill-rule
+    filter
+    filterUnits
+    flood-color
+    flood-opacity
+    font-family
+    font-size
+    font-size-adjust
+    font-stretch
+    font-style
+    font-variant
+    font-weight
+    from
+    fr
+    fx
+    fy
+
+G
+
+    gradientTransform
+    gradientUnits
+
+H
+
+    height
+    href
+    hreflang
+    
+I
+
+    id
+    image-rendering
+    in
+    in2
+    intercept
+
+K
+
+    k1
+    k2
+    k3
+    k4
+    kernelMatrix
+    keyPoints
+    keySplines
+    keyTimes
+
+L
+
+    lang
+    lengthAdjust
+    letter-spacing
+    lighting-color
+    limitingConeAngle
+    local
+
+M
+
+    marker-end
+    marker-mid
+    marker-start
+    markerHeight
+    markerUnits
+    markerWidth
+    mask
+    maskContentUnits
+    maskUnits
+    max
+    media
+    min
+    mode
+
+N
+
+    numOctaves
+
+O
+
+    offset
+    opacity
+    operator
+    order
+    orient
+    origin
+    overflow
+    overline-position
+    overline-thickness
+
+P
+
+    paint-order
+    path
+    pathLength
+    patternContentUnits
+    patternTransform
+    patternUnits
+    ping
+    pointer-events
+    points
+    pointsAtX
+    pointsAtY
+    pointsAtZ
+    preserveAlpha
+    preserveAspectRatio
+    primitiveUnits
+
+R
+
+    r
+    radius
+    referrerPolicy
+    refX
+    refY
+    rel
+    rendering-intent
+    repeatCount
+    repeatDur
+    requiredExtensions
+    restart
+    result
+    rotate
+    rx
+    ry
+
+S
+
+    scale
+    seed
+    shape-rendering
+    spacing
+    specularConstant
+    specularExponent
+    speed
+    spreadMethod
+    startOffset
+    stdDeviation
+    stitchTiles
+    stop-color
+    stop-opacity
+    strikethrough-position
+    strikethrough-thickness
+    stroke
+    stroke-dasharray
+    stroke-dashoffset
+    stroke-linecap
+    stroke-linejoin
+    stroke-miterlimit
+    stroke-opacity
+    stroke-width
+    style
+    surfaceScale
+    systemLanguage
+
+T
+
+    tabindex
+    tableValues
+    target
+    targetX
+    targetY
+    text-anchor
+    text-decoration
+    text-rendering
+    textLength
+    to
+    transform
+    transform-origin
+    type
+
+U
+
+    underline-position
+    underline-thickness
+    unicode-bidi
+    
+V
+
+    values
+    vector-effect
+    viewBox
+    visibility
+
+W
+
+    width
+    word-spacing
+    writing-mode
+
+X
+
+    x
+    x1
+    x2
+    xChannelSelector
+    xlink:actuate
+    xlink:role
+    xml:lang
+    
+Y
+
+    y
+    y1
+    y2
+    yChannelSelector
+
+Z
+
+    z
+    
+
+USE ELEMENT for:
+-----------
+clip-path, clip-rule, color, color-interpolation, color-rendering, cursor, display, fill, fill-opacity, fill-rule, filter, mask, opacity, pointer-events, shape-rendering, stroke, stroke-dasharray, stroke-dashoffset, stroke-linecap, stroke-linejoin, stroke-miterlimit, stroke-opacity, stroke-width, transform, vector-effect, visibility
+
+syntax:
+    const defs = document.createElementNS(ns, "defs");
+    clip.setAttributeNS(null, "id", "defs");
+    svg.appendChild(defs);
+
+    const clip = document.createElementNS(ns, "clipPath");
+    clip.setAttributeNS(null, "id", `path${m}`);
+    const rect = document.createElementNS(ns, "rect");
+    rect.setAttributeNS(null, "height", motifHeight);
+    rect.setAttributeNS(null, "width", motifWidth);
+    rect.setAttributeNS(null, "x", motifWidth/2);
+    rect.setAttributeNS(null, "y", motifHeight/2);
+    clip.appendChild(rect);
+    defs.appendChild(clip);
+
+    const g = document.createElementNS(ns, "g");
+    g.setAttributeNS(null, "id", `pattern${m}`);
+    svg.appendChild(g);
+
+    const use = document.createElementNS(ns, "use");
+    use.setAttributeNS(null, "clip-path", `url(#path${m})`);
+    use.setAttributeNS(null, "href", `#pattern${m}`);
+    svg.appendChild(use);
+
