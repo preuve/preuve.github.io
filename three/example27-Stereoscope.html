@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Example 27</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+        <script type="module">
+            import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
+            import { GUI } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/libs/lil-gui.module.min.js';
+            import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js';
+            
+            let camera, scene, renderer;
+            
+            // { normal, offset } s.t. offset + normal.dot(pt) = 0 for each of the 3 points
+            function plane(ptA,ptB,ptC) {
+                return { 
+                    normal: new THREE.Vector3().subVectors(ptC, ptA).cross(
+                            new THREE.Vector3().subVectors(ptB, ptA)), 
+                    offset: ptA.dot(new THREE.Vector3().crossVectors(ptB, ptC)) 
+                    };
+            }
+            
+            function planeFromFacet (matrix) {
+                const ptA = aOnFacet.clone().applyMatrix4(matrix);
+                const ptB = bOnFacet.clone().applyMatrix4(matrix);
+                const ptC = cOnFacet.clone().applyMatrix4(matrix);
+                return plane(ptA, ptB, ptC);
+            }
+        
+            // intersection of the plane and the line between the 2 points
+            function spot(plan, pt0, pt1) {
+                const v = new THREE.Vector3().subVectors(pt1, pt0);
+                const k = -(plan.offset + plan.normal.dot(pt0)) / plan.normal.dot(v);
+                
+                return pt0.clone().addScaledVector(v, k);
+            }
+            
+            class Ray {
+            
+                constructor (geometry) {
+                    this.ray = new THREE.Mesh( geometry, materialRay );
+                    this.geometry = geometry;
+                    this.initialBase = new THREE.Vector3(0, -geometry.parameters.height/2, 0);
+                    this.initialExtr = new THREE.Vector3(0, geometry.parameters.height/2, 0);
+                    
+                    this.base = undefined;
+                    this.extr = undefined;
+                }
+                
+                rayBetween(pt0, pt1) {
+                  
+                    const preOffset = new THREE.Matrix4().setPosition(
+                        new THREE.Vector3().sub(this.initialBase));
+                    const postOffset = new THREE.Matrix4().setPosition(pt0);
+                    
+                    const u = new THREE.Vector3().subVectors(this.initialExtr, this.initialBase);
+                    const v = new THREE.Vector3().subVectors(pt1, pt0);
+                    const axis = u.clone().cross(v).normalize();
+                    
+                    const r = new THREE.Matrix4().makeRotationAxis (axis, u.angleTo(v));
+                    const s = new THREE.Vector3(
+                        1,
+                        pt1.distanceTo(pt0) / this.initialExtr.distanceTo(this.initialBase),
+                        1);
+          
+                    const matrix = postOffset.multiply(r).scale(s).multiply(preOffset);
+                        
+                    this.base = pt0;
+                    this.extr = pt1;
+                    
+                    scene.remove(this.ray);
+                    const upToDateGeometry = this.geometry.clone().applyMatrix4(matrix);
+                    this.ray = new THREE.Mesh( upToDateGeometry, materialRay );
+                    
+                    scene.add(this.ray);
+                }
+               
+                reflectionFromTo(ray, orientMatr0, orientMatr1) {
+                    const unitRay = new THREE.Vector3().subVectors(ray.extr, ray.base);
+                    const v = planeFromFacet(orientMatr0).normal;
+                    const p = unitRay.clone().projectOnVector(v);
+                    
+                    const n = p.sub(unitRay).normalize();
+                    
+                    const reflected = unitRay.reflect(n);
+                    this.rayBetween(ray.extr, new THREE.Vector3().addVectors(ray.extr, reflected));
+                    this.rayBetween(ray.extr, spot(planeFromFacet(orientMatr1), this.base, this.extr));
+                }
+
+            }
+                        
+            let left, right;
+        
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.physicallyCorrectLights = true
+            document.body.appendChild( renderer.domElement );
+
+            const fov = 75;
+            const aspect = 1;  // the canvas default
+            const near = 0.1;
+            const far = 15;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.z = 2;
+            
+            left = new THREE.Group();
+            scene = new THREE.Scene();
+            scene.add(left);
+            
+            right = left.clone();
+            scene.add(right);
+            
+            const color1 = 0xFFFFFF;
+            const intensity1 = 3;
+            const light1 = new THREE.DirectionalLight(color1, intensity1);
+            light1.position.set(-1, 2, 4);
+            left.add(light1);
+            
+            const color2 = 0xFFFFFF;
+            const intensity2 = 3;
+            const light2 = new THREE.DirectionalLight(color2, intensity2);
+            light2.position.set(1, -2, -4);
+            left.add(light2);
+            
+            //
+            // * L --------- * pt3 --- big screen ---------- * pt3 ----- * R ----
+            //  \             \                             /           /
+            //   \       ----  * pt1--- facet1             /           /
+            //    \           / \           facet1' ----  * pt4---    /
+            //     \ray3     /   \ ray1                  / \         /  
+            //      \       /ray2 \                ray4 /   \ray5   /    
+            //       \     /       pt0                 /     \     /ray6
+            //        \   /                           /       \   /        
+            //         \ /                           /         \ /
+            //      --- * pt2 ---- facet2           * pt5   --- * pt6 ---- facet2'   
+            //                                             
+            
+            const defaultRayLength = 1; 
+           
+            const point0 = new THREE.Vector3(defaultRayLength / 2, 0, 0);
+            const point1 = new THREE.Vector3(0, 0, 0);
+            
+            const up = new THREE.Vector3(0, 1, 0);
+            const towardsVanishingPoint = new THREE.Vector3(0, 0, -1);
+
+            const geometryFirstFacet = new THREE.BoxGeometry(1, 1, 0.02);
+            const geometrySecondFacet = new THREE.BoxGeometry(3, 1, 0.02);
+            const materialFacet = new THREE.MeshStandardMaterial({
+                color: 'green',
+                side: THREE.DoubleSide
+            });                
+            
+            const aOnFacet = new THREE.Vector3(0.5, 0.5, 0.01);
+            const bOnFacet = new THREE.Vector3(-0.5, 0.5, 0.01);
+            const cOnFacet = new THREE.Vector3(0.5, -0.5, 0.01);
+                                
+            const geometryScreen = new THREE.BoxGeometry(12, 3, 0.03);
+            const materialScreen = new THREE.MeshStandardMaterial({
+                color: 'cyan',
+                side: THREE.DoubleSide
+            });    
+            
+            const bigScreen = new THREE.Mesh(geometryScreen, materialScreen);
+            bigScreen.position.x = -6;
+            bigScreen.position.z = -1;
+            bigScreen.rotation.y = Math.PI/2;
+            bigScreen.updateMatrix();
+            const planeScreen = planeFromFacet(bigScreen.matrix);
+            scene.add(bigScreen);
+
+            //const vNormalLeftFacet = new THREE.Vector3(0,0,1);
+            
+            const facet1 = new THREE.Mesh(geometryFirstFacet, materialFacet);
+            // const arrowHelper_Point1 = new THREE.ArrowHelper(vNormalLeftFacet, point1, 1, 'red'); 
+            // facet1.add(arrowHelper_Point1);
+            left.add(facet1);
+
+            const materialRay = new THREE.MeshStandardMaterial( {color: 0xffff00} );
+            
+            const geometryRay1 = new THREE.CylinderGeometry( 0.01, 0.01, defaultRayLength, 32 );
+            const objRay1 = new Ray(geometryRay1);
+            scene.add(objRay1.ray);
+            
+            const geometryRay2 = new THREE.CylinderGeometry( 0.01, 0.01, defaultRayLength, 32 );
+            const objRay2 = new Ray(geometryRay2);
+            scene.add(objRay2.ray);
+            
+            const facet2 = new THREE.Mesh(geometrySecondFacet, materialFacet);
+            // const arrowHelper_Point2 = new THREE.ArrowHelper(vNormalLeftFacet, point1, 1, 'red'); 
+            // facet2.add(arrowHelper_Point2);
+            facet2.position.x = 0.5;
+            facet2.position.z = 1.5;
+            left.add(facet2);
+            
+            const ray3Length = 15; 
+            const geometryRay3 = new THREE.CylinderGeometry( 0.01, 0.01, ray3Length, 32 );
+            const objRay3 = new Ray(geometryRay3);
+            scene.add(objRay3.ray);
+           
+            const geometryRay4 = new THREE.CylinderGeometry( 0.01, 0.01, defaultRayLength, 32 );
+            const objRay4 = new Ray(geometryRay4);
+            scene.add(objRay4.ray);
+            
+            const geometryRay5 = new THREE.CylinderGeometry( 0.01, 0.01, defaultRayLength, 32 );
+            const objRay5 = new Ray(geometryRay5);
+            scene.add(objRay5.ray);
+          
+            const ray6Length = 15; 
+            const geometryRay6 = new THREE.CylinderGeometry( 0.01, 0.01, ray6Length, 32 );
+            const objRay6 = new Ray(geometryRay6);
+            scene.add(objRay6.ray);
+          
+            const gui = new GUI();
+
+            const geometrySpot = new THREE.SphereGeometry(0.08);
+            const materialSpot = new THREE.MeshStandardMaterial( {color: 0x0000ff} );
+
+            const spotLeft =  new THREE.Mesh( geometrySpot, materialSpot ); scene.add(spotLeft);
+            const spotRight = new THREE.Mesh( geometrySpot, materialSpot ); scene.add(spotRight);
+            const focus =     new THREE.Mesh( geometrySpot, materialSpot ); scene.add(focus);
+            
+            const zRefl = new THREE.Matrix4();
+            zRefl.set(  1,0, 0,0,  
+                        0,1, 0,0,  
+                        0,0,-1,0,  
+                        0,0, 0,1);
+            zRefl.multiply(new THREE.Matrix4().makeTranslation(0, 0, 1));
+            
+            let facet2Refl;
+            
+            const params = {
+                f: () => {
+                
+                    facet1.rotation.y = params.alpha;
+                    facet1.updateMatrix();
+                    
+                    objRay1.rayBetween(
+                        point0.clone().applyAxisAngle(up, params.gamma1)
+                                        .applyAxisAngle(towardsVanishingPoint, params.gamma2), 
+                        point1);
+                   
+                    focus.position.copy(spot(planeScreen, objRay1.base, objRay1.extr));
+                    
+                    facet2.rotation.y = Math.PI + params.alpha;
+                    facet2.updateMatrix();
+                   
+                    objRay2.reflectionFromTo(objRay1, facet1.matrix, facet2.matrix);
+                    
+                    objRay3.reflectionFromTo(objRay2, facet2.matrix, bigScreen.matrix);
+                    spotLeft.position.copy(spot(planeScreen, objRay3.base, objRay3.extr));
+                    
+                    scene.remove(right);
+                    right = left.clone();
+                    right.applyMatrix4(zRefl);
+                    scene.add(right);
+                    
+                    const point4 = point1.clone().applyMatrix4(zRefl);
+                    const unitRay4 = new THREE.Vector3().subVectors(point4, focus.position).normalize();
+                    const point5 = point4.clone().addScaledVector(unitRay4, defaultRayLength/2);
+                    
+                    objRay4.rayBetween(point5, point4);
+                    
+                    facet2Refl = zRefl.clone().multiply(facet2.matrix);
+                    objRay5.reflectionFromTo(
+                        objRay4, 
+                        zRefl.clone().multiply(facet1.matrix), 
+                        facet2Refl
+                        );
+                    
+                    objRay6.reflectionFromTo(objRay5, facet2Refl, bigScreen.matrix);
+                    
+                    spotRight.position.copy(spot(planeScreen, objRay6.base, objRay6.extr));
+                    //console.log(spotLeft.position.distanceTo(spotRight.position));
+                    }, 
+                    
+                alpha: Math.PI/2,
+                gamma1: 0,
+                gamma2: 0
+                };
+                
+            params.f();
+            gui.add(params,'f');
+            gui.add(params, 'alpha', Math.PI/2 - 0.8, Math.PI/2 + 0.8, .01).name('alpha').onChange(event=>params.f());
+            gui.add(params, 'gamma1', -1, 1, .01).name('gamma1').onChange(event=>params.f());
+            gui.add(params, 'gamma2', -1, 1, .01).name('gamma2').onChange(event=>params.f());
+            
+            const controls = new OrbitControls( camera, renderer.domElement );
+            window.addEventListener( 'resize',  resizeRendererToDisplaySize );
+
+            function resizeRendererToDisplaySize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+            }
+
+            function render(time) {
+                time *= 0.001;                
+                renderer.render(scene, camera);
+                
+                requestAnimationFrame(render);
+            }
+
+            resizeRendererToDisplaySize();
+            requestAnimationFrame(render);
+
+        </script>
+	</body>
+</html>
+
