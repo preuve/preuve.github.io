@@ -2,29 +2,43 @@ module Main where
 
 import Prelude
 
-import Effect (Effect)
+import Article(fromIncremental, get, nl, t_, m_, put, setTitle_, runningText, enterHit, toSeed, splits)
+
+import Control.Alt ((<|>))
+
 import Data.Array((!!)) as Array
-import Data.Maybe(Maybe (..), maybe, fromMaybe)
+import Data.Foldable (oneOfMap)
+import Data.Maybe(Maybe (..))
 import Data.Ord(abs) as Ord
+import Data.Tuple.Nested ((/\))
 
-import Article (fromIncremental, get, nl, t, m, put, setTitle, validateInput)
-import Concur.Core (Widget)
-import Concur.Core.FRP (dyn, display, debounce)
-import Concur.VDom (HTML)
-import Concur.VDom.Run (runWidgetInDom)
-import Concur.VDom.Props (onChange, unsafeTargetValue, onKeyEnter, attr, autoFocus, size) as P
-import Concur.VDom.DOM as D
+import Deku.Attribute ((:=))
+import Deku.Core (Domable, class Korok)
+import Deku.Control(text_)
+import Deku.DOM as D
+import Deku.Toplevel (runInBody1, runInBodyA)
 
-import Rand(rand, consume)
+import Effect (Effect)
+import FRP.Event (bang)
+import FRP.Event.VBus (V, vbus)
+
 import Exercise1 (exo1)
 import Exercise2 (exo2)
 import Exercise3 (exo3)
 import Exercise4 (exo4)
 
-type State = { seed :: Maybe String
-             , enabled :: Boolean 
-             }
+import Rand(Rand, rand, consume)
 
+import Type.Proxy (Proxy(..))
+
+type Nuts = forall s m lock payload. Korok s m 
+  => Array (Domable m lock payload)
+
+type State = V
+  ( textContent :: String
+  , enabled :: Boolean
+  )
+  
 class HasDefault a where
   dflt :: a
   
@@ -38,81 +52,68 @@ nth xs n = case xs Array.!! n of
 
 infixr 6 nth as !!
 
-body :: State -> Widget HTML State
-body st = dyn $ do
-  display $ D.text "Enoncé n° "
-  newState <- debounce 50.0 st $ 
-                \s -> D.input 
-                        [ P.size 6
-                        , P.autoFocus true
-                        , (\ x -> { seed: show <$> (validateInput $ Just x)
-                                  , enabled: false
-                                  }
-                          )  <$> P.unsafeTargetValue 
-                             <$> P.onChange
-                        , s { enabled = maybe false (const true) 
-                                        $ validateInput s.seed} <$ P.onKeyEnter
-                        ]
-  let odd = 2 * Ord.abs (fromMaybe 0 $ validateInput newState.seed) + 1
-      r0 = rand { val: odd
-                , gen: 0
-                , seed: odd*odd
-                }
-  display $ D.div' $ if not newState.enabled 
-      then []
-      else fromIncremental $ do    
-        nl
-      
-        let mode = (fromMaybe 0 $ validateInput newState.seed) < 0
-            r1 = consume 30 r0
-            r2 = consume 30 r1
-            r3 = consume 30 r2
-            r4 = consume 30 r3
- 
-        exo1 mode r1 
-        exo2 mode r2 
-        exo3 mode r3 
-        exo4 mode r4 
-       
-        get        
-  
-initialState = { seed: Nothing 
-               , enabled: false
-               } :: State
-
-header :: forall a. Widget HTML a
-header = D.div' $ fromIncremental $ do
-  setTitle "Devoir 8 : Produit scalaire / Suites numériques"
-  nl
-  put $ D.div [ P.attr "style" "display: grid; grid-template-columns: 1fr 1fr 1fr;"]
-      [ D.label [] [D.text "Nom:"]
-      , D.label [] [D.text "Prénom:"]
-      , D.label [] [D.text "Classe:"]
-      ]
-  put $ D.ul []
-      [ D.li [] [D.text "4 exercices"]
-      , D.li [] (fromIncremental $ do
-           t "5 points par exercice ("
-           m "\\bullet"
-           t ": 1 point, "
-           m "\\circ"
-           t ": "
-           m "\\frac{1}{2}"
-           t " point)"
-           get)
-      , D.li [] [D.text "sans document"]
-      , D.li [] [D.text "calculatrice nécessaire"]
-      ]
-  get
-
-article :: State -> Widget HTML State
-article state =
-  D.div'
-    [ header
-    , body state
-    ]
+fromRelative :: Int -> Rand
+fromRelative n = 
+  let odd = 2 * Ord.abs n + 1
+  in rand { val: odd, gen: 0, seed: odd * odd}
 
 main :: Effect Unit
-main = runWidgetInDom "main"
-           $ article initialState
+main = do
+  runInBodyA header
+  runInBody1 ( vbus (Proxy :: _ State) \push event -> 
+   let 
+      doc seed enabled = 
+        D.div ((if _ then D.Style := "display: block;" else D.Style := "display: none;") <$> enabled) $ 
+            let f0 = (fromRelative /\ (_ < 0)) `splits` seed
+                f1 = (\(a/\b) -> consume 30 a /\ b) <$> f0
+                f2 = (\(a/\b) -> consume 30 a /\ b) <$> f1
+                f3 = (\(a/\b) -> consume 30 a /\ b) <$> f2
+            in fromIncremental $ do    
+              nl    
+              exo1 f1
+              exo2 f2
+              exo3 f3
+              exo4 f0 -- no seed needed for this exo
+              get
+              
+     in D.div_
+        [ D.div_  
+          [ D.label_ [text_ "Enoncé n° "]
+          , D.input
+            ( runningText (bang push.textContent) 
+              <|> enterHit (bang push.enabled)
+              <|> oneOfMap bang
+                [ D.Size := "56"
+                , D.Autofocus := ""
+                ]
+            )
+            []
+          ]
+          , doc (toSeed <$> event.textContent) (bang false <|> event.enabled)
+        ]
+      )
 
+header :: Nuts
+header = fromIncremental $ do
+  setTitle_ "Devoir 8 : Produit scalaire / Suites numériques"
+  nl
+  put $ D.div (bang $ D.Style := "display: grid; grid-template-columns: 1fr 1fr 1fr;")
+      [ D.label_ [text_ "Nom:"]
+      , D.label_ [text_ "Prénom:"]
+      , D.label_ [text_ "Classe:"]
+      ]
+  put $ D.ul_
+      [ D.li_ [text_ "4 exercices"]
+      , D.li_ (fromIncremental $ do
+           t_ "5 points par exercice ("
+           m_ "\\bullet"
+           t_ ": 1 point, "
+           m_ "\\circ"
+           t_ ": "
+           m_ "\\frac{1}{2}"
+           t_ " point)"
+           get)
+      , D.li_ [text_ "sans document"]
+      , D.li_ [text_ "calculatrice nécessaire"]
+      ]
+  get

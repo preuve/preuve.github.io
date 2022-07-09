@@ -31,24 +31,28 @@ Purpose:
     the package set's repo
 
 Syntax:
-where `entityName` is one of the following:
-- dependencies
-- repo
-- version
+Replace the overrides' "{=}" (an empty record) with the following idea
+The "//" or "⫽" means "merge these two records and
+  when they have the same value, use the one on the right:"
 -------------------------------
-let upstream = --
-in  upstream
-  with packageName.entityName = "new value"
+let override =
+  { packageName =
+      upstream.packageName // { updateEntity1 = "new value", updateEntity2 = "new value" }
+  , packageName =
+      upstream.packageName // { version = "v4.0.0" }
+  , packageName =
+      upstream.packageName // { repo = "https://www.example.com/path/to/new/repo.git" }
+  }
 -------------------------------
 
 Example:
 -------------------------------
-let upstream = --
-in  upstream
-  with halogen.version = "master"
-  with halogen.repo = "https://example.com/path/to/git/repo.git"
-
-  with halogen-vdom.version = "v4.0.0"
+let overrides =
+  { halogen =
+      upstream.halogen // { version = "master" }
+  , halogen-vdom =
+      upstream.halogen-vdom // { version = "v4.0.0" }
+  }
 -------------------------------
 
 ### Additions
@@ -57,30 +61,37 @@ Purpose:
 - Add packages that aren't already included in the default package set
 
 Syntax:
-where `<version>` is:
-- a tag (i.e. "v4.0.0")
-- a branch (i.e. "master")
-- commit hash (i.e. "701f3e44aafb1a6459281714858fadf2c4c2a977")
+Replace the additions' "{=}" (an empty record) with the following idea:
 -------------------------------
-let upstream = --
-in  upstream
-  with new-package-name =
-    { dependencies =
-       [ "dependency1"
-       , "dependency2"
-       ]
-    , repo =
-       "https://example.com/path/to/git/repo.git"
-    , version =
-        "<version>"
-    }
+let additions =
+  { package-name =
+       { dependencies =
+           [ "dependency1"
+           , "dependency2"
+           ]
+       , repo =
+           "https://example.com/path/to/git/repo.git"
+       , version =
+           "tag ('v4.0.0') or branch ('master')"
+       }
+  , package-name =
+       { dependencies =
+           [ "dependency1"
+           , "dependency2"
+           ]
+       , repo =
+           "https://example.com/path/to/git/repo.git"
+       , version =
+           "tag ('v4.0.0') or branch ('master')"
+       }
+  , etc.
+  }
 -------------------------------
 
 Example:
 -------------------------------
-let upstream = --
-in  upstream
-  with benchotron =
+let additions =
+  { benchotron =
       { dependencies =
           [ "arrays"
           , "exists"
@@ -102,16 +113,84 @@ in  upstream
       , version =
           "v7.0.0"
       }
+  }
 -------------------------------
 -}
+let additions =
+      { concur-react =
+        { dependencies =
+           [ "aff"
+            , "arrays"
+            , "avar"
+            , "console"
+            , "concur-core"
+            , "foldable-traversable"
+            , "free"
+            , "nonempty"
+            , "profunctor-lenses"
+            , "react"
+            , "react-dom"
+            , "tailrec"
+            , "web-dom"
+            , "web-html"
+        ]
+        , repo = "https://github.com/purescript-concur/purescript-concur-react.git"
+        , version = "v0.4.2"
+        },
+        concur-core =
+        { dependencies =
+           [ "aff"
+            , "aff-bus"
+            , "arrays"
+            , "avar"
+            , "console"
+            , "foldable-traversable"
+            , "free"
+            , "profunctor-lenses"
+            , "tailrec"
+            , "control"
+            , "datetime"
+            , "effect"
+            , "either"
+            , "exceptions"
+            , "identity"
+            , "lazy"
+            , "maybe"
+            , "newtype"
+            , "parallel"
+            , "prelude"
+            , "transformers"
+            , "tuples"
+            ]
+        , repo = "https://github.com/Ebmtranceboy/purescript-concur-core.git"
+        , version = "v0.5.0"
+        },
+        concur-vdom = { 
+            dependencies =
+                [ "aff"
+                , "arrays"
+                , "avar"
+                , "concur-core"
+                , "console"
+                , "foldable-traversable"
+                , "free"
+                , "geometry-plane"
+                , "halogen-vdom"
+                , "nonempty"
+                , "profunctor-lenses"
+                , "sparse-polynomials"
+                , "tailrec"
+                , "web-dom"
+                , "web-html"
+                ]
+        , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
+        , version = "v0.1.1"
+        }
+      }
 
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20200909/packages.dhall sha256:b899488adf6f02a92bbaae88039935bbc61bcba4cf4462f6d915fc3d0e094604
-  with concur-vdom =
-          { dependencies = [ "concur-react" ]
-          , repo = "https://github.com/Ebmtranceboy/purescript-concur-vdom.git"
-          , version = "v0.0.9"
-          }
- 
-in  upstream
+      https://github.com/purescript/package-sets/releases/download/psc-0.15.0-20220515/packages.dhall
+        sha256:6d7cde12a37db772a5fb78a1d8877481445abfd3351d57605e2ceb5e66892022
+     
 
+in  upstream // additions

@@ -37,7 +37,7 @@ randomParam r =
         else randomParam rc
 
 showSeq :: Param -> String
-showSeq {a,b,c} =
+showSeq {a,b,c: _c} =
   (case a of
     -1 -> "-v_n"
     1 -> "v_n"

@@ -35,7 +35,7 @@ randomParam r =
         else randomParam rb
 
 showSeq :: Param -> String
-showSeq {a,b} =
+showSeq {a,b: _b} =
   (case a of
     -1 -> "-n^2-t_n"
     1 -> "n^2-t_n"

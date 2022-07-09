@@ -2,54 +2,60 @@ module Exercise4 where
 
 import Prelude
 
-import Control.Monad.State (State)
-import Concur.Core (Widget)
-import Concur.VDom (HTML)
+import Article (b_, m_, nl, openSection_, t_)
+import Control.Monad.State.Class(class MonadState)
+import Data.Tuple.Nested (type (/\))
+import Deku.Core (Domable, class Korok)
+import FRP.Event (AnEvent)
 import Rand (Rand)
-import Article (t, m, nl, b, openSection)
 
-exo4 :: forall a. Boolean -> Rand -> State (Array (Widget HTML a)) Unit
-exo4 mode r0 = do
-  openSection "Exercice IV" "5 points"
+exo4 :: forall st s m lock payload
+    . Korok s m 
+    => Functor st 
+    => MonadState (Array (Domable m lock payload)) st 
+    => AnEvent m (Rand /\ Boolean) 
+    -> st Unit
+exo4 _ = do  
+  openSection_ "Exercice IV" "5 points"
   
-  t "Soit "
-  m "(p_n)"
-  t " la suite définie pour "
-  m "n\\geq 2"
-  t " par "
-  m $ "\\left\\{\\begin{array}{l}p_2=\\sqrt{6}\\\\"
+  t_ "Soit "
+  m_ "(p_n)"
+  t_ " la suite définie pour "
+  m_ "n\\geq 2"
+  t_ " par "
+  m_ $ "\\left\\{\\begin{array}{l}p_2=\\sqrt{6}\\\\"
                                  <> "p_{n+1}=\\sqrt{p_n^2+\\dfrac{6}{n^2}}"
                                  <> "\\end{array}\\right."
-  t "."
+  t_ "."
   nl
   nl
 
-  b "1"
-  m "\\bullet\\bullet\\;"
-  t "Montrer que "
-  m "p_n>0"
-  t " pour tout "
-  m "n\\geq 2"
-  t "."
+  b_ "1"
+  m_ "\\bullet\\bullet\\;"
+  t_ "Montrer que "
+  m_ "p_n>0"
+  t_ " pour tout "
+  m_ "n\\geq 2"
+  t_ "."
   nl
 
-  b "2"
-  m "\\bullet\\bullet\\;"
-  t "Montrer que "
-  m "(p_n)"
-  t " est croissante pour tout "
-  m "n\\geq 2"
-  t "."
+  b_ "2"
+  m_ "\\bullet\\bullet\\;"
+  t_ "Montrer que "
+  m_ "(p_n)"
+  t_ " est croissante pour tout "
+  m_ "n\\geq 2"
+  t_ "."
   nl
 
-  b "3"
-  m "\\bullet\\;"
-  t "A l'aide de la calculatrice, dire si la suite semble convergente."
+  b_ "3"
+  m_ "\\bullet\\;"
+  t_ "A l'aide de la calculatrice, dire si la suite semble convergente."
   nl
-  t "Si oui, conjecturer la valeur de sa limite quand "
-  m "n"
-  t " tend vers "
-  m "+\\infty"
-  t "."
+  t_ "Si oui, conjecturer la valeur de sa limite quand "
+  m_ "n"
+  t_ " tend vers "
+  m_ "+\\infty"
+  t_ "."
   nl
   nl

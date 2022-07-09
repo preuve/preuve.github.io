@@ -4,15 +4,26 @@ You can edit this file as you like.
 -}
 { name = "my-project"
 , dependencies =
-  [ "canvas"
+  [ "arrays"
+  , "canvas"
+  , "concur-core"
   , "concur-vdom"
   , "console"
-  , "dom-filereader"
   , "effect"
+  , "foldable-traversable"
   , "geometry-plane"
   , "halogen-vdom"
+  , "integers"
+  , "maybe"
+  , "numbers"
+  , "ordered-collections"
+  , "partial"
+  , "prelude"
   , "psci-support"
+  , "rationals"
   , "sparse-polynomials"
+  , "transformers"
+  , "tuples"
   , "web-html"
   ]
 , packages = ./packages.dhall

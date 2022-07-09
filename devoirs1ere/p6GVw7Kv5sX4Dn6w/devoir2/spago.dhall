@@ -4,12 +4,20 @@ You can edit this file as you like.
 -}
 { name = "my-project"
 , dependencies =
-  [ "concur-vdom"
+  [ "arrays"
+  , "concur-core"
+  , "concur-vdom"
   , "console"
-  , "geometry-plane"
   , "effect"
-  , "halogen-vdom"
-  , "psci-support"
+  , "foldable-traversable"
+  , "geometry-plane"
+  , "integers"
+  , "maybe"
+  , "numbers"
+  , "partial"
+  , "prelude"
+  , "transformers"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

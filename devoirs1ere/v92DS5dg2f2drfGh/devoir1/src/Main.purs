@@ -18,7 +18,7 @@ import Data.Foldable (foldr)
 import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Ord (abs)
 import Effect (Effect)
-import Math (pi, cos, sin)
+import Data.Number (pi, cos, sin)
 import Rand (rand)
 
 type State = { seed :: Maybe String
@@ -105,7 +105,7 @@ body st = dyn $ do
         let arr = case r1.val `mod` 3 of
                     0 -> thirds
                     1 -> fourths
-                    otherwise -> sixths
+                    _ -> sixths
         let n = Array.length arr
         let r2 = rand r1
         let i1 = r2.val `mod` n
@@ -275,39 +275,39 @@ fpi_6 = "\\frac{5\\pi}{6}" :: String
 
 -- | mesure principale symetrique par rapport a l'axe des abcisses
 symx :: String -> String
-symx a = 
-  case unit of
-    unit | a == m5pi_6 -> fpi_6
-         | a == m3pi_4 -> tpi_4
-         | a == m2pi_3 -> tpi_3
-         | a == mpi_3 -> pi_3
-         | a == mpi_4 -> pi_4
-         | a == mpi_6 -> pi_6
-         | a == pi_6 -> mpi_6
-         | a == pi_4 -> mpi_4
-         | a == pi_3 -> mpi_3
-         | a == tpi_3 -> m2pi_3
-         | a == tpi_4 -> m3pi_4
-         | a == fpi_6 -> m5pi_6
-         | otherwise -> a 
+symx a = next
+  where
+    next  | a == m5pi_6 = fpi_6
+          | a == m3pi_4 = tpi_4
+          | a == m2pi_3 = tpi_3
+          | a == mpi_3 = pi_3
+          | a == mpi_4 = pi_4
+          | a == mpi_6 = pi_6
+          | a == pi_6 = mpi_6
+          | a == pi_4 = mpi_4
+          | a == pi_3 = mpi_3
+          | a == tpi_3 = m2pi_3
+          | a == tpi_4 = m3pi_4
+          | a == fpi_6 = m5pi_6
+          | otherwise = a 
          
 -- | mesure principale symetrique par rapport a l'axe des ordonnees
 symy :: String -> String
-symy a  =
-  case unit of
-    unit | a == m5pi_6 -> mpi_6
-         | a == m3pi_4 -> mpi_4
-         | a == m2pi_3 -> mpi_3
-         | a == mpi_3 -> m2pi_3
-         | a == mpi_4 -> m3pi_4
-         | a == mpi_6 -> m5pi_6
-         | a == pi_6 -> fpi_6
-         | a == pi_4 -> tpi_4
-         | a == pi_3 -> tpi_3
-         | a == tpi_3 -> pi_3
-         | a == tpi_4 -> pi_4
-         | a == fpi_6 -> pi_6
-         | otherwise -> a 
+symy a  = next
+  where
+    next  | a == m5pi_6 = mpi_6
+          | a == m3pi_4 = mpi_4
+          | a == m2pi_3 = mpi_3
+          | a == mpi_3 = m2pi_3
+          | a == mpi_4 = m3pi_4
+          | a == mpi_6 = m5pi_6
+          | a == pi_6 = fpi_6
+          | a == pi_4 = tpi_4
+          | a == pi_3 = tpi_3
+          | a == tpi_3 = pi_3
+          | a == tpi_4 = pi_4
+          | a == fpi_6 = pi_6
+          | otherwise = a 
 
 spi_6 = "\\frac{7\\pi}{6}" :: String
 fpi_4 = "\\frac{5\\pi}{4}" :: String
@@ -318,15 +318,15 @@ epi_6 = "\\frac{11\\pi}{6}" :: String
 
 -- | values of ]-pi;pi] as values of [0;2pi[ 
 positive :: String -> String
-positive a =
-  case unit of
-    unit | a == m5pi_6 -> spi_6
-         | a == m3pi_4 -> fpi_4
-         | a == m2pi_3 -> fpi_3
-         | a == mpi_3 -> fipi_3
-         | a == mpi_4 -> spi_4
-         | a == mpi_6 -> epi_6
-         | otherwise -> a
+positive a = next
+  where
+    next  | a == m5pi_6 = spi_6
+          | a == m3pi_4 = fpi_4
+          | a == m2pi_3 = fpi_3
+          | a == mpi_3 = fipi_3
+          | a == mpi_4 = spi_4
+          | a == mpi_6 = epi_6
+          | otherwise = a
 
 p1_2 = "\\frac{1}{2}" :: String
 m1_2 = "-\\frac{1}{2}" :: String

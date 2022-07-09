@@ -21,7 +21,7 @@ import Data.Rational (Rational, Ratio, fromInt, numerator, denominator)
 import Data.Traversable (foldr, scanl)
 import Data.Ord(abs) as Ord
 import Effect (Effect)
-import Math (pi)
+import Data.Number (pi)
 import Rand (Rand, rand)
 
 type State = { seed :: Maybe String
@@ -35,12 +35,11 @@ showFraction f =
       else "\\frac{" <> show (numerator f) <> "}{" <> show (denominator f) <> "}"
 
 inlineFraction :: Rational -> String
-inlineFraction c =
-  case unit of
-       unit | c < zero -> "-" <> (showFraction $ Ord.abs c)
-            | c == zero -> ""
-            | otherwise -> "+" <> showFraction c
-
+inlineFraction c = next
+  where 
+    next  | c < zero = "-" <> (showFraction $ Ord.abs c)
+          | c == zero = ""
+            | otherwise = "+" <> showFraction c
 
 primes :: Array Int
 primes = [2,2,2,2,2,2,3,3,3,3,3,5,5,5,5]
@@ -98,7 +97,7 @@ randFraction = \ r ->
         else {fraction: fromInt (sign * den) / fromInt num, nextRand}
 
 alpha :: Rational -> Rational -> Rational -> Rational
-alpha a b c = -b/a/fromInt 2
+alpha a b _ = -b/a/fromInt 2
 
 beta :: Rational -> Rational -> Rational -> Rational
 beta a b c = 
@@ -111,18 +110,18 @@ delta a b c = b * b - fromInt 4 * a * c
 
 showTrinom :: Rational -> Rational -> Rational -> String
 showTrinom a b c =
-  let m2 = 
-        case unit of
-             unit | a == - one -> "-x^2"
-                  | a == one -> "x^2"
-                  | otherwise -> showFraction a <> "x^2"
-      m1 =
-        case unit of
-             unit | b == - one -> "-x"
-                  | b < zero -> "-" <> (showFraction $ Ord.abs b) <> "x"
-                  | b == zero -> ""
-                  | b == one -> "+x"
-                  | otherwise -> "+" <> showFraction b <> "x"
+  let m2 = next
+        where
+          next  | a == - one = "-x^2"
+                | a == one = "x^2"
+                | otherwise = showFraction a <> "x^2"
+      m1 = next
+        where
+          next  | b == - one = "-x"
+                | b < zero = "-" <> (showFraction $ Ord.abs b) <> "x"
+                | b == zero = ""
+                | b == one = "+x"
+                | otherwise = "+" <> showFraction b <> "x"
    in m2 <> m1 <> inlineFraction c 
 
 type Point = { exact :: String
@@ -147,39 +146,39 @@ fpi_6 = "\\frac{5\\pi}{6}" :: String
 
 -- | mesure principale symetrique par rapport a l'axe des abcisses
 symx :: String -> String
-symx a = 
-  case unit of
-    unit | a == m5pi_6 -> fpi_6
-         | a == m3pi_4 -> tpi_4
-         | a == m2pi_3 -> tpi_3
-         | a == mpi_3 -> pi_3
-         | a == mpi_4 -> pi_4
-         | a == mpi_6 -> pi_6
-         | a == pi_6 -> mpi_6
-         | a == pi_4 -> mpi_4
-         | a == pi_3 -> mpi_3
-         | a == tpi_3 -> m2pi_3
-         | a == tpi_4 -> m3pi_4
-         | a == fpi_6 -> m5pi_6
-         | otherwise -> a 
+symx a = next
+  where
+    next  | a == m5pi_6 = fpi_6
+          | a == m3pi_4 = tpi_4
+          | a == m2pi_3 = tpi_3
+          | a == mpi_3 = pi_3
+          | a == mpi_4 = pi_4
+          | a == mpi_6 = pi_6
+          | a == pi_6 = mpi_6
+          | a == pi_4 = mpi_4
+          | a == pi_3 = mpi_3
+          | a == tpi_3 = m2pi_3
+          | a == tpi_4 = m3pi_4
+          | a == fpi_6 = m5pi_6
+          | otherwise = a 
          
 -- | mesure principale symetrique par rapport a l'axe des ordonnees
 symy :: String -> String
-symy a  =
-  case unit of
-    unit | a == m5pi_6 -> mpi_6
-         | a == m3pi_4 -> mpi_4
-         | a == m2pi_3 -> mpi_3
-         | a == mpi_3 -> m2pi_3
-         | a == mpi_4 -> m3pi_4
-         | a == mpi_6 -> m5pi_6
-         | a == pi_6 -> fpi_6
-         | a == pi_4 -> tpi_4
-         | a == pi_3 -> tpi_3
-         | a == tpi_3 -> pi_3
-         | a == tpi_4 -> pi_4
-         | a == fpi_6 -> pi_6
-         | otherwise -> a 
+symy a  = next
+  where
+    next  | a == m5pi_6 = mpi_6
+          | a == m3pi_4 = mpi_4
+          | a == m2pi_3 = mpi_3
+          | a == mpi_3 = m2pi_3
+          | a == mpi_4 = m3pi_4
+          | a == mpi_6 = m5pi_6
+          | a == pi_6 = fpi_6
+          | a == pi_4 = tpi_4
+          | a == pi_3 = tpi_3
+          | a == tpi_3 = pi_3
+          | a == tpi_4 = pi_4
+          | a == fpi_6 = pi_6
+          | otherwise = a 
 
 spi_6 = "\\frac{7\\pi}{6}" :: String
 fpi_4 = "\\frac{5\\pi}{4}" :: String
@@ -190,15 +189,15 @@ epi_6 = "\\frac{11\\pi}{6}" :: String
 
 -- | values of ]-pi;pi] as values of [0;2pi[ 
 positive :: String -> String
-positive a =
-  case unit of
-    unit | a == m5pi_6 -> spi_6
-         | a == m3pi_4 -> fpi_4
-         | a == m2pi_3 -> fpi_3
-         | a == mpi_3 -> fipi_3
-         | a == mpi_4 -> spi_4
-         | a == mpi_6 -> epi_6
-         | otherwise -> a
+positive a = next
+  where
+    next  | a == m5pi_6 = spi_6
+          | a == m3pi_4 = fpi_4
+          | a == m2pi_3 = fpi_3
+          | a == mpi_3 = fipi_3
+          | a == mpi_4 = spi_4
+          | a == mpi_6 = epi_6
+          | otherwise = a
 
 p1_2 = "\\frac{1}{2}" :: String
 m1_2 = "-\\frac{1}{2}" :: String

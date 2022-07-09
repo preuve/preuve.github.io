@@ -34,7 +34,7 @@ randomParam r =
         else randomParam ra
 
 showSeq :: Param -> String
-showSeq {a} =
+showSeq {a: _a} =
   "\\dfrac{1}{1-s_n}"
 
 rshow :: Rational -> String

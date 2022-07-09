@@ -2,77 +2,33 @@ module Article where
 
 import Prelude
 
-import Concur.Core (Widget)
-import Concur.Core.Props (Props)
-import Concur.VDom (HTML)
-import Concur.VDom.DOM as D
-import Concur.VDom.Props (dangerouslySetInnerHTML, attr) as P
-import Concur.VDom.Props.Internal (Prop)
-import Concur.VDom.SVG as S
-
 import Control.Monad.State(State, runState)
 import Control.Monad.State.Class(class MonadState, modify)
 import Control.Monad.State.Class(get) as Control
 
-import Data.Array(snoc, elemIndex, (:), (..), length)
+import Data.Array (snoc, (:), elemIndex, (..), length, unsafeIndex)
+import Data.Foldable (for_, foldr)
 import Data.Geometry.Plane (Point, point, segment, vector, scale, (<+|), cosAngle, middle, abs, ord, normalTo, normalized)
+import Data.Int(round)
+import Data.Maybe(Maybe(..), fromJust)
+import Data.Number (acos, pi, isNaN, fromString)
+import Data.Tuple (fst, snd)
+import Data.Tuple.Nested ((/\), type (/\))
 
-import Data.Int (round)
-import Data.Maybe (Maybe(..), fromJust)
-import Data.Tuple (fst)
-import Data.Foldable (foldr)
+import Deku.Attribute (cb, (:=), unsafeAttribute, prop', Attribute)
+import Deku.Control(text_)
+import Deku.Core (Domable, class Korok)
+import Deku.DOM as D
 
-import Effect.Class (liftEffect)
-import Global (readFloat, isNaN)
-import KaTeX (equation, inline) as KaTeX
-
-import Math (acos, pi)
+import Effect(Effect)
+import FRP.Event (bang, AnEvent)
+import KaTeX (render, display, textMode) as KaTeX
 
 import Partial.Unsafe(unsafePartial)
 
-openSection :: forall a. String -> String -> IncrementalArrayLine a
-openSection title points =
-  put $ D.div' 
-          [ D.div [P.attr "style" "margin: 0; display: flex; justify-content: space-between"]
-              [ D.label [P.attr "style" "font-size: 24px; font-weight: 700;"]  [D.text title]
-              , D.label [P.attr "style" "font-size: 16px; font-weight: 700;"] [D.text points]
-              ]
-          , D.hr'
-          ]
-
-
-
-measure :: forall a. Point -> Point -> Number -> Array (Props Prop a)
-measure p q howFar =
-    let grow = (ord q - ord p) * (abs q - abs p) > 0.0
-        v = vector p q
-        n = normalTo v
-        a = round $ (_ / pi) $ (_ * 180.0) $ acos $ cosAngle v $ vector (point "" 0.0 0.0) (point "" 1.0 0.0)
-        mid = middle "" (segment p q Nothing) <+| scale howFar (normalized n)
-        x = round $ abs mid
-        y = round $ ord mid
-        pos = show x  <> "," <> show y
-    in  [ S.attr "x" (show x)
-        , S.attr "y" (show y)
-        , S.transform $ "rotate(" <> (show $ if grow then a else -a) <> "," <> pos <> ") "
-        ]
-             
-
--- | inverses a permutation of [0,1,..,n-1] 
-invPerm :: Array Int -> Array Int
-invPerm ps = 
-  foldr (\i acc -> 
-    (unsafePartial $ fromJust 
-    $ elemIndex i ps) : acc) [] $ 0..(length ps - 1)
-
-validateInput :: Maybe String -> Maybe Int
-validateInput (Just inp) =
- let r = readFloat inp
-  in if isNaN r
-    then Nothing
-    else 
-      Just $ round r
-validateInput _ = Nothing
+import Web.Event.Event (target)
+import Web.HTML.HTMLInputElement (fromEventTarget, value)
+import Web.UIEvent.KeyboardEvent (fromEvent, code)
 
 get :: forall m s. MonadState s m => m s
 get = Control.get
@@ -83,45 +39,150 @@ put x = void $ modify (flip snoc x)
 fromIncremental :: forall a. State (Array a) (Array a) -> Array a
 fromIncremental seq = fst $ runState seq []
 
-type IncrementalArrayLine a = State (Array (Widget HTML a)) Unit
+type Put = forall st s m lock payload. Functor st 
+  => MonadState (Array (Domable m lock payload)) st 
+  => Korok s m 
+  => st Unit
 
-mImpl :: forall a. String -> Widget HTML a
-mImpl str = do
-  ktx <- liftEffect $ KaTeX.inline str
-  D.label [P.dangerouslySetInnerHTML ktx] []
+type PutString =  forall st s m lock payload. Korok s m => Functor st 
+  => MonadState (Array (Domable m lock payload)) st => String -> st Unit
 
-m :: forall a. String -> IncrementalArrayLine a
-m str = put $ mImpl str
+type PutEvent = forall st s m lock payload. Korok s m => Functor st 
+  => MonadState (Array (Domable m lock payload)) st => AnEvent m String -> st Unit
+
+m' :: forall t. String -> Attribute t
+m' = \txt -> D.Self := KaTeX.render txt
   
-equationImpl :: forall a. String -> Widget HTML a
-equationImpl str = do
-  ktx <- liftEffect $ KaTeX.equation str
-  D.label [P.dangerouslySetInnerHTML ktx] []
+m :: PutEvent
+m str = put $ D.label (m' <$> str) []
+
+m_ :: PutString
+m_ str = m $ bang str
   
-equation :: forall a. String -> IncrementalArrayLine a
-equation str = put $ equationImpl str
- 
-t :: forall a. String -> IncrementalArrayLine a
-t str = put $ D.label' [D.text str]
+t' :: forall t. String -> Attribute t
+t' txt = D.Self := KaTeX.textMode txt
 
-nl :: forall a. IncrementalArrayLine a
-nl = put $ D.br [] []
+t :: PutEvent
+t str = put $ D.label (t' <$> str) []
 
-em :: forall a. String -> IncrementalArrayLine a
-em str = put $ D.em [] [D.text str]
+t_ :: PutString
+t_ str = t $ bang str
 
-b :: forall a. String -> IncrementalArrayLine a
-b str = put $ D.b [] [D.text str]
+nl :: Put
+nl = put $ D.br_ []
 
-setTitle :: forall a. String -> IncrementalArrayLine a
-setTitle str = put $ D.h1 [] [D.text str]
+nl' :: forall t. (String -> Attribute t) /\ String
+nl' = (\txt -> D.Self := KaTeX.textMode txt) /\ "<br>"
 
-section :: forall a. String -> IncrementalArrayLine a
-section str = put $ D.h2 [] [D.text str]
+setTitle_ :: String -> Put
+setTitle_ str = put $ D.h1_ [text_ str]
 
-subsection :: forall a. String -> IncrementalArrayLine a
-subsection str = put $ D.h3 [] [D.text str]
+equation :: PutEvent
+equation str = put $ D.label ((\txt -> D.Self := KaTeX.display txt) <$> str) []
 
-subsubsection :: forall a. String -> IncrementalArrayLine a
-subsubsection str = put $ D.h4 [] [D.text str]
+equation_ :: PutString
+equation_ str = equation $ bang str
+  
+em_ :: String -> Put
+em_ str = put $ D.em_ [text_ str]
 
+b_ :: String -> Put
+b_ str = put $ D.b_ [text_ str]
+
+section_ :: String -> Put
+section_ str = put $ D.h2_ [text_ str]
+
+subsection_ :: String -> Put
+subsection_ str = put $ D.h3_ [text_ str]
+
+subsubsection_ :: String -> Put
+subsubsection_ str = put $ D.h4_ [text_ str]
+
+openSection_ :: String -> String -> Put
+openSection_ title points =
+  put $ D.div_ 
+    [ D.div (bang $ D.Style := "margin: 0; display: flex; justify-content: space-between")
+        [ D.label (bang $ D.Style := "font-size: 24px; font-weight: 700;")  [text_ title]
+        , D.label (bang $ D.Style := "font-size: 16px; font-weight: 700;") [text_ points]
+        ]
+    , D.hr_ []
+    ]
+
+-- OCCASIONAL TOOLS :
+
+-- compensates the impossible use of length when using events of arrays
+pad :: forall t. Int -> Array ((String -> Attribute t) /\ String ) -> Array ((String -> Attribute t) /\ String ) 
+pad n arr = arr <> ((\_ -> t' /\ "") <$> (0..(n - length arr - 1)))
+
+-- similar to `sequence` when array length can be provided
+toArray :: forall a m. Int -> AnEvent m (Array a) -> Array (AnEvent m a) 
+toArray n arrEv = (\i -> (\arr -> unsafePartial $ unsafeIndex arr i) <$> arrEv) <$> (0..(n-1))
+
+-- distributes the event property over a tuple
+toTuple :: forall a b m. AnEvent m (a /\ b) -> AnEvent m a /\ AnEvent m b
+toTuple tupEv = (fst <$> tupEv) /\ (snd <$> tupEv)
+
+-- splits two uses of an event
+splits :: forall m a b c. (a -> b) /\ (a -> c) -> AnEvent m a -> AnEvent m (b /\ c)
+splits (f /\ g) e = (\x -> f x /\ g x) <$> e
+
+-- | inverses a permutation of [0,1,..,n-1] 
+invPerm :: Array Int -> Array Int
+invPerm ps = 
+  foldr (\i acc -> 
+    (unsafePartial $ fromJust 
+    $ elemIndex i ps) : acc) [] $ 0..(length ps - 1)
+
+measure :: forall t e. Applicative t => Point -> Point -> Number -> Array (AnEvent t (Attribute e))
+measure p q howFar =
+    let grow = (ord q - ord p) * (abs q - abs p) > 0.0
+        v = vector p q
+        n = normalTo v
+        a = round $ (_ / pi) $ (_ * 180.0) $ acos $ cosAngle v $ vector (point "" 0.0 0.0) (point "" 1.0 0.0)
+        mid = middle "" (segment p q Nothing) <+| scale howFar (normalized n)
+        x = round $ abs mid
+        y = round $ ord mid
+        pos = show x  <> "," <> show y
+    in  [ bang $ unsafeAttribute {key: "x", value: prop' (show x) }
+        , bang $ unsafeAttribute {key: "x", value: prop' (show x) }
+        , bang $ unsafeAttribute {key: "transform", value: prop' ("rotate(" <> (show $ if grow then a else -a) <> "," <> pos <> ") ") }
+        ]
+
+validateInput :: Maybe String -> Maybe Int
+validateInput inp =
+  inp >>= fromString >>= (\x -> if isNaN x then Nothing else Just (round x))
+
+toSeed :: String -> Int
+toSeed txt = case validateInput (Just txt) of
+    Just n -> n
+    _      -> 0
+
+runningText
+  :: forall m
+   . Applicative m
+  => AnEvent m (String -> Effect Unit)
+  -> AnEvent m (Attribute D.Input_)
+runningText = map
+  ( \push ->
+      D.OnInput := cb \e -> for_
+        ( target e
+            >>= fromEventTarget
+        )
+        ( value
+            >=> push
+        )
+  )
+
+enterHit
+  :: forall m
+   . Applicative m
+  => AnEvent m (Boolean -> Effect Unit)
+  -> AnEvent m (Attribute D.Input_)
+enterHit = map
+  ( \push ->
+      D.OnKeyup := cb \e -> for_
+        (fromEvent e) \kevt -> do
+      push false
+      when (code kevt == "Enter") $ do 
+        push true
+  )

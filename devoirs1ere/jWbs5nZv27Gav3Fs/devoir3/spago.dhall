@@ -4,16 +4,21 @@ You can edit this file as you like.
 -}
 { name = "my-project"
 , dependencies =
-  [ "canvas"
+  [ "arrays"
+  , "concur-core"
   , "concur-vdom"
   , "console"
-  , "dom-filereader"
   , "effect"
+  , "foldable-traversable"
   , "geometry-plane"
-  , "halogen-vdom"
-  , "psci-support"
-  , "sparse-polynomials"
-  , "web-html"
+  , "integers"
+  , "maybe"
+  , "numbers"
+  , "partial"
+  , "prelude"
+  , "rationals"
+  , "transformers"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

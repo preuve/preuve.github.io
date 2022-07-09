@@ -2,19 +2,23 @@ module Exercise1 where
 
 import Prelude
 
-import Control.Monad.State (State)
-import Data.Array (length, (!!))
-import Data.Int (pow)
-import Data.Maybe (fromJust)
-import Data.Rational (Rational, fromInt, numerator, denominator)
-import Partial.Unsafe (unsafePartial)
-import Rand (Rand, rand)
-import Article (m, nl, t, b, em, equation, openSection)
-import Concur.Core (Widget)
-import Concur.VDom (HTML)
+import Article (m, m_, nl, t_, t, b_, em_, equation, openSection_)
 
-majorant :: Int
-majorant = 20
+import Control.Monad.State.Class(class MonadState)
+
+import Data.Array (length, unsafeIndex)
+import Data.Int (pow)
+import Data.Tuple (fst) 
+import Data.Tuple.Nested ((/\), type (/\))
+import Data.Rational (Rational, numerator, denominator, fromInt)
+
+import Deku.Core (Domable, class Korok)
+
+import FRP.Event (AnEvent)
+
+import Partial.Unsafe (unsafePartial)
+
+import Rand (Rand, rand)
 
 type Acute = Boolean -- is angle pi/3 or 2pi/3
 type Param = {ac :: Int, ab :: Int, sqrtD :: Int, a :: Acute}
@@ -36,11 +40,12 @@ problems = [ {ac: 7, ab: 3, sqrtD: 13}, {ac: 7, ab: 5, sqrtD: 11}
 randomParam :: Rand -> Param
 randomParam r =
   let rp = rand r
-      {ac, ab, sqrtD} = unsafePartial $ fromJust $
-                          problems !! (rp.val `mod` (length problems))
+      {ac, ab, sqrtD} = 
+        unsafePartial $ unsafeIndex 
+          problems (rp.val `mod` (length problems))
       ra = rand rp
       a = ra.val `mod` 2 == 0
-    in {ac,ab,sqrtD,a}
+  in { ac, ab, sqrtD, a}
 
 showAngle :: Acute -> String
 showAngle = case _ of
@@ -66,51 +71,58 @@ rshow r =
                     <> show d
                     <> "}"
 
-exo1 :: forall a. Boolean -> Rand -> State (Array (Widget HTML a)) Unit
-exo1 mode r0 = do
-  openSection "Exercice I" "5 points"
-  
-  t "Soit "
-  m "ABC"
-  t " un triangle tel que "
-  let {ac,ab,sqrtD,a} = randomParam r0
-  m $ "AB = " <> show ab
-  t ", "
-  m $ "AC = " <> show ac
-  t " et "
-  m $ "\\widehat{ABC} = " <> showAngle a <> "."
-  nl
-  t "On note "
-  m "BC=x."
-  nl
-  nl
+exo1 :: forall st s m lock payload
+  . Korok s m 
+  => Functor st 
+  => MonadState (Array (Domable m lock payload)) st 
+  => AnEvent m (Rand /\ Boolean) 
+  -> st Unit
+exo1 f0 = do
+  openSection_ "Exercice I" "5 points"
 
-  b "1"
-  m "\\bullet\\bullet\\circ\\;"
-  t "Evaluer, en fonction de  "
-  m "x"
-  t ", le produit scalaire "
-  m "\\overrightarrow{BA}\\cdot\\overrightarrow{BC}"
-  t " de "
-  em "deux"
-  t " manières différentes."
+  t_ "Soit "
+  m_ "ABC"
+  t_ " un triangle tel que "
+  let r0 = fst <$> f0
+  let p0 = randomParam <$> r0
+  m $ ((_.ab) >>> show >>> ("AB = " <> _)) <$> p0
+  t_ ", "
+  m $ ((_.ac) >>> show >>> ("AC = " <> _)) <$> p0
+  t_ " et "
+  m $ ((_.a) >>> showAngle >>> ("\\widehat{ABC} = " <> _) >>> (_ <> ".")) <$> p0
   nl
-  t "En déduire que "
-  m "x"
-  t " satisfait l'équation "
-  equation $ "x^2" <> (if a then "-" else "+") <> show ab <> "x" <> showInt (ab**2-ac**2) <> "=0"
+  t_ "On note "
+  m_ "BC=x."
   nl
   nl
-
-  b "2"
-  m "\\bullet\\bullet\\circ\\;"
-  t "Résoudre cette équation, et en déduire la valeur de "
-  m "BC."
+  b_ "1"
+  m_ "\\bullet\\bullet\\circ\\;"
+  t_ "Evaluer, en fonction de  "
+  m_ "x"
+  t_ ", le produit scalaire "
+  m_ "\\overrightarrow{BA}{\\Large\\cdot}\\overrightarrow{BC}"
+  t_ " de "
+  em_ "deux"
+  t_ " manières différentes."
   nl
-
-  if mode
-    then do
-          nl
-          t "réponse: "
-          t $ rshow $ ((fromInt $ (if a then ab else -ab) + sqrtD)) / (fromInt 2)
-    else pure mempty
+  t_ "En déduire que "
+  m_ "x"
+  t_ " satisfait l'équation "
+  equation $ ( \ ( r /\ _m) -> 
+    let {ab, ac, sqrtD: _sqrtD, a} = randomParam r
+    in "x^2" <> (if a then "-" else "+") <> show ab <> "x" <> showInt (ab**2-ac**2) <> "=0"
+    ) <$> f0
+  nl
+  nl
+  b_ "2"
+  m_ "\\bullet\\bullet\\circ\\;"
+  t_ "Résoudre cette équation, et en déduire la valeur de "
+  m_ "BC."
+  nl
+  t $ ( \ (r /\ m) -> 
+    let {ab, ac: _ac, sqrtD, a} = randomParam r
+    in 
+      if m 
+         then ("réponse: " <> rshow (((fromInt $ (if a then ab else -ab) + sqrtD)) / (fromInt 2))) 
+         else ""
+    ) <$> f0
