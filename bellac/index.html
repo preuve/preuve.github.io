@@ -7,7 +7,8 @@
    
     <style>
       body{
-        background: #635351;
+        background: linear-gradient(#635351, #312625) ;
+        background-repeat: no-repeat;
         color: #c3c2c7;
       }
       a{
@@ -30,10 +31,11 @@
 .list-group {
 margin-bottom: 20px;
 padding-left: 0px;
+font-size: 22px;
+font-weight: 900;
 }
 * {
 box-sizing: border-box;
-width:65%
 }
 .list-group-item:first-child {
 border-top-right-radius: 10px;
@@ -49,7 +51,7 @@ color: #555;
 .list-group-item {
 position: relative;
 display: block;
-padding: 10px 15px;
+padding: 20px 30px;
 margin-bottom: -1px;
 background-color: #c3c3c3;
 border: 1px solid #000000;
@@ -59,22 +61,32 @@ color: #21B384;
 text-decoration: none;
 background: none repeat scroll 0% 0% transparent;
 }
-
+.center {
+padding-top: 30px;
+display: flex;
+justify-content: center;
+height: 100vh;
+}
 
     </style>
   </head>
 
   <body  style="font-family:arial;">
+  <div class="center">
 <div class="list-group">
 
 <a class="list-group-item" href="etatexterieur/index.html">Etat des lieux de la façade ouest</a>
+<a class="list-group-item" href="demande/index.html">Dossier de demande préalable</a>
 <a class="list-group-item" href="vuedensemble/index.html">Vue d'ensemble du projet</a>
 <a class="list-group-item" href="vuesdetaillees/index.html">Vue détaillée par étage</a>
-<a class="list-group-item" href="verriere/index.html">La fenêtre de toit (verrière)</a>
+<a class="list-group-item" href="verriere/index.html">Souhait pour la fenêtre de toit (verrière)</a>
+<a class="list-group-item" href="fenetre/index.html">Contacts commerciaux pour la verrière</a>
+<a class="list-group-item" href="trappe/index.html">Trappes de toit</a>
+<a class="list-group-item" href="chantier/index.html">Planning prévisionnel pour les travaux</a>
 
 
 </div>
-
+</div>
 
 </body>
 </html>
