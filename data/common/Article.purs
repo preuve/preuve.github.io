@@ -17,11 +17,13 @@ import Data.Tuple.Nested ((/\), type (/\))
 
 import Deku.Attribute (cb, (:=), unsafeAttribute, prop', Attribute)
 import Deku.Control(text_)
-import Deku.Core (Domable, class Korok)
+import Deku.Core (Domable)
 import Deku.DOM as D
 
 import Effect(Effect)
-import FRP.Event (bang, AnEvent)
+
+import FRP.Event (Event)
+
 import KaTeX (render, display, textMode) as KaTeX
 
 import Partial.Unsafe(unsafePartial)
@@ -39,17 +41,15 @@ put x = void $ modify (flip snoc x)
 fromIncremental :: forall a. State (Array a) (Array a) -> Array a
 fromIncremental seq = fst $ runState seq []
 
-type Put = forall st s m lock payload. Functor st 
-  => MonadState (Array (Domable m lock payload)) st 
-  => Korok s m 
+type Put = forall st lock payload. Functor st 
+  => MonadState (Array (Domable lock payload)) st 
   => st Unit
+    
+type PutString =  forall st lock payload. Functor st 
+  => MonadState (Array (Domable lock payload)) st => String -> st Unit
 
-type PutString =  forall st s m lock payload. Korok s m => Functor st 
-  => MonadState (Array (Domable m lock payload)) st => String -> st Unit
-
-type PutEvent = forall st s m lock payload. Korok s m => Functor st 
-  => MonadState (Array (Domable m lock payload)) st => AnEvent m String -> st Unit
-
+type PutEvent = forall st lock payload. Functor st => MonadState (Array (Domable lock payload)) st => Event String -> st Unit
+  
 m' :: forall t. String -> Attribute t
 m' = \txt -> D.Self := KaTeX.render txt
   
@@ -57,7 +57,7 @@ m :: PutEvent
 m str = put $ D.label (m' <$> str) []
 
 m_ :: PutString
-m_ str = m $ bang str
+m_ str = m $ pure str
   
 t' :: forall t. String -> Attribute t
 t' txt = D.Self := KaTeX.textMode txt
@@ -66,7 +66,7 @@ t :: PutEvent
 t str = put $ D.label (t' <$> str) []
 
 t_ :: PutString
-t_ str = t $ bang str
+t_ str = t $ pure str
 
 nl :: Put
 nl = put $ D.br_ []
@@ -81,7 +81,7 @@ equation :: PutEvent
 equation str = put $ D.label ((\txt -> D.Self := KaTeX.display txt) <$> str) []
 
 equation_ :: PutString
-equation_ str = equation $ bang str
+equation_ str = equation $ pure str
   
 em_ :: String -> Put
 em_ str = put $ D.em_ [text_ str]
@@ -101,9 +101,9 @@ subsubsection_ str = put $ D.h4_ [text_ str]
 openSection_ :: String -> String -> Put
 openSection_ title points =
   put $ D.div_ 
-    [ D.div (bang $ D.Style := "margin: 0; display: flex; justify-content: space-between")
-        [ D.label (bang $ D.Style := "font-size: 24px; font-weight: 700;")  [text_ title]
-        , D.label (bang $ D.Style := "font-size: 16px; font-weight: 700;") [text_ points]
+    [ D.div (pure $ D.Style := "margin: 0; display: flex; justify-content: space-between")
+        [ D.label (pure $ D.Style := "font-size: 24px; font-weight: 700;")  [text_ title]
+        , D.label (pure $ D.Style := "font-size: 16px; font-weight: 700;") [text_ points]
         ]
     , D.hr_ []
     ]
@@ -115,15 +115,15 @@ pad :: forall t. Int -> Array ((String -> Attribute t) /\ String ) -> Array ((St
 pad n arr = arr <> ((\_ -> t' /\ "") <$> (0..(n - length arr - 1)))
 
 -- similar to `sequence` when array length can be provided
-toArray :: forall a m. Int -> AnEvent m (Array a) -> Array (AnEvent m a) 
+toArray :: forall a ev. Functor ev => Int -> ev (Array a) -> Array (ev a) 
 toArray n arrEv = (\i -> (\arr -> unsafePartial $ unsafeIndex arr i) <$> arrEv) <$> (0..(n-1))
 
 -- distributes the event property over a tuple
-toTuple :: forall a b m. AnEvent m (a /\ b) -> AnEvent m a /\ AnEvent m b
+toTuple :: forall a b ev. Functor ev => ev (a /\ b) -> ev a /\ ev b
 toTuple tupEv = (fst <$> tupEv) /\ (snd <$> tupEv)
 
 -- splits two uses of an event
-splits :: forall m a b c. (a -> b) /\ (a -> c) -> AnEvent m a -> AnEvent m (b /\ c)
+splits :: forall ev a b c. Functor ev => (a -> b) /\ (a -> c) -> ev a -> ev (b /\ c)
 splits (f /\ g) e = (\x -> f x /\ g x) <$> e
 
 -- | inverses a permutation of [0,1,..,n-1] 
@@ -133,7 +133,7 @@ invPerm ps =
     (unsafePartial $ fromJust 
     $ elemIndex i ps) : acc) [] $ 0..(length ps - 1)
 
-measure :: forall t e. Applicative t => Point -> Point -> Number -> Array (AnEvent t (Attribute e))
+measure :: forall ev e. Applicative ev => Point -> Point -> Number -> Array (ev (Attribute e))
 measure p q howFar =
     let grow = (ord q - ord p) * (abs q - abs p) > 0.0
         v = vector p q
@@ -143,9 +143,9 @@ measure p q howFar =
         x = round $ abs mid
         y = round $ ord mid
         pos = show x  <> "," <> show y
-    in  [ bang $ unsafeAttribute {key: "x", value: prop' (show x) }
-        , bang $ unsafeAttribute {key: "x", value: prop' (show x) }
-        , bang $ unsafeAttribute {key: "transform", value: prop' ("rotate(" <> (show $ if grow then a else -a) <> "," <> pos <> ") ") }
+    in  [ pure $ unsafeAttribute {key: "x", value: prop' (show x) }
+        , pure $ unsafeAttribute {key: "x", value: prop' (show x) }
+        , pure $ unsafeAttribute {key: "transform", value: prop' ("rotate(" <> (show $ if grow then a else -a) <> "," <> pos <> ") ") }
         ]
 
 validateInput :: Maybe String -> Maybe Int
@@ -158,10 +158,10 @@ toSeed txt = case validateInput (Just txt) of
     _      -> 0
 
 runningText
-  :: forall m
-   . Applicative m
-  => AnEvent m (String -> Effect Unit)
-  -> AnEvent m (Attribute D.Input_)
+  :: forall ev
+   . Functor ev
+  => ev (String -> Effect Unit)
+  -> ev (Attribute D.Input_)
 runningText = map
   ( \push ->
       D.OnInput := cb \e -> for_
@@ -173,11 +173,12 @@ runningText = map
         )
   )
 
+
 enterHit
-  :: forall m
-   . Applicative m
-  => AnEvent m (Boolean -> Effect Unit)
-  -> AnEvent m (Attribute D.Input_)
+  :: forall ev
+   . Functor ev
+  => ev (Boolean -> Effect Unit)
+  -> ev (Attribute D.Input_)
 enterHit = map
   ( \push ->
       D.OnKeyup := cb \e -> for_

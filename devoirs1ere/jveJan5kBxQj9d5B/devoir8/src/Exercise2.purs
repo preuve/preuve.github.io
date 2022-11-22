@@ -4,7 +4,7 @@ import Prelude
 
 import Article (t', m', m, m_, nl, nl', t_, b_, em_, openSection_, put, get, fromIncremental, toArray, toTuple, pad, splits)
 
-import Control.Monad.State.Class(class MonadState)
+import Control.Monad.State.Class (class MonadState)
 
 import Data.Array (length, take, unsafeIndex)
 import Data.Traversable (for_, maximum)
@@ -13,11 +13,11 @@ import Data.Maybe (fromJust)
 import Data.Tuple (fst) 
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Attribute((:=), Attribute)
-import Deku.Core (Domable, class Korok)
+import Deku.Attribute ((:=), Attribute)
+import Deku.Core (Domable)
 import Deku.DOM as D
 
-import FRP.Event (AnEvent, bang, sampleOn)
+import FRP.Event (Event, sampleOnRight)
 
 import Partial.Unsafe (unsafePartial)
 
@@ -171,11 +171,10 @@ problems =
         }
     ]
            
-exo2 :: forall st s m lock payload
-    . Korok s m 
-    => Functor st 
-    => MonadState (Array (Domable m lock payload)) st 
-    => AnEvent m (Rand /\ Boolean) 
+exo2 :: forall st lock payload
+    . Functor st 
+    => MonadState (Array (Domable lock payload)) st 
+    => Event (Rand /\ Boolean) 
     -> st Unit
 exo2 f0 = do  
     openSection_ "Exercice II" "5 points"
@@ -202,12 +201,12 @@ exo2 f0 = do
         
         for_ (toArray longestQuestion $ (pad longestQuestion) <<< (_.q) <$> p) \tupEv -> do
             let f /\ x = toTuple tupEv 
-            put $ D.label (sampleOn x f) []
+            put $ D.label (sampleOnRight x f) []
             
         t_ " :"
         nl
         nl
-        put $ D.div ( bang $ D.Style :=  "display: grid; grid-template-columns: 1fr 1fr 1fr;" )
+        put $ D.div ( pure $ D.Style :=  "display: grid; grid-template-columns: 1fr 1fr 1fr;" )
             [ D.label_ $ fromIncremental $ do 
                 t_ "(a) "
                 m $ (_.a) <$> p         

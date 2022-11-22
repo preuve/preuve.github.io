@@ -12,9 +12,9 @@ import Data.Tuple (fst)
 import Data.Tuple.Nested ((/\), type (/\))
 import Data.Rational (Rational, numerator, denominator, fromInt)
 
-import Deku.Core (Domable, class Korok)
+import Deku.Core (Domable)
 
-import FRP.Event (AnEvent)
+import FRP.Event (Event)
 
 import Partial.Unsafe (unsafePartial)
 
@@ -71,11 +71,10 @@ rshow r =
                     <> show d
                     <> "}"
 
-exo1 :: forall st s m lock payload
-  . Korok s m 
-  => Functor st 
-  => MonadState (Array (Domable m lock payload)) st 
-  => AnEvent m (Rand /\ Boolean) 
+exo1 :: forall st lock payload
+  .  Functor st 
+  => MonadState (Array (Domable lock payload)) st 
+  => Event (Rand /\ Boolean) 
   -> st Unit
 exo1 f0 = do
   openSection_ "Exercice I" "5 points"

@@ -4,17 +4,17 @@ import Prelude
 
 import Article (b_, m, m_, nl, openSection_, put, splits, t', t_, toArray)
 
-import Control.Monad.State.Class(class MonadState)
+import Control.Monad.State.Class (class MonadState)
 
 import Data.Array (length, take, unsafeIndex)
 import Data.FoldableWithIndex (forWithIndex_, foldMapWithIndex)
 import Data.Tuple (fst) 
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Core (Domable, class Korok)
+import Deku.Core (Domable)
 import Deku.DOM as D
 
-import FRP.Event (AnEvent)
+import FRP.Event (Event)
 
 import Partial.Unsafe (unsafePartial)
 
@@ -48,11 +48,10 @@ problems =
         }
     ]
 
-exo3 :: forall st s m lock payload
-    . Korok s m 
-    => Functor st 
-    => MonadState (Array (Domable m lock payload)) st 
-    => AnEvent m (Rand /\ Boolean) 
+exo3 :: forall st lock payload
+    . Functor st 
+    => MonadState (Array (Domable lock payload)) st 
+    => Event (Rand /\ Boolean) 
     -> st Unit
 exo3 f0 = do  
     openSection_ "Exercice III" "5 points"

@@ -3,17 +3,16 @@ module Exercise4 where
 import Prelude
 
 import Article (b_, m_, nl, openSection_, t_)
-import Control.Monad.State.Class(class MonadState)
+import Control.Monad.State.Class (class MonadState)
 import Data.Tuple.Nested (type (/\))
-import Deku.Core (Domable, class Korok)
-import FRP.Event (AnEvent)
+import Deku.Core (Domable)
+import FRP.Event (Event)
 import Rand (Rand)
 
-exo4 :: forall st s m lock payload
-    . Korok s m 
-    => Functor st 
-    => MonadState (Array (Domable m lock payload)) st 
-    => AnEvent m (Rand /\ Boolean) 
+exo4 :: forall st lock payload
+    . Functor st 
+    => MonadState (Array (Domable lock payload)) st 
+    => Event (Rand /\ Boolean) 
     -> st Unit
 exo4 _ = do  
   openSection_ "Exercice IV" "5 points"

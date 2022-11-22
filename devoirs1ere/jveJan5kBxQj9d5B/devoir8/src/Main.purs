@@ -13,13 +13,12 @@ import Data.Ord(abs) as Ord
 import Data.Tuple.Nested ((/\))
 
 import Deku.Attribute ((:=))
-import Deku.Core (Domable, class Korok)
+import Deku.Core (Domable, envy)
 import Deku.Control(text_)
 import Deku.DOM as D
-import Deku.Toplevel (runInBody1, runInBodyA)
+import Deku.Toplevel (runInBody)
 
 import Effect (Effect)
-import FRP.Event (bang)
 import FRP.Event.VBus (V, vbus)
 
 import Exercise1 (exo1)
@@ -31,8 +30,7 @@ import Rand(Rand, rand, consume)
 
 import Type.Proxy (Proxy(..))
 
-type Nuts = forall s m lock payload. Korok s m 
-  => Array (Domable m lock payload)
+type Nuts = forall lock payload. Array (Domable lock payload)
 
 type State = V
   ( textContent :: String
@@ -59,8 +57,8 @@ fromRelative n =
 
 main :: Effect Unit
 main = do
-  runInBodyA header
-  runInBody1 ( vbus (Proxy :: _ State) \push event -> 
+  runInBody (D.div_ header)
+  runInBody ( envy $ vbus (Proxy :: _ State) \push event -> 
    let 
       doc seed enabled = 
         D.div ((if _ then D.Style := "display: block;" else D.Style := "display: none;") <$> enabled) $ 
@@ -80,16 +78,16 @@ main = do
         [ D.div_  
           [ D.label_ [text_ "Enoncé n° "]
           , D.input
-            ( runningText (bang push.textContent) 
-              <|> enterHit (bang push.enabled)
-              <|> oneOfMap bang
+            ( runningText (pure push.textContent) 
+              <|> enterHit (pure push.enabled)
+              <|> oneOfMap pure
                 [ D.Size := "56"
                 , D.Autofocus := ""
                 ]
             )
             []
           ]
-          , doc (toSeed <$> event.textContent) (bang false <|> event.enabled)
+          , doc (toSeed <$> event.textContent) (pure false <|> event.enabled)
         ]
       )
 
@@ -97,7 +95,7 @@ header :: Nuts
 header = fromIncremental $ do
   setTitle_ "Devoir 8 : Produit scalaire / Suites numériques"
   nl
-  put $ D.div (bang $ D.Style := "display: grid; grid-template-columns: 1fr 1fr 1fr;")
+  put $ D.div (pure $ D.Style := "display: grid; grid-template-columns: 1fr 1fr 1fr;")
       [ D.label_ [text_ "Nom:"]
       , D.label_ [text_ "Prénom:"]
       , D.label_ [text_ "Classe:"]
