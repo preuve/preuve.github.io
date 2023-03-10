@@ -5267,7 +5267,7 @@
   var m_2 = /* @__PURE__ */ m_(functorStateT3)(monadStateStateT3);
   var get3 = /* @__PURE__ */ get2(monadStateStateT3);
   var equation_2 = /* @__PURE__ */ equation_(functorStateT3)(monadStateStateT3);
-  var documentation = /* @__PURE__ */ fromIncremental(/* @__PURE__ */ discard3(/* @__PURE__ */ setTitle_("Data.Algebraic.Numberfield")(functorStateT3)(monadStateStateT3))(function() {
+  var documentation = /* @__PURE__ */ fromIncremental(/* @__PURE__ */ discard3(/* @__PURE__ */ setTitle_("Data.Algebraic.NumberField")(functorStateT3)(monadStateStateT3))(function() {
     return discard3(nl2)(function() {
       return discard3(subsubsubsection_("Technical documentation at")(functorStateT3)(monadStateStateT3))(function() {
         return discard3(a_2("https://pursuit.purescript.org/packages/purescript-numberfield")(functorStateT3)(monadStateStateT3))(function() {

@@ -16,7 +16,7 @@ type Nuts = forall lock payload. Array (Domable lock payload)
 
 documentation :: Nuts
 documentation = fromIncremental $ do
-  setTitle_ "Data.Algebraic.Numberfield"
+  setTitle_ "Data.Algebraic.NumberField"
   nl
   subsubsubsection_ "Technical documentation at"
   a_ "https://pursuit.purescript.org/packages/purescript-numberfield"
