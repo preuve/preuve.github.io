@@ -89,6 +89,12 @@ em_ str = put $ D.em_ [text_ str]
 b_ :: String -> Put
 b_ str = put $ D.b_ [text_ str]
 
+a_ :: String -> Put
+a_ str = put $ D.a (pure $ D.Href := str) [text_ str]
+
+pre_ :: String -> Put
+pre_ str = put $ D.pre_ [text_ str]
+
 section_ :: String -> Put
 section_ str = put $ D.h2_ [text_ str]
 
@@ -97,6 +103,9 @@ subsection_ str = put $ D.h3_ [text_ str]
 
 subsubsection_ :: String -> Put
 subsubsection_ str = put $ D.h4_ [text_ str]
+
+subsubsubsection_ :: String -> Put
+subsubsubsection_ str = put $ D.h5_ [text_ str]
 
 openSection_ :: String -> String -> Put
 openSection_ title points =
