@@ -5317,7 +5317,7 @@
                                                                     return discard3(t_2("According to the rupture fields theory, all computations taking place in "))(function() {
                                                                       return discard3(m_2("\\mathbb{Q}(\\alpha)"))(function() {
                                                                         return discard3(t_2(" can be performed in "))(function() {
-                                                                          return discard3(m_2("\\mathbb{Q}[X]\\backslash P_1(X)"))(function() {
+                                                                          return discard3(m_2("\\mathbb{Q}[X]/ P_1(X)"))(function() {
                                                                             return discard3(t_2(" which is, significant fact, a field whereas "))(function() {
                                                                               return discard3(m_2("\\mathbb{Q}[X]"))(function() {
                                                                                 return discard3(t_2(" is only a ring."))(function() {
