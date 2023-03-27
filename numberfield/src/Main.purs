@@ -4,7 +4,7 @@ import Prelude
 
 import Article
   ( fromIncremental, get, nl, t_, m_, put, a_, equation_
-  , setTitle_, subsubsection_, subsubsubsection_, subsection_, pre_, section_)
+  , setTitle_, subsubsubsection_, pre_, section_)
 
 import Deku.Core (Domable)
 import Deku.Control(text_)
@@ -45,7 +45,7 @@ documentation = fromIncremental $ do
       <> "\n\n> import Data.Algebraic.NumberField" 
       <> "\n> import Data.Ratio (Ratio, (%))"
       <> "\n> import Data.Reflectable (reifyType)"
-      <> "\n> import Data.Sparse.Polynomial ((^), display)"
+      <> "\n> import Data.Sparse.Polynomial ((^), display, factor)"
       <> "\n> import JS.BigInt (BigInt, fromInt)"
 
   put $ D.h3_ (fromIncremental $ do
@@ -69,12 +69,21 @@ documentation = fromIncremental $ do
   t_ "So, the minimal polynomial of "
   m_ "\\alpha"
   t_ " is"
-  equation_ "P_1(X) = X^2-X-1."
+  equation_ "P_1(X) = X^2-X-1"
+  t_ "since this expression is irreductible in "
+  m_ "\\mathbb{Q}"
+  t_ " (see below.)"
+  nl
+  nl
   t_ "According to the rupture fields theory, all computations taking place in "
   m_ "\\mathbb{Q}(\\alpha)"
   t_ " can be performed in "
-  m_ "\\mathbb{Q}[X]\\backslash P_1(X)"
-  t_ " which is, significant fact, a field whereas "
+  m_ "\\mathbb{Q}[X]/ P_1(X)"
+  t_ " which is, significant fact, a field "
+  m_ "-"
+  t_ " like "
+  m_ "\\mathbb{Q} \\, -"
+  t_ " whereas "
   m_ "\\mathbb{Q}[X]"
   t_ " is only a ring."
   nl
@@ -212,6 +221,51 @@ documentation = fromIncremental $ do
       <> "\n\"((1 % 3)×sr3+(-1 % 3))×cr2^2+(1 % 3)×cr2+(-1 % 3)×sr3+2 % 3\""
   t_ "the expression we're looking for is"
   equation_ "\\frac{1}{3}\\sqrt{3}\\sqrt[3]{4}-\\frac{1}{3}\\sqrt[3]{4}+\\frac{1}{3}\\sqrt[3]{2}-\\frac{1}{ 3}\\sqrt{3}+\\frac{2}{3}."
+  put $ D.h3_ (fromIncremental $ do
+      t_ "Troubleshooting (is "
+      m_ "P"
+      t_ " minimal ?)"
+      get)
+  t_ $ "Given an algebraic expression, it is sometimes harder than it seems to choose the minimal "
+    <> "polynomial for it."
+  nl
+  t_ "For instance, with"
+  equation_ "\\alpha=\\sqrt{7+\\sqrt{24}}"
+  t_ "we can derive"
+  equation_ "(\\alpha^2-7)^2=24"
+  t_ "and"
+  equation_ "\\alpha^4-14\\alpha^2+49=24"
+  t_ "However, if we choose"
+  equation_ "\\tilde{P}(X)=X^4-14X^2+25"
+  t_ "as the minimal polynomial, we can't get the right answer for "
+  m_ "\\alpha^3-9\\alpha" 
+  t_ " (which is "
+  m_ "10"
+  t_ ", but we don't know it yet.)"
+  nl
+  t_ $ "The reason of this issue is due to required irreductibility of "
+    <> "the minimal polynomial, but that's not the case for "
+  m_ "\\tilde{P}"
+  t_ $ " by looking at the result of the `factor` function which displays some non-trivial "
+    <> " factors of "
+  m_ "\\tilde{P}"
+  t_ ":"
+  pre_ $ "> frac n = fromInt n % fromInt 1"
+      <> "\n> ptilde = frac 1^4 - frac 14^2 + frac 25^0"
+      <> "\n>"
+      <> "\n> factor ptilde"
+      <> "\n[(-1 % 1)×x^2+(-2 % 1)×x+5 % 1,(-1 % 1)×x^2+(2 % 1)×x+5 % 1,(1 % 1)×x^2+(2 % 1)×x+(-5 % 1),(1 % 1)×x^2+(-2 % 1)×x+(-5 % 1)]"
+  t_ "Incidentally, each of these factors can be chosen as a minimal polynomial for "
+  m_ "\\alpha"
+  t_ ". Let's choose the last one, and check that it satisfies "
+  m_ "\\alpha"
+  t_ "'s definition:"
+  pre_ $ "> display [\"a\"] $ run $ reifyType (framework (frac 1 ^ 0) [one ^ 2 - frac 2 ^ 1 - frac 5 ^ 0]) (build ((const $ let a = element (frac 1 ^ 1) in let kst n = element (frac n ^ 0) in (a*a-kst 7)*(a*a-kst 7)) :: forall f. Expression f _))"
+      <> "\n\"24 % 1\""
+  t_ "Now, the framework is coherent:"
+  pre_ $ "> display [\"a\"] $ run $ reifyType (framework (frac 1 ^ 0) [one ^ 2 - frac 2 ^ 1 - frac 5 ^ 0]) (build ((const $ let a = element (frac 1 ^ 1) in let kst n = element (frac n ^ 0) in a*a*a -kst 9 *a) :: forall f. Expression f _))"
+      <> "\n\"10 % 1\""
+  
   get
 
 main :: Effect Unit
