@@ -11,7 +11,7 @@ import Data.Symbol (class IsSymbol)
 import Data.Tuple.Nested ((/\))
 import Deku.Attribute (Attribute, cb, (:=))
 import Deku.Control (text, text_)
-import Deku.Core (Domable)
+import Deku.Core (Nut)
 import Deku.Hooks (useState)
 import Deku.Do as Deku
 import Deku.DOM as D
@@ -102,19 +102,19 @@ selectedIndexChange = map \push -> D.OnChange := cb \e -> for_
   (target e >>= fromEventTarget)
   (selectedIndex >=> push)
 
-numericInput :: forall tl key lock payload. 
+numericInput :: forall tl key. 
   IsSymbol key 
   => Cons key Number tl RowState 
   => String -> String -> String 
   -> Int -> (State -> Effect Unit) -> Event State 
-  -> Proxy key -> Array (Domable lock payload)
+  -> Proxy key -> Array Nut
 numericInput title unity short precision setter getter proxy =
   [ D.p_ [text_ title]
     , D.input
-        (textInput $ 
+        [textInput $ 
           ( \st -> setter <<< flip (set proxy) st <<< fromMaybe 0.0 <<< fromString
           ) <$> getter
-        )
+        ]
         []
     , D.div_
         [ text $
@@ -138,14 +138,14 @@ main = runInBody Deku.do
     <>
     [ D.p_ [ text_ "Fréquence des remboursements: "]
     , D.select 
-      ( selectedIndexChange $ 
+      [ selectedIndexChange $ 
         ( \st -> setter <<< st { frequency = _ } 
             <<< (\n -> case (frequencies !! n) of
                             Just f -> f
                             Nothing -> Yearly
                 )
         ) <$> getter
-      )
+      ]
       (
         ( \freq -> D.option_ [text_ $ show freq]
         ) <$> frequencies
