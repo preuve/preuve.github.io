@@ -74,21 +74,17 @@ main = do
           [ D.div_  
             [ D.label_ [text_ "Enoncé n° "]
             , D.input
-              [ textInput
-                (
+              [ textInput $
                   ( (setState <<< _) <<< flip 
                       (set (Proxy :: _ "textContent")
                       )
                   ) <$> state
-                )
-              , keyDown 
-                (
+              , keyDown $
                   ( (setState <<< _) <<< flip 
                       (set (Proxy :: _ "enabled") 
                         <<< (\key -> code key == "Enter")
                       )
                   ) <$> state
-                )
               , D.Size !:= "56"
               , D.Autofocus !:= ""
               ]

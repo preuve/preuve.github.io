@@ -7021,6 +7021,11 @@
   var bind6 = /* @__PURE__ */ bind(bindMaybe);
   var composeKleisli3 = /* @__PURE__ */ composeKleisli(bindEffect);
   var append13 = /* @__PURE__ */ append(semigroupArray);
+  var set3 = /* @__PURE__ */ set({
+    reflectSymbol: function() {
+      return "frequency";
+    }
+  })()();
   var map18 = /* @__PURE__ */ map(functorArray);
   var Daily = /* @__PURE__ */ function() {
     function Daily2() {
@@ -7107,7 +7112,7 @@
     }));
   });
   var numericInput = function(dictIsSymbol) {
-    var set3 = set(dictIsSymbol)()();
+    var set1 = set(dictIsSymbol)()();
     var get3 = get(dictIsSymbol)();
     return function() {
       return function(title3) {
@@ -7117,21 +7122,30 @@
               return function(setter) {
                 return function(getter) {
                   return function(proxy) {
-                    return [p_([text_(title3)]), input([textInput(map17(function(st) {
-                      var $51 = flip(set3(proxy))(st);
-                      var $52 = fromMaybe(0);
-                      return function($53) {
-                        return setter($51($52(fromString($53))));
-                      };
-                    })(getter))])([]), div_([text(map17(function() {
-                      var $54 = toStringWith(fixed(precision));
-                      var $55 = get3(proxy);
+                    return [p_([text_(title3)]), input([textInput(map17(function() {
+                      var $55 = flip(function() {
+                        var $57 = set1(proxy);
+                        var $58 = fromMaybe(0);
+                        return function($59) {
+                          return $57($58(fromString($59)));
+                        };
+                      }());
                       return function($56) {
+                        return function(v) {
+                          return function($60) {
+                            return setter(v($60));
+                          };
+                        }($55($56));
+                      };
+                    }())(getter))])([]), div_([text(map17(function() {
+                      var $61 = toStringWith(fixed(precision));
+                      var $62 = get3(proxy);
+                      return function($63) {
                         return function(v) {
                           return v + unity;
                         }(function(v) {
                           return $$short + v;
-                        }($54($55($56))));
+                        }($61($62($63))));
                       };
                     }())(getter))])];
                   };
@@ -7208,36 +7222,39 @@
     return annuity(s2) / nbOfAnnuities(s2);
   };
   var main2 = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialState))(function(v) {
-    return div_(append13(numericInput1("Montant du pr\xEAt (en euros)")(" \u20AC")("Montant: ")(2)(v.value0)(v.value1)($$Proxy.value))(append13(numericInput2("Taux annuel (en %)")(" %")("Taux: ")(2)(v.value0)(v.value1)($$Proxy.value))(append13(numericInput3("Dur\xE9e (en ann\xE9es)")(" ans")("Dur\xE9e: ")(0)(v.value0)(v.value1)($$Proxy.value))([p_([text_("Fr\xE9quence des remboursements: ")]), select([selectedIndexChange(map17(function(st) {
-      return function($57) {
-        return v.value0(function(v1) {
-          return {
-            frequency: v1,
-            capital: st.capital,
-            duration: st.duration,
-            taux: st.taux
+    return div_(append13(numericInput1("Montant du pr\xEAt (en euros)")(" \u20AC")("Montant: ")(2)(v.value0)(v.value1)($$Proxy.value))(append13(numericInput2("Taux annuel (en %)")(" %")("Taux: ")(2)(v.value0)(v.value1)($$Proxy.value))(append13(numericInput3("Dur\xE9e (en ann\xE9es)")(" ans")("Dur\xE9e: ")(0)(v.value0)(v.value1)($$Proxy.value))([p_([text_("Fr\xE9quence des remboursements: ")]), select([selectedIndexChange(map17(function() {
+      var $64 = flip(function() {
+        var $66 = set3($$Proxy.value);
+        return function($67) {
+          return $66(function(n) {
+            var v1 = index(frequencies)(n);
+            if (v1 instanceof Just) {
+              return v1.value0;
+            }
+            ;
+            if (v1 instanceof Nothing) {
+              return Yearly.value;
+            }
+            ;
+            throw new Error("Failed pattern match at Main (line 148, column 24 - line 150, column 46): " + [v1.constructor.name]);
+          }($67));
+        };
+      }());
+      return function($65) {
+        return function(v1) {
+          return function($68) {
+            return v.value0(v1($68));
           };
-        }(function(n) {
-          var v1 = index(frequencies)(n);
-          if (v1 instanceof Just) {
-            return v1.value0;
-          }
-          ;
-          if (v1 instanceof Nothing) {
-            return Yearly.value;
-          }
-          ;
-          throw new Error("Failed pattern match at Main (line 143, column 24 - line 145, column 46): " + [v1.constructor.name]);
-        }($57)));
+        }($64($65));
       };
-    })(v.value1))])(map18(function(freq) {
+    }())(v.value1))])(map18(function(freq) {
       return option_([text_(show3(freq))]);
-    })(frequencies)), div_([text(map17(function($58) {
+    })(frequencies)), div_([text(map17(function($69) {
       return function(v1) {
         return "Fr\xE9quence: " + v1;
       }(show3(function(v1) {
         return v1.frequency;
-      }($58)));
+      }($69)));
     })(v.value1))]), h3_([text(map17(function(st) {
       return "Dans ces conditions, pour rembourser le pr\xEAt de " + (toStringWith(fixed(2))(st.capital) + ("\u20AC, il faudra effectuer un versement de " + (toStringWith(fixed(2))(debit(st)) + (" \u20AC" + (" " + (show3(st.frequency) + (" pendant " + (toStringWith(fixed(0))(st.duration) + " ans."))))))));
     })(v.value1))]), br_([]), h3_([text(map17(function(st) {

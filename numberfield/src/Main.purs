@@ -6,15 +6,13 @@ import Article
   ( fromIncremental, get, nl, t_, m_, put, a_, equation_
   , setTitle_, subsubsubsection_, pre_, section_)
 
-import Deku.Core (Domable)
+import Deku.Core (Nut)
 import Deku.Control(text_)
 import Deku.DOM as D
 import Deku.Toplevel (runInBody)
 import Effect (Effect)
 
-type Nuts = forall lock payload. Array (Domable lock payload)
-
-documentation :: Nuts
+documentation :: Array Nut
 documentation = fromIncremental $ do
   setTitle_ "Data.Algebraic.NumberField"
   nl

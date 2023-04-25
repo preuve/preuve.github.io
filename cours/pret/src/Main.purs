@@ -112,7 +112,9 @@ numericInput title unity short precision setter getter proxy =
   [ D.p_ [text_ title]
     , D.input
         [textInput $ 
-          ( \st -> setter <<< flip (set proxy) st <<< fromMaybe 0.0 <<< fromString
+          ( (setter <<< _) <<< flip 
+              ( set proxy <<< fromMaybe 0.0 <<< fromString
+              )
           ) <$> getter
         ]
         []
@@ -139,11 +141,13 @@ main = runInBody Deku.do
     [ D.p_ [ text_ "Fréquence des remboursements: "]
     , D.select 
       [ selectedIndexChange $ 
-        ( \st -> setter <<< st { frequency = _ } 
-            <<< (\n -> case (frequencies !! n) of
+        ( (setter <<< _) <<< flip
+            ( set (Proxy :: _ "frequency")
+                <<< (\n -> case (frequencies !! n) of
                             Just f -> f
                             Nothing -> Yearly
-                )
+                    )
+            )
         ) <$> getter
       ]
       (
