@@ -13,11 +13,10 @@
   , "partial"
   , "prelude"
   , "rationals"
+  , "record"
   , "transformers"
   , "tuples"
   , "web-dom"
-  , "web-events"
-  , "web-html"
   , "web-uievents"
   ]
 , packages = ./packages.dhall

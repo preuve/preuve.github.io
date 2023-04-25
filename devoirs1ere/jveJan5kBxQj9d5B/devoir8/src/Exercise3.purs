@@ -11,7 +11,7 @@ import Data.FoldableWithIndex (forWithIndex_, foldMapWithIndex)
 import Data.Tuple (fst) 
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Core (Domable)
+import Deku.Core (Nut)
 import Deku.DOM as D
 
 import FRP.Event (Event)
@@ -48,11 +48,10 @@ problems =
         }
     ]
 
-exo3 :: forall st lock payload
-    . Functor st 
-    => MonadState (Array (Domable lock payload)) st 
-    => Event (Rand /\ Boolean) 
-    -> st Unit
+exo3 :: forall st.  
+  Functor st =>
+  MonadState (Array Nut) st =>
+  Event (Rand /\ Boolean) -> st Unit
 exo3 f0 = do  
     openSection_ "Exercice III" "5 points"
   
@@ -79,13 +78,13 @@ exo3 f0 = do
         nl
     )
 
-    put $ D.label ((\ ((_r /\ m) /\ arr) -> t' $
+    put $ D.label [(\ ((_r /\ m) /\ arr) -> t' $
         if m 
            then "réponses: " <> foldMapWithIndex (\i p ->
                 " " <> show (i+1)
                     <> ") "
                     <> p.answer)  arr
            else ""
-        ) <$> (identity /\ chosen_event) `splits` f0) []
+        ) <$> (identity /\ chosen_event) `splits` f0] []
         
 

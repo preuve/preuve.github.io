@@ -13,8 +13,8 @@ import Data.Maybe (fromJust)
 import Data.Tuple (fst) 
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Attribute ((:=), Attribute)
-import Deku.Core (Domable)
+import Deku.Attribute ((!:=), Attribute)
+import Deku.Core (Nut)
 import Deku.DOM as D
 
 import FRP.Event (Event, sampleOnRight)
@@ -171,11 +171,10 @@ problems =
         }
     ]
            
-exo2 :: forall st lock payload
-    . Functor st 
-    => MonadState (Array (Domable lock payload)) st 
-    => Event (Rand /\ Boolean) 
-    -> st Unit
+exo2 :: forall st.  
+  Functor st =>
+  MonadState (Array Nut) st =>
+  Event (Rand /\ Boolean) -> st Unit
 exo2 f0 = do  
     openSection_ "Exercice II" "5 points"
         
@@ -201,12 +200,12 @@ exo2 f0 = do
         
         for_ (toArray longestQuestion $ (pad longestQuestion) <<< (_.q) <$> p) \tupEv -> do
             let f /\ x = toTuple tupEv 
-            put $ D.label (sampleOnRight x f) []
+            put $ D.label [sampleOnRight x f] []
             
         t_ " :"
         nl
         nl
-        put $ D.div ( pure $ D.Style :=  "display: grid; grid-template-columns: 1fr 1fr 1fr;" )
+        put $ D.div [D.Style !:=  "display: grid; grid-template-columns: 1fr 1fr 1fr;"]
             [ D.label_ $ fromIncremental $ do 
                 t_ "(a) "
                 m $ (_.a) <$> p         
@@ -224,9 +223,9 @@ exo2 f0 = do
         nl
     )
                                
-    put $ D.label ((\ ((_r /\ m) /\ arr) -> t' $
+    put $ D.label [(\ ((_r /\ m) /\ arr) -> t' $
         if m 
            then "réponses: " <> foldMapWithIndex (\i a -> " " <> show (i+1) <> ") ("<> a.r <> ")") arr
            else ""
-        ) <$> (identity /\ chosen_event) `splits` f0) []
+        ) <$> (identity /\ chosen_event) `splits` f0] []
     

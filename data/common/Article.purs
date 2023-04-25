@@ -2,35 +2,29 @@ module Article where
 
 import Prelude
 
-import Control.Monad.State(State, runState)
-import Control.Monad.State.Class(class MonadState, modify)
-import Control.Monad.State.Class(get) as Control
+import Control.Monad.State (State, runState)
+import Control.Monad.State.Class (class MonadState, modify)
+import Control.Monad.State.Class (get) as Control
 
 import Data.Array (snoc, (:), elemIndex, (..), length, unsafeIndex)
-import Data.Foldable (for_, foldr)
+import Data.Foldable (foldr)
 import Data.Geometry.Plane (Point, point, segment, vector, scale, (<+|), cosAngle, middle, abs, ord, normalTo, normalized)
-import Data.Int(round)
-import Data.Maybe(Maybe(..), fromJust)
+import Data.Int (round)
+import Data.Maybe (Maybe(..), fromJust)
 import Data.Number (acos, pi, isNaN, fromString)
 import Data.Tuple (fst, snd)
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Attribute (cb, (:=), unsafeAttribute, prop', Attribute)
-import Deku.Control(text_)
-import Deku.Core (Domable)
+import Deku.Attribute ((:=), (!:=), unsafeAttribute, prop', Attribute)
+import Deku.Control (text_)
+import Deku.Core (Nut)
 import Deku.DOM as D
-
-import Effect(Effect)
 
 import FRP.Event (Event)
 
 import KaTeX (render, display, textMode) as KaTeX
 
-import Partial.Unsafe(unsafePartial)
-
-import Web.Event.Event (target)
-import Web.HTML.HTMLInputElement (fromEventTarget, value)
-import Web.UIEvent.KeyboardEvent (fromEvent, code)
+import Partial.Unsafe (unsafePartial)
 
 get :: forall m s. MonadState s m => m s
 get = Control.get
@@ -39,22 +33,23 @@ put :: forall a st. Functor st => MonadState (Array a) st => a -> st Unit
 put x = void $ modify (flip snoc x)
 
 fromIncremental :: forall a. State (Array a) (Array a) -> Array a
-fromIncremental seq = fst $ runState seq []
+fromIncremental seq = fst $ 
+  runState seq []
 
-type Put = forall st lock payload. Functor st 
-  => MonadState (Array (Domable lock payload)) st 
+type Put = forall st. Functor st 
+  => MonadState (Array Nut) st 
   => st Unit
     
-type PutString =  forall st lock payload. Functor st 
-  => MonadState (Array (Domable lock payload)) st => String -> st Unit
+type PutString =  forall st. Functor st 
+  => MonadState (Array Nut) st => String -> st Unit
 
-type PutEvent = forall st lock payload. Functor st => MonadState (Array (Domable lock payload)) st => Event String -> st Unit
+type PutEvent = forall st. Functor st => MonadState (Array Nut) st => Event String -> st Unit
   
 m' :: forall t. String -> Attribute t
 m' = \txt -> D.Self := KaTeX.render txt
   
 m :: PutEvent
-m str = put $ D.label (m' <$> str) []
+m str = put $ D.label [m' <$> str] []
 
 m_ :: PutString
 m_ str = m $ pure str
@@ -63,7 +58,7 @@ t' :: forall t. String -> Attribute t
 t' txt = D.Self := KaTeX.textMode txt
 
 t :: PutEvent
-t str = put $ D.label (t' <$> str) []
+t str = put $ D.label [t' <$> str] []
 
 t_ :: PutString
 t_ str = t $ pure str
@@ -78,7 +73,7 @@ setTitle_ :: String -> Put
 setTitle_ str = put $ D.h1_ [text_ str]
 
 equation :: PutEvent
-equation str = put $ D.label ((\txt -> D.Self := KaTeX.display txt) <$> str) []
+equation str = put $ D.label [(\txt -> D.Self := KaTeX.display txt) <$> str] []
 
 equation_ :: PutString
 equation_ str = equation $ pure str
@@ -90,7 +85,7 @@ b_ :: String -> Put
 b_ str = put $ D.b_ [text_ str]
 
 a_ :: String -> Put
-a_ str = put $ D.a (pure $ D.Href := str) [text_ str]
+a_ str = put $ D.a [D.Href !:= str] [text_ str]
 
 pre_ :: String -> Put
 pre_ str = put $ D.pre_ [text_ str]
@@ -110,9 +105,9 @@ subsubsubsection_ str = put $ D.h5_ [text_ str]
 openSection_ :: String -> String -> Put
 openSection_ title points =
   put $ D.div_ 
-    [ D.div (pure $ D.Style := "margin: 0; display: flex; justify-content: space-between")
-        [ D.label (pure $ D.Style := "font-size: 24px; font-weight: 700;")  [text_ title]
-        , D.label (pure $ D.Style := "font-size: 16px; font-weight: 700;") [text_ points]
+    [ D.div [D.Style !:= "margin: 0; display: flex; justify-content: space-between"]
+        [ D.label [D.Style !:= "font-size: 24px; font-weight: 700;"]  [text_ title]
+        , D.label [D.Style !:= "font-size: 16px; font-weight: 700;"] [text_ points]
         ]
     , D.hr_ []
     ]
@@ -165,34 +160,3 @@ toSeed :: String -> Int
 toSeed txt = case validateInput (Just txt) of
     Just n -> n
     _      -> 0
-
-runningText
-  :: forall ev
-   . Functor ev
-  => ev (String -> Effect Unit)
-  -> ev (Attribute D.Input_)
-runningText = map
-  ( \push ->
-      D.OnInput := cb \e -> for_
-        ( target e
-            >>= fromEventTarget
-        )
-        ( value
-            >=> push
-        )
-  )
-
-
-enterHit
-  :: forall ev
-   . Functor ev
-  => ev (Boolean -> Effect Unit)
-  -> ev (Attribute D.Input_)
-enterHit = map
-  ( \push ->
-      D.OnKeyup := cb \e -> for_
-        (fromEvent e) \kevt -> do
-      push false
-      when (code kevt == "Enter") $ do 
-        push true
-  )
