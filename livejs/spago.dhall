@@ -12,6 +12,7 @@ You can edit this file as you like.
   , "integers"
   , "prelude"
   , "tuples"
+  , "web-events"
   , "web-uievents"
   ]
 , packages = ./packages.dhall

@@ -21,8 +21,8 @@ import Graphics.Canvas
     , setStrokeStyle
     , strokePath
     )
+import Web.Event.Event (preventDefault)
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
-
 
 initialPos = { x: 0.0, y: 0.0 } :: { x :: Number, y :: Number }
 
@@ -76,6 +76,7 @@ main = do
                                     moveTo ctx lastX lastY
                                     lineTo ctx x y
                                     closePath ctx
+                    preventDefault e
                     ) <$> pos            
                 ]
                 []

@@ -6806,6 +6806,13 @@
     return getCanvasElementByIdImpl(elId, Just.create, Nothing.value);
   };
 
+  // output/Web.Event.Event/foreign.js
+  function preventDefault(e) {
+    return function() {
+      return e.preventDefault();
+    };
+  }
+
   // output/Web.UIEvent.MouseEvent/foreign.js
   function clientX(e) {
     return e.clientX;
@@ -6866,29 +6873,32 @@
       }));
     })(v.value1), map10(function(p) {
       return attr1(OnTouchmove.value)(cb(function(e) {
-        return for_4(fromEvent(e))(function(me) {
-          var y = toNumber(clientY(me));
-          var x = toNumber(clientX(me));
-          return function __do2() {
-            v.value0({
-              x,
-              y
-            })();
-            var melem = getCanvasElementById("LiveCanvas")();
-            return for_4(melem)(function(elem3) {
-              return function __do3() {
-                var ctx = getContext2D(elem3)();
-                setStrokeStyle(ctx)("#00000077")();
-                setLineWidth(ctx)(12)();
-                return strokePath(ctx)(function __do4() {
-                  moveTo2(ctx)(p.x)(p.y)();
-                  lineTo(ctx)(x)(y)();
-                  return closePath(ctx)();
-                })();
-              };
-            })();
-          };
-        });
+        return function __do2() {
+          for_4(fromEvent(e))(function(me) {
+            var y = toNumber(clientY(me));
+            var x = toNumber(clientX(me));
+            return function __do3() {
+              v.value0({
+                x,
+                y
+              })();
+              var melem = getCanvasElementById("LiveCanvas")();
+              return for_4(melem)(function(elem3) {
+                return function __do4() {
+                  var ctx = getContext2D(elem3)();
+                  setStrokeStyle(ctx)("#00000077")();
+                  setLineWidth(ctx)(12)();
+                  return strokePath(ctx)(function __do5() {
+                    moveTo2(ctx)(p.x)(p.y)();
+                    lineTo(ctx)(x)(y)();
+                    return closePath(ctx)();
+                  })();
+                };
+              })();
+            };
+          })();
+          return preventDefault(e)();
+        };
       }));
     })(v.value1)])([])]);
   }));
