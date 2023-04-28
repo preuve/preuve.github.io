@@ -6813,11 +6813,39 @@
     };
   }
 
+  // output/Web.TouchEvent.Touch/foreign.js
+  function clientX(t) {
+    return t.clientX;
+  }
+  function clientY(t) {
+    return t.clientY;
+  }
+
+  // output/Web.TouchEvent.TouchEvent/foreign.js
+  function touches(e) {
+    return e.touches;
+  }
+
+  // output/Web.TouchEvent.TouchEvent/index.js
+  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("TouchEvent");
+
+  // output/Web.TouchEvent.TouchList/foreign.js
+  function _item(i, l) {
+    return l.item(i);
+  }
+
+  // output/Web.TouchEvent.TouchList/index.js
+  var item = function(i) {
+    return function(l) {
+      return toMaybe(_item(i, l));
+    };
+  };
+
   // output/Web.UIEvent.MouseEvent/foreign.js
-  function clientX(e) {
+  function clientX2(e) {
     return e.clientX;
   }
-  function clientY(e) {
+  function clientY2(e) {
     return e.clientY;
   }
   function buttons(e) {
@@ -6825,7 +6853,7 @@
   }
 
   // output/Web.UIEvent.MouseEvent/index.js
-  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("MouseEvent");
+  var fromEvent2 = /* @__PURE__ */ unsafeReadProtoTagged("MouseEvent");
 
   // output/Main/index.js
   var pureAttr2 = /* @__PURE__ */ pureAttr(attrCanvas_WidthString);
@@ -6842,9 +6870,9 @@
   var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
     return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
       return attr2(OnMousemove.value)(cb(function(e) {
-        return for_4(fromEvent(e))(function(me) {
-          var y = toNumber(clientY(me));
-          var x = toNumber(clientX(me));
+        return for_4(fromEvent2(e))(function(me) {
+          var y = toNumber(clientY2(me));
+          var x = toNumber(clientX2(me));
           return function __do2() {
             v.value0({
               x,
@@ -6875,27 +6903,29 @@
       return attr1(OnTouchmove.value)(cb(function(e) {
         return function __do2() {
           for_4(fromEvent(e))(function(me) {
-            var y = toNumber(clientY(me));
-            var x = toNumber(clientX(me));
-            return function __do3() {
-              v.value0({
-                x,
-                y
-              })();
-              var melem = getCanvasElementById("LiveCanvas")();
-              return for_4(melem)(function(elem3) {
-                return function __do4() {
-                  var ctx = getContext2D(elem3)();
-                  setStrokeStyle(ctx)("#00000077")();
-                  setLineWidth(ctx)(12)();
-                  return strokePath(ctx)(function __do5() {
-                    moveTo2(ctx)(p.x)(p.y)();
-                    lineTo(ctx)(x)(y)();
-                    return closePath(ctx)();
-                  })();
-                };
-              })();
-            };
+            return for_4(item(0)(touches(me)))(function(t) {
+              var y = toNumber(clientY(t));
+              var x = toNumber(clientX(t));
+              return function __do3() {
+                v.value0({
+                  x,
+                  y
+                })();
+                var melem = getCanvasElementById("LiveCanvas")();
+                return for_4(melem)(function(elem3) {
+                  return function __do4() {
+                    var ctx = getContext2D(elem3)();
+                    setStrokeStyle(ctx)("#00000077")();
+                    setLineWidth(ctx)(12)();
+                    return strokePath(ctx)(function __do5() {
+                      moveTo2(ctx)(p.x)(p.y)();
+                      lineTo(ctx)(x)(y)();
+                      return closePath(ctx)();
+                    })();
+                  };
+                })();
+              };
+            });
           })();
           return preventDefault(e)();
         };

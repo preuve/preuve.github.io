@@ -22,6 +22,9 @@ import Graphics.Canvas
     , strokePath
     )
 import Web.Event.Event (preventDefault)
+import Web.TouchEvent.Touch (clientX, clientY) as Touch
+import Web.TouchEvent.TouchEvent (fromEvent, touches) as Touch
+import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
 initialPos = { x: 0.0, y: 0.0 } :: { x :: Number, y :: Number }
@@ -58,24 +61,26 @@ main = do
                                     else pure unit
                     ) <$> pos            
                 , (\p -> D.OnTouchmove := cb \e -> do
-                    for_ (fromEvent e)
-                        \me -> do
-                            let lastX = p.x
-                                lastY = p.y
-                                x = toNumber $ clientX me
-                                y = toNumber $ clientY me
-                            setPos { x, y }
-                            melem <- getCanvasElementById "LiveCanvas"
-                            for_ melem \elem -> do
-                                ctx <- getContext2D elem 
-                                setStrokeStyle ctx "#00000077"
-                                
-                                setLineWidth ctx 12.0
-                                
-                                strokePath ctx $ do
-                                    moveTo ctx lastX lastY
-                                    lineTo ctx x y
-                                    closePath ctx
+                    for_ (Touch.fromEvent e)
+                        \me -> 
+                            for_ (Touch.item 0 (Touch.touches me))
+                                \t -> do
+                                    let lastX = p.x
+                                        lastY = p.y
+                                        x = toNumber $ Touch.clientX t
+                                        y = toNumber $ Touch.clientY t
+                                    setPos { x, y }
+                                    melem <- getCanvasElementById "LiveCanvas"
+                                    for_ melem \elem -> do
+                                        ctx <- getContext2D elem 
+                                        setStrokeStyle ctx "#00000077"
+                                        
+                                        setLineWidth ctx 12.0
+                                        
+                                        strokePath ctx $ do
+                                            moveTo ctx lastX lastY
+                                            lineTo ctx x y
+                                            closePath ctx
                     preventDefault e
                     ) <$> pos            
                 ]

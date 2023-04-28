@@ -13,6 +13,7 @@ You can edit this file as you like.
   , "prelude"
   , "tuples"
   , "web-events"
+  , "web-touchevents"
   , "web-uievents"
   ]
 , packages = ./packages.dhall
