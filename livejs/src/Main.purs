@@ -23,7 +23,7 @@ import Graphics.Canvas
     )
 import Web.Event.Event (preventDefault)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
-import Web.TouchEvent.TouchEvent (fromEvent, touches) as Touch
+import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
 import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
@@ -60,11 +60,20 @@ main = do
                                         closePath ctx
                                     else pure unit
                     ) <$> pos
-                , D.OnTouchstart !:= cb \e -> preventDefault e
+                , (\p -> D.OnTouchstart := cb \e -> do
+                    for_ (Touch.fromEvent e)
+                        \me -> 
+                            for_ (Touch.item 0 (Touch.changedTouches me))
+                                \t -> do
+                                    let x = toNumber $ Touch.clientX t
+                                        y = toNumber $ Touch.clientY t
+                                    setPos { x, y }
+                    preventDefault e
+                    ) <$> pos            
                 , (\p -> D.OnTouchmove := cb \e -> do
                     for_ (Touch.fromEvent e)
                         \me -> 
-                            for_ (Touch.item 0 (Touch.touches me))
+                            for_ (Touch.item 0 (Touch.changedTouches me))
                                 \t -> do
                                     let lastX = p.x
                                         lastY = p.y

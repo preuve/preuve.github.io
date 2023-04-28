@@ -6841,8 +6841,8 @@
   }
 
   // output/Web.TouchEvent.TouchEvent/foreign.js
-  function touches(e) {
-    return e.touches;
+  function changedTouches(e) {
+    return e.changedTouches;
   }
 
   // output/Web.TouchEvent.TouchEvent/index.js
@@ -6881,8 +6881,8 @@
   var map10 = /* @__PURE__ */ map(functorEvent);
   var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
-  var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnTouchstartCb);
-  var attr1 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
+  var attr1 = /* @__PURE__ */ attr(attrOnTouchstartCb);
+  var attr22 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
   var initialPos = {
     x: 0,
     y: 0
@@ -6919,13 +6919,27 @@
           };
         });
       }));
-    })(v.value1), pureAttr3(OnTouchstart.value)(cb(function(e) {
-      return preventDefault(e);
-    })), map10(function(p) {
-      return attr1(OnTouchmove.value)(cb(function(e) {
+    })(v.value1), map10(function(p) {
+      return attr1(OnTouchstart.value)(cb(function(e) {
         return function __do2() {
           for_4(fromEvent(e))(function(me) {
-            return for_4(item(0)(touches(me)))(function(t) {
+            return for_4(item(0)(changedTouches(me)))(function(t) {
+              var y = toNumber(clientY(t));
+              var x = toNumber(clientX(t));
+              return v.value0({
+                x,
+                y
+              });
+            });
+          })();
+          return preventDefault(e)();
+        };
+      }));
+    })(v.value1), map10(function(p) {
+      return attr22(OnTouchmove.value)(cb(function(e) {
+        return function __do2() {
+          for_4(fromEvent(e))(function(me) {
+            return for_4(item(0)(changedTouches(me)))(function(t) {
               var y = toNumber(clientY(t));
               var x = toNumber(clientX(t));
               return function __do3() {
