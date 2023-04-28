@@ -4,14 +4,20 @@ You can edit this file as you like.
 -}
 { name = "my-project"
 , dependencies =
-  [ "behaviors"
-  , "canvas"
+  [ "canvas"
   , "colors"
   , "console"
-  , "debug"
-  , "drawing"
+  , "control"
+  , "deku"
   , "effect"
-  , "psci-support"
+  , "foldable-traversable"
+  , "integers"
+  , "lists"
+  , "maybe"
+  , "numbers"
+  , "prelude"
+  , "tuples"
+  , "web-uievents"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
