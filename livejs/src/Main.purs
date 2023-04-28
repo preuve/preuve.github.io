@@ -59,7 +59,8 @@ main = do
                                         lineTo ctx x y
                                         closePath ctx
                                     else pure unit
-                    ) <$> pos            
+                    ) <$> pos
+                , D.OnTouchstart !:= cb \e -> preventDefault e
                 , (\p -> D.OnTouchmove := cb \e -> do
                     for_ (Touch.fromEvent e)
                         \me -> 

@@ -3536,6 +3536,25 @@
     }
   };
 
+  // output/Deku.DOM.Attr.OnTouchstart/index.js
+  var OnTouchstart = /* @__PURE__ */ function() {
+    function OnTouchstart2() {
+    }
+    ;
+    OnTouchstart2.value = new OnTouchstart2();
+    return OnTouchstart2;
+  }();
+  var attrOnTouchstartCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "touchstart  ",
+          value: cb$prime(value12)
+        });
+      };
+    }
+  };
+
   // output/Deku.DOM.Attr.Width/index.js
   var Width = /* @__PURE__ */ function() {
     function Width2() {
@@ -6862,6 +6881,7 @@
   var map10 = /* @__PURE__ */ map(functorEvent);
   var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
+  var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnTouchstartCb);
   var attr1 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
   var initialPos = {
     x: 0,
@@ -6884,8 +6904,8 @@
                 var ctx = getContext2D(elem3)();
                 setStrokeStyle(ctx)("#00000077")();
                 setLineWidth(ctx)(12)();
-                var $15 = buttons(me) > 0;
-                if ($15) {
+                var $16 = buttons(me) > 0;
+                if ($16) {
                   return strokePath(ctx)(function __do4() {
                     moveTo2(ctx)(p.x)(p.y)();
                     lineTo(ctx)(x)(y)();
@@ -6899,7 +6919,9 @@
           };
         });
       }));
-    })(v.value1), map10(function(p) {
+    })(v.value1), pureAttr3(OnTouchstart.value)(cb(function(e) {
+      return preventDefault(e);
+    })), map10(function(p) {
       return attr1(OnTouchmove.value)(cb(function(e) {
         return function __do2() {
           for_4(fromEvent(e))(function(me) {
