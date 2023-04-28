@@ -6,6 +6,7 @@ You can edit this file as you like.
 , dependencies =
   [ "canvas"
   , "console"
+  , "debug"
   , "deku"
   , "effect"
   , "foldable-traversable"

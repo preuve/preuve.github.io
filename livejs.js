@@ -384,13 +384,34 @@
   var showIntImpl = function(n) {
     return n.toString();
   };
+  var showNumberImpl = function(n) {
+    var str = n.toString();
+    return isNaN(str + ".0") ? str : str + ".0";
+  };
+  var showArrayImpl = function(f) {
+    return function(xs) {
+      var ss = [];
+      for (var i = 0, l = xs.length; i < l; i++) {
+        ss[i] = f(xs[i]);
+      }
+      return "[" + ss.join(",") + "]";
+    };
+  };
 
   // output/Data.Show/index.js
+  var showNumber = {
+    show: showNumberImpl
+  };
   var showInt = {
     show: showIntImpl
   };
   var show = function(dict) {
     return dict.show;
+  };
+  var showArray = function(dictShow) {
+    return {
+      show: showArrayImpl(show(dictShow))
+    };
   };
 
   // output/Data.Maybe/index.js
@@ -741,6 +762,47 @@
   };
   var floor2 = function($39) {
     return unsafeClamp(floor($39));
+  };
+
+  // output/Debug/foreign.js
+  var req = typeof module === "undefined" ? void 0 : module.require;
+  var util = function() {
+    try {
+      return req === void 0 ? void 0 : req("util");
+    } catch (e) {
+      return void 0;
+    }
+  }();
+  function _spy(tag, x) {
+    if (util !== void 0) {
+      console.log(tag + ":", util.inspect(x, { depth: null, colors: true }));
+    } else {
+      console.log(tag + ":", x);
+    }
+    return x;
+  }
+  var now = function() {
+    var perf;
+    if (typeof performance !== "undefined") {
+      perf = performance;
+    } else if (req) {
+      try {
+        perf = req("perf_hooks").performance;
+      } catch (e) {
+      }
+    }
+    return function() {
+      return (perf || Date).now();
+    };
+  }();
+
+  // output/Debug/index.js
+  var spy = function() {
+    return function(tag) {
+      return function(a) {
+        return _spy(tag, a);
+      };
+    };
   };
 
   // output/Effect/foreign.js
@@ -4399,7 +4461,7 @@
         }
       };
     }();
-    function Supervisor(util) {
+    function Supervisor(util2) {
       var fibers = {};
       var fiberId = 0;
       var count2 = 0;
@@ -4433,9 +4495,9 @@
                 return function() {
                   delete kills[fid];
                   killCount--;
-                  if (util.isLeft(result) && util.fromLeft(result)) {
+                  if (util2.isLeft(result) && util2.fromLeft(result)) {
                     setTimeout(function() {
-                      throw util.fromLeft(result);
+                      throw util2.fromLeft(result);
                     }, 0);
                   }
                   if (killCount === 0) {
@@ -4473,7 +4535,7 @@
     var PENDING = 4;
     var RETURN = 5;
     var COMPLETED = 6;
-    function Fiber(util, supervisor, aff) {
+    function Fiber(util2, supervisor, aff) {
       var runTick = 0;
       var status = SUSPENDED;
       var step3 = aff;
@@ -4505,12 +4567,12 @@
                 }
               } catch (e) {
                 status = RETURN;
-                fail = util.left(e);
+                fail = util2.left(e);
                 step3 = null;
               }
               break;
             case STEP_RESULT:
-              if (util.isLeft(step3)) {
+              if (util2.isLeft(step3)) {
                 status = RETURN;
                 fail = step3;
                 step3 = null;
@@ -4518,7 +4580,7 @@
                 status = RETURN;
               } else {
                 status = STEP_BIND;
-                step3 = util.fromRight(step3);
+                step3 = util2.fromRight(step3);
               }
               break;
             case CONTINUE:
@@ -4534,7 +4596,7 @@
                 case PURE:
                   if (bhead === null) {
                     status = RETURN;
-                    step3 = util.right(step3._1);
+                    step3 = util2.right(step3._1);
                   } else {
                     status = STEP_BIND;
                     step3 = step3._1;
@@ -4542,11 +4604,11 @@
                   break;
                 case SYNC:
                   status = STEP_RESULT;
-                  step3 = runSync(util.left, util.right, step3._1);
+                  step3 = runSync(util2.left, util2.right, step3._1);
                   break;
                 case ASYNC:
                   status = PENDING;
-                  step3 = runAsync(util.left, step3._1, function(result2) {
+                  step3 = runAsync(util2.left, step3._1, function(result2) {
                     return function() {
                       if (runTick !== localRunTick) {
                         return;
@@ -4565,7 +4627,7 @@
                   return;
                 case THROW:
                   status = RETURN;
-                  fail = util.left(step3._1);
+                  fail = util2.left(step3._1);
                   step3 = null;
                   break;
                 case CATCH:
@@ -4593,18 +4655,18 @@
                   break;
                 case FORK:
                   status = STEP_RESULT;
-                  tmp = Fiber(util, supervisor, step3._2);
+                  tmp = Fiber(util2, supervisor, step3._2);
                   if (supervisor) {
                     supervisor.register(tmp);
                   }
                   if (step3._1) {
                     tmp.run();
                   }
-                  step3 = util.right(tmp);
+                  step3 = util2.right(tmp);
                   break;
                 case SEQ:
                   status = CONTINUE;
-                  step3 = sequential2(util, supervisor, step3._1);
+                  step3 = sequential2(util2, supervisor, step3._1);
                   break;
               }
               break;
@@ -4624,7 +4686,7 @@
                       status = RETURN;
                     } else if (fail) {
                       status = CONTINUE;
-                      step3 = attempt._2(util.fromLeft(fail));
+                      step3 = attempt._2(util2.fromLeft(fail));
                       fail = null;
                     }
                     break;
@@ -4635,13 +4697,13 @@
                       bhead = attempt._1;
                       btail = attempt._2;
                       status = STEP_BIND;
-                      step3 = util.fromRight(step3);
+                      step3 = util2.fromRight(step3);
                     }
                     break;
                   case BRACKET:
                     bracketCount--;
                     if (fail === null) {
-                      result = util.fromRight(step3);
+                      result = util2.fromRight(step3);
                       attempts = new Aff2(CONS, new Aff2(RELEASE, attempt._2, result), attempts, tmp);
                       if (interrupt === tmp || bracketCount > 0) {
                         status = CONTINUE;
@@ -4653,11 +4715,11 @@
                     attempts = new Aff2(CONS, new Aff2(FINALIZED, step3, fail), attempts, interrupt);
                     status = CONTINUE;
                     if (interrupt && interrupt !== tmp && bracketCount === 0) {
-                      step3 = attempt._1.killed(util.fromLeft(interrupt))(attempt._2);
+                      step3 = attempt._1.killed(util2.fromLeft(interrupt))(attempt._2);
                     } else if (fail) {
-                      step3 = attempt._1.failed(util.fromLeft(fail))(attempt._2);
+                      step3 = attempt._1.failed(util2.fromLeft(fail))(attempt._2);
                     } else {
-                      step3 = attempt._1.completed(util.fromRight(step3))(attempt._2);
+                      step3 = attempt._1.completed(util2.fromRight(step3))(attempt._2);
                     }
                     fail = null;
                     bracketCount++;
@@ -4687,12 +4749,12 @@
               joins = null;
               if (interrupt && fail) {
                 setTimeout(function() {
-                  throw util.fromLeft(fail);
+                  throw util2.fromLeft(fail);
                 }, 0);
-              } else if (util.isLeft(step3) && rethrow) {
+              } else if (util2.isLeft(step3) && rethrow) {
                 setTimeout(function() {
                   if (rethrow) {
-                    throw util.fromLeft(step3);
+                    throw util2.fromLeft(step3);
                   }
                 }, 0);
               }
@@ -4726,26 +4788,26 @@
       function kill(error2, cb2) {
         return function() {
           if (status === COMPLETED) {
-            cb2(util.right(void 0))();
+            cb2(util2.right(void 0))();
             return function() {
             };
           }
           var canceler = onComplete({
             rethrow: false,
             handler: function() {
-              return cb2(util.right(void 0));
+              return cb2(util2.right(void 0));
             }
           })();
           switch (status) {
             case SUSPENDED:
-              interrupt = util.left(error2);
+              interrupt = util2.left(error2);
               status = COMPLETED;
               step3 = interrupt;
               run3(runTick);
               break;
             case PENDING:
               if (interrupt === null) {
-                interrupt = util.left(error2);
+                interrupt = util2.left(error2);
               }
               if (bracketCount === 0) {
                 if (status === PENDING) {
@@ -4759,7 +4821,7 @@
               break;
             default:
               if (interrupt === null) {
-                interrupt = util.left(error2);
+                interrupt = util2.left(error2);
               }
               if (bracketCount === 0) {
                 status = RETURN;
@@ -4802,7 +4864,7 @@
         }
       };
     }
-    function runPar(util, supervisor, par, cb2) {
+    function runPar(util2, supervisor, par, cb2) {
       var fiberId = 0;
       var fibers = {};
       var killId = 0;
@@ -4858,7 +4920,7 @@
             }
           }
         if (count2 === 0) {
-          cb3(util.right(void 0))();
+          cb3(util2.right(void 0))();
         } else {
           kid = 0;
           tmp = count2;
@@ -4870,7 +4932,7 @@
       }
       function join3(result, head4, tail2) {
         var fail, step3, lhs, rhs, tmp, kid;
-        if (util.isLeft(result)) {
+        if (util2.isLeft(result)) {
           fail = result;
           step3 = null;
         } else {
@@ -4896,7 +4958,7 @@
             switch (head4.tag) {
               case MAP:
                 if (fail === null) {
-                  head4._3 = util.right(head4._1(util.fromRight(step3)));
+                  head4._3 = util2.right(head4._1(util2.fromRight(step3)));
                   step3 = head4._3;
                 } else {
                   head4._3 = fail;
@@ -4928,17 +4990,17 @@
                 } else if (lhs === EMPTY || rhs === EMPTY) {
                   return;
                 } else {
-                  step3 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
+                  step3 = util2.right(util2.fromRight(lhs)(util2.fromRight(rhs)));
                   head4._3 = step3;
                 }
                 break;
               case ALT:
                 lhs = head4._1._3;
                 rhs = head4._2._3;
-                if (lhs === EMPTY && util.isLeft(rhs) || rhs === EMPTY && util.isLeft(lhs)) {
+                if (lhs === EMPTY && util2.isLeft(rhs) || rhs === EMPTY && util2.isLeft(lhs)) {
                   return;
                 }
-                if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
+                if (lhs !== EMPTY && util2.isLeft(lhs) && rhs !== EMPTY && util2.isLeft(rhs)) {
                   fail = step3 === lhs ? rhs : lhs;
                   step3 = null;
                   head4._3 = fail;
@@ -5021,7 +5083,7 @@
                     status = RETURN;
                     tmp = step3;
                     step3 = new Aff2(FORKED, fid, new Aff2(CONS, head4, tail2), EMPTY);
-                    tmp = Fiber(util, supervisor, tmp);
+                    tmp = Fiber(util2, supervisor, tmp);
                     tmp.onComplete({
                       rethrow: false,
                       handler: resolve(step3)
@@ -5059,7 +5121,7 @@
         }
       }
       function cancel(error2, cb3) {
-        interrupt = util.left(error2);
+        interrupt = util2.left(error2);
         var innerKills;
         for (var kid in kills) {
           if (kills.hasOwnProperty(kid)) {
@@ -5095,10 +5157,10 @@
         });
       };
     }
-    function sequential2(util, supervisor, par) {
+    function sequential2(util2, supervisor, par) {
       return new Aff2(ASYNC, function(cb2) {
         return function() {
-          return runPar(util, supervisor, par, cb2);
+          return runPar(util2, supervisor, par, cb2);
         };
       });
     }
@@ -6882,6 +6944,8 @@
   var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var attr1 = /* @__PURE__ */ attr(attrOnTouchstartCb);
+  var spy2 = /* @__PURE__ */ spy();
+  var show3 = /* @__PURE__ */ show(/* @__PURE__ */ showArray(showNumber));
   var attr22 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
   var initialPos = {
     x: 0,
@@ -6890,63 +6954,67 @@
   var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
     return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
       return attr2(OnMousemove.value)(cb(function(e) {
-        return for_4(fromEvent2(e))(function(me) {
-          var y = toNumber(clientY2(me));
-          var x = toNumber(clientX2(me));
-          return function __do2() {
-            v.value0({
-              x,
-              y
-            })();
-            var melem = getCanvasElementById("LiveCanvas")();
-            return for_4(melem)(function(elem3) {
-              return function __do3() {
-                var ctx = getContext2D(elem3)();
-                setStrokeStyle(ctx)("#00000077")();
-                setLineWidth(ctx)(12)();
-                var $16 = buttons(me) > 0;
-                if ($16) {
-                  return strokePath(ctx)(function __do4() {
-                    moveTo2(ctx)(p.x)(p.y)();
-                    lineTo(ctx)(x)(y)();
-                    return closePath(ctx)();
-                  })();
-                }
-                ;
-                return unit;
-              };
-            })();
-          };
-        });
+        return function __do2() {
+          preventDefault(e)();
+          return for_4(fromEvent2(e))(function(me) {
+            var y = toNumber(clientY2(me));
+            var x = toNumber(clientX2(me));
+            return function __do3() {
+              v.value0({
+                x,
+                y
+              })();
+              var melem = getCanvasElementById("LiveCanvas")();
+              return for_4(melem)(function(elem3) {
+                return function __do4() {
+                  var ctx = getContext2D(elem3)();
+                  setStrokeStyle(ctx)("#00000077")();
+                  setLineWidth(ctx)(12)();
+                  var $19 = buttons(me) > 0;
+                  if ($19) {
+                    return strokePath(ctx)(function __do5() {
+                      moveTo2(ctx)(p.x)(p.y)();
+                      lineTo(ctx)(x)(y)();
+                      return closePath(ctx)();
+                    })();
+                  }
+                  ;
+                  return unit;
+                };
+              })();
+            };
+          })();
+        };
       }));
     })(v.value1), map10(function(p) {
       return attr1(OnTouchstart.value)(cb(function(e) {
         return function __do2() {
-          for_4(fromEvent(e))(function(me) {
+          preventDefault(e)();
+          return for_4(fromEvent(e))(function(me) {
             return for_4(item(0)(changedTouches(me)))(function(t) {
               var y = toNumber(clientY(t));
               var x = toNumber(clientX(t));
-              return v.value0({
+              return spy2(show3([x, y]))(v.value0({
                 x,
                 y
-              });
+              }));
             });
           })();
-          return preventDefault(e)();
         };
       }));
     })(v.value1), map10(function(p) {
       return attr22(OnTouchmove.value)(cb(function(e) {
         return function __do2() {
-          for_4(fromEvent(e))(function(me) {
+          preventDefault(e)();
+          return for_4(fromEvent(e))(function(me) {
             return for_4(item(0)(changedTouches(me)))(function(t) {
               var y = toNumber(clientY(t));
               var x = toNumber(clientX(t));
               return function __do3() {
-                v.value0({
+                spy2(show3([x, y]))(v.value0({
                   x,
                   y
-                })();
+                }))();
                 var melem = getCanvasElementById("LiveCanvas")();
                 return for_4(melem)(function(elem3) {
                   return function __do4() {
@@ -6963,7 +7031,6 @@
               };
             });
           })();
-          return preventDefault(e)();
         };
       }));
     })(v.value1)])([])]);

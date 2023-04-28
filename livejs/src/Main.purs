@@ -8,6 +8,7 @@ import Data.Tuple.Nested ((/\))
 import Deku.Attribute ((:=), (!:=), cb)
 import Deku.Do as Deku
 import Deku.DOM as D
+import Debug (spy)
 import Deku.Hooks (useState)
 import Deku.Toplevel (runInBody)
 import Effect (Effect)
@@ -39,12 +40,14 @@ main = do
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
                 , (\p -> D.OnMousemove := cb \e -> do
+                    preventDefault e
                     for_ (fromEvent e)
                         \me -> do
                             let lastX = p.x
                                 lastY = p.y
                                 x = toNumber $ clientX me
                                 y = toNumber $ clientY me
+                            --spy (show [x,y]) $ 
                             setPos { x, y }
                             melem <- getCanvasElementById "LiveCanvas"
                             for_ melem \elem -> do
@@ -61,16 +64,17 @@ main = do
                                     else pure unit
                     ) <$> pos
                 , (\p -> D.OnTouchstart := cb \e -> do
+                    preventDefault e
                     for_ (Touch.fromEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
                                 \t -> do
                                     let x = toNumber $ Touch.clientX t
                                         y = toNumber $ Touch.clientY t
-                                    setPos { x, y }
-                    preventDefault e
+                                    spy (show [x,y]) $ setPos { x, y }
                     ) <$> pos            
                 , (\p -> D.OnTouchmove := cb \e -> do
+                    preventDefault e
                     for_ (Touch.fromEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
@@ -79,7 +83,8 @@ main = do
                                         lastY = p.y
                                         x = toNumber $ Touch.clientX t
                                         y = toNumber $ Touch.clientY t
-                                    setPos { x, y }
+                                    spy (show [x,y]) $ setPos { x, y }
+                                    
                                     melem <- getCanvasElementById "LiveCanvas"
                                     for_ melem \elem -> do
                                         ctx <- getContext2D elem 
@@ -91,7 +96,6 @@ main = do
                                             moveTo ctx lastX lastY
                                             lineTo ctx x y
                                             closePath ctx
-                    preventDefault e
                     ) <$> pos            
                 ]
                 []
