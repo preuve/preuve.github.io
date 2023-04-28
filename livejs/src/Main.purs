@@ -35,7 +35,7 @@ main = do
                 [ D.Width !:= "2000px"
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
-                , (\p -> D.OnPointermove := cb \e -> do
+                , (\p -> D.OnMousemove := cb \e -> do
                     for_ (fromEvent e)
                         \me -> do
                             let lastX = p.x
@@ -56,6 +56,26 @@ main = do
                                         lineTo ctx x y
                                         closePath ctx
                                     else pure unit
+                    ) <$> pos            
+                , (\p -> D.OnTouchmove := cb \e -> do
+                    for_ (fromEvent e)
+                        \me -> do
+                            let lastX = p.x
+                                lastY = p.y
+                                x = toNumber $ clientX me
+                                y = toNumber $ clientY me
+                            setPos { x, y }
+                            melem <- getCanvasElementById "LiveCanvas"
+                            for_ melem \elem -> do
+                                ctx <- getContext2D elem 
+                                setStrokeStyle ctx "#00000077"
+                                
+                                setLineWidth ctx 12.0
+                                
+                                strokePath ctx $ do
+                                    moveTo ctx lastX lastY
+                                    lineTo ctx x y
+                                    closePath ctx
                     ) <$> pos            
                 ]
                 []

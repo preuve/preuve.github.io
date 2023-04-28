@@ -3452,10 +3452,10 @@
     return dict.attr;
   };
   var pureAttr = function(dictAttr) {
-    var attr1 = attr(dictAttr);
+    var attr12 = attr(dictAttr);
     return function(a) {
       return function(b) {
-        return pure4(attr1(a)(b));
+        return pure4(attr12(a)(b));
       };
     };
   };
@@ -3498,19 +3498,38 @@
     }
   };
 
-  // output/Deku.DOM.Attr.OnPointermove/index.js
-  var OnPointermove = /* @__PURE__ */ function() {
-    function OnPointermove2() {
+  // output/Deku.DOM.Attr.OnMousemove/index.js
+  var OnMousemove = /* @__PURE__ */ function() {
+    function OnMousemove2() {
     }
     ;
-    OnPointermove2.value = new OnPointermove2();
-    return OnPointermove2;
+    OnMousemove2.value = new OnMousemove2();
+    return OnMousemove2;
   }();
-  var attrOnPointermoveCb = {
+  var attrOnMousemoveCb = {
     attr: function(v) {
       return function(value12) {
         return unsafeAttribute({
-          key: "pointermove",
+          key: "mousemove",
+          value: cb$prime(value12)
+        });
+      };
+    }
+  };
+
+  // output/Deku.DOM.Attr.OnTouchmove/index.js
+  var OnTouchmove = /* @__PURE__ */ function() {
+    function OnTouchmove2() {
+    }
+    ;
+    OnTouchmove2.value = new OnTouchmove2();
+    return OnTouchmove2;
+  }();
+  var attrOnTouchmoveCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "touchmove  ",
           value: cb$prime(value12)
         });
       };
@@ -6806,15 +6825,16 @@
   var pureAttr1 = /* @__PURE__ */ pureAttr(attrCanvas_HeightString);
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
   var map10 = /* @__PURE__ */ map(functorEvent);
-  var attr2 = /* @__PURE__ */ attr(attrOnPointermoveCb);
+  var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
+  var attr1 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
   var initialPos = {
     x: 0,
     y: 0
   };
   var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
     return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
-      return attr2(OnPointermove.value)(cb(function(e) {
+      return attr2(OnMousemove.value)(cb(function(e) {
         return for_4(fromEvent(e))(function(me) {
           var y = toNumber(clientY(me));
           var x = toNumber(clientX(me));
@@ -6829,8 +6849,8 @@
                 var ctx = getContext2D(elem3)();
                 setStrokeStyle(ctx)("#00000077")();
                 setLineWidth(ctx)(12)();
-                var $14 = buttons(me) > 0;
-                if ($14) {
+                var $15 = buttons(me) > 0;
+                if ($15) {
                   return strokePath(ctx)(function __do4() {
                     moveTo2(ctx)(p.x)(p.y)();
                     lineTo(ctx)(x)(y)();
@@ -6839,6 +6859,32 @@
                 }
                 ;
                 return unit;
+              };
+            })();
+          };
+        });
+      }));
+    })(v.value1), map10(function(p) {
+      return attr1(OnTouchmove.value)(cb(function(e) {
+        return for_4(fromEvent(e))(function(me) {
+          var y = toNumber(clientY(me));
+          var x = toNumber(clientX(me));
+          return function __do2() {
+            v.value0({
+              x,
+              y
+            })();
+            var melem = getCanvasElementById("LiveCanvas")();
+            return for_4(melem)(function(elem3) {
+              return function __do3() {
+                var ctx = getContext2D(elem3)();
+                setStrokeStyle(ctx)("#00000077")();
+                setLineWidth(ctx)(12)();
+                return strokePath(ctx)(function __do4() {
+                  moveTo2(ctx)(p.x)(p.y)();
+                  lineTo(ctx)(x)(y)();
+                  return closePath(ctx)();
+                })();
               };
             })();
           };
