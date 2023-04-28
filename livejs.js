@@ -3498,19 +3498,19 @@
     }
   };
 
-  // output/Deku.DOM.Attr.OnMousemove/index.js
-  var OnMousemove = /* @__PURE__ */ function() {
-    function OnMousemove2() {
+  // output/Deku.DOM.Attr.OnPointermove/index.js
+  var OnPointermove = /* @__PURE__ */ function() {
+    function OnPointermove2() {
     }
     ;
-    OnMousemove2.value = new OnMousemove2();
-    return OnMousemove2;
+    OnPointermove2.value = new OnPointermove2();
+    return OnPointermove2;
   }();
-  var attrOnMousemoveCb = {
+  var attrOnPointermoveCb = {
     attr: function(v) {
       return function(value12) {
         return unsafeAttribute({
-          key: "mousemove",
+          key: "pointermove",
           value: cb$prime(value12)
         });
       };
@@ -6806,7 +6806,7 @@
   var pureAttr1 = /* @__PURE__ */ pureAttr(attrCanvas_HeightString);
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
   var map10 = /* @__PURE__ */ map(functorEvent);
-  var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
+  var attr2 = /* @__PURE__ */ attr(attrOnPointermoveCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var initialPos = {
     x: 0,
@@ -6814,7 +6814,7 @@
   };
   var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
     return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
-      return attr2(OnMousemove.value)(cb(function(e) {
+      return attr2(OnPointermove.value)(cb(function(e) {
         return for_4(fromEvent(e))(function(me) {
           var y = toNumber(clientY(me));
           var x = toNumber(clientX(me));

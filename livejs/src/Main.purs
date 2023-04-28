@@ -35,7 +35,7 @@ main = do
                 [ D.Width !:= "2000px"
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
-                , (\p -> D.OnMousemove := cb \e -> do
+                , (\p -> D.OnPointermove := cb \e -> do
                     for_ (fromEvent e)
                         \me -> do
                             let lastX = p.x
