@@ -24,6 +24,7 @@ import Graphics.Canvas
     )
 import Web.Event.Event (preventDefault)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
+import Web.TouchEvent.Touch (pageX, pageY) as Touch
 import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
 import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
@@ -69,8 +70,8 @@ main = do
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
                                 \t -> do
-                                    let x = toNumber $ Touch.clientX t
-                                        y = toNumber $ Touch.clientY t
+                                    let x = toNumber $ Touch.pageX t
+                                        y = toNumber $ Touch.pageY t
                                     spy (show [x,y]) $ setPos { x, y }
                     ) <$> pos            
                 , (\p -> D.OnTouchmove := cb \e -> do
@@ -81,8 +82,8 @@ main = do
                                 \t -> do
                                     let lastX = p.x
                                         lastY = p.y
-                                        x = toNumber $ Touch.clientX t
-                                        y = toNumber $ Touch.clientY t
+                                        x = toNumber $ Touch.pageX t
+                                        y = toNumber $ Touch.pageY t
                                     spy (show [x,y]) $ setPos { x, y }
                                     
                                     melem <- getCanvasElementById "LiveCanvas"

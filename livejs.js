@@ -6895,11 +6895,11 @@
   }
 
   // output/Web.TouchEvent.Touch/foreign.js
-  function clientX(t) {
-    return t.clientX;
+  function pageX(t) {
+    return t.pageX;
   }
-  function clientY(t) {
-    return t.clientY;
+  function pageY(t) {
+    return t.pageY;
   }
 
   // output/Web.TouchEvent.TouchEvent/foreign.js
@@ -6992,8 +6992,8 @@
           preventDefault(e)();
           return for_4(fromEvent(e))(function(me) {
             return for_4(item(0)(changedTouches(me)))(function(t) {
-              var y = toNumber(clientY(t));
-              var x = toNumber(clientX(t));
+              var y = toNumber(pageY(t));
+              var x = toNumber(pageX(t));
               return spy2(show3([x, y]))(v.value0({
                 x,
                 y
@@ -7008,8 +7008,8 @@
           preventDefault(e)();
           return for_4(fromEvent(e))(function(me) {
             return for_4(item(0)(changedTouches(me)))(function(t) {
-              var y = toNumber(clientY(t));
-              var x = toNumber(clientX(t));
+              var y = toNumber(pageY(t));
+              var x = toNumber(pageX(t));
               return function __do3() {
                 spy2(show3([x, y]))(v.value0({
                   x,
