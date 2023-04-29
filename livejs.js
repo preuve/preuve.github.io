@@ -3517,10 +3517,10 @@
     return dict.attr;
   };
   var pureAttr = function(dictAttr) {
-    var attr12 = attr(dictAttr);
+    var attr1 = attr(dictAttr);
     return function(a) {
       return function(b) {
-        return pure4(attr12(a)(b));
+        return pure4(attr1(a)(b));
       };
     };
   };
@@ -3558,25 +3558,6 @@
         return unsafeAttribute({
           key: "id",
           value: prop$prime(value12)
-        });
-      };
-    }
-  };
-
-  // output/Deku.DOM.Attr.OnMousemove/index.js
-  var OnMousemove = /* @__PURE__ */ function() {
-    function OnMousemove2() {
-    }
-    ;
-    OnMousemove2.value = new OnMousemove2();
-    return OnMousemove2;
-  }();
-  var attrOnMousemoveCb = {
-    attr: function(v) {
-      return function(value12) {
-        return unsafeAttribute({
-          key: "mousemove",
-          value: cb$prime(value12)
         });
       };
     }
@@ -6952,29 +6933,14 @@
     };
   };
 
-  // output/Web.UIEvent.MouseEvent/foreign.js
-  function clientX2(e) {
-    return e.clientX;
-  }
-  function clientY2(e) {
-    return e.clientY;
-  }
-  function buttons(e) {
-    return e.buttons;
-  }
-
-  // output/Web.UIEvent.MouseEvent/index.js
-  var fromEvent2 = /* @__PURE__ */ unsafeReadProtoTagged("MouseEvent");
-
   // output/Main/index.js
   var pureAttr2 = /* @__PURE__ */ pureAttr(attrCanvas_WidthString);
   var pureAttr1 = /* @__PURE__ */ pureAttr(attrCanvas_HeightString);
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
-  var map10 = /* @__PURE__ */ map(functorEvent);
-  var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
-  var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnTouchstartCb);
-  var attr1 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
+  var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
+  var map10 = /* @__PURE__ */ map(functorEvent);
+  var attr2 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
   var spy2 = /* @__PURE__ */ spy();
   var show3 = /* @__PURE__ */ show(/* @__PURE__ */ showArray(showNumber));
   var initialPos = {
@@ -6984,42 +6950,7 @@
   var main = function __do2() {
     var isMobile = emitsTouchEvents();
     return runInBody(bind3(useState(initialPos))(function(v) {
-      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
-        return attr2(OnMousemove.value)(cb(function(e) {
-          return function __do3() {
-            preventDefault(e)();
-            stopPropagation(e)();
-            return for_4(fromEvent2(e))(function(me) {
-              var y = toNumber(clientY2(me));
-              var x = toNumber(clientX2(me));
-              return function __do4() {
-                v.value0({
-                  x,
-                  y
-                })();
-                var melem = getCanvasElementById("LiveCanvas")();
-                return for_4(melem)(function(elem3) {
-                  return function __do5() {
-                    var ctx = getContext2D(elem3)();
-                    setStrokeStyle(ctx)("#00000077")();
-                    setLineWidth(ctx)(12)();
-                    var $20 = buttons(me) > 0;
-                    if ($20) {
-                      return strokePath(ctx)(function __do6() {
-                        moveTo2(ctx)(p.x)(p.y)();
-                        lineTo(ctx)(x)(y)();
-                        return closePath(ctx)();
-                      })();
-                    }
-                    ;
-                    return unit;
-                  };
-                })();
-              };
-            })();
-          };
-        }));
-      })(v.value1), pureAttr3(OnTouchstart.value)(cb(function(e) {
+      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnTouchstart.value)(cb(function(e) {
         return function __do3() {
           preventDefault(e)();
           stopPropagation(e)();
@@ -7053,7 +6984,7 @@
           })();
         };
       })), map10(function(p) {
-        return attr1(OnTouchmove.value)(cb(function(e) {
+        return attr2(OnTouchmove.value)(cb(function(e) {
           return function __do3() {
             preventDefault(e)();
             stopPropagation(e)();

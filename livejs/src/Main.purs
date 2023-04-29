@@ -46,6 +46,7 @@ main = do
                 [ D.Width !:= "2000px"
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
+                {-
                 , (\p -> D.OnMousemove := cb \e -> do
                     preventDefault e
                     stopPropagation e
@@ -71,6 +72,7 @@ main = do
                                         closePath ctx
                                     else pure unit
                     ) <$> pos
+                    -}
                 , D.OnTouchstart !:= cb \e -> do
                     preventDefault e
                     stopPropagation e
