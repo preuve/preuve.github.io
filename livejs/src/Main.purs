@@ -4,6 +4,7 @@ import Prelude
 
 import Data.Foldable (for_)
 import Data.Int (toNumber)
+import Data.Number (pi)
 import Data.Tuple.Nested ((/\))
 import Deku.Attribute ((:=), (!:=), cb)
 import Deku.Do as Deku
@@ -21,6 +22,9 @@ import Graphics.Canvas
     , setLineWidth
     , setStrokeStyle
     , strokePath
+    , beginPath
+    , fill
+    , arc
     )
 import Web.Event.Event (preventDefault)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
@@ -73,6 +77,12 @@ main = do
                                     let x = toNumber $ Touch.pageX t
                                         y = toNumber $ Touch.pageY t
                                     spy (show [x,y]) $ setPos { x, y }
+                                    melem <- getCanvasElementById "LiveCanvas"
+                                    for_ melem \elem -> do
+                                        ctx <- getContext2D elem 
+                                        beginPath ctx
+                                        arc ctx { end: 2.0 * pi, radius: 4.0, start: 0.0, useCounterClockwise: false, x, y }
+                                        fill ctx
                     ) <$> pos            
                 , (\p -> D.OnTouchmove := cb \e -> do
                     preventDefault e

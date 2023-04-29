@@ -735,6 +735,9 @@
     };
   };
 
+  // output/Data.Number/index.js
+  var pi = 3.141592653589793;
+
   // output/Data.Int/index.js
   var top2 = /* @__PURE__ */ top(boundedInt);
   var bottom2 = /* @__PURE__ */ bottom(boundedInt);
@@ -6848,6 +6851,11 @@
       ctx.stroke();
     };
   }
+  function fill(ctx) {
+    return function() {
+      ctx.fill();
+    };
+  }
   function lineTo(ctx) {
     return function(x) {
       return function(y) {
@@ -6869,6 +6877,13 @@
   function closePath(ctx) {
     return function() {
       ctx.closePath();
+    };
+  }
+  function arc(ctx) {
+    return function(a) {
+      return function() {
+        ctx.arc(a.x, a.y, a.radius, a.start, a.end, a.useCounterClockwise);
+      };
     };
   }
 
@@ -6970,8 +6985,8 @@
                   var ctx = getContext2D(elem3)();
                   setStrokeStyle(ctx)("#00000077")();
                   setLineWidth(ctx)(12)();
-                  var $19 = buttons(me) > 0;
-                  if ($19) {
+                  var $20 = buttons(me) > 0;
+                  if ($20) {
                     return strokePath(ctx)(function __do5() {
                       moveTo2(ctx)(p.x)(p.y)();
                       lineTo(ctx)(x)(y)();
@@ -6994,10 +7009,28 @@
             return for_4(item(0)(changedTouches(me)))(function(t) {
               var y = toNumber(pageY(t));
               var x = toNumber(pageX(t));
-              return spy2(show3([x, y]))(v.value0({
-                x,
-                y
-              }));
+              return function __do3() {
+                spy2(show3([x, y]))(v.value0({
+                  x,
+                  y
+                }))();
+                var melem = getCanvasElementById("LiveCanvas")();
+                return for_4(melem)(function(elem3) {
+                  return function __do4() {
+                    var ctx = getContext2D(elem3)();
+                    beginPath(ctx)();
+                    arc(ctx)({
+                      end: 2 * pi,
+                      radius: 4,
+                      start: 0,
+                      useCounterClockwise: false,
+                      x,
+                      y
+                    })();
+                    return fill(ctx)();
+                  };
+                })();
+              };
             });
           })();
         };
