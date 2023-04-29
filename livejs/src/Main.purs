@@ -90,7 +90,36 @@ main = do
                                         beginPath ctx
                                         arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
                                         fill ctx
-                            
+                    for_ (Touch.fromEvent e)
+                        \me -> 
+                            for_ (Touch.item 1 (Touch.changedTouches me))
+                                \t -> do
+                                    let x = toNumber $ Touch.pageX t
+                                        y = toNumber $ Touch.pageY t
+                                    setPos { x, y }
+                                    melem <- getCanvasElementById "LiveCanvas"
+                                    for_ melem \elem -> do
+                                        ctx <- getContext2D elem 
+                                        setFillStyle ctx "#00000077"
+                                        
+                                        beginPath ctx
+                                        arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
+                                        fill ctx
+                    for_ (Touch.fromEvent e)
+                        \me -> 
+                            for_ (Touch.item 2 (Touch.changedTouches me))
+                                \t -> do
+                                    let x = toNumber $ Touch.pageX t
+                                        y = toNumber $ Touch.pageY t
+                                    setPos { x, y }
+                                    melem <- getCanvasElementById "LiveCanvas"
+                                    for_ melem \elem -> do
+                                        ctx <- getContext2D elem 
+                                        setFillStyle ctx "#00000077"
+                                        
+                                        beginPath ctx
+                                        arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
+                                        fill ctx
                     preventDefault e
                     stopPropagation e
                     {-

@@ -6851,6 +6851,64 @@
               };
             });
           })();
+          for_4(fromEvent(e))(function(me) {
+            return for_4(item(1)(changedTouches(me)))(function(t) {
+              var y = toNumber(pageY(t));
+              var x = toNumber(pageX(t));
+              return function __do4() {
+                v.value0({
+                  x,
+                  y
+                })();
+                var melem = getCanvasElementById("LiveCanvas")();
+                return for_4(melem)(function(elem3) {
+                  return function __do5() {
+                    var ctx = getContext2D(elem3)();
+                    setFillStyle(ctx)("#00000077")();
+                    beginPath(ctx)();
+                    arc(ctx)({
+                      end: 2 * pi,
+                      radius: 24,
+                      start: 0,
+                      useCounterClockwise: false,
+                      x,
+                      y
+                    })();
+                    return fill(ctx)();
+                  };
+                })();
+              };
+            });
+          })();
+          for_4(fromEvent(e))(function(me) {
+            return for_4(item(2)(changedTouches(me)))(function(t) {
+              var y = toNumber(pageY(t));
+              var x = toNumber(pageX(t));
+              return function __do4() {
+                v.value0({
+                  x,
+                  y
+                })();
+                var melem = getCanvasElementById("LiveCanvas")();
+                return for_4(melem)(function(elem3) {
+                  return function __do5() {
+                    var ctx = getContext2D(elem3)();
+                    setFillStyle(ctx)("#00000077")();
+                    beginPath(ctx)();
+                    arc(ctx)({
+                      end: 2 * pi,
+                      radius: 24,
+                      start: 0,
+                      useCounterClockwise: false,
+                      x,
+                      y
+                    })();
+                    return fill(ctx)();
+                  };
+                })();
+              };
+            });
+          })();
           preventDefault(e)();
           return stopPropagation(e)();
         };
