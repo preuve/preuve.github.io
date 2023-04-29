@@ -5997,7 +5997,7 @@
           state4.units[ptr].main.removeEventListener(a.key, state4.units[ptr].listeners[a.key]);
         }
         var el = (e) => avv(e)();
-        state4.units[ptr].main.addEventListener(a.key, el);
+        state4.units[ptr].main.addEventListener(a.key, el, {passive: false});
         state4.units[ptr].listeners[a.key] = el;
       }
     }
