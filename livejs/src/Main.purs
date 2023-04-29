@@ -27,7 +27,7 @@ import Graphics.Canvas
     , fill
     , arc
     )
-import Web.Event.Event (preventDefault)
+import Web.Event.Event (preventDefault, stopPropagation)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
 import Web.TouchEvent.Touch (pageX, pageY) as Touch
 import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
@@ -48,6 +48,7 @@ main = do
                 , D.Id !:= "LiveCanvas"
                 , (\p -> D.OnMousemove := cb \e -> do
                     preventDefault e
+                    stopPropagation e
                     for_ (fromEvent e)
                         \me -> do
                             let lastX = p.x
@@ -72,6 +73,7 @@ main = do
                     ) <$> pos
                 , D.OnTouchstart !:= cb \e -> do
                     preventDefault e
+                    stopPropagation e
                     for_ (Touch.fromEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
@@ -88,6 +90,7 @@ main = do
                             
                 , (\p -> D.OnTouchmove := cb \e -> do
                     preventDefault e
+                    stopPropagation e
                     for_ (Touch.fromEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))

@@ -6918,6 +6918,11 @@
       return e.preventDefault();
     };
   }
+  function stopPropagation(e) {
+    return function() {
+      return e.stopPropagation();
+    };
+  }
 
   // output/Web.TouchEvent.Touch/foreign.js
   function pageX(t) {
@@ -6983,6 +6988,7 @@
         return attr2(OnMousemove.value)(cb(function(e) {
           return function __do3() {
             preventDefault(e)();
+            stopPropagation(e)();
             return for_4(fromEvent2(e))(function(me) {
               var y = toNumber(clientY2(me));
               var x = toNumber(clientX2(me));
@@ -7016,6 +7022,7 @@
       })(v.value1), pureAttr3(OnTouchstart.value)(cb(function(e) {
         return function __do3() {
           preventDefault(e)();
+          stopPropagation(e)();
           return for_4(fromEvent(e))(function(me) {
             return for_4(item(0)(changedTouches(me)))(function(t) {
               var y = toNumber(pageY(t));
@@ -7049,6 +7056,7 @@
         return attr1(OnTouchmove.value)(cb(function(e) {
           return function __do3() {
             preventDefault(e)();
+            stopPropagation(e)();
             return for_4(fromEvent(e))(function(me) {
               return for_4(item(0)(changedTouches(me)))(function(t) {
                 var y = toNumber(pageY(t));
