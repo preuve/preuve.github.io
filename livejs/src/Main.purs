@@ -13,6 +13,7 @@ import Debug (spy)
 import Deku.Hooks (useState)
 import Deku.Toplevel (runInBody)
 import Effect (Effect)
+import EmitsTouchEvents (emitsTouchEvents)
 import Graphics.Canvas 
     ( closePath
     , getCanvasElementById
@@ -37,6 +38,7 @@ initialPos = { x: 0.0, y: 0.0 } :: { x :: Number, y :: Number }
 
 main :: Effect Unit
 main = do
+    isMobile <- emitsTouchEvents
     runInBody Deku.do
         setPos /\ pos <- useState initialPos
         D.div_
@@ -68,7 +70,7 @@ main = do
                                         closePath ctx
                                     else pure unit
                     ) <$> pos
-                , (\p -> D.OnTouchstart := cb \e -> do
+                , D.OnTouchstart !:= cb \e -> do
                     preventDefault e
                     for_ (Touch.fromEvent e)
                         \me -> 
@@ -76,14 +78,14 @@ main = do
                                 \t -> do
                                     let x = toNumber $ Touch.pageX t
                                         y = toNumber $ Touch.pageY t
-                                    spy (show [x,y]) $ setPos { x, y }
+                                    setPos { x, y }
                                     melem <- getCanvasElementById "LiveCanvas"
                                     for_ melem \elem -> do
                                         ctx <- getContext2D elem 
                                         beginPath ctx
                                         arc ctx { end: 2.0 * pi, radius: 4.0, start: 0.0, useCounterClockwise: false, x, y }
                                         fill ctx
-                    ) <$> pos            
+                            
                 , (\p -> D.OnTouchmove := cb \e -> do
                     preventDefault e
                     for_ (Touch.fromEvent e)
