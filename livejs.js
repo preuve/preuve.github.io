@@ -6952,9 +6952,7 @@
     return runInBody(bind3(useState(initialPos))(function(v) {
       return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnTouchstart.value)(cb(function(e) {
         return function __do3() {
-          preventDefault(e)();
-          stopPropagation(e)();
-          return for_4(fromEvent(e))(function(me) {
+          for_4(fromEvent(e))(function(me) {
             return for_4(item(0)(changedTouches(me)))(function(t) {
               var y = toNumber(pageY(t));
               var x = toNumber(pageX(t));
@@ -6982,13 +6980,13 @@
               };
             });
           })();
+          preventDefault(e)();
+          return stopPropagation(e)();
         };
       })), map10(function(p) {
         return attr2(OnTouchmove.value)(cb(function(e) {
           return function __do3() {
-            preventDefault(e)();
-            stopPropagation(e)();
-            return for_4(fromEvent(e))(function(me) {
+            for_4(fromEvent(e))(function(me) {
               return for_4(item(0)(changedTouches(me)))(function(t) {
                 var y = toNumber(pageY(t));
                 var x = toNumber(pageX(t));
@@ -7013,6 +7011,8 @@
                 };
               });
             })();
+            preventDefault(e)();
+            return stopPropagation(e)();
           };
         }));
       })(v.value1)])([])]);

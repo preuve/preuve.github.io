@@ -74,8 +74,6 @@ main = do
                     ) <$> pos
                     -}
                 , D.OnTouchstart !:= cb \e -> do
-                    preventDefault e
-                    stopPropagation e
                     for_ (Touch.fromEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
@@ -90,9 +88,9 @@ main = do
                                         arc ctx { end: 2.0 * pi, radius: 4.0, start: 0.0, useCounterClockwise: false, x, y }
                                         fill ctx
                             
-                , (\p -> D.OnTouchmove := cb \e -> do
                     preventDefault e
                     stopPropagation e
+                , (\p -> D.OnTouchmove := cb \e -> do
                     for_ (Touch.fromEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
@@ -114,6 +112,8 @@ main = do
                                             moveTo ctx lastX lastY
                                             lineTo ctx x y
                                             closePath ctx
+                    preventDefault e
+                    stopPropagation e
                     ) <$> pos            
                 ]
                 []
