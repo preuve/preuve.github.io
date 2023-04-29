@@ -89,6 +89,7 @@ main = do
                                         
                                         beginPath ctx
                                         arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
+                                        closePath ctx
                                         fill ctx
                     for_ (Touch.fromEvent e)
                         \me -> 

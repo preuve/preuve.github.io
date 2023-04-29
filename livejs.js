@@ -6754,6 +6754,11 @@
       ctx.fill();
     };
   }
+  function closePath(ctx) {
+    return function() {
+      ctx.closePath();
+    };
+  }
   function arc(ctx) {
     return function(a) {
       return function() {
@@ -6845,6 +6850,7 @@
                       x,
                       y
                     })();
+                    closePath(ctx)();
                     return fill(ctx)();
                   };
                 })();
