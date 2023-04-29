@@ -175,20 +175,20 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map11 = map(dictApply.Functor0());
+    var map10 = map(dictApply.Functor0());
     return function(a) {
       return function(b) {
-        return apply1(map11($$const(identity2))(a))(b);
+        return apply1(map10($$const(identity2))(a))(b);
       };
     };
   };
   var lift2 = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map11 = map(dictApply.Functor0());
+    var map10 = map(dictApply.Functor0());
     return function(f) {
       return function(a) {
         return function(b) {
-          return apply1(map11(f)(a))(b);
+          return apply1(map10(f)(a))(b);
         };
       };
     };
@@ -384,34 +384,13 @@
   var showIntImpl = function(n) {
     return n.toString();
   };
-  var showNumberImpl = function(n) {
-    var str = n.toString();
-    return isNaN(str + ".0") ? str : str + ".0";
-  };
-  var showArrayImpl = function(f) {
-    return function(xs) {
-      var ss = [];
-      for (var i = 0, l = xs.length; i < l; i++) {
-        ss[i] = f(xs[i]);
-      }
-      return "[" + ss.join(",") + "]";
-    };
-  };
 
   // output/Data.Show/index.js
-  var showNumber = {
-    show: showNumberImpl
-  };
   var showInt = {
     show: showIntImpl
   };
   var show = function(dict) {
     return dict.show;
-  };
-  var showArray = function(dictShow) {
-    return {
-      show: showArrayImpl(show(dictShow))
-    };
   };
 
   // output/Data.Maybe/index.js
@@ -765,47 +744,6 @@
   };
   var floor2 = function($39) {
     return unsafeClamp(floor($39));
-  };
-
-  // output/Debug/foreign.js
-  var req = typeof module === "undefined" ? void 0 : module.require;
-  var util = function() {
-    try {
-      return req === void 0 ? void 0 : req("util");
-    } catch (e) {
-      return void 0;
-    }
-  }();
-  function _spy(tag, x) {
-    if (util !== void 0) {
-      console.log(tag + ":", util.inspect(x, { depth: null, colors: true }));
-    } else {
-      console.log(tag + ":", x);
-    }
-    return x;
-  }
-  var now = function() {
-    var perf;
-    if (typeof performance !== "undefined") {
-      perf = performance;
-    } else if (req) {
-      try {
-        perf = req("perf_hooks").performance;
-      } catch (e) {
-      }
-    }
-    return function() {
-      return (perf || Date).now();
-    };
-  }();
-
-  // output/Debug/index.js
-  var spy = function() {
-    return function(tag) {
-      return function(a) {
-        return _spy(tag, a);
-      };
-    };
   };
 
   // output/Effect/foreign.js
@@ -1420,7 +1358,7 @@
       };
     }
     return function(apply5) {
-      return function(map11) {
+      return function(map10) {
         return function(pure9) {
           return function(f) {
             return function(array) {
@@ -1429,14 +1367,14 @@
                   case 0:
                     return pure9([]);
                   case 1:
-                    return map11(array1)(f(array[bot]));
+                    return map10(array1)(f(array[bot]));
                   case 2:
-                    return apply5(map11(array2)(f(array[bot])))(f(array[bot + 1]));
+                    return apply5(map10(array2)(f(array[bot])))(f(array[bot + 1]));
                   case 3:
-                    return apply5(apply5(map11(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                    return apply5(apply5(map10(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
                     var pivot = bot + Math.floor((top3 - bot) / 4) * 2;
-                    return apply5(map11(concat2)(go2(bot, pivot)))(go2(pivot, top3));
+                    return apply5(map10(concat2)(go2(bot, pivot)))(go2(pivot, top3));
                 }
               }
               return go2(0, array.length);
@@ -3563,25 +3501,6 @@
     }
   };
 
-  // output/Deku.DOM.Attr.OnTouchmove/index.js
-  var OnTouchmove = /* @__PURE__ */ function() {
-    function OnTouchmove2() {
-    }
-    ;
-    OnTouchmove2.value = new OnTouchmove2();
-    return OnTouchmove2;
-  }();
-  var attrOnTouchmoveCb = {
-    attr: function(v) {
-      return function(value12) {
-        return unsafeAttribute({
-          key: "touchmove  ",
-          value: cb$prime(value12)
-        });
-      };
-    }
-  };
-
   // output/Deku.DOM.Attr.OnTouchstart/index.js
   var OnTouchstart = /* @__PURE__ */ function() {
     function OnTouchstart2() {
@@ -3755,10 +3674,10 @@
       return arr;
     }
     return function(apply5) {
-      return function(map11) {
+      return function(map10) {
         return function(f) {
           var buildFrom = function(x, ys) {
-            return apply5(map11(consList)(f(x)))(ys);
+            return apply5(map10(consList)(f(x)))(ys);
           };
           var go2 = function(acc, currentLen, xs) {
             if (currentLen === 0) {
@@ -3772,12 +3691,12 @@
             }
           };
           return function(array) {
-            var acc = map11(finalCell)(f(array[array.length - 1]));
+            var acc = map10(finalCell)(f(array[array.length - 1]));
             var result = go2(acc, array.length - 1, array);
             while (result instanceof Cont) {
               result = result.fn();
             }
-            return map11(listToArray)(result);
+            return map10(listToArray)(result);
           };
         };
       };
@@ -4445,7 +4364,7 @@
         }
       };
     }();
-    function Supervisor(util2) {
+    function Supervisor(util) {
       var fibers = {};
       var fiberId = 0;
       var count2 = 0;
@@ -4479,9 +4398,9 @@
                 return function() {
                   delete kills[fid];
                   killCount--;
-                  if (util2.isLeft(result) && util2.fromLeft(result)) {
+                  if (util.isLeft(result) && util.fromLeft(result)) {
                     setTimeout(function() {
-                      throw util2.fromLeft(result);
+                      throw util.fromLeft(result);
                     }, 0);
                   }
                   if (killCount === 0) {
@@ -4519,7 +4438,7 @@
     var PENDING = 4;
     var RETURN = 5;
     var COMPLETED = 6;
-    function Fiber(util2, supervisor, aff) {
+    function Fiber(util, supervisor, aff) {
       var runTick = 0;
       var status = SUSPENDED;
       var step3 = aff;
@@ -4551,12 +4470,12 @@
                 }
               } catch (e) {
                 status = RETURN;
-                fail = util2.left(e);
+                fail = util.left(e);
                 step3 = null;
               }
               break;
             case STEP_RESULT:
-              if (util2.isLeft(step3)) {
+              if (util.isLeft(step3)) {
                 status = RETURN;
                 fail = step3;
                 step3 = null;
@@ -4564,7 +4483,7 @@
                 status = RETURN;
               } else {
                 status = STEP_BIND;
-                step3 = util2.fromRight(step3);
+                step3 = util.fromRight(step3);
               }
               break;
             case CONTINUE:
@@ -4580,7 +4499,7 @@
                 case PURE:
                   if (bhead === null) {
                     status = RETURN;
-                    step3 = util2.right(step3._1);
+                    step3 = util.right(step3._1);
                   } else {
                     status = STEP_BIND;
                     step3 = step3._1;
@@ -4588,11 +4507,11 @@
                   break;
                 case SYNC:
                   status = STEP_RESULT;
-                  step3 = runSync(util2.left, util2.right, step3._1);
+                  step3 = runSync(util.left, util.right, step3._1);
                   break;
                 case ASYNC:
                   status = PENDING;
-                  step3 = runAsync(util2.left, step3._1, function(result2) {
+                  step3 = runAsync(util.left, step3._1, function(result2) {
                     return function() {
                       if (runTick !== localRunTick) {
                         return;
@@ -4611,7 +4530,7 @@
                   return;
                 case THROW:
                   status = RETURN;
-                  fail = util2.left(step3._1);
+                  fail = util.left(step3._1);
                   step3 = null;
                   break;
                 case CATCH:
@@ -4639,18 +4558,18 @@
                   break;
                 case FORK:
                   status = STEP_RESULT;
-                  tmp = Fiber(util2, supervisor, step3._2);
+                  tmp = Fiber(util, supervisor, step3._2);
                   if (supervisor) {
                     supervisor.register(tmp);
                   }
                   if (step3._1) {
                     tmp.run();
                   }
-                  step3 = util2.right(tmp);
+                  step3 = util.right(tmp);
                   break;
                 case SEQ:
                   status = CONTINUE;
-                  step3 = sequential2(util2, supervisor, step3._1);
+                  step3 = sequential2(util, supervisor, step3._1);
                   break;
               }
               break;
@@ -4670,7 +4589,7 @@
                       status = RETURN;
                     } else if (fail) {
                       status = CONTINUE;
-                      step3 = attempt._2(util2.fromLeft(fail));
+                      step3 = attempt._2(util.fromLeft(fail));
                       fail = null;
                     }
                     break;
@@ -4681,13 +4600,13 @@
                       bhead = attempt._1;
                       btail = attempt._2;
                       status = STEP_BIND;
-                      step3 = util2.fromRight(step3);
+                      step3 = util.fromRight(step3);
                     }
                     break;
                   case BRACKET:
                     bracketCount--;
                     if (fail === null) {
-                      result = util2.fromRight(step3);
+                      result = util.fromRight(step3);
                       attempts = new Aff2(CONS, new Aff2(RELEASE, attempt._2, result), attempts, tmp);
                       if (interrupt === tmp || bracketCount > 0) {
                         status = CONTINUE;
@@ -4699,11 +4618,11 @@
                     attempts = new Aff2(CONS, new Aff2(FINALIZED, step3, fail), attempts, interrupt);
                     status = CONTINUE;
                     if (interrupt && interrupt !== tmp && bracketCount === 0) {
-                      step3 = attempt._1.killed(util2.fromLeft(interrupt))(attempt._2);
+                      step3 = attempt._1.killed(util.fromLeft(interrupt))(attempt._2);
                     } else if (fail) {
-                      step3 = attempt._1.failed(util2.fromLeft(fail))(attempt._2);
+                      step3 = attempt._1.failed(util.fromLeft(fail))(attempt._2);
                     } else {
-                      step3 = attempt._1.completed(util2.fromRight(step3))(attempt._2);
+                      step3 = attempt._1.completed(util.fromRight(step3))(attempt._2);
                     }
                     fail = null;
                     bracketCount++;
@@ -4733,12 +4652,12 @@
               joins = null;
               if (interrupt && fail) {
                 setTimeout(function() {
-                  throw util2.fromLeft(fail);
+                  throw util.fromLeft(fail);
                 }, 0);
-              } else if (util2.isLeft(step3) && rethrow) {
+              } else if (util.isLeft(step3) && rethrow) {
                 setTimeout(function() {
                   if (rethrow) {
-                    throw util2.fromLeft(step3);
+                    throw util.fromLeft(step3);
                   }
                 }, 0);
               }
@@ -4772,26 +4691,26 @@
       function kill(error2, cb2) {
         return function() {
           if (status === COMPLETED) {
-            cb2(util2.right(void 0))();
+            cb2(util.right(void 0))();
             return function() {
             };
           }
           var canceler = onComplete({
             rethrow: false,
             handler: function() {
-              return cb2(util2.right(void 0));
+              return cb2(util.right(void 0));
             }
           })();
           switch (status) {
             case SUSPENDED:
-              interrupt = util2.left(error2);
+              interrupt = util.left(error2);
               status = COMPLETED;
               step3 = interrupt;
               run3(runTick);
               break;
             case PENDING:
               if (interrupt === null) {
-                interrupt = util2.left(error2);
+                interrupt = util.left(error2);
               }
               if (bracketCount === 0) {
                 if (status === PENDING) {
@@ -4805,7 +4724,7 @@
               break;
             default:
               if (interrupt === null) {
-                interrupt = util2.left(error2);
+                interrupt = util.left(error2);
               }
               if (bracketCount === 0) {
                 status = RETURN;
@@ -4848,7 +4767,7 @@
         }
       };
     }
-    function runPar(util2, supervisor, par, cb2) {
+    function runPar(util, supervisor, par, cb2) {
       var fiberId = 0;
       var fibers = {};
       var killId = 0;
@@ -4904,7 +4823,7 @@
             }
           }
         if (count2 === 0) {
-          cb3(util2.right(void 0))();
+          cb3(util.right(void 0))();
         } else {
           kid = 0;
           tmp = count2;
@@ -4916,7 +4835,7 @@
       }
       function join3(result, head4, tail2) {
         var fail, step3, lhs, rhs, tmp, kid;
-        if (util2.isLeft(result)) {
+        if (util.isLeft(result)) {
           fail = result;
           step3 = null;
         } else {
@@ -4942,7 +4861,7 @@
             switch (head4.tag) {
               case MAP:
                 if (fail === null) {
-                  head4._3 = util2.right(head4._1(util2.fromRight(step3)));
+                  head4._3 = util.right(head4._1(util.fromRight(step3)));
                   step3 = head4._3;
                 } else {
                   head4._3 = fail;
@@ -4974,17 +4893,17 @@
                 } else if (lhs === EMPTY || rhs === EMPTY) {
                   return;
                 } else {
-                  step3 = util2.right(util2.fromRight(lhs)(util2.fromRight(rhs)));
+                  step3 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
                   head4._3 = step3;
                 }
                 break;
               case ALT:
                 lhs = head4._1._3;
                 rhs = head4._2._3;
-                if (lhs === EMPTY && util2.isLeft(rhs) || rhs === EMPTY && util2.isLeft(lhs)) {
+                if (lhs === EMPTY && util.isLeft(rhs) || rhs === EMPTY && util.isLeft(lhs)) {
                   return;
                 }
-                if (lhs !== EMPTY && util2.isLeft(lhs) && rhs !== EMPTY && util2.isLeft(rhs)) {
+                if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
                   fail = step3 === lhs ? rhs : lhs;
                   step3 = null;
                   head4._3 = fail;
@@ -5067,7 +4986,7 @@
                     status = RETURN;
                     tmp = step3;
                     step3 = new Aff2(FORKED, fid, new Aff2(CONS, head4, tail2), EMPTY);
-                    tmp = Fiber(util2, supervisor, tmp);
+                    tmp = Fiber(util, supervisor, tmp);
                     tmp.onComplete({
                       rethrow: false,
                       handler: resolve(step3)
@@ -5105,7 +5024,7 @@
         }
       }
       function cancel(error2, cb3) {
-        interrupt = util2.left(error2);
+        interrupt = util.left(error2);
         var innerKills;
         for (var kid in kills) {
           if (kills.hasOwnProperty(kid)) {
@@ -5141,10 +5060,10 @@
         });
       };
     }
-    function sequential2(util2, supervisor, par) {
+    function sequential2(util, supervisor, par) {
       return new Aff2(ASYNC, function(cb2) {
         return function() {
-          return runPar(util2, supervisor, par, cb2);
+          return runPar(util, supervisor, par, cb2);
         };
       });
     }
@@ -6272,12 +6191,12 @@
 
   // output/Control.Monad.State.Trans/index.js
   var functorStateT = function(dictFunctor) {
-    var map11 = map(dictFunctor);
+    var map10 = map(dictFunctor);
     return {
       map: function(f) {
         return function(v) {
           return function(s) {
-            return map11(function(v1) {
+            return map10(function(v1) {
               return new Tuple(f(v1.value0), v1.value1);
             })(v(s));
           };
@@ -6818,17 +6737,10 @@
       return c.getContext("2d");
     };
   }
-  function setLineWidth(ctx) {
-    return function(width8) {
-      return function() {
-        ctx.lineWidth = width8;
-      };
-    };
-  }
-  function setStrokeStyle(ctx) {
+  function setFillStyle(ctx) {
     return function(style) {
       return function() {
-        ctx.strokeStyle = style;
+        ctx.fillStyle = style;
       };
     };
   }
@@ -6837,37 +6749,9 @@
       ctx.beginPath();
     };
   }
-  function stroke(ctx) {
-    return function() {
-      ctx.stroke();
-    };
-  }
   function fill(ctx) {
     return function() {
       ctx.fill();
-    };
-  }
-  function lineTo(ctx) {
-    return function(x) {
-      return function(y) {
-        return function() {
-          ctx.lineTo(x, y);
-        };
-      };
-    };
-  }
-  function moveTo2(ctx) {
-    return function(x) {
-      return function(y) {
-        return function() {
-          ctx.moveTo(x, y);
-        };
-      };
-    };
-  }
-  function closePath(ctx) {
-    return function() {
-      ctx.closePath();
     };
   }
   function arc(ctx) {
@@ -6879,16 +6763,6 @@
   }
 
   // output/Graphics.Canvas/index.js
-  var strokePath = function(ctx) {
-    return function(path) {
-      return function __do3() {
-        beginPath(ctx)();
-        var a = path();
-        stroke(ctx)();
-        return a;
-      };
-    };
-  };
   var getCanvasElementById = function(elId) {
     return getCanvasElementByIdImpl(elId, Just.create, Nothing.value);
   };
@@ -6939,10 +6813,6 @@
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
   var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnTouchstartCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
-  var map10 = /* @__PURE__ */ map(functorEvent);
-  var attr2 = /* @__PURE__ */ attr(attrOnTouchmoveCb);
-  var spy2 = /* @__PURE__ */ spy();
-  var show3 = /* @__PURE__ */ show(/* @__PURE__ */ showArray(showNumber));
   var initialPos = {
     x: 0,
     y: 0
@@ -6965,10 +6835,11 @@
                 return for_4(melem)(function(elem3) {
                   return function __do5() {
                     var ctx = getContext2D(elem3)();
+                    setFillStyle(ctx)("#00000077")();
                     beginPath(ctx)();
                     arc(ctx)({
                       end: 2 * pi,
-                      radius: 4,
+                      radius: 24,
                       start: 0,
                       useCounterClockwise: false,
                       x,
@@ -6983,39 +6854,7 @@
           preventDefault(e)();
           return stopPropagation(e)();
         };
-      })), map10(function(p) {
-        return attr2(OnTouchmove.value)(cb(function(e) {
-          return function __do3() {
-            for_4(fromEvent(e))(function(me) {
-              return for_4(item(0)(changedTouches(me)))(function(t) {
-                var y = toNumber(pageY(t));
-                var x = toNumber(pageX(t));
-                return function __do4() {
-                  spy2(show3([x, y]))(v.value0({
-                    x,
-                    y
-                  }))();
-                  var melem = getCanvasElementById("LiveCanvas")();
-                  return for_4(melem)(function(elem3) {
-                    return function __do5() {
-                      var ctx = getContext2D(elem3)();
-                      setStrokeStyle(ctx)("#00000077")();
-                      setLineWidth(ctx)(12)();
-                      return strokePath(ctx)(function __do6() {
-                        moveTo2(ctx)(p.x)(p.y)();
-                        lineTo(ctx)(x)(y)();
-                        return closePath(ctx)();
-                      })();
-                    };
-                  })();
-                };
-              });
-            })();
-            preventDefault(e)();
-            return stopPropagation(e)();
-          };
-        }));
-      })(v.value1)])([])]);
+      }))])([])]);
     }))();
   };
 

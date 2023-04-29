@@ -22,6 +22,7 @@ import Graphics.Canvas
     , moveTo
     , setLineWidth
     , setStrokeStyle
+    , setFillStyle
     , strokePath
     , beginPath
     , fill
@@ -84,12 +85,15 @@ main = do
                                     melem <- getCanvasElementById "LiveCanvas"
                                     for_ melem \elem -> do
                                         ctx <- getContext2D elem 
+                                        setFillStyle ctx "#00000077"
+                                        
                                         beginPath ctx
-                                        arc ctx { end: 2.0 * pi, radius: 4.0, start: 0.0, useCounterClockwise: false, x, y }
+                                        arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
                                         fill ctx
                             
                     preventDefault e
                     stopPropagation e
+                    {-
                 , (\p -> D.OnTouchmove := cb \e -> do
                     for_ (Touch.fromEvent e)
                         \me -> 
@@ -114,7 +118,8 @@ main = do
                                             closePath ctx
                     preventDefault e
                     stopPropagation e
-                    ) <$> pos            
+                    ) <$> pos   
+                    -}
                 ]
                 []
             ]
