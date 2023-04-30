@@ -31,7 +31,7 @@ import Graphics.Canvas
 import Web.Event.Event (preventDefault, stopPropagation)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
 import Web.TouchEvent.Touch (pageX, pageY) as Touch
-import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
+import Web.TouchEvent.TouchEvent (fromEvent, fromUIEvent, changedTouches) as Touch
 import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
@@ -47,7 +47,7 @@ main = do
                 [ D.Width !:= "2000px"
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
-                {-
+                
                 , (\p -> D.OnMousemove := cb \e -> do
                     preventDefault e
                     stopPropagation e
@@ -73,9 +73,11 @@ main = do
                                         closePath ctx
                                     else pure unit
                     ) <$> pos
-                    -}
+                    
+                    
+                    {-
                 , D.OnTouchstart !:= cb \e -> do
-                    for_ (Touch.fromEvent e)
+                    for_ (Touch.fromUIEvent e)
                         \me -> 
                             for_ (Touch.item 0 (Touch.changedTouches me))
                                 \t -> do
@@ -123,6 +125,8 @@ main = do
                                         fill ctx
                     preventDefault e
                     stopPropagation e
+                    -}
+                    
                     {-
                 , (\p -> D.OnTouchmove := cb \e -> do
                     for_ (Touch.fromEvent e)

@@ -175,20 +175,20 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map10 = map(dictApply.Functor0());
+    var map11 = map(dictApply.Functor0());
     return function(a) {
       return function(b) {
-        return apply1(map10($$const(identity2))(a))(b);
+        return apply1(map11($$const(identity2))(a))(b);
       };
     };
   };
   var lift2 = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map10 = map(dictApply.Functor0());
+    var map11 = map(dictApply.Functor0());
     return function(f) {
       return function(a) {
         return function(b) {
-          return apply1(map10(f)(a))(b);
+          return apply1(map11(f)(a))(b);
         };
       };
     };
@@ -713,9 +713,6 @@
       return n % m;
     };
   };
-
-  // output/Data.Number/index.js
-  var pi = 3.141592653589793;
 
   // output/Data.Int/index.js
   var top2 = /* @__PURE__ */ top(boundedInt);
@@ -1358,7 +1355,7 @@
       };
     }
     return function(apply5) {
-      return function(map10) {
+      return function(map11) {
         return function(pure9) {
           return function(f) {
             return function(array) {
@@ -1367,14 +1364,14 @@
                   case 0:
                     return pure9([]);
                   case 1:
-                    return map10(array1)(f(array[bot]));
+                    return map11(array1)(f(array[bot]));
                   case 2:
-                    return apply5(map10(array2)(f(array[bot])))(f(array[bot + 1]));
+                    return apply5(map11(array2)(f(array[bot])))(f(array[bot + 1]));
                   case 3:
-                    return apply5(apply5(map10(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                    return apply5(apply5(map11(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
                     var pivot = bot + Math.floor((top3 - bot) / 4) * 2;
-                    return apply5(map10(concat2)(go2(bot, pivot)))(go2(pivot, top3));
+                    return apply5(map11(concat2)(go2(bot, pivot)))(go2(pivot, top3));
                 }
               }
               return go2(0, array.length);
@@ -3501,19 +3498,19 @@
     }
   };
 
-  // output/Deku.DOM.Attr.OnTouchstart/index.js
-  var OnTouchstart = /* @__PURE__ */ function() {
-    function OnTouchstart2() {
+  // output/Deku.DOM.Attr.OnMousemove/index.js
+  var OnMousemove = /* @__PURE__ */ function() {
+    function OnMousemove2() {
     }
     ;
-    OnTouchstart2.value = new OnTouchstart2();
-    return OnTouchstart2;
+    OnMousemove2.value = new OnMousemove2();
+    return OnMousemove2;
   }();
-  var attrOnTouchstartCb = {
+  var attrOnMousemoveCb = {
     attr: function(v) {
       return function(value12) {
         return unsafeAttribute({
-          key: "touchstart  ",
+          key: "mousemove",
           value: cb$prime(value12)
         });
       };
@@ -3674,10 +3671,10 @@
       return arr;
     }
     return function(apply5) {
-      return function(map10) {
+      return function(map11) {
         return function(f) {
           var buildFrom = function(x, ys) {
-            return apply5(map10(consList)(f(x)))(ys);
+            return apply5(map11(consList)(f(x)))(ys);
           };
           var go2 = function(acc, currentLen, xs) {
             if (currentLen === 0) {
@@ -3691,12 +3688,12 @@
             }
           };
           return function(array) {
-            var acc = map10(finalCell)(f(array[array.length - 1]));
+            var acc = map11(finalCell)(f(array[array.length - 1]));
             var result = go2(acc, array.length - 1, array);
             while (result instanceof Cont) {
               result = result.fn();
             }
-            return map10(listToArray)(result);
+            return map11(listToArray)(result);
           };
         };
       };
@@ -6191,12 +6188,12 @@
 
   // output/Control.Monad.State.Trans/index.js
   var functorStateT = function(dictFunctor) {
-    var map10 = map(dictFunctor);
+    var map11 = map(dictFunctor);
     return {
       map: function(f) {
         return function(v) {
           return function(s) {
-            return map10(function(v1) {
+            return map11(function(v1) {
               return new Tuple(f(v1.value0), v1.value1);
             })(v(s));
           };
@@ -6737,10 +6734,17 @@
       return c.getContext("2d");
     };
   }
-  function setFillStyle(ctx) {
+  function setLineWidth(ctx) {
+    return function(width8) {
+      return function() {
+        ctx.lineWidth = width8;
+      };
+    };
+  }
+  function setStrokeStyle(ctx) {
     return function(style) {
       return function() {
-        ctx.fillStyle = style;
+        ctx.strokeStyle = style;
       };
     };
   }
@@ -6749,9 +6753,27 @@
       ctx.beginPath();
     };
   }
-  function fill(ctx) {
+  function stroke(ctx) {
     return function() {
-      ctx.fill();
+      ctx.stroke();
+    };
+  }
+  function lineTo(ctx) {
+    return function(x) {
+      return function(y) {
+        return function() {
+          ctx.lineTo(x, y);
+        };
+      };
+    };
+  }
+  function moveTo2(ctx) {
+    return function(x) {
+      return function(y) {
+        return function() {
+          ctx.moveTo(x, y);
+        };
+      };
     };
   }
   function closePath(ctx) {
@@ -6759,15 +6781,18 @@
       ctx.closePath();
     };
   }
-  function arc(ctx) {
-    return function(a) {
-      return function() {
-        ctx.arc(a.x, a.y, a.radius, a.start, a.end, a.useCounterClockwise);
-      };
-    };
-  }
 
   // output/Graphics.Canvas/index.js
+  var strokePath = function(ctx) {
+    return function(path) {
+      return function __do3() {
+        beginPath(ctx)();
+        var a = path();
+        stroke(ctx)();
+        return a;
+      };
+    };
+  };
   var getCanvasElementById = function(elId) {
     return getCanvasElementByIdImpl(elId, Just.create, Nothing.value);
   };
@@ -6784,39 +6809,26 @@
     };
   }
 
-  // output/Web.TouchEvent.Touch/foreign.js
-  function pageX(t) {
-    return t.pageX;
+  // output/Web.UIEvent.MouseEvent/foreign.js
+  function clientX(e) {
+    return e.clientX;
   }
-  function pageY(t) {
-    return t.pageY;
+  function clientY(e) {
+    return e.clientY;
   }
-
-  // output/Web.TouchEvent.TouchEvent/foreign.js
-  function changedTouches(e) {
-    return e.changedTouches;
+  function buttons(e) {
+    return e.buttons;
   }
 
-  // output/Web.TouchEvent.TouchEvent/index.js
-  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("TouchEvent");
-
-  // output/Web.TouchEvent.TouchList/foreign.js
-  function _item(i, l) {
-    return l.item(i);
-  }
-
-  // output/Web.TouchEvent.TouchList/index.js
-  var item = function(i) {
-    return function(l) {
-      return toMaybe(_item(i, l));
-    };
-  };
+  // output/Web.UIEvent.MouseEvent/index.js
+  var fromEvent = /* @__PURE__ */ unsafeReadProtoTagged("MouseEvent");
 
   // output/Main/index.js
   var pureAttr2 = /* @__PURE__ */ pureAttr(attrCanvas_WidthString);
   var pureAttr1 = /* @__PURE__ */ pureAttr(attrCanvas_HeightString);
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
-  var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnTouchstartCb);
+  var map10 = /* @__PURE__ */ map(functorEvent);
+  var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var initialPos = {
     x: 0,
@@ -6825,12 +6837,14 @@
   var main = function __do2() {
     var isMobile = emitsTouchEvents();
     return runInBody(bind3(useState(initialPos))(function(v) {
-      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnTouchstart.value)(cb(function(e) {
-        return function __do3() {
-          for_4(fromEvent(e))(function(me) {
-            return for_4(item(0)(changedTouches(me)))(function(t) {
-              var y = toNumber(pageY(t));
-              var x = toNumber(pageX(t));
+      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
+        return attr2(OnMousemove.value)(cb(function(e) {
+          return function __do3() {
+            preventDefault(e)();
+            stopPropagation(e)();
+            return for_4(fromEvent(e))(function(me) {
+              var y = toNumber(clientY(me));
+              var x = toNumber(clientX(me));
               return function __do4() {
                 v.value0({
                   x,
@@ -6840,85 +6854,25 @@
                 return for_4(melem)(function(elem3) {
                   return function __do5() {
                     var ctx = getContext2D(elem3)();
-                    setFillStyle(ctx)("#00000077")();
-                    beginPath(ctx)();
-                    arc(ctx)({
-                      end: 2 * pi,
-                      radius: 24,
-                      start: 0,
-                      useCounterClockwise: false,
-                      x,
-                      y
-                    })();
-                    closePath(ctx)();
-                    return fill(ctx)();
+                    setStrokeStyle(ctx)("#00000077")();
+                    setLineWidth(ctx)(12)();
+                    var $14 = buttons(me) > 0;
+                    if ($14) {
+                      return strokePath(ctx)(function __do6() {
+                        moveTo2(ctx)(p.x)(p.y)();
+                        lineTo(ctx)(x)(y)();
+                        return closePath(ctx)();
+                      })();
+                    }
+                    ;
+                    return unit;
                   };
                 })();
               };
-            });
-          })();
-          for_4(fromEvent(e))(function(me) {
-            return for_4(item(1)(changedTouches(me)))(function(t) {
-              var y = toNumber(pageY(t));
-              var x = toNumber(pageX(t));
-              return function __do4() {
-                v.value0({
-                  x,
-                  y
-                })();
-                var melem = getCanvasElementById("LiveCanvas")();
-                return for_4(melem)(function(elem3) {
-                  return function __do5() {
-                    var ctx = getContext2D(elem3)();
-                    setFillStyle(ctx)("#00000077")();
-                    beginPath(ctx)();
-                    arc(ctx)({
-                      end: 2 * pi,
-                      radius: 24,
-                      start: 0,
-                      useCounterClockwise: false,
-                      x,
-                      y
-                    })();
-                    return fill(ctx)();
-                  };
-                })();
-              };
-            });
-          })();
-          for_4(fromEvent(e))(function(me) {
-            return for_4(item(2)(changedTouches(me)))(function(t) {
-              var y = toNumber(pageY(t));
-              var x = toNumber(pageX(t));
-              return function __do4() {
-                v.value0({
-                  x,
-                  y
-                })();
-                var melem = getCanvasElementById("LiveCanvas")();
-                return for_4(melem)(function(elem3) {
-                  return function __do5() {
-                    var ctx = getContext2D(elem3)();
-                    setFillStyle(ctx)("#00000077")();
-                    beginPath(ctx)();
-                    arc(ctx)({
-                      end: 2 * pi,
-                      radius: 24,
-                      start: 0,
-                      useCounterClockwise: false,
-                      x,
-                      y
-                    })();
-                    return fill(ctx)();
-                  };
-                })();
-              };
-            });
-          })();
-          preventDefault(e)();
-          return stopPropagation(e)();
-        };
-      }))])([])]);
+            })();
+          };
+        }));
+      })(v.value1)])([])]);
     }))();
   };
 
