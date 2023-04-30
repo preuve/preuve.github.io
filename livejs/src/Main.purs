@@ -55,24 +55,24 @@ main = do
                 , D.OnMouseup !:= cb \e -> do
                     setPos initialPos
                 , (\mp -> D.OnMousemove := cb \e -> do
-                    for_ mp \p -> do 
-                        melem <- getCanvasElementById "LiveCanvas"
-                        for_ melem \elem -> do
-                            ctx <- getContext2D elem 
-                            setStrokeStyle ctx "#00000077"
-                            setLineWidth ctx 12.0
-                            for_ (fromEvent e)
-                                \me -> do
+                    for_ (fromEvent e)
+                        \me -> do
+                            let x = toNumber $ clientX me
+                                y = toNumber $ clientY me
+                            for_ mp 
+                                \p -> do 
                                     let lastX = p.x
                                         lastY = p.y
-                                        x = toNumber $ clientX me
-                                        y = toNumber $ clientY me
-                                    setPos $ Just { x, y }
-                                    
-                                    strokePath ctx $ do
-                                        moveTo ctx lastX lastY
-                                        lineTo ctx x y
-                                        closePath ctx
+                                    melem <- getCanvasElementById "LiveCanvas"
+                                    for_ melem \elem -> do
+                                        ctx <- getContext2D elem 
+                                        setStrokeStyle ctx "#00000077"
+                                        setLineWidth ctx 12.0
+                                        strokePath ctx $ do
+                                            moveTo ctx lastX lastY
+                                            lineTo ctx x y
+                                            closePath ctx
+                            setPos $ Just { x, y }
                     ) <$> pos
                     
                     

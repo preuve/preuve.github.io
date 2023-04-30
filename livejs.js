@@ -6862,22 +6862,18 @@
       return v.value0(initialPos);
     })), map10(function(mp) {
       return attr2(OnMousemove.value)(cb(function(e) {
-        return for_4(mp)(function(p) {
+        return for_4(fromEvent(e))(function(me) {
+          var y = toNumber(clientY(me));
+          var x = toNumber(clientX(me));
           return function __do2() {
-            var melem = getCanvasElementById("LiveCanvas")();
-            return for_4(melem)(function(elem3) {
+            for_4(mp)(function(p) {
               return function __do3() {
-                var ctx = getContext2D(elem3)();
-                setStrokeStyle(ctx)("#00000077")();
-                setLineWidth(ctx)(12)();
-                return for_4(fromEvent(e))(function(me) {
-                  var y = toNumber(clientY(me));
-                  var x = toNumber(clientX(me));
+                var melem = getCanvasElementById("LiveCanvas")();
+                return for_4(melem)(function(elem3) {
                   return function __do4() {
-                    v.value0(new Just({
-                      x,
-                      y
-                    }))();
+                    var ctx = getContext2D(elem3)();
+                    setStrokeStyle(ctx)("#00000077")();
+                    setLineWidth(ctx)(12)();
                     return strokePath(ctx)(function __do5() {
                       moveTo2(ctx)(p.x)(p.y)();
                       lineTo(ctx)(x)(y)();
@@ -6887,6 +6883,10 @@
                 })();
               };
             })();
+            return v.value0(new Just({
+              x,
+              y
+            }))();
           };
         });
       }));
