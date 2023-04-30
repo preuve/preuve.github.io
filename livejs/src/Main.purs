@@ -49,20 +49,14 @@ main = do
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
                 , D.OnMousedown !:= cb \e -> do
-                    preventDefault e
-                    stopPropagation e
                     for_ (fromEvent e)
                         \me -> do
                             let x = toNumber $ clientX me
                                 y = toNumber $ clientY me
                             setPos $ Just { x, y }
                 , D.OnMouseup !:= cb \e -> do
-                    preventDefault e
-                    stopPropagation e
                     setPos initialPos
                 , (\mp -> D.OnMousemove := cb \e -> do
-                    preventDefault e
-                    stopPropagation e
                     for_ mp \p -> do 
                         melem <- getCanvasElementById "LiveCanvas"
                         for_ melem \elem -> do
