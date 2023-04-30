@@ -6831,6 +6831,11 @@
       return e.preventDefault();
     };
   }
+  function stopPropagation(e) {
+    return function() {
+      return e.stopPropagation();
+    };
+  }
 
   // output/Web.UIEvent.MouseEvent/foreign.js
   function clientX(e) {
@@ -6859,6 +6864,7 @@
     return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
       return function __do2() {
         preventDefault(e)();
+        stopPropagation(e)();
         return for_4(fromEvent(e))(function(me) {
           var y = toNumber(clientY(me));
           var x = toNumber(clientX(me));
@@ -6874,6 +6880,7 @@
       return attr2(OnMousemove.value)(cb(function(e) {
         return function __do2() {
           preventDefault(e)();
+          stopPropagation(e)();
           return for_4(fromEvent(e))(function(me) {
             var y = toNumber(clientY(me));
             var x = toNumber(clientX(me));
@@ -6884,7 +6891,7 @@
                   return for_4(melem)(function(elem3) {
                     return function __do5() {
                       var ctx = getContext2D(elem3)();
-                      setStrokeStyle(ctx)("#00000177")();
+                      setStrokeStyle(ctx)("#00000277")();
                       setLineWidth(ctx)(12)();
                       return strokePath(ctx)(function __do6() {
                         moveTo2(ctx)(p.x)(p.y)();
