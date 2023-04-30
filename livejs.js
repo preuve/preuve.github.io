@@ -6825,6 +6825,13 @@
     return getCanvasElementByIdImpl(elId, Just.create, Nothing.value);
   };
 
+  // output/Web.Event.Event/foreign.js
+  function preventDefault(e) {
+    return function() {
+      return e.preventDefault();
+    };
+  }
+
   // output/Web.UIEvent.MouseEvent/foreign.js
   function clientX(e) {
     return e.clientX;
@@ -6850,45 +6857,51 @@
   }();
   var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
     return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
-      return for_4(fromEvent(e))(function(me) {
-        var y = toNumber(clientY(me));
-        var x = toNumber(clientX(me));
-        return v.value0(new Just({
-          x,
-          y
-        }));
-      });
+      return function __do2() {
+        preventDefault(e)();
+        return for_4(fromEvent(e))(function(me) {
+          var y = toNumber(clientY(me));
+          var x = toNumber(clientX(me));
+          return v.value0(new Just({
+            x,
+            y
+          }));
+        })();
+      };
     })), pureAttr4(OnMouseup.value)(cb(function(e) {
       return v.value0(initialPos);
     })), map10(function(mp) {
       return attr2(OnMousemove.value)(cb(function(e) {
-        return for_4(fromEvent(e))(function(me) {
-          var y = toNumber(clientY(me));
-          var x = toNumber(clientX(me));
-          return function __do2() {
-            for_4(mp)(function(p) {
-              return function __do3() {
-                var melem = getCanvasElementById("LiveCanvas")();
-                return for_4(melem)(function(elem3) {
-                  return function __do4() {
-                    var ctx = getContext2D(elem3)();
-                    setStrokeStyle(ctx)("#00000077")();
-                    setLineWidth(ctx)(12)();
-                    return strokePath(ctx)(function __do5() {
-                      moveTo2(ctx)(p.x)(p.y)();
-                      lineTo(ctx)(x)(y)();
-                      return closePath(ctx)();
-                    })();
-                  };
-                })();
-              };
-            })();
-            return v.value0(new Just({
-              x,
-              y
-            }))();
-          };
-        });
+        return function __do2() {
+          preventDefault(e)();
+          return for_4(fromEvent(e))(function(me) {
+            var y = toNumber(clientY(me));
+            var x = toNumber(clientX(me));
+            return function __do3() {
+              for_4(mp)(function(p) {
+                return function __do4() {
+                  var melem = getCanvasElementById("LiveCanvas")();
+                  return for_4(melem)(function(elem3) {
+                    return function __do5() {
+                      var ctx = getContext2D(elem3)();
+                      setStrokeStyle(ctx)("#00000177")();
+                      setLineWidth(ctx)(12)();
+                      return strokePath(ctx)(function __do6() {
+                        moveTo2(ctx)(p.x)(p.y)();
+                        lineTo(ctx)(x)(y)();
+                        return closePath(ctx)();
+                      })();
+                    };
+                  })();
+                };
+              })();
+              return v.value0(new Just({
+                x,
+                y
+              }))();
+            };
+          })();
+        };
       }));
     })(v.value1)])([])]);
   }));

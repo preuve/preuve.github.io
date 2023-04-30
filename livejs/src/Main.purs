@@ -47,6 +47,7 @@ main = do
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
                 , D.OnMousedown !:= cb \e -> do
+                    preventDefault e
                     for_ (fromEvent e)
                         \me -> do
                             let x = toNumber $ clientX me
@@ -55,6 +56,7 @@ main = do
                 , D.OnMouseup !:= cb \e -> do
                     setPos initialPos
                 , (\mp -> D.OnMousemove := cb \e -> do
+                    preventDefault e
                     for_ (fromEvent e)
                         \me -> do
                             let x = toNumber $ clientX me
@@ -66,7 +68,7 @@ main = do
                                     melem <- getCanvasElementById "LiveCanvas"
                                     for_ melem \elem -> do
                                         ctx <- getContext2D elem 
-                                        setStrokeStyle ctx "#00000077"
+                                        setStrokeStyle ctx "#00000177"
                                         setLineWidth ctx 12.0
                                         strokePath ctx $ do
                                             moveTo ctx lastX lastY
