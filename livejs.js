@@ -6841,6 +6841,11 @@
       return e.preventDefault();
     };
   }
+  function stopPropagation(e) {
+    return function() {
+      return e.stopPropagation();
+    };
+  }
 
   // output/Web.UIEvent.MouseEvent/foreign.js
   function clientX(e) {
@@ -6862,55 +6867,58 @@
   var pureAttr4 = /* @__PURE__ */ pureAttr(attrOnMouseupCb);
   var map10 = /* @__PURE__ */ map(functorEvent);
   var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
-  var initialPos = {
-    x: 0,
-    y: 0,
-    down: false
-  };
+  var initialPos = /* @__PURE__ */ function() {
+    return Nothing.value;
+  }();
   var main = function __do2() {
     var isMobile = emitsTouchEvents();
     return runInBody(bind3(useState(initialPos))(function(v) {
       return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
         return function __do3() {
           preventDefault(e)();
+          stopPropagation(e)();
           return for_4(fromEvent(e))(function(me) {
             var y = toNumber(clientY(me));
             var x = toNumber(clientX(me));
-            return v.value0({
+            return v.value0(new Just({
               x,
-              y,
-              down: true
-            });
+              y
+            }));
           })();
         };
       })), pureAttr4(OnMouseup.value)(cb(function(e) {
         return function __do3() {
           preventDefault(e)();
+          stopPropagation(e)();
           return v.value0(initialPos)();
         };
-      })), map10(function(p) {
+      })), map10(function(mp) {
         return attr2(OnMousemove.value)(cb(function(e) {
           return function __do3() {
             preventDefault(e)();
-            return for_4(fromEvent(e))(function(me) {
-              var y = toNumber(clientY(me));
-              var x = toNumber(clientX(me));
+            stopPropagation(e)();
+            return for_4(mp)(function(p) {
               return function __do4() {
-                v.value0({
-                  x,
-                  y,
-                  down: true
-                })();
                 var melem = getCanvasElementById("LiveCanvas")();
                 return for_4(melem)(function(elem3) {
                   return function __do5() {
                     var ctx = getContext2D(elem3)();
                     setStrokeStyle(ctx)("#00000077")();
                     setLineWidth(ctx)(12)();
-                    return strokePath(ctx)(function __do6() {
-                      moveTo2(ctx)(p.x)(p.y)();
-                      lineTo(ctx)(x)(y)();
-                      return closePath(ctx)();
+                    return for_4(fromEvent(e))(function(me) {
+                      var y = toNumber(clientY(me));
+                      var x = toNumber(clientX(me));
+                      return function __do6() {
+                        v.value0(new Just({
+                          x,
+                          y
+                        }))();
+                        return strokePath(ctx)(function __do7() {
+                          moveTo2(ctx)(p.x)(p.y)();
+                          lineTo(ctx)(x)(y)();
+                          return closePath(ctx)();
+                        })();
+                      };
                     })();
                   };
                 })();

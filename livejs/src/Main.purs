@@ -4,6 +4,7 @@ import Prelude
 
 import Data.Foldable (for_)
 import Data.Int (toNumber)
+import Data.Maybe (Maybe (..))
 import Data.Number (pi)
 import Data.Tuple.Nested ((/\))
 import Deku.Attribute ((:=), (!:=), cb)
@@ -35,7 +36,7 @@ import Web.TouchEvent.TouchEvent (fromEvent, fromUIEvent, changedTouches) as Tou
 import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
-initialPos = { x: 0.0, y: 0.0, down: false } :: { x :: Number, y :: Number, down :: Boolean }
+initialPos = Nothing :: Maybe { x :: Number, y :: Number }
 
 main :: Effect Unit
 main = do
@@ -49,35 +50,37 @@ main = do
                 , D.Id !:= "LiveCanvas"
                 , D.OnMousedown !:= cb \e -> do
                     preventDefault e
+                    stopPropagation e
                     for_ (fromEvent e)
                         \me -> do
                             let x = toNumber $ clientX me
                                 y = toNumber $ clientY me
-                            setPos { x, y, down: true }
+                            setPos $ Just { x, y }
                 , D.OnMouseup !:= cb \e -> do
                     preventDefault e
+                    stopPropagation e
                     setPos initialPos
-                , (\p -> D.OnMousemove := cb \e -> do
+                , (\mp -> D.OnMousemove := cb \e -> do
                     preventDefault e
-                    for_ (fromEvent e)
-                        \me -> do
-                            let lastX = p.x
-                                lastY = p.y
-                                x = toNumber $ clientX me
-                                y = toNumber $ clientY me
-                            --spy (show [x,y]) $ 
-                            setPos { x, y, down: true }
-                            melem <- getCanvasElementById "LiveCanvas"
-                            for_ melem \elem -> do
-                                ctx <- getContext2D elem 
-                                setStrokeStyle ctx "#00000077"
-                                
-                                setLineWidth ctx 12.0
-                                
-                                strokePath ctx $ do
-                                    moveTo ctx lastX lastY
-                                    lineTo ctx x y
-                                    closePath ctx
+                    stopPropagation e
+                    for_ mp \p -> do 
+                        melem <- getCanvasElementById "LiveCanvas"
+                        for_ melem \elem -> do
+                            ctx <- getContext2D elem 
+                            setStrokeStyle ctx "#00000077"
+                            setLineWidth ctx 12.0
+                            for_ (fromEvent e)
+                                \me -> do
+                                    let lastX = p.x
+                                        lastY = p.y
+                                        x = toNumber $ clientX me
+                                        y = toNumber $ clientY me
+                                    setPos $ Just { x, y }
+                                    
+                                    strokePath ctx $ do
+                                        moveTo ctx lastX lastY
+                                        lineTo ctx x y
+                                        closePath ctx
                     ) <$> pos
                     
                     
