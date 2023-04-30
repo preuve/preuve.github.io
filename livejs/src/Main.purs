@@ -35,12 +35,10 @@ import Web.TouchEvent.TouchEvent (fromEvent, fromUIEvent, changedTouches) as Tou
 import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
-initialPos = Nothing :: Maybe { x :: Number, y :: Number }
-
 main :: Effect Unit
 main = do
     runInBody Deku.do
-        setPos /\ pos <- useState initialPos
+        setPos /\ pos <- useState Nothing
         D.div_
             [ D.canvas
                 [ D.Width !:= "2000px"
@@ -54,8 +52,28 @@ main = do
                             let x = toNumber $ clientX me
                                 y = toNumber $ clientY me
                             setPos $ Just { x, y }
-                , D.OnMouseup !:= cb \e -> do
-                    setPos initialPos
+                , (\mp -> D.OnMouseup := cb \e -> do
+                    preventDefault e
+                    stopPropagation e
+                    for_ (fromEvent e)
+                        \me -> do
+                            let x = toNumber $ clientX me
+                                y = toNumber $ clientY me
+                            for_ mp 
+                                \p -> do 
+                                    let lastX = p.x
+                                        lastY = p.y
+                                    melem <- getCanvasElementById "LiveCanvas"
+                                    for_ melem \elem -> do
+                                        ctx <- getContext2D elem 
+                                        setStrokeStyle ctx "#00000277"
+                                        setLineWidth ctx 12.0
+                                        strokePath ctx $ do
+                                            moveTo ctx lastX lastY
+                                            lineTo ctx x y
+                                            closePath ctx
+                            setPos Nothing
+                    ) <$> pos
                 , (\mp -> D.OnMousemove := cb \e -> do
                     preventDefault e
                     stopPropagation e

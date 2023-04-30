@@ -3452,10 +3452,10 @@
     return dict.attr;
   };
   var pureAttr = function(dictAttr) {
-    var attr1 = attr(dictAttr);
+    var attr12 = attr(dictAttr);
     return function(a) {
       return function(b) {
-        return pure4(attr1(a)(b));
+        return pure4(attr12(a)(b));
       };
     };
   };
@@ -6854,64 +6854,92 @@
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
   var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnMousedownCb);
   var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
-  var pureAttr4 = /* @__PURE__ */ pureAttr(attrOnMouseupCb);
   var map10 = /* @__PURE__ */ map(functorEvent);
-  var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
-  var initialPos = /* @__PURE__ */ function() {
-    return Nothing.value;
-  }();
-  var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
-    return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
-      return function __do2() {
-        preventDefault(e)();
-        stopPropagation(e)();
-        return for_4(fromEvent(e))(function(me) {
-          var y = toNumber(clientY(me));
-          var x = toNumber(clientX(me));
-          return v.value0(new Just({
-            x,
-            y
-          }));
-        })();
-      };
-    })), pureAttr4(OnMouseup.value)(cb(function(e) {
-      return v.value0(initialPos);
-    })), map10(function(mp) {
-      return attr2(OnMousemove.value)(cb(function(e) {
+  var attr2 = /* @__PURE__ */ attr(attrOnMouseupCb);
+  var attr1 = /* @__PURE__ */ attr(attrOnMousemoveCb);
+  var main = /* @__PURE__ */ function() {
+    return runInBody(bind3(useState(Nothing.value))(function(v) {
+      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
         return function __do2() {
           preventDefault(e)();
           stopPropagation(e)();
           return for_4(fromEvent(e))(function(me) {
             var y = toNumber(clientY(me));
             var x = toNumber(clientX(me));
-            return function __do3() {
-              for_4(mp)(function(p) {
-                return function __do4() {
-                  var melem = getCanvasElementById("LiveCanvas")();
-                  return for_4(melem)(function(elem3) {
-                    return function __do5() {
-                      var ctx = getContext2D(elem3)();
-                      setStrokeStyle(ctx)("#00000277")();
-                      setLineWidth(ctx)(12)();
-                      return strokePath(ctx)(function __do6() {
-                        moveTo2(ctx)(p.x)(p.y)();
-                        lineTo(ctx)(x)(y)();
-                        return closePath(ctx)();
-                      })();
-                    };
-                  })();
-                };
-              })();
-              return v.value0(new Just({
-                x,
-                y
-              }))();
-            };
+            return v.value0(new Just({
+              x,
+              y
+            }));
           })();
         };
-      }));
-    })(v.value1)])([])]);
-  }));
+      })), map10(function(mp) {
+        return attr2(OnMouseup.value)(cb(function(e) {
+          return function __do2() {
+            preventDefault(e)();
+            stopPropagation(e)();
+            return for_4(fromEvent(e))(function(me) {
+              var y = toNumber(clientY(me));
+              var x = toNumber(clientX(me));
+              return function __do3() {
+                for_4(mp)(function(p) {
+                  return function __do4() {
+                    var melem = getCanvasElementById("LiveCanvas")();
+                    return for_4(melem)(function(elem3) {
+                      return function __do5() {
+                        var ctx = getContext2D(elem3)();
+                        setStrokeStyle(ctx)("#00000277")();
+                        setLineWidth(ctx)(12)();
+                        return strokePath(ctx)(function __do6() {
+                          moveTo2(ctx)(p.x)(p.y)();
+                          lineTo(ctx)(x)(y)();
+                          return closePath(ctx)();
+                        })();
+                      };
+                    })();
+                  };
+                })();
+                return v.value0(Nothing.value)();
+              };
+            })();
+          };
+        }));
+      })(v.value1), map10(function(mp) {
+        return attr1(OnMousemove.value)(cb(function(e) {
+          return function __do2() {
+            preventDefault(e)();
+            stopPropagation(e)();
+            return for_4(fromEvent(e))(function(me) {
+              var y = toNumber(clientY(me));
+              var x = toNumber(clientX(me));
+              return function __do3() {
+                for_4(mp)(function(p) {
+                  return function __do4() {
+                    var melem = getCanvasElementById("LiveCanvas")();
+                    return for_4(melem)(function(elem3) {
+                      return function __do5() {
+                        var ctx = getContext2D(elem3)();
+                        setStrokeStyle(ctx)("#00000277")();
+                        setLineWidth(ctx)(12)();
+                        return strokePath(ctx)(function __do6() {
+                          moveTo2(ctx)(p.x)(p.y)();
+                          lineTo(ctx)(x)(y)();
+                          return closePath(ctx)();
+                        })();
+                      };
+                    })();
+                  };
+                })();
+                return v.value0(new Just({
+                  x,
+                  y
+                }))();
+              };
+            })();
+          };
+        }));
+      })(v.value1)])([])]);
+    }));
+  }();
 
   // <stdin>
   main();
