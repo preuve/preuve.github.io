@@ -3498,6 +3498,25 @@
     }
   };
 
+  // output/Deku.DOM.Attr.OnMousedown/index.js
+  var OnMousedown = /* @__PURE__ */ function() {
+    function OnMousedown2() {
+    }
+    ;
+    OnMousedown2.value = new OnMousedown2();
+    return OnMousedown2;
+  }();
+  var attrOnMousedownCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "mousedown",
+          value: cb$prime(value12)
+        });
+      };
+    }
+  };
+
   // output/Deku.DOM.Attr.OnMousemove/index.js
   var OnMousemove = /* @__PURE__ */ function() {
     function OnMousemove2() {
@@ -3511,6 +3530,25 @@
       return function(value12) {
         return unsafeAttribute({
           key: "mousemove",
+          value: cb$prime(value12)
+        });
+      };
+    }
+  };
+
+  // output/Deku.DOM.Attr.OnMouseup/index.js
+  var OnMouseup = /* @__PURE__ */ function() {
+    function OnMouseup2() {
+    }
+    ;
+    OnMouseup2.value = new OnMouseup2();
+    return OnMouseup2;
+  }();
+  var attrOnMouseupCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "mouseup",
           value: cb$prime(value12)
         });
       };
@@ -6803,11 +6841,6 @@
       return e.preventDefault();
     };
   }
-  function stopPropagation(e) {
-    return function() {
-      return e.stopPropagation();
-    };
-  }
 
   // output/Web.UIEvent.MouseEvent/foreign.js
   function clientX(e) {
@@ -6815,9 +6848,6 @@
   }
   function clientY(e) {
     return e.clientY;
-  }
-  function buttons(e) {
-    return e.buttons;
   }
 
   // output/Web.UIEvent.MouseEvent/index.js
@@ -6827,28 +6857,49 @@
   var pureAttr2 = /* @__PURE__ */ pureAttr(attrCanvas_WidthString);
   var pureAttr1 = /* @__PURE__ */ pureAttr(attrCanvas_HeightString);
   var pureAttr22 = /* @__PURE__ */ pureAttr(attrCanvas_IdString);
+  var pureAttr3 = /* @__PURE__ */ pureAttr(attrOnMousedownCb);
+  var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
+  var pureAttr4 = /* @__PURE__ */ pureAttr(attrOnMouseupCb);
   var map10 = /* @__PURE__ */ map(functorEvent);
   var attr2 = /* @__PURE__ */ attr(attrOnMousemoveCb);
-  var for_4 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var initialPos = {
     x: 0,
-    y: 0
+    y: 0,
+    down: false
   };
   var main = function __do2() {
     var isMobile = emitsTouchEvents();
     return runInBody(bind3(useState(initialPos))(function(v) {
-      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), map10(function(p) {
+      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
+        return function __do3() {
+          preventDefault(e)();
+          return for_4(fromEvent(e))(function(me) {
+            var y = toNumber(clientY(me));
+            var x = toNumber(clientX(me));
+            return v.value0({
+              x,
+              y,
+              down: true
+            });
+          })();
+        };
+      })), pureAttr4(OnMouseup.value)(cb(function(e) {
+        return function __do3() {
+          preventDefault(e)();
+          return v.value0(initialPos)();
+        };
+      })), map10(function(p) {
         return attr2(OnMousemove.value)(cb(function(e) {
           return function __do3() {
             preventDefault(e)();
-            stopPropagation(e)();
             return for_4(fromEvent(e))(function(me) {
               var y = toNumber(clientY(me));
               var x = toNumber(clientX(me));
               return function __do4() {
                 v.value0({
                   x,
-                  y
+                  y,
+                  down: true
                 })();
                 var melem = getCanvasElementById("LiveCanvas")();
                 return for_4(melem)(function(elem3) {
@@ -6856,16 +6907,11 @@
                     var ctx = getContext2D(elem3)();
                     setStrokeStyle(ctx)("#00000077")();
                     setLineWidth(ctx)(12)();
-                    var $14 = buttons(me) > 0;
-                    if ($14) {
-                      return strokePath(ctx)(function __do6() {
-                        moveTo2(ctx)(p.x)(p.y)();
-                        lineTo(ctx)(x)(y)();
-                        return closePath(ctx)();
-                      })();
-                    }
-                    ;
-                    return unit;
+                    return strokePath(ctx)(function __do6() {
+                      moveTo2(ctx)(p.x)(p.y)();
+                      lineTo(ctx)(x)(y)();
+                      return closePath(ctx)();
+                    })();
                   };
                 })();
               };

@@ -35,7 +35,7 @@ import Web.TouchEvent.TouchEvent (fromEvent, fromUIEvent, changedTouches) as Tou
 import Web.TouchEvent.TouchList (item) as Touch
 import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
-initialPos = { x: 0.0, y: 0.0 } :: { x :: Number, y :: Number }
+initialPos = { x: 0.0, y: 0.0, down: false } :: { x :: Number, y :: Number, down :: Boolean }
 
 main :: Effect Unit
 main = do
@@ -47,10 +47,18 @@ main = do
                 [ D.Width !:= "2000px"
                 , D.Height !:= "2000px"
                 , D.Id !:= "LiveCanvas"
-                
+                , D.OnMousedown !:= cb \e -> do
+                    preventDefault e
+                    for_ (fromEvent e)
+                        \me -> do
+                            let x = toNumber $ clientX me
+                                y = toNumber $ clientY me
+                            setPos { x, y, down: true }
+                , D.OnMouseup !:= cb \e -> do
+                    preventDefault e
+                    setPos initialPos
                 , (\p -> D.OnMousemove := cb \e -> do
                     preventDefault e
-                    stopPropagation e
                     for_ (fromEvent e)
                         \me -> do
                             let lastX = p.x
@@ -58,7 +66,7 @@ main = do
                                 x = toNumber $ clientX me
                                 y = toNumber $ clientY me
                             --spy (show [x,y]) $ 
-                            setPos { x, y }
+                            setPos { x, y, down: true }
                             melem <- getCanvasElementById "LiveCanvas"
                             for_ melem \elem -> do
                                 ctx <- getContext2D elem 
@@ -66,12 +74,10 @@ main = do
                                 
                                 setLineWidth ctx 12.0
                                 
-                                if buttons me > 0 
-                                    then strokePath ctx $ do
-                                        moveTo ctx lastX lastY
-                                        lineTo ctx x y
-                                        closePath ctx
-                                    else pure unit
+                                strokePath ctx $ do
+                                    moveTo ctx lastX lastY
+                                    lineTo ctx x y
+                                    closePath ctx
                     ) <$> pos
                     
                     
