@@ -14,7 +14,6 @@ import Debug (spy)
 import Deku.Hooks (useState)
 import Deku.Toplevel (runInBody)
 import Effect (Effect)
-import EmitsTouchEvents (emitsTouchEvents)
 import Graphics.Canvas 
     ( closePath
     , getCanvasElementById
@@ -40,7 +39,6 @@ initialPos = Nothing :: Maybe { x :: Number, y :: Number }
 
 main :: Effect Unit
 main = do
-    isMobile <- emitsTouchEvents
     runInBody Deku.do
         setPos /\ pos <- useState initialPos
         D.div_

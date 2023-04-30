@@ -2724,7 +2724,7 @@
             };
           })();
         });
-        return function __do3() {
+        return function __do2() {
           c1();
           return c2();
         };
@@ -2746,7 +2746,7 @@
         var c2 = v1(b, function(f) {
           return write2(new Just(f))(latest)();
         });
-        return function __do3() {
+        return function __do2() {
           c1();
           return c2();
         };
@@ -2759,12 +2759,12 @@
       return function(tf, k) {
         var a = liftST2(newSTArray)();
         foldMap4(function(v) {
-          return function __do3() {
+          return function __do2() {
             var u = v(tf, k);
             return $$void3(liftST2(push(u)(a)))();
           };
         })(f)();
-        return function __do3() {
+        return function __do2() {
           var o = liftST2(freeze(a))();
           return fastForeachThunk(o);
         };
@@ -2774,7 +2774,7 @@
   var mailbox$prime = function(dictOrd) {
     var alter2 = alter(dictOrd);
     var lookup2 = lookup(dictOrd);
-    return function __do3() {
+    return function __do2() {
       var r = $$new(empty2)();
       return {
         event: function(a) {
@@ -2830,7 +2830,7 @@
         var c = v1(tf, k);
         return write2(c)(cancelInner)();
       });
-      return function __do3() {
+      return function __do2() {
         var ci = read2(cancelInner)();
         ci();
         return cancelOuter();
@@ -2892,7 +2892,7 @@
         modify_(function(v1) {
           return v1 + 1 | 0;
         })(idx)();
-        return function __do3() {
+        return function __do2() {
           write2(mempty2)(rk)();
           deleteObjHack(ix, subscribers);
           return unit;
@@ -2912,7 +2912,7 @@
       var v1 = f(v.event);
       var c2 = v.event(tf, k);
       var c1 = v1(tf, v.push);
-      return function __do3() {
+      return function __do2() {
         c1();
         return c2();
       };
@@ -3036,7 +3036,7 @@
         })();
         liftST2(splice(0)(length(samples1))([])(replay1))();
         liftST2(splice(0)(length(samples2))([])(replay2))();
-        return function __do3() {
+        return function __do2() {
           c1();
           return c2();
         };
@@ -3049,7 +3049,7 @@
     }($lazy_backdoor(345).subscribe)(i);
   };
   var $lazy_backdoor = /* @__PURE__ */ $runtime_lazy3("backdoor", "FRP.Event", function() {
-    var create_ = function __do3() {
+    var create_ = function __do2() {
       var subscribers = objHack();
       var idx = $$new(0)();
       return {
@@ -3060,7 +3060,7 @@
           modify_(function(v1) {
             return v1 + 1 | 0;
           })(idx)();
-          return function __do4() {
+          return function __do3() {
             write2(mempty2)(rk)();
             deleteObjHack(ix, subscribers);
             return unit;
@@ -3210,7 +3210,7 @@
       }(),
       hot: function() {
         var hot_ = function(e) {
-          return function __do3() {
+          return function __do2() {
             var v = $lazy_create(837)();
             var unsubscribe = subscribe(e)(v.push)();
             return {
@@ -3223,7 +3223,7 @@
       }(),
       mailbox: function() {
         var mailbox_ = function(dictOrd) {
-          return function __do3() {
+          return function __do2() {
             var v = mailbox$prime(dictOrd)();
             return {
               event: v.event,
@@ -3259,7 +3259,7 @@
               var tid = $$new(mempty1)();
               var canceler = v(tf, function(a) {
                 var localId = $$new(Nothing.value)();
-                var id = setTimeout2(n)(function __do3() {
+                var id = setTimeout2(n)(function __do2() {
                   k(a);
                   var lid = read2(localId)();
                   return maybe(pure3(unit))(function(id2) {
@@ -3269,7 +3269,7 @@
                 write2(new Just(id))(localId)();
                 return modify_(append1(singleton4(id)))(tid)();
               });
-              return function __do3() {
+              return function __do2() {
                 var ids = read2(tid)();
                 for_22(ids)(clearTimeout2)();
                 return canceler();
@@ -3282,7 +3282,7 @@
     };
   });
   var $lazy_create = /* @__PURE__ */ $runtime_lazy3("create", "FRP.Event", function() {
-    return function __do3() {
+    return function __do2() {
       unit;
       return function(v) {
         return v;
@@ -3353,7 +3353,7 @@
         return function(tf, k) {
           return apply2(map2(function(v2) {
             return function(v3) {
-              return function __do3() {
+              return function __do2() {
                 v2();
                 return v3();
               };
@@ -3821,7 +3821,7 @@
   var thawST = _copyST;
   var mutate = function(f) {
     return function(m) {
-      return runST(function __do3() {
+      return runST(function __do2() {
         var s = thawST(m)();
         f(s)();
         return s;
@@ -3965,7 +3965,7 @@
                   ;
                   if (kid$prime instanceof Remove && stage instanceof Middle) {
                     $$void4(write(End.value)(stageRef))();
-                    var mic = function __do3() {
+                    var mic = function __do2() {
                       var idRef = read(myIds)();
                       for_23(idRef)(function(old) {
                         return for_12(psr.parent)(function(pnt) {
@@ -4017,7 +4017,7 @@
                 var mican = read(myImmediateCancellation)();
                 return mican();
               });
-              return function __do3() {
+              return function __do2() {
                 bind2(read(cancelInner))(foldl3(applySecond2)(pure1(unit)))();
                 return cancelOuter();
               };
@@ -4248,7 +4248,7 @@
                 pos: Nothing.value,
                 dynFamily: Nothing.value
               })(v1)(children)), k);
-              return function __do3() {
+              return function __do2() {
                 k(v1.deleteFromCache({
                   id: me
                 }));
@@ -6417,7 +6417,7 @@
   };
   var sendToPos2 = function(a) {
     return function(state4) {
-      return function __do3() {
+      return function __do2() {
         var scope2 = getScope(a.id)(state4)();
         var parent2 = getParent(a.id)(state4)();
         var dynFamily = getDynFamily(a.id)(state4)();
@@ -6492,7 +6492,7 @@
               return pure13(wrap2(v));
             }();
             var hasIdAndInScope = pure13(liftF(pure23(giveNewParent_(just)(roj)(gnp))));
-            return function __do3() {
+            return function __do2() {
               var hasId = stateHasKey(gnp.id)(ffi)();
               if (hasId) {
                 var scope2 = getScope(gnp.id)(ffi)();
@@ -6521,7 +6521,7 @@
   };
   var fullDOMInterpret = function(seed) {
     var l = {
-      ids: function __do3() {
+      ids: function __do2() {
         var s = read(seed)();
         var o = show2(evalGen(arbitrary2)({
           newSeed: mkSeed(s),
@@ -6708,7 +6708,7 @@
     var f = function(n) {
       return function(i) {
         return go$prime(n + 1 | 0)(makeEvent(function(k) {
-          return function __do3() {
+          return function __do2() {
             unit;
             bind4(i(ffi))(k)();
             return pure8(unit);
@@ -6720,7 +6720,7 @@
   };
   var runInElement$prime = function(elt) {
     return function(eee) {
-      return function __do3() {
+      return function __do2() {
         var ffi = makeFFIDOMSnapshot();
         var evt = mapFlipped2(liftST3(newSTRef(0)))(function() {
           var $55 = deku(elt)(eee);
@@ -6735,7 +6735,7 @@
     };
   };
   var runInBody$prime = function(eee) {
-    return function __do3() {
+    return function __do2() {
       var b$prime = bind4(bind4(windowImpl)(document2))(body)();
       return maybe(mempty12)(function(elt) {
         return runInElement$prime(elt)(eee);
@@ -6744,16 +6744,6 @@
   };
   var runInBody = function(a) {
     return $$void6(runInBody$prime(a));
-  };
-
-  // output/EmitsTouchEvents/foreign.js
-  var emitsTouchEvents = () => {
-    try {
-      document.createEvent("TouchEvent");
-      return true;
-    } catch (e) {
-      return false;
-    }
   };
 
   // output/Graphics.Canvas/foreign.js
@@ -6823,7 +6813,7 @@
   // output/Graphics.Canvas/index.js
   var strokePath = function(ctx) {
     return function(path) {
-      return function __do3() {
+      return function __do2() {
         beginPath(ctx)();
         var a = path();
         stroke(ctx)();
@@ -6834,18 +6824,6 @@
   var getCanvasElementById = function(elId) {
     return getCanvasElementByIdImpl(elId, Just.create, Nothing.value);
   };
-
-  // output/Web.Event.Event/foreign.js
-  function preventDefault(e) {
-    return function() {
-      return e.preventDefault();
-    };
-  }
-  function stopPropagation(e) {
-    return function() {
-      return e.stopPropagation();
-    };
-  }
 
   // output/Web.UIEvent.MouseEvent/foreign.js
   function clientX(e) {
@@ -6870,65 +6848,50 @@
   var initialPos = /* @__PURE__ */ function() {
     return Nothing.value;
   }();
-  var main = function __do2() {
-    var isMobile = emitsTouchEvents();
-    return runInBody(bind3(useState(initialPos))(function(v) {
-      return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
-        return function __do3() {
-          preventDefault(e)();
-          stopPropagation(e)();
-          return for_4(fromEvent(e))(function(me) {
-            var y = toNumber(clientY(me));
-            var x = toNumber(clientX(me));
-            return v.value0(new Just({
-              x,
-              y
-            }));
-          })();
-        };
-      })), pureAttr4(OnMouseup.value)(cb(function(e) {
-        return function __do3() {
-          preventDefault(e)();
-          stopPropagation(e)();
-          return v.value0(initialPos)();
-        };
-      })), map10(function(mp) {
-        return attr2(OnMousemove.value)(cb(function(e) {
-          return function __do3() {
-            preventDefault(e)();
-            stopPropagation(e)();
-            return for_4(mp)(function(p) {
-              return function __do4() {
-                var melem = getCanvasElementById("LiveCanvas")();
-                return for_4(melem)(function(elem3) {
-                  return function __do5() {
-                    var ctx = getContext2D(elem3)();
-                    setStrokeStyle(ctx)("#00000077")();
-                    setLineWidth(ctx)(12)();
-                    return for_4(fromEvent(e))(function(me) {
-                      var y = toNumber(clientY(me));
-                      var x = toNumber(clientX(me));
-                      return function __do6() {
-                        v.value0(new Just({
-                          x,
-                          y
-                        }))();
-                        return strokePath(ctx)(function __do7() {
-                          moveTo2(ctx)(p.x)(p.y)();
-                          lineTo(ctx)(x)(y)();
-                          return closePath(ctx)();
-                        })();
-                      };
+  var main = /* @__PURE__ */ runInBody(/* @__PURE__ */ bind3(/* @__PURE__ */ useState(initialPos))(function(v) {
+    return div_([canvas([pureAttr2(Width.value)("2000px"), pureAttr1(Height.value)("2000px"), pureAttr22(Id.value)("LiveCanvas"), pureAttr3(OnMousedown.value)(cb(function(e) {
+      return for_4(fromEvent(e))(function(me) {
+        var y = toNumber(clientY(me));
+        var x = toNumber(clientX(me));
+        return v.value0(new Just({
+          x,
+          y
+        }));
+      });
+    })), pureAttr4(OnMouseup.value)(cb(function(e) {
+      return v.value0(initialPos);
+    })), map10(function(mp) {
+      return attr2(OnMousemove.value)(cb(function(e) {
+        return for_4(mp)(function(p) {
+          return function __do2() {
+            var melem = getCanvasElementById("LiveCanvas")();
+            return for_4(melem)(function(elem3) {
+              return function __do3() {
+                var ctx = getContext2D(elem3)();
+                setStrokeStyle(ctx)("#00000077")();
+                setLineWidth(ctx)(12)();
+                return for_4(fromEvent(e))(function(me) {
+                  var y = toNumber(clientY(me));
+                  var x = toNumber(clientX(me));
+                  return function __do4() {
+                    v.value0(new Just({
+                      x,
+                      y
+                    }))();
+                    return strokePath(ctx)(function __do5() {
+                      moveTo2(ctx)(p.x)(p.y)();
+                      lineTo(ctx)(x)(y)();
+                      return closePath(ctx)();
                     })();
                   };
                 })();
               };
             })();
           };
-        }));
-      })(v.value1)])([])]);
-    }))();
-  };
+        });
+      }));
+    })(v.value1)])([])]);
+  }));
 
   // <stdin>
   main();
