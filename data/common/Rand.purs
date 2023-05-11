@@ -49,7 +49,7 @@ unsort n r =
       shake [x] _ ys = x : ys
       shake xs r' ys = 
         let r'' = rand r'
-            x = unsafePartial $  fromJust 
+            x = unsafePartial $ fromJust 
                               $ xs !! (r''.val `mod` length xs)
         in shake (xs \\ [x]) r'' (x : ys)
    in shake (0..(n-1)) r []

@@ -6,7 +6,6 @@ You can edit this file as you like.
 , dependencies =
   [ "canvas"
   , "console"
-  , "debug"
   , "deku"
   , "effect"
   , "foldable-traversable"
@@ -14,10 +13,12 @@ You can edit this file as you like.
   , "maybe"
   , "numbers"
   , "prelude"
+  , "refs"
   , "tuples"
+  , "unsafe-coerce"
   , "web-events"
+  , "web-html"
   , "web-touchevents"
-  , "web-uievents"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

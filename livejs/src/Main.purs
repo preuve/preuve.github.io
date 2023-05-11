@@ -1,182 +1,140 @@
-module Main where
+module Touch51.Main where
 
 import Prelude
 
-import Data.Foldable (for_)
-import Data.Int (toNumber)
+import Data.Foldable (for_, traverse_)
 import Data.Maybe (Maybe (..))
+
 import Data.Number (pi)
+import Data.Int (toNumber)
 import Data.Tuple.Nested ((/\))
-import Deku.Attribute ((:=), (!:=), cb)
+
+import Deku.Attribute ((!:=), cb)
+import Deku.Control (text)
 import Deku.Do as Deku
 import Deku.DOM as D
-import Debug (spy)
-import Deku.Hooks (useState)
+import Deku.Hooks (useState, useState', useEffect, useRef)
 import Deku.Toplevel (runInBody)
+
 import Effect (Effect)
+import Effect.Ref (new, read, write)
 import Graphics.Canvas 
-    ( closePath
-    , getCanvasElementById
+    (CanvasElement
+    , arc
+    , beginPath
+    , closePath
+    , fill
     , getContext2D
     , lineTo
     , moveTo
+    , setFillStyle
     , setLineWidth
     , setStrokeStyle
-    , setFillStyle
     , strokePath
-    , beginPath
-    , fill
-    , arc
     )
-import Web.Event.Event (preventDefault, stopPropagation)
-import Web.TouchEvent.Touch (clientX, clientY) as Touch
-import Web.TouchEvent.Touch (pageX, pageY) as Touch
-import Web.TouchEvent.TouchEvent (fromEvent, fromUIEvent, changedTouches) as Touch
-import Web.TouchEvent.TouchList (item) as Touch
-import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
 
+import Web.Event.Event (EventType(..), preventDefault)
+import Web.Event.EventTarget (EventListener, addEventListener, eventListener)
+import Web.HTML.HTMLCanvasElement as HTMLCanvasElement
+import Unsafe.Coerce (unsafeCoerce)
+
+import Web.TouchEvent.Touch (clientX, clientY) as Touch
+import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
+import Web.TouchEvent.TouchList (item) as Touch
+--import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
+
+type Event a = (a -> Effect Unit) -> Effect (Effect Unit)
+
+data Use a = Special a | Regular a | None
+
+for :: forall a f. Applicative f => Use a -> (a -> f Unit) -> f Unit
+for (Special x) f = f x 
+for (Regular x) f = f x 
+for _ _ = pure unit
+
+touchListener ::  forall a.              
+        ({ x :: Number         
+         , y :: Number         
+         }                     
+         -> Effect a     
+        )                      
+        -> Effect EventListener
+
+touchListener f =  
+    eventListener \e -> do
+        preventDefault e
+        for_ (Touch.fromEvent e)
+            \me -> for_ (Touch.item 0 $ Touch.changedTouches me)
+                \t -> do
+                    let x = toNumber $ Touch.clientX t
+                        y = toNumber $ Touch.clientY t
+                    f { x, y }
+                          
 main :: Effect Unit
 main = do
+    emctx <- new Nothing
+    
     runInBody Deku.do
-        setPos /\ pos <- useState Nothing
+        setOrigin /\ origin <- useState None
+        rorigin <- useRef None origin
+        setPosition /\ position <- useState'
+        
+        useEffect origin $ case _ of
+            Special { x, y } -> do
+                mctx <- read emctx
+                for_ mctx \ctx -> do
+                    beginPath ctx
+                    arc ctx 
+                        { end: 2.0 * pi
+                        , radius: 40.0
+                        , start: 0.0
+                        , useCounterClockwise: false
+                        , x
+                        , y 
+                        }
+                    fill ctx
+            _ -> pure unit
+            
+        useEffect position \ { x, y } -> do
+            morig <- rorigin
+            for morig \ { x: lastX, y: lastY} -> do
+                mctx <- read emctx
+                for_ mctx \ctx -> do
+                    strokePath ctx $ do
+                        moveTo ctx lastX lastY
+                        lineTo ctx x y
+                        closePath ctx
+
+            setOrigin $ Regular { x, y }
+        
         D.div_
             [ D.canvas
-                [ D.Width !:= "2000px"
-                , D.Height !:= "2000px"
-                , D.Id !:= "LiveCanvas"
-                , D.OnMousedown !:= cb \e -> do
-                    preventDefault e
-                    stopPropagation e
-                    for_ (fromEvent e)
-                        \me -> do
-                            let x = toNumber $ clientX me
-                                y = toNumber $ clientY me
-                            setPos $ Just { x, y }
-                , (\mp -> D.OnMouseup := cb \e -> do
-                    preventDefault e
-                    stopPropagation e
-                    for_ (fromEvent e)
-                        \me -> do
-                            let x = toNumber $ clientX me
-                                y = toNumber $ clientY me
-                            for_ mp 
-                                \p -> do 
-                                    let lastX = p.x
-                                        lastY = p.y
-                                    melem <- getCanvasElementById "LiveCanvas"
-                                    for_ melem \elem -> do
-                                        ctx <- getContext2D elem 
-                                        setStrokeStyle ctx "#00000277"
-                                        setLineWidth ctx 12.0
-                                        strokePath ctx $ do
-                                            moveTo ctx lastX lastY
-                                            lineTo ctx x y
-                                            closePath ctx
-                            setPos Nothing
-                    ) <$> pos
-                , (\mp -> D.OnMousemove := cb \e -> do
-                    preventDefault e
-                    stopPropagation e
-                    for_ (fromEvent e)
-                        \me -> do
-                            let x = toNumber $ clientX me
-                                y = toNumber $ clientY me
-                            for_ mp 
-                                \p -> do 
-                                    let lastX = p.x
-                                        lastY = p.y
-                                    melem <- getCanvasElementById "LiveCanvas"
-                                    for_ melem \elem -> do
-                                        ctx <- getContext2D elem 
-                                        setStrokeStyle ctx "#00000277"
-                                        setLineWidth ctx 12.0
-                                        strokePath ctx $ do
-                                            moveTo ctx lastX lastY
-                                            lineTo ctx x y
-                                            closePath ctx
-                            setPos $ Just { x, y }
-                    ) <$> pos
+                [ D.Height !:= "3000px"
+                , D.Width !:= "2000px"
+                , D.Self !:= HTMLCanvasElement.fromElement >>> traverse_ \elt -> do
+                    let canvas = (unsafeCoerce :: HTMLCanvasElement.HTMLCanvasElement -> CanvasElement) elt
+                    initialCtx <- getContext2D canvas
+                    setFillStyle initialCtx "#00000277"
+                    setStrokeStyle initialCtx "#00000277"
+                    setLineWidth initialCtx 12.0
+                    write (Just initialCtx) emctx
                     
-                    
-                    {-
-                , D.OnTouchstart !:= cb \e -> do
-                    for_ (Touch.fromUIEvent e)
-                        \me -> 
-                            for_ (Touch.item 0 (Touch.changedTouches me))
-                                \t -> do
-                                    let x = toNumber $ Touch.pageX t
-                                        y = toNumber $ Touch.pageY t
-                                    setPos { x, y }
-                                    melem <- getCanvasElementById "LiveCanvas"
-                                    for_ melem \elem -> do
-                                        ctx <- getContext2D elem 
-                                        setFillStyle ctx "#00000077"
-                                        
-                                        beginPath ctx
-                                        arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
-                                        closePath ctx
-                                        fill ctx
-                    for_ (Touch.fromEvent e)
-                        \me -> 
-                            for_ (Touch.item 1 (Touch.changedTouches me))
-                                \t -> do
-                                    let x = toNumber $ Touch.pageX t
-                                        y = toNumber $ Touch.pageY t
-                                    setPos { x, y }
-                                    melem <- getCanvasElementById "LiveCanvas"
-                                    for_ melem \elem -> do
-                                        ctx <- getContext2D elem 
-                                        setFillStyle ctx "#00000077"
-                                        
-                                        beginPath ctx
-                                        arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
-                                        fill ctx
-                    for_ (Touch.fromEvent e)
-                        \me -> 
-                            for_ (Touch.item 2 (Touch.changedTouches me))
-                                \t -> do
-                                    let x = toNumber $ Touch.pageX t
-                                        y = toNumber $ Touch.pageY t
-                                    setPos { x, y }
-                                    melem <- getCanvasElementById "LiveCanvas"
-                                    for_ melem \elem -> do
-                                        ctx <- getContext2D elem 
-                                        setFillStyle ctx "#00000077"
-                                        
-                                        beginPath ctx
-                                        arc ctx { end: 2.0 * pi, radius: 24.0, start: 0.0, useCounterClockwise: false, x, y }
-                                        fill ctx
-                    preventDefault e
-                    stopPropagation e
-                    -}
-                    
-                    {-
-                , (\p -> D.OnTouchmove := cb \e -> do
-                    for_ (Touch.fromEvent e)
-                        \me -> 
-                            for_ (Touch.item 0 (Touch.changedTouches me))
-                                \t -> do
-                                    let lastX = p.x
-                                        lastY = p.y
-                                        x = toNumber $ Touch.pageX t
-                                        y = toNumber $ Touch.pageY t
-                                    spy (show [x,y]) $ setPos { x, y }
-                                    
-                                    melem <- getCanvasElementById "LiveCanvas"
-                                    for_ melem \elem -> do
-                                        ctx <- getContext2D elem 
-                                        setStrokeStyle ctx "#00000077"
-                                        
-                                        setLineWidth ctx 12.0
-                                        
-                                        strokePath ctx $ do
-                                            moveTo ctx lastX lastY
-                                            lineTo ctx x y
-                                            closePath ctx
-                    preventDefault e
-                    stopPropagation e
-                    ) <$> pos   
-                    -}
+                    start <- touchListener $ 
+                                setOrigin <<< Special
+                    addEventListener (EventType "touchstart") start true (HTMLCanvasElement.toEventTarget elt)
+
+                    move <- touchListener setPosition
+                    addEventListener (EventType "touchmove") move true (HTMLCanvasElement.toEventTarget elt)
                 ]
                 []
+            , D.button 
+                [ D.Style !:= "font-size: 100px;"
+                , D.OnClick !:= cb \_ -> do
+                    mctx <- read emctx
+                    for_ mctx \ctx -> do
+                        setFillStyle ctx "#0000FFFF"
+                ] 
+                [text $ show <$> position]
             ]
+
+ 

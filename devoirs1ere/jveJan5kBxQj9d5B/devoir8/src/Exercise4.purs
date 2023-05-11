@@ -3,16 +3,13 @@ module Exercise4 where
 import Prelude
 
 import Article (b_, m_, nl, openSection_, t_)
-import Control.Monad.State.Class (class MonadState)
+import Control.Monad.Writer (Writer)
 import Data.Tuple.Nested (type (/\))
 import Deku.Core (Nut)
 import FRP.Event (Event)
 import Rand (Rand)
 
-exo4 :: forall st.  
-  Functor st =>
-  MonadState (Array Nut) st =>
-  Event (Rand /\ Boolean) -> st Unit
+exo4 :: Event (Rand /\ Boolean) -> Writer Nut Unit
 exo4 _ = do  
   openSection_ "Exercice IV" "5 points"
   

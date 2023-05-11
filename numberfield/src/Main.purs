@@ -3,42 +3,49 @@ module Main where
 import Prelude
 
 import Article
-  ( fromIncremental, get, nl, t_, m_, put, a_, equation_
+  ( nl, t_, m_, a_, equation_
   , setTitle_, subsubsubsection_, pre_, section_)
-
+import Control.Monad.Writer (Writer, execWriter, tell)
 import Deku.Core (Nut)
 import Deku.Control(text_)
 import Deku.DOM as D
 import Deku.Toplevel (runInBody)
 import Effect (Effect)
 
-documentation :: Array Nut
-documentation = fromIncremental $ do
+documentation :: Writer Nut Unit
+documentation = do
   setTitle_ "Data.Algebraic.NumberField"
+  
   nl
+  
   subsubsubsection_ "Technical documentation at"
+  
   a_ "https://pursuit.purescript.org/packages/purescript-numberfield"
+  
   section_ "Computation with extension fields of the field of rational numbers "
   t_ $ "Thanks to the introduction of arbitrary precision integers in Javascript, "
     <> "it is now possible to perform ambitious theoretic computations in the browser "
     <> "without drowning in low-level details."
   nl
   nl
-  t_ "The main purpose of this page is to show interactively"
-  put $ D.ul_
-      [ D.li_ (fromIncremental $ do
-          t_ "how to do computations in "
-          m_ "\\mathbb{Q}(\\alpha)"
-          t_ " where "
-          m_ "\\alpha"
-          t_ " is an algebraic number "
-          get)
-      , D.li_ [text_ "how to compute minimal polynomials of sums of algebraic numbers"]
-      ]
   
+  t_ "The main purpose of this page is to show interactively"
+  tell $ D.ul_ 
+    [ D.li_ 
+        [ execWriter $ do
+            t_ "how to do computations in "
+            m_ "\\mathbb{Q}(\\alpha)"
+            t_ " where "
+            m_ "\\alpha"
+            t_ " is an algebraic number "
+          ]
+    , D.li_ [text_ "how to compute minimal polynomials of sums of algebraic numbers"]
+    ]
+
   t_ "A minimal understanding of how to work with "
   a_ "https://pursuit.purescript.org/packages/purescript-sparse-polynomials"
   t_ " is assumed."
+
   pre_ $ "import Prelude" 
       <> "\n\n> import Data.Algebraic.NumberField" 
       <> "\n> import Data.Ratio (Ratio, (%))"
@@ -46,10 +53,12 @@ documentation = fromIncremental $ do
       <> "\n> import Data.Sparse.Polynomial ((^), display, factor)"
       <> "\n> import JS.BigInt (BigInt, fromInt)"
 
-  put $ D.h3_ (fromIncremental $ do
+  tell $ D.h3_ 
+    [ execWriter $ do
         t_ "Computations in "
         m_ "\\mathbb{Q}(\\alpha)"
-        get)
+    ]
+
   t_ "First, let's choose "
   m_ "\\mathbb{Q}"
   t_ " as the undelying field by defining its unity"
@@ -151,11 +160,13 @@ documentation = fromIncremental $ do
       <> "\n\"(11 % 1)×phi+7 % 1\""
   t_ "we conclude that the simplification gives"
   equation_ "11\\phi+7"
-  
-  put $ D.h3_ (fromIncremental $ do
+
+  tell $ D.h3_ 
+    [ execWriter $ do
       t_ "Computations in "
       m_ "\\mathbb{Q}(\\alpha_0,\\alpha_1,\\cdots)"
-      get)
+    ]
+
   t_ $ "This second paragraph is nothing but the general case from which "
     <> "the first paragraph is extracted."
   nl
@@ -219,11 +230,14 @@ documentation = fromIncremental $ do
       <> "\n\"((1 % 3)×sr3+(-1 % 3))×cr2^2+(1 % 3)×cr2+(-1 % 3)×sr3+2 % 3\""
   t_ "the expression we're looking for is"
   equation_ "\\frac{1}{3}\\sqrt{3}\\sqrt[3]{4}-\\frac{1}{3}\\sqrt[3]{4}+\\frac{1}{3}\\sqrt[3]{2}-\\frac{1}{ 3}\\sqrt{3}+\\frac{2}{3}."
-  put $ D.h3_ (fromIncremental $ do
+  
+  tell $ D.h3_
+    [ execWriter $ do
       t_ "Troubleshooting (is "
       m_ "P"
       t_ " minimal ?)"
-      get)
+    ]
+
   t_ $ "Given an algebraic expression, it is sometimes harder than it seems to choose the minimal "
     <> "polynomial for it."
   nl
@@ -263,9 +277,6 @@ documentation = fromIncremental $ do
   t_ "Now, the framework is coherent:"
   pre_ $ "> display [\"a\"] $ run $ reifyType (framework (frac 1 ^ 0) [one ^ 2 - frac 2 ^ 1 - frac 5 ^ 0]) (build ((const $ let a = element (frac 1 ^ 1) in let kst n = element (frac n ^ 0) in a*a*a -kst 9 *a) :: forall f. Expression f _))"
       <> "\n\"10 % 1\""
-  
-  get
 
 main :: Effect Unit
-main = do
-  runInBody (D.div_ documentation)
+main = execWriter documentation # runInBody

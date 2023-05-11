@@ -2,13 +2,14 @@ module Article where
 
 import Prelude
 
-import Control.Monad.State (State, runState)
-import Control.Monad.State.Class (class MonadState, modify)
-import Control.Monad.State.Class (get) as Control
+import Control.Monad.Writer (Writer, tell)
 
-import Data.Array (snoc, (:), elemIndex, (..), length, unsafeIndex)
+import Data.Array ((:), elemIndex, (..), length, unsafeIndex)
 import Data.Foldable (foldr)
-import Data.Geometry.Plane (Point, point, segment, vector, scale, (<+|), cosAngle, middle, abs, ord, normalTo, normalized)
+import Data.Geometry.Plane 
+  (Point
+  , point, segment, vector
+  , scale, (<+|), cosAngle, middle, abs, ord, normalTo, normalized)
 import Data.Int (round)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Number (acos, pi, isNaN, fromString)
@@ -21,90 +22,69 @@ import Deku.Core (Nut)
 import Deku.DOM as D
 
 import FRP.Event (Event)
-
 import KaTeX (render, display, textMode) as KaTeX
-
 import Partial.Unsafe (unsafePartial)
 
-get :: forall m s. MonadState s m => m s
-get = Control.get
-
-put :: forall a st. Functor st => MonadState (Array a) st => a -> st Unit
-put x = void $ modify (flip snoc x)
-
-fromIncremental :: forall a. State (Array a) (Array a) -> Array a
-fromIncremental seq = fst $ 
-  runState seq []
-
-type Put = forall st. Functor st 
-  => MonadState (Array Nut) st 
-  => st Unit
-    
-type PutString =  forall st. Functor st 
-  => MonadState (Array Nut) st => String -> st Unit
-
-type PutEvent = forall st. Functor st => MonadState (Array Nut) st => Event String -> st Unit
-  
 m' :: forall t. String -> Attribute t
 m' = \txt -> D.Self := KaTeX.render txt
   
-m :: PutEvent
-m str = put $ D.label [m' <$> str] []
+m :: Event String -> Writer Nut Unit
+m str = tell $ D.label [m' <$> str] []
 
-m_ :: PutString
+m_ :: String -> Writer Nut Unit
 m_ str = m $ pure str
   
 t' :: forall t. String -> Attribute t
 t' txt = D.Self := KaTeX.textMode txt
 
-t :: PutEvent
-t str = put $ D.label [t' <$> str] []
+t :: Event String -> Writer Nut Unit
+t str = tell $ D.label [t' <$> str] []
 
-t_ :: PutString
+t_ :: String -> Writer Nut Unit
 t_ str = t $ pure str
 
-nl :: Put
-nl = put $ D.br_ []
+nl :: Writer Nut Unit
+nl = tell $ D.br_ []
 
-nl' :: forall t. (String -> Attribute t) /\ String
-nl' = (\txt -> D.Self := KaTeX.textMode txt) /\ "<br>"
+nl' :: forall t. Attribute t
+nl' = D.Self := KaTeX.textMode "<br>" 
 
-setTitle_ :: String -> Put
-setTitle_ str = put $ D.h1_ [text_ str]
+setTitle_ :: String -> Writer Nut Unit
+setTitle_ str = tell $ D.h1_ [text_ str]
 
-equation :: PutEvent
-equation str = put $ D.label [(\txt -> D.Self := KaTeX.display txt) <$> str] []
+equation :: Event String -> Writer Nut Unit
+equation str = tell $ D.label [(\txt -> D.Self := KaTeX.display txt) <$> str] []
 
-equation_ :: PutString
+equation_ :: String -> Writer Nut Unit
 equation_ str = equation $ pure str
   
-em_ :: String -> Put
-em_ str = put $ D.em_ [text_ str]
+em_ :: String -> Writer Nut Unit
+em_ str = tell $ D.em_ [text_ str]
 
-b_ :: String -> Put
-b_ str = put $ D.b_ [text_ str]
+b_ :: String -> Writer Nut Unit
+b_ str = tell $ D.b_ [text_ str]
 
-a_ :: String -> Put
-a_ str = put $ D.a [D.Href !:= str] [text_ str]
+a_ :: String -> Writer Nut Unit     
+a_ str = tell $ D.a [D.Href !:= str] [text_ str]
 
-pre_ :: String -> Put
-pre_ str = put $ D.pre_ [text_ str]
+pre_ :: String -> Writer Nut Unit 
+pre_ str = tell $ D.pre_ [text_ str]
 
-section_ :: String -> Put
-section_ str = put $ D.h2_ [text_ str]
+section_ :: String -> Writer Nut Unit
+section_ str = tell $ D.h2_ [text_ str]
 
-subsection_ :: String -> Put
-subsection_ str = put $ D.h3_ [text_ str]
+subsection_ :: String -> Writer Nut Unit 
+subsection_ str = tell $ D.h3_ [text_ str]
 
-subsubsection_ :: String -> Put
-subsubsection_ str = put $ D.h4_ [text_ str]
+subsubsection_ :: String -> Writer Nut Unit 
+subsubsection_ str = tell $ D.h4_ [text_ str]
 
-subsubsubsection_ :: String -> Put
-subsubsubsection_ str = put $ D.h5_ [text_ str]
+subsubsubsection_ :: String -> Writer Nut Unit
+subsubsubsection_ str = tell $ D.h5_ [text_ str]
 
-openSection_ :: String -> String -> Put
+openSection_ :: String -> String -> Writer Nut Unit 
 openSection_ title points =
-  put $ D.div_ 
+  tell $ D.div_ 
     [ D.div [D.Style !:= "margin: 0; display: flex; justify-content: space-between"]
         [ D.label [D.Style !:= "font-size: 24px; font-weight: 700;"]  [text_ title]
         , D.label [D.Style !:= "font-size: 16px; font-weight: 700;"] [text_ points]
@@ -113,22 +93,6 @@ openSection_ title points =
     ]
 
 -- OCCASIONAL TOOLS :
-
--- compensates the impossible use of length when using events of arrays
-pad :: forall t. Int -> Array ((String -> Attribute t) /\ String ) -> Array ((String -> Attribute t) /\ String ) 
-pad n arr = arr <> ((\_ -> t' /\ "") <$> (0..(n - length arr - 1)))
-
--- similar to `sequence` when array length can be provided
-toArray :: forall a ev. Functor ev => Int -> ev (Array a) -> Array (ev a) 
-toArray n arrEv = (\i -> (\arr -> unsafePartial $ unsafeIndex arr i) <$> arrEv) <$> (0..(n-1))
-
--- distributes the event property over a tuple
-toTuple :: forall a b ev. Functor ev => ev (a /\ b) -> ev a /\ ev b
-toTuple tupEv = (fst <$> tupEv) /\ (snd <$> tupEv)
-
--- splits two uses of an event
-splits :: forall ev a b c. Functor ev => (a -> b) /\ (a -> c) -> ev a -> ev (b /\ c)
-splits (f /\ g) e = (\x -> f x /\ g x) <$> e
 
 -- | inverses a permutation of [0,1,..,n-1] 
 invPerm :: Array Int -> Array Int

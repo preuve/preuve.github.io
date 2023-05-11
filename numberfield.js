@@ -68,10 +68,10 @@
     return dict.map;
   };
   var mapFlipped = function(dictFunctor) {
-    var map18 = map(dictFunctor);
+    var map17 = map(dictFunctor);
     return function(fa) {
       return function(f) {
-        return map18(f)(fa);
+        return map17(f)(fa);
       };
     };
   };
@@ -143,8 +143,8 @@
   };
   var join = function(dictBind) {
     var bind1 = bind(dictBind);
-    return function(m2) {
-      return bind1(m2)(identity3);
+    return function(m) {
+      return bind1(m)(identity3);
     };
   };
 
@@ -565,12 +565,12 @@
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
     var bind4 = bind(dictMonad.Bind1());
-    var pure10 = pure(dictMonad.Applicative0());
+    var pure8 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a2) {
         return bind4(f)(function(f$prime) {
           return bind4(a2)(function(a$prime) {
-            return pure10(f$prime(a$prime));
+            return pure8(f$prime(a$prime));
           });
         });
       };
@@ -649,8 +649,8 @@
   };
   var functorIdentity = {
     map: function(f) {
-      return function(m2) {
-        return f(m2);
+      return function(m) {
+        return f(m);
       };
     }
   };
@@ -703,9 +703,9 @@
   var modifyImpl = function(f) {
     return function(ref) {
       return function() {
-        var t2 = f(ref.value);
-        ref.value = t2.state;
-        return t2.value;
+        var t = f(ref.value);
+        ref.value = t.state;
+        return t.value;
       };
     };
   };
@@ -827,11 +827,11 @@
     var mempty5 = mempty(dictMonoid);
     var applyWriterT1 = applyWriterT(dictMonoid.Semigroup0());
     return function(dictApplicative) {
-      var pure10 = pure(dictApplicative);
+      var pure8 = pure(dictApplicative);
       var applyWriterT2 = applyWriterT1(dictApplicative.Apply0());
       return {
         pure: function(a2) {
-          return pure10(new Tuple(a2, mempty5));
+          return pure8(new Tuple(a2, mempty5));
         },
         Apply0: function() {
           return applyWriterT2;
@@ -1047,9 +1047,9 @@
   var modifyImpl2 = function(f) {
     return function(ref) {
       return function() {
-        var t2 = f(ref.value);
-        ref.value = t2.state;
-        return t2.value;
+        var t = f(ref.value);
+        ref.value = t.state;
+        return t.value;
       };
     };
   };
@@ -1266,13 +1266,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond3 = applySecond(dictApplicative.Apply0());
-    var pure10 = pure(dictApplicative);
+    var pure8 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond3(f($454));
-        })(pure10(unit));
+        })(pure8(unit));
       };
     };
   };
@@ -1405,13 +1405,13 @@
     }
     return function(apply5) {
       return function(map10) {
-        return function(pure10) {
+        return function(pure8) {
           return function(f) {
             return function(array) {
               function go2(bot, top3) {
                 switch (top3 - bot) {
                   case 0:
-                    return pure10([]);
+                    return pure8([]);
                   case 1:
                     return map10(array1)(f(array[bot]));
                   case 2:
@@ -1463,8 +1463,8 @@
   var isFiniteImpl = isFinite;
   var floor = Math.floor;
   var remainder = function(n) {
-    return function(m2) {
-      return n % m2;
+    return function(m) {
+      return n % m;
     };
   };
 
@@ -2249,26 +2249,26 @@
           var $tco_var_ctx = $copy_ctx;
           var $tco_done1 = false;
           var $tco_result;
-          function $tco_loop(ctx, m2) {
-            if (m2 instanceof Two && (m2.value0 instanceof Leaf && m2.value3 instanceof Leaf)) {
+          function $tco_loop(ctx, m) {
+            if (m instanceof Two && (m.value0 instanceof Leaf && m.value3 instanceof Leaf)) {
               $tco_done1 = true;
               return up(ctx)(Leaf.value);
             }
             ;
-            if (m2 instanceof Two) {
-              $tco_var_ctx = new Cons(new TwoRight(m2.value0, m2.value1, m2.value2), ctx);
-              $copy_m = m2.value3;
+            if (m instanceof Two) {
+              $tco_var_ctx = new Cons(new TwoRight(m.value0, m.value1, m.value2), ctx);
+              $copy_m = m.value3;
               return;
             }
             ;
-            if (m2 instanceof Three && (m2.value0 instanceof Leaf && (m2.value3 instanceof Leaf && m2.value6 instanceof Leaf))) {
+            if (m instanceof Three && (m.value0 instanceof Leaf && (m.value3 instanceof Leaf && m.value6 instanceof Leaf))) {
               $tco_done1 = true;
-              return up(new Cons(new TwoRight(Leaf.value, m2.value1, m2.value2), ctx))(Leaf.value);
+              return up(new Cons(new TwoRight(Leaf.value, m.value1, m.value2), ctx))(Leaf.value);
             }
             ;
-            if (m2 instanceof Three) {
-              $tco_var_ctx = new Cons(new ThreeRight(m2.value0, m2.value1, m2.value2, m2.value3, m2.value4, m2.value5), ctx);
-              $copy_m = m2.value6;
+            if (m instanceof Three) {
+              $tco_var_ctx = new Cons(new ThreeRight(m.value0, m.value1, m.value2, m.value3, m.value4, m.value5), ctx);
+              $copy_m = m.value6;
               return;
             }
             ;
@@ -2286,30 +2286,30 @@
       var maxNode = function($copy_m) {
         var $tco_done2 = false;
         var $tco_result;
-        function $tco_loop(m2) {
-          if (m2 instanceof Two && m2.value3 instanceof Leaf) {
+        function $tco_loop(m) {
+          if (m instanceof Two && m.value3 instanceof Leaf) {
             $tco_done2 = true;
             return {
-              key: m2.value1,
-              value: m2.value2
+              key: m.value1,
+              value: m.value2
             };
           }
           ;
-          if (m2 instanceof Two) {
-            $copy_m = m2.value3;
+          if (m instanceof Two) {
+            $copy_m = m.value3;
             return;
           }
           ;
-          if (m2 instanceof Three && m2.value6 instanceof Leaf) {
+          if (m instanceof Three && m.value6 instanceof Leaf) {
             $tco_done2 = true;
             return {
-              key: m2.value4,
-              value: m2.value5
+              key: m.value4,
+              value: m.value5
             };
           }
           ;
-          if (m2 instanceof Three) {
-            $copy_m = m2.value6;
+          if (m instanceof Three) {
+            $copy_m = m.value6;
             return;
           }
           ;
@@ -2328,86 +2328,86 @@
           var $tco_var_ctx = $copy_ctx;
           var $tco_done3 = false;
           var $tco_result;
-          function $tco_loop(ctx, m2) {
-            if (m2 instanceof Leaf) {
+          function $tco_loop(ctx, m) {
+            if (m instanceof Leaf) {
               $tco_done3 = true;
               return Nothing.value;
             }
             ;
-            if (m2 instanceof Two) {
-              var v = compare3(k)(m2.value1);
-              if (m2.value3 instanceof Leaf && v instanceof EQ) {
+            if (m instanceof Two) {
+              var v = compare3(k)(m.value1);
+              if (m.value3 instanceof Leaf && v instanceof EQ) {
                 $tco_done3 = true;
-                return new Just(new Tuple(m2.value2, up(ctx)(Leaf.value)));
+                return new Just(new Tuple(m.value2, up(ctx)(Leaf.value)));
               }
               ;
               if (v instanceof EQ) {
-                var max6 = maxNode(m2.value0);
+                var max6 = maxNode(m.value0);
                 $tco_done3 = true;
-                return new Just(new Tuple(m2.value2, removeMaxNode(new Cons(new TwoLeft(max6.key, max6.value, m2.value3), ctx))(m2.value0)));
+                return new Just(new Tuple(m.value2, removeMaxNode(new Cons(new TwoLeft(max6.key, max6.value, m.value3), ctx))(m.value0)));
               }
               ;
               if (v instanceof LT) {
-                $tco_var_ctx = new Cons(new TwoLeft(m2.value1, m2.value2, m2.value3), ctx);
-                $copy_m = m2.value0;
+                $tco_var_ctx = new Cons(new TwoLeft(m.value1, m.value2, m.value3), ctx);
+                $copy_m = m.value0;
                 return;
               }
               ;
-              $tco_var_ctx = new Cons(new TwoRight(m2.value0, m2.value1, m2.value2), ctx);
-              $copy_m = m2.value3;
+              $tco_var_ctx = new Cons(new TwoRight(m.value0, m.value1, m.value2), ctx);
+              $copy_m = m.value3;
               return;
             }
             ;
-            if (m2 instanceof Three) {
+            if (m instanceof Three) {
               var leaves = function() {
-                if (m2.value0 instanceof Leaf && (m2.value3 instanceof Leaf && m2.value6 instanceof Leaf)) {
+                if (m.value0 instanceof Leaf && (m.value3 instanceof Leaf && m.value6 instanceof Leaf)) {
                   return true;
                 }
                 ;
                 return false;
               }();
-              var v = compare3(k)(m2.value4);
-              var v3 = compare3(k)(m2.value1);
+              var v = compare3(k)(m.value4);
+              var v3 = compare3(k)(m.value1);
               if (leaves && v3 instanceof EQ) {
                 $tco_done3 = true;
-                return new Just(new Tuple(m2.value2, fromZipper1(ctx)(new Two(Leaf.value, m2.value4, m2.value5, Leaf.value))));
+                return new Just(new Tuple(m.value2, fromZipper1(ctx)(new Two(Leaf.value, m.value4, m.value5, Leaf.value))));
               }
               ;
               if (leaves && v instanceof EQ) {
                 $tco_done3 = true;
-                return new Just(new Tuple(m2.value5, fromZipper1(ctx)(new Two(Leaf.value, m2.value1, m2.value2, Leaf.value))));
+                return new Just(new Tuple(m.value5, fromZipper1(ctx)(new Two(Leaf.value, m.value1, m.value2, Leaf.value))));
               }
               ;
               if (v3 instanceof EQ) {
-                var max6 = maxNode(m2.value0);
+                var max6 = maxNode(m.value0);
                 $tco_done3 = true;
-                return new Just(new Tuple(m2.value2, removeMaxNode(new Cons(new ThreeLeft(max6.key, max6.value, m2.value3, m2.value4, m2.value5, m2.value6), ctx))(m2.value0)));
+                return new Just(new Tuple(m.value2, removeMaxNode(new Cons(new ThreeLeft(max6.key, max6.value, m.value3, m.value4, m.value5, m.value6), ctx))(m.value0)));
               }
               ;
               if (v instanceof EQ) {
-                var max6 = maxNode(m2.value3);
+                var max6 = maxNode(m.value3);
                 $tco_done3 = true;
-                return new Just(new Tuple(m2.value5, removeMaxNode(new Cons(new ThreeMiddle(m2.value0, m2.value1, m2.value2, max6.key, max6.value, m2.value6), ctx))(m2.value3)));
+                return new Just(new Tuple(m.value5, removeMaxNode(new Cons(new ThreeMiddle(m.value0, m.value1, m.value2, max6.key, max6.value, m.value6), ctx))(m.value3)));
               }
               ;
               if (v3 instanceof LT) {
-                $tco_var_ctx = new Cons(new ThreeLeft(m2.value1, m2.value2, m2.value3, m2.value4, m2.value5, m2.value6), ctx);
-                $copy_m = m2.value0;
+                $tco_var_ctx = new Cons(new ThreeLeft(m.value1, m.value2, m.value3, m.value4, m.value5, m.value6), ctx);
+                $copy_m = m.value0;
                 return;
               }
               ;
               if (v3 instanceof GT && v instanceof LT) {
-                $tco_var_ctx = new Cons(new ThreeMiddle(m2.value0, m2.value1, m2.value2, m2.value4, m2.value5, m2.value6), ctx);
-                $copy_m = m2.value3;
+                $tco_var_ctx = new Cons(new ThreeMiddle(m.value0, m.value1, m.value2, m.value4, m.value5, m.value6), ctx);
+                $copy_m = m.value3;
                 return;
               }
               ;
-              $tco_var_ctx = new Cons(new ThreeRight(m2.value0, m2.value1, m2.value2, m2.value3, m2.value4, m2.value5), ctx);
-              $copy_m = m2.value6;
+              $tco_var_ctx = new Cons(new ThreeRight(m.value0, m.value1, m.value2, m.value3, m.value4, m.value5), ctx);
+              $copy_m = m.value6;
               return;
             }
             ;
-            throw new Error("Failed pattern match at Data.Map.Internal (line 525, column 16 - line 548, column 80): " + [m2.constructor.name]);
+            throw new Error("Failed pattern match at Data.Map.Internal (line 525, column 16 - line 548, column 80): " + [m.constructor.name]);
           }
           ;
           while (!$tco_done3) {
@@ -2423,39 +2423,39 @@
   var foldableMap = {
     foldr: function(f) {
       return function(z) {
-        return function(m2) {
-          if (m2 instanceof Leaf) {
+        return function(m) {
+          if (m instanceof Leaf) {
             return z;
           }
           ;
-          if (m2 instanceof Two) {
-            return foldr(foldableMap)(f)(f(m2.value2)(foldr(foldableMap)(f)(z)(m2.value3)))(m2.value0);
+          if (m instanceof Two) {
+            return foldr(foldableMap)(f)(f(m.value2)(foldr(foldableMap)(f)(z)(m.value3)))(m.value0);
           }
           ;
-          if (m2 instanceof Three) {
-            return foldr(foldableMap)(f)(f(m2.value2)(foldr(foldableMap)(f)(f(m2.value5)(foldr(foldableMap)(f)(z)(m2.value6)))(m2.value3)))(m2.value0);
+          if (m instanceof Three) {
+            return foldr(foldableMap)(f)(f(m.value2)(foldr(foldableMap)(f)(f(m.value5)(foldr(foldableMap)(f)(z)(m.value6)))(m.value3)))(m.value0);
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 133, column 17 - line 136, column 85): " + [m2.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 133, column 17 - line 136, column 85): " + [m.constructor.name]);
         };
       };
     },
     foldl: function(f) {
       return function(z) {
-        return function(m2) {
-          if (m2 instanceof Leaf) {
+        return function(m) {
+          if (m instanceof Leaf) {
             return z;
           }
           ;
-          if (m2 instanceof Two) {
-            return foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(z)(m2.value0))(m2.value2))(m2.value3);
+          if (m instanceof Two) {
+            return foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(z)(m.value0))(m.value2))(m.value3);
           }
           ;
-          if (m2 instanceof Three) {
-            return foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(z)(m2.value0))(m2.value2))(m2.value3))(m2.value5))(m2.value6);
+          if (m instanceof Three) {
+            return foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(z)(m.value0))(m.value2))(m.value3))(m.value5))(m.value6);
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 137, column 17 - line 140, column 85): " + [m2.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 137, column 17 - line 140, column 85): " + [m.constructor.name]);
         };
       };
     },
@@ -2463,20 +2463,20 @@
       var mempty5 = mempty(dictMonoid);
       var append22 = append(dictMonoid.Semigroup0());
       return function(f) {
-        return function(m2) {
-          if (m2 instanceof Leaf) {
+        return function(m) {
+          if (m instanceof Leaf) {
             return mempty5;
           }
           ;
-          if (m2 instanceof Two) {
-            return append22(foldMap(foldableMap)(dictMonoid)(f)(m2.value0))(append22(f(m2.value2))(foldMap(foldableMap)(dictMonoid)(f)(m2.value3)));
+          if (m instanceof Two) {
+            return append22(foldMap(foldableMap)(dictMonoid)(f)(m.value0))(append22(f(m.value2))(foldMap(foldableMap)(dictMonoid)(f)(m.value3)));
           }
           ;
-          if (m2 instanceof Three) {
-            return append22(foldMap(foldableMap)(dictMonoid)(f)(m2.value0))(append22(f(m2.value2))(append22(foldMap(foldableMap)(dictMonoid)(f)(m2.value3))(append22(f(m2.value5))(foldMap(foldableMap)(dictMonoid)(f)(m2.value6)))));
+          if (m instanceof Three) {
+            return append22(foldMap(foldableMap)(dictMonoid)(f)(m.value0))(append22(f(m.value2))(append22(foldMap(foldableMap)(dictMonoid)(f)(m.value3))(append22(f(m.value5))(foldMap(foldableMap)(dictMonoid)(f)(m.value6)))));
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 141, column 17 - line 144, column 93): " + [m2.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 141, column 17 - line 144, column 93): " + [m.constructor.name]);
         };
       };
     }
@@ -2484,39 +2484,39 @@
   var foldableWithIndexMap = {
     foldrWithIndex: function(f) {
       return function(z) {
-        return function(m2) {
-          if (m2 instanceof Leaf) {
+        return function(m) {
+          if (m instanceof Leaf) {
             return z;
           }
           ;
-          if (m2 instanceof Two) {
-            return foldrWithIndex(foldableWithIndexMap)(f)(f(m2.value1)(m2.value2)(foldrWithIndex(foldableWithIndexMap)(f)(z)(m2.value3)))(m2.value0);
+          if (m instanceof Two) {
+            return foldrWithIndex(foldableWithIndexMap)(f)(f(m.value1)(m.value2)(foldrWithIndex(foldableWithIndexMap)(f)(z)(m.value3)))(m.value0);
           }
           ;
-          if (m2 instanceof Three) {
-            return foldrWithIndex(foldableWithIndexMap)(f)(f(m2.value1)(m2.value2)(foldrWithIndex(foldableWithIndexMap)(f)(f(m2.value4)(m2.value5)(foldrWithIndex(foldableWithIndexMap)(f)(z)(m2.value6)))(m2.value3)))(m2.value0);
+          if (m instanceof Three) {
+            return foldrWithIndex(foldableWithIndexMap)(f)(f(m.value1)(m.value2)(foldrWithIndex(foldableWithIndexMap)(f)(f(m.value4)(m.value5)(foldrWithIndex(foldableWithIndexMap)(f)(z)(m.value6)))(m.value3)))(m.value0);
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 147, column 26 - line 150, column 120): " + [m2.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 147, column 26 - line 150, column 120): " + [m.constructor.name]);
         };
       };
     },
     foldlWithIndex: function(f) {
       return function(z) {
-        return function(m2) {
-          if (m2 instanceof Leaf) {
+        return function(m) {
+          if (m instanceof Leaf) {
             return z;
           }
           ;
-          if (m2 instanceof Two) {
-            return foldlWithIndex(foldableWithIndexMap)(f)(f(m2.value1)(foldlWithIndex(foldableWithIndexMap)(f)(z)(m2.value0))(m2.value2))(m2.value3);
+          if (m instanceof Two) {
+            return foldlWithIndex(foldableWithIndexMap)(f)(f(m.value1)(foldlWithIndex(foldableWithIndexMap)(f)(z)(m.value0))(m.value2))(m.value3);
           }
           ;
-          if (m2 instanceof Three) {
-            return foldlWithIndex(foldableWithIndexMap)(f)(f(m2.value4)(foldlWithIndex(foldableWithIndexMap)(f)(f(m2.value1)(foldlWithIndex(foldableWithIndexMap)(f)(z)(m2.value0))(m2.value2))(m2.value3))(m2.value5))(m2.value6);
+          if (m instanceof Three) {
+            return foldlWithIndex(foldableWithIndexMap)(f)(f(m.value4)(foldlWithIndex(foldableWithIndexMap)(f)(f(m.value1)(foldlWithIndex(foldableWithIndexMap)(f)(z)(m.value0))(m.value2))(m.value3))(m.value5))(m.value6);
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 151, column 26 - line 154, column 120): " + [m2.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 151, column 26 - line 154, column 120): " + [m.constructor.name]);
         };
       };
     },
@@ -2524,20 +2524,20 @@
       var mempty5 = mempty(dictMonoid);
       var append22 = append(dictMonoid.Semigroup0());
       return function(f) {
-        return function(m2) {
-          if (m2 instanceof Leaf) {
+        return function(m) {
+          if (m instanceof Leaf) {
             return mempty5;
           }
           ;
-          if (m2 instanceof Two) {
-            return append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m2.value0))(append22(f(m2.value1)(m2.value2))(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m2.value3)));
+          if (m instanceof Two) {
+            return append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value0))(append22(f(m.value1)(m.value2))(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value3)));
           }
           ;
-          if (m2 instanceof Three) {
-            return append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m2.value0))(append22(f(m2.value1)(m2.value2))(append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m2.value3))(append22(f(m2.value4)(m2.value5))(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m2.value6)))));
+          if (m instanceof Three) {
+            return append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value0))(append22(f(m.value1)(m.value2))(append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value3))(append22(f(m.value4)(m.value5))(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value6)))));
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 155, column 26 - line 158, column 128): " + [m2.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 155, column 26 - line 158, column 128): " + [m.constructor.name]);
         };
       };
     },
@@ -2562,8 +2562,8 @@
   var $$delete = function(dictOrd) {
     var pop1 = pop(dictOrd);
     return function(k) {
-      return function(m2) {
-        return maybe(m2)(snd)(pop1(k)(m2));
+      return function(m) {
+        return maybe(m)(snd)(pop1(k)(m));
       };
     };
   };
@@ -2573,14 +2573,14 @@
     var insert1 = insert(dictOrd);
     return function(f) {
       return function(k) {
-        return function(m2) {
-          var v = f(lookup1(k)(m2));
+        return function(m) {
+          var v = f(lookup1(k)(m));
           if (v instanceof Nothing) {
-            return delete1(k)(m2);
+            return delete1(k)(m);
           }
           ;
           if (v instanceof Just) {
-            return insert1(k)(v.value0)(m2);
+            return insert1(k)(v.value0)(m);
           }
           ;
           throw new Error("Failed pattern match at Data.Map.Internal (line 596, column 15 - line 598, column 25): " + [v.constructor.name]);
@@ -2594,14 +2594,14 @@
       return function(m1) {
         return function(m2) {
           var go2 = function(k) {
-            return function(m3) {
+            return function(m) {
               return function(v) {
                 return alter1(function() {
                   var $936 = maybe(v)(f(v));
                   return function($937) {
                     return Just.create($936($937));
                   };
-                }())(k)(m3);
+                }())(k)(m);
               };
             };
           };
@@ -3527,7 +3527,6 @@
   };
 
   // output/Deku.Attribute/index.js
-  var pure4 = /* @__PURE__ */ pure(applicativeEvent);
   var Prop$prime = /* @__PURE__ */ function() {
     function Prop$prime2(value0) {
       this.value0 = value0;
@@ -3555,28 +3554,7 @@
     Unset$prime2.value = new Unset$prime2();
     return Unset$prime2;
   }();
-  var Attribute = function(x) {
-    return x;
-  };
   var unsafeUnAttribute = /* @__PURE__ */ coerce();
-  var unsafeAttribute = Attribute;
-  var prop$prime = /* @__PURE__ */ function() {
-    return Prop$prime.create;
-  }();
-  var cb$prime = /* @__PURE__ */ function() {
-    return Cb$prime.create;
-  }();
-  var attr = function(dict) {
-    return dict.attr;
-  };
-  var pureAttr = function(dictAttr) {
-    var attr1 = attr(dictAttr);
-    return function(a2) {
-      return function(b2) {
-        return pure4(attr1(a2)(b2));
-      };
-    };
-  };
 
   // output/Bolson.Core/index.js
   var Local = /* @__PURE__ */ function() {
@@ -3743,12 +3721,12 @@
   }();
 
   // output/Foreign.Object/foreign.js
-  function _copyST(m2) {
+  function _copyST(m) {
     return function() {
       var r = {};
-      for (var k in m2) {
-        if (hasOwnProperty.call(m2, k)) {
-          r[k] = m2[k];
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r[k] = m[k];
         }
       }
       return r;
@@ -3761,15 +3739,15 @@
   function _foldM(bind4) {
     return function(f) {
       return function(mz) {
-        return function(m2) {
+        return function(m) {
           var acc = mz;
           function g2(k2) {
             return function(z) {
-              return f(z)(k2)(m2[k2]);
+              return f(z)(k2)(m[k2]);
             };
           }
-          for (var k in m2) {
-            if (hasOwnProperty.call(m2, k)) {
+          for (var k in m) {
+            if (hasOwnProperty.call(m, k)) {
               acc = bind4(acc)(g2(k));
             }
           }
@@ -3779,11 +3757,11 @@
     };
   }
   function toArrayWithKey(f) {
-    return function(m2) {
+    return function(m) {
       var r = [];
-      for (var k in m2) {
-        if (hasOwnProperty.call(m2, k)) {
-          r.push(f(k)(m2[k]));
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r.push(f(k)(m[k]));
         }
       }
       return r;
@@ -3798,19 +3776,19 @@
   // output/Foreign.Object.ST/foreign.js
   function poke2(k) {
     return function(v) {
-      return function(m2) {
+      return function(m) {
         return function() {
-          m2[k] = v;
-          return m2;
+          m[k] = v;
+          return m;
         };
       };
     };
   }
   var deleteImpl = function(k) {
-    return function(m2) {
+    return function(m) {
       return function() {
-        delete m2[k];
-        return m2;
+        delete m[k];
+        return m;
       };
     };
   };
@@ -3824,9 +3802,9 @@
   });
   var thawST = _copyST;
   var mutate = function(f) {
-    return function(m2) {
+    return function(m) {
       return runST(function __do2() {
-        var s2 = thawST(m2)();
+        var s2 = thawST(m)();
         f(s2)();
         return s2;
       });
@@ -3861,8 +3839,8 @@
     },
     foldr: function(f) {
       return function(z) {
-        return function(m2) {
-          return foldr3(f)(z)(values(m2));
+        return function(m) {
+          return foldr3(f)(z)(values(m));
         };
       };
     },
@@ -4062,7 +4040,7 @@
   var lcmap2 = /* @__PURE__ */ lcmap(profunctorFn);
   var unwrap2 = /* @__PURE__ */ unwrap();
   var eq2 = /* @__PURE__ */ eq(eqScope);
-  var pure5 = /* @__PURE__ */ pure(applicativeST);
+  var pure4 = /* @__PURE__ */ pure(applicativeST);
   var pure12 = /* @__PURE__ */ pure(applicativeEvent);
   var empty5 = /* @__PURE__ */ empty(plusEvent);
   var merge3 = /* @__PURE__ */ merge(foldableArray);
@@ -4184,7 +4162,7 @@
                 scope: v.scope,
                 ez: false,
                 raiseId: function(v4) {
-                  return pure5(unit);
+                  return pure4(unit);
                 },
                 pos: Nothing.value,
                 dynFamily: new Just(me)
@@ -4237,7 +4215,7 @@
   // output/Deku.Control/index.js
   var map5 = /* @__PURE__ */ map(functorEvent);
   var merge4 = /* @__PURE__ */ merge(foldableArray);
-  var pure6 = /* @__PURE__ */ pure(applicativeEvent);
+  var pure5 = /* @__PURE__ */ pure(applicativeEvent);
   var empty6 = /* @__PURE__ */ empty(plusEvent);
   var pure13 = /* @__PURE__ */ pure(applicativeST);
   var coerce3 = /* @__PURE__ */ coerce();
@@ -4301,14 +4279,14 @@
         return makeLemmingEventO(function(v2, k) {
           var me = v1.ids();
           v.raiseId(me)();
-          var unsub = v2(merge4([pure6(v1.makeText({
+          var unsub = v2(merge4([pure5(v1.makeText({
             id: me,
             parent: v.parent,
             pos: v.pos,
             scope: v.scope,
             dynFamily: v.dynFamily
           })), unsafeSetText(v1)(me)(txt), maybe(empty6)(function(p2) {
-            return pure6(v1.attributeParent({
+            return pure5(v1.attributeParent({
               id: me,
               parent: p2,
               pos: v.pos,
@@ -4329,7 +4307,7 @@
     return go$prime;
   };
   var text_ = function(txt) {
-    return text(pure6(txt));
+    return text(pure5(txt));
   };
   var portalFlatten2 = function() {
     return {
@@ -4376,7 +4354,7 @@
       var go2 = function(children) {
         return function(v1) {
           return makeLemmingEventO(function(v2, k) {
-            return v2(alt2(pure6(v1.makeRoot({
+            return v2(alt2(pure5(v1.makeRoot({
               id: "deku-root",
               root
             })))(__internalDekuFlatten2({
@@ -4403,7 +4381,7 @@
             return makeLemmingEventO(function(v2, k) {
               var me = v1.ids();
               v.raiseId(me)();
-              var unsub = v2(alt2(merge4(append4([pure6(v1.makeElement({
+              var unsub = v2(alt2(merge4(append4([pure5(v1.makeElement({
                 id: me,
                 parent: v.parent,
                 scope: v.scope,
@@ -4411,7 +4389,7 @@
                 pos: v.pos,
                 dynFamily: v.dynFamily
               })), unsafeSetAttribute(v1)(me)(atts)])(maybe([])(function(p2) {
-                return [pure6(v1.attributeParent({
+                return [pure5(v1.attributeParent({
                   id: me,
                   parent: p2,
                   pos: v.pos,
@@ -4465,28 +4443,6 @@
     };
   };
 
-  // output/Deku.DOM.Attr.Href/index.js
-  var Href = /* @__PURE__ */ function() {
-    function Href2() {
-    }
-    ;
-    Href2.value = new Href2();
-    return Href2;
-  }();
-  var attrA_HrefString = {
-    attr: function(v) {
-      return function(value12) {
-        return unsafeAttribute({
-          key: "href",
-          value: prop$prime(value12)
-        });
-      };
-    }
-  };
-
-  // output/Deku.DOM.Elt.A/index.js
-  var a = /* @__PURE__ */ elementify2("a");
-
   // output/Deku.DOM.Elt.Br/index.js
   var br = /* @__PURE__ */ elementify2("br");
   var br_ = /* @__PURE__ */ br(/* @__PURE__ */ empty(plusArray));
@@ -4495,118 +4451,20 @@
   var h1 = /* @__PURE__ */ elementify2("h1");
   var h1_ = /* @__PURE__ */ h1(/* @__PURE__ */ empty(plusArray));
 
-  // output/Deku.DOM.Elt.H2/index.js
-  var h2 = /* @__PURE__ */ elementify2("h2");
-  var h2_ = /* @__PURE__ */ h2(/* @__PURE__ */ empty(plusArray));
-
-  // output/Deku.DOM.Elt.H3/index.js
-  var h3 = /* @__PURE__ */ elementify2("h3");
-  var h3_ = /* @__PURE__ */ h3(/* @__PURE__ */ empty(plusArray));
-
-  // output/Deku.DOM.Elt.H5/index.js
-  var h5 = /* @__PURE__ */ elementify2("h5");
-  var h5_ = /* @__PURE__ */ h5(/* @__PURE__ */ empty(plusArray));
-
-  // output/Deku.DOM.Elt.Label/index.js
-  var label = /* @__PURE__ */ elementify2("label");
-
-  // output/Deku.DOM.Elt.Li/index.js
-  var li = /* @__PURE__ */ elementify2("li");
-  var li_ = /* @__PURE__ */ li(/* @__PURE__ */ empty(plusArray));
-
-  // output/Deku.DOM.Elt.Pre/index.js
-  var pre = /* @__PURE__ */ elementify2("pre");
-  var pre_ = /* @__PURE__ */ pre(/* @__PURE__ */ empty(plusArray));
-
-  // output/Deku.DOM.Elt.Ul/index.js
-  var ul = /* @__PURE__ */ elementify2("ul");
-  var ul_ = /* @__PURE__ */ ul(/* @__PURE__ */ empty(plusArray));
-
-  // output/Deku.DOM/index.js
-  var Self = /* @__PURE__ */ function() {
-    function Self2() {
-    }
-    ;
-    Self2.value = new Self2();
-    return Self2;
-  }();
-  var attrSelfElementFunctionEf = {
-    attr: function(v) {
-      return function(value12) {
-        return unsafeAttribute({
-          key: "@self@",
-          value: cb$prime(value12)
-        });
-      };
-    }
-  };
-
-  // output/KaTeX/foreign.js
-  var render = (content3) => (elem3) => () => katex.render(content3, elem3, {
-    throwOnError: false
-  });
-  var display = (content3) => (elem3) => () => katex.render(content3, elem3, {
-    throwOnError: false,
-    displayMode: true
-  });
-  var textMode = (content3) => (elem3) => () => elem3.innerHTML = content3;
-
   // output/Article/index.js
-  var attr2 = /* @__PURE__ */ attr(attrSelfElementFunctionEf);
-  var tell2 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
-  var map15 = /* @__PURE__ */ map(functorEvent);
-  var pure7 = /* @__PURE__ */ pure(applicativeEvent);
-  var pureAttr2 = /* @__PURE__ */ pureAttr(attrA_HrefString);
-  var t$prime = function(txt) {
-    return attr2(Self.value)(textMode(txt));
-  };
-  var t = function(str) {
-    return tell2(label([map15(t$prime)(str)])([]));
-  };
-  var t_ = function(str) {
-    return t(pure7(str));
-  };
-  var subsubsubsection_ = function(str) {
-    return tell2(h5_([text_(str)]));
-  };
+  var tell1 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
   var setTitle_ = function(str) {
-    return tell2(h1_([text_(str)]));
+    return tell1(h1_([text_(str)]));
   };
-  var section_2 = function(str) {
-    return tell2(h2_([text_(str)]));
-  };
-  var pre_2 = function(str) {
-    return tell2(pre_([text_(str)]));
-  };
-  var nl = /* @__PURE__ */ tell2(/* @__PURE__ */ br_([]));
-  var m$prime = function(txt) {
-    return attr2(Self.value)(render(txt));
-  };
-  var m = function(str) {
-    return tell2(label([map15(m$prime)(str)])([]));
-  };
-  var m_ = function(str) {
-    return m(pure7(str));
-  };
-  var equation2 = function(str) {
-    return tell2(label([map15(function(txt) {
-      return attr2(Self.value)(display(txt));
-    })(str)])([]));
-  };
-  var equation_ = function(str) {
-    return equation2(pure7(str));
-  };
-  var a_2 = function(str) {
-    return tell2(a([pureAttr2(Href.value)(str)])([text_(str)]));
-  };
+  var nl = /* @__PURE__ */ tell1(/* @__PURE__ */ br_([]));
 
   // output/Control.Monad.Writer/index.js
   var unwrap4 = /* @__PURE__ */ unwrap();
   var runWriter = function($5) {
     return unwrap4(runWriterT($5));
   };
-  var execWriter = function(m2) {
-    return snd(runWriter(m2));
+  var execWriter = function(m) {
+    return snd(runWriter(m));
   };
 
   // output/Data.CatQueue/index.js
@@ -4918,10 +4776,10 @@
     };
   };
   var resume = function(dictFunctor) {
-    var map18 = map(dictFunctor);
+    var map17 = map(dictFunctor);
     return resume$prime(function(g2) {
       return function(i2) {
-        return new Left(map18(i2)(g2));
+        return new Left(map17(i2)(g2));
       };
     })(Right.create);
   };
@@ -4977,10 +4835,10 @@
       }
     };
   });
-  var pure8 = /* @__PURE__ */ pure(freeApplicative);
+  var pure6 = /* @__PURE__ */ pure(freeApplicative);
   var liftF = function(f) {
     return fromView(new Bind(f, function($192) {
-      return pure8($192);
+      return pure6($192);
     }));
   };
 
@@ -5699,11 +5557,11 @@
     };
   };
   var applicativeStateT = function(dictMonad) {
-    var pure10 = pure(dictMonad.Applicative0());
+    var pure8 = pure(dictMonad.Applicative0());
     return {
       pure: function(a2) {
         return function(s2) {
-          return pure10(new Tuple(a2, s2));
+          return pure8(new Tuple(a2, s2));
         };
       },
       Apply0: function() {
@@ -5712,12 +5570,12 @@
     };
   };
   var monadStateStateT = function(dictMonad) {
-    var pure10 = pure(dictMonad.Applicative0());
+    var pure8 = pure(dictMonad.Applicative0());
     var monadStateT1 = monadStateT(dictMonad);
     return {
       state: function(f) {
         return function($200) {
-          return pure10(f($200));
+          return pure8(f($200));
         };
       },
       Monad0: function() {
@@ -5804,7 +5662,7 @@
 
   // output/Deku.Interpret/index.js
   var map7 = /* @__PURE__ */ map(functorEvent);
-  var map16 = /* @__PURE__ */ map(functorFn);
+  var map15 = /* @__PURE__ */ map(functorFn);
   var map23 = /* @__PURE__ */ map(functorEffect);
   var $$void5 = /* @__PURE__ */ $$void(functorST);
   var show2 = /* @__PURE__ */ show(showInt);
@@ -5823,8 +5681,8 @@
   };
   var functorEFunctionOfFFIDOMS = {
     map: function(f) {
-      return function(m2) {
-        return map7(map16(map23(f)))(m2);
+      return function(m) {
+        return map7(map15(map23(f)))(m);
       };
     }
   };
@@ -6069,12 +5927,12 @@
   var resume2 = /* @__PURE__ */ resume(functorEFunctionOfFFIDOMS);
   var monoidEffect3 = /* @__PURE__ */ monoidEffect(monoidUnit);
   var mempty4 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidEvent(/* @__PURE__ */ monoidFn(monoidEffect3)));
-  var pure9 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure7 = /* @__PURE__ */ pure(applicativeEffect);
   var bind3 = /* @__PURE__ */ bind(bindEffect);
   var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorEffect);
   var liftST3 = /* @__PURE__ */ liftST(monadSTEffect);
   var mempty12 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidEffect(monoidEffect3));
-  var map17 = /* @__PURE__ */ map(functorMaybe);
+  var map16 = /* @__PURE__ */ map(functorMaybe);
   var $$void6 = /* @__PURE__ */ $$void(functorEffect);
   var flattenToSingleEvent = function(ffi) {
     var go$prime = function(n) {
@@ -6104,7 +5962,7 @@
           return function __do2() {
             unit;
             bind3(i2(ffi))(k)();
-            return pure9(unit);
+            return pure7(unit);
           };
         }));
       };
@@ -6132,7 +5990,7 @@
       var b$prime = bind3(bind3(windowImpl)(document2))(body2)();
       return maybe(mempty12)(function(elt) {
         return runInElement$prime(elt)(eee);
-      })(map17(toElement)(b$prime))();
+      })(map16(toElement)(b$prime))();
     };
   };
   var runInBody = function(a2) {
@@ -6140,394 +5998,8 @@
   };
 
   // output/Main/index.js
-  var discard3 = /* @__PURE__ */ discard(discardUnit)(/* @__PURE__ */ bindWriterT(semigroupNut)(bindIdentity));
-  var tell3 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
-  var documentation = /* @__PURE__ */ discard3(/* @__PURE__ */ setTitle_("Data.Algebraic.NumberField"))(function() {
-    return discard3(nl)(function() {
-      return discard3(subsubsubsection_("Technical documentation at"))(function() {
-        return discard3(a_2("https://pursuit.purescript.org/packages/purescript-numberfield"))(function() {
-          return discard3(section_2("Computation with extension fields of the field of rational numbers "))(function() {
-            return discard3(t_("Thanks to the introduction of arbitrary precision integers in Javascript, it is now possible to perform ambitious theoretic computations in the browser without drowning in low-level details."))(function() {
-              return discard3(nl)(function() {
-                return discard3(nl)(function() {
-                  return discard3(t_("The main purpose of this page is to show interactively"))(function() {
-                    return discard3(tell3(ul_([li_([execWriter(discard3(t_("how to do computations in "))(function() {
-                      return discard3(m_("\\mathbb{Q}(\\alpha)"))(function() {
-                        return discard3(t_(" where "))(function() {
-                          return discard3(m_("\\alpha"))(function() {
-                            return t_(" is an algebraic number ");
-                          });
-                        });
-                      });
-                    }))]), li_([text_("how to compute minimal polynomials of sums of algebraic numbers")])])))(function() {
-                      return discard3(t_("A minimal understanding of how to work with "))(function() {
-                        return discard3(a_2("https://pursuit.purescript.org/packages/purescript-sparse-polynomials"))(function() {
-                          return discard3(t_(" is assumed."))(function() {
-                            return discard3(pre_2("import Prelude\n\n> import Data.Algebraic.NumberField\n> import Data.Ratio (Ratio, (%))\n> import Data.Reflectable (reifyType)\n> import Data.Sparse.Polynomial ((^), display, factor)\n> import JS.BigInt (BigInt, fromInt)"))(function() {
-                              return discard3(tell3(h3_([execWriter(discard3(t_("Computations in "))(function() {
-                                return m_("\\mathbb{Q}(\\alpha)");
-                              }))])))(function() {
-                                return discard3(t_("First, let's choose "))(function() {
-                                  return discard3(m_("\\mathbb{Q}"))(function() {
-                                    return discard3(t_(" as the undelying field by defining its unity"))(function() {
-                                      return discard3(pre_2("> bigOne = fromInt 1 % fromInt 1"))(function() {
-                                        return discard3(t_("As an initial example, suppose that "))(function() {
-                                          return discard3(m_("\\alpha"))(function() {
-                                            return discard3(t_(" is an algebraic number we know the minimal polynomial of."))(function() {
-                                              return discard3(nl)(function() {
-                                                return discard3(t_("For instance, "))(function() {
-                                                  return discard3(m_("\\alpha = \\phi"))(function() {
-                                                    return discard3(t_(", the golden ratio satisfying"))(function() {
-                                                      return discard3(equation_("\\phi ^ 2 = \\phi + 1"))(function() {
-                                                        return discard3(t_("or rather"))(function() {
-                                                          return discard3(equation_("\\phi ^ 2 - \\phi - 1 = 0."))(function() {
-                                                            return discard3(t_("So, the minimal polynomial of "))(function() {
-                                                              return discard3(m_("\\alpha"))(function() {
-                                                                return discard3(t_(" is"))(function() {
-                                                                  return discard3(equation_("P_1(X) = X^2-X-1"))(function() {
-                                                                    return discard3(t_("since this expression is irreductible in "))(function() {
-                                                                      return discard3(m_("\\mathbb{Q}"))(function() {
-                                                                        return discard3(t_(" (see below.)"))(function() {
-                                                                          return discard3(nl)(function() {
-                                                                            return discard3(nl)(function() {
-                                                                              return discard3(t_("According to the rupture fields theory, all computations taking place in "))(function() {
-                                                                                return discard3(m_("\\mathbb{Q}(\\alpha)"))(function() {
-                                                                                  return discard3(t_(" can be performed in "))(function() {
-                                                                                    return discard3(m_("\\mathbb{Q}[X]/ P_1(X)"))(function() {
-                                                                                      return discard3(t_(" which is, significant fact, a field "))(function() {
-                                                                                        return discard3(m_("-"))(function() {
-                                                                                          return discard3(t_(" like "))(function() {
-                                                                                            return discard3(m_("\\mathbb{Q} \\, -"))(function() {
-                                                                                              return discard3(t_(" whereas "))(function() {
-                                                                                                return discard3(m_("\\mathbb{Q}[X]"))(function() {
-                                                                                                  return discard3(t_(" is only a ring."))(function() {
-                                                                                                    return discard3(nl)(function() {
-                                                                                                      return discard3(t_("With the property that "))(function() {
-                                                                                                        return discard3(m_("\\mathbb{Q}(\\alpha)"))(function() {
-                                                                                                          return discard3(t_(" is also a vector space of the same dimension as the degree of "))(function() {
-                                                                                                            return discard3(m_("P_1"))(function() {
-                                                                                                              return discard3(t_(", we can conclude that every addition, multiplication, subtraction and inversion involving elements of "))(function() {
-                                                                                                                return discard3(m_("\\mathbb{Q}(\\alpha)"))(function() {
-                                                                                                                  return discard3(t_(" can eventually be simplified to an expression of the form"))(function() {
-                                                                                                                    return discard3(equation_("a\\alpha + b"))(function() {
-                                                                                                                      return discard3(t_("where "))(function() {
-                                                                                                                        return discard3(m_("a"))(function() {
-                                                                                                                          return discard3(t_(" and "))(function() {
-                                                                                                                            return discard3(m_("b"))(function() {
-                                                                                                                              return discard3(t_(" are elements of "))(function() {
-                                                                                                                                return discard3(m_("\\mathbb{Q}."))(function() {
-                                                                                                                                  return discard3(nl)(function() {
-                                                                                                                                    return discard3(nl)(function() {
-                                                                                                                                      return discard3(t_("To illustrate, let's simplify"))(function() {
-                                                                                                                                        return discard3(equation_("\\frac{\\phi + 2}{(\\phi-2)^2}."))(function() {
-                                                                                                                                          return discard3(t_("This is a 3-step process."))(function() {
-                                                                                                                                            return discard3(nl)(function() {
-                                                                                                                                              return discard3(t_("The first thing to do is to define a framework in which computations will take place."))(function() {
-                                                                                                                                                return discard3(pre_2("> fw1 = framework (bigOne ^ 0) [one ^ 2 - one ^ 1 - one ^ 0]"))(function() {
-                                                                                                                                                  return discard3(t_("The first argument is the polynomic representation of unity as a polynomial of arity equal to the number of univariate polynomials that define "))(function() {
-                                                                                                                                                    return discard3(m_("\\alpha"))(function() {
-                                                                                                                                                      return discard3(t_(", one here."))(function() {
-                                                                                                                                                        return discard3(nl)(function() {
-                                                                                                                                                          return discard3(t_("The second argument is an array listing the polynomial(s) it(them)self(ves)."))(function() {
-                                                                                                                                                            return discard3(nl)(function() {
-                                                                                                                                                              return discard3(nl)(function() {
-                                                                                                                                                                return discard3(t_("The second step is to define the expression,"))(function() {
-                                                                                                                                                                  return discard3(pre_2("> :paste\n\u2026 test1 :: forall f. Expression f _\n\u2026 test1 = const $\n\u2026    let phi = element (bigOne ^ 1)\n\u2026        toFrac n = element ((fromInt n % fromInt 1) ^ 0)\n\u2026     in (phi + toFrac 2) * recip ((phi - toFrac 2) * (phi - toFrac 2))\n\u2026"))(function() {
-                                                                                                                                                                    return discard3(t_("then hit "))(function() {
-                                                                                                                                                                      return discard3(m_("<"))(function() {
-                                                                                                                                                                        return discard3(t_("CTRL"))(function() {
-                                                                                                                                                                          return discard3(m_(">"))(function() {
-                                                                                                                                                                            return discard3(t_("+D."))(function() {
-                                                                                                                                                                              return discard3(pre_2(">"))(function() {
-                                                                                                                                                                                return discard3(t_("The compiler will refuse the expression if the type signature is not provided. "))(function() {
-                                                                                                                                                                                  return discard3(nl)(function() {
-                                                                                                                                                                                    return discard3(t_("The first binding is the selection of our variable, "))(function() {
-                                                                                                                                                                                      return discard3(m_("\\phi"))(function() {
-                                                                                                                                                                                        return discard3(t_(". This makes the correspondance between the (unique) variable of a univariate polynomial and the minimal polynomial provided."))(function() {
-                                                                                                                                                                                          return discard3(nl)(function() {
-                                                                                                                                                                                            return discard3(t_("The second binding defines a helper function introducing numerical constants in the expression."))(function() {
-                                                                                                                                                                                              return discard3(nl)(function() {
-                                                                                                                                                                                                return discard3(t_("Then, the expression is naturally defined with the division replaced by a product with the reciprocal."))(function() {
-                                                                                                                                                                                                  return discard3(nl)(function() {
-                                                                                                                                                                                                    return discard3(nl)(function() {
-                                                                                                                                                                                                      return discard3(t_("From the last step"))(function() {
-                                                                                                                                                                                                        return discard3(pre_2('> display ["phi"] $ run $ reifyType fw1 (build test1)\n"(11 % 1)\xD7phi+7 % 1"'))(function() {
-                                                                                                                                                                                                          return discard3(t_("we conclude that the simplification gives"))(function() {
-                                                                                                                                                                                                            return discard3(equation_("11\\phi+7"))(function() {
-                                                                                                                                                                                                              return discard3(tell3(h3_([execWriter(discard3(t_("Computations in "))(function() {
-                                                                                                                                                                                                                return m_("\\mathbb{Q}(\\alpha_0,\\alpha_1,\\cdots)");
-                                                                                                                                                                                                              }))])))(function() {
-                                                                                                                                                                                                                return discard3(t_("This second paragraph is nothing but the general case from which the first paragraph is extracted."))(function() {
-                                                                                                                                                                                                                  return discard3(nl)(function() {
-                                                                                                                                                                                                                    return discard3(t_("Nevertheless, it will show two new interesting tools which would have seemed trivial if presented earlier."))(function() {
-                                                                                                                                                                                                                      return discard3(nl)(function() {
-                                                                                                                                                                                                                        return discard3(nl)(function() {
-                                                                                                                                                                                                                          return discard3(t_("Now, we want to work with several algebraic numbers, "))(function() {
-                                                                                                                                                                                                                            return discard3(m_("\\alpha_i"))(function() {
-                                                                                                                                                                                                                              return discard3(t_(", each of which have a known minimal polynomial."))(function() {
-                                                                                                                                                                                                                                return discard3(nl)(function() {
-                                                                                                                                                                                                                                  return discard3(t_("Behind the scene, the same process happens, as before, "))(function() {
-                                                                                                                                                                                                                                    return discard3(t_(" with an algebraic number, "))(function() {
-                                                                                                                                                                                                                                      return discard3(m_("\\alpha"))(function() {
-                                                                                                                                                                                                                                        return discard3(t_(", along with its minimal polynomial. The difference now is that "))(function() {
-                                                                                                                                                                                                                                          return discard3(m_("\\alpha"))(function() {
-                                                                                                                                                                                                                                            return discard3(t_(" is not provided anymore, it is computed as the sum of the "))(function() {
-                                                                                                                                                                                                                                              return discard3(m_("\\alpha_i"))(function() {
-                                                                                                                                                                                                                                                return discard3(t_(" along with its minimal polynomial."))(function() {
-                                                                                                                                                                                                                                                  return discard3(nl)(function() {
-                                                                                                                                                                                                                                                    return discard3(nl)(function() {
-                                                                                                                                                                                                                                                      return discard3(t_("As before, let's illustrate from an example, by expressing"))(function() {
-                                                                                                                                                                                                                                                        return discard3(equation_("\\frac{1}{\\sqrt[3]{4}+\\sqrt[3]{2}-\\sqrt{3}}"))(function() {
-                                                                                                                                                                                                                                                          return discard3(t_("as a sum rather than a quotient."))(function() {
-                                                                                                                                                                                                                                                            return discard3(nl)(function() {
-                                                                                                                                                                                                                                                              return discard3(nl)(function() {
-                                                                                                                                                                                                                                                                return discard3(t_("With "))(function() {
-                                                                                                                                                                                                                                                                  return discard3(m_("\\alpha_0 = \\sqrt[3]{2}"))(function() {
-                                                                                                                                                                                                                                                                    return discard3(t_(" and "))(function() {
-                                                                                                                                                                                                                                                                      return discard3(m_("\\alpha_1 = \\sqrt{3}"))(function() {
-                                                                                                                                                                                                                                                                        return discard3(t_(" and, since "))(function() {
-                                                                                                                                                                                                                                                                          return discard3(m_("\\alpha_0^2 = \\sqrt[3]{4}"))(function() {
-                                                                                                                                                                                                                                                                            return discard3(t_(", we have only two algebraic numbers to deal with."))(function() {
-                                                                                                                                                                                                                                                                              return discard3(pre_2("> fw2 = let f = fromInt in framework (bigOne^0^0) [one^3 - (f 2 % f 1)^0, one^2 - (f 3 % f 1)^0]"))(function() {
-                                                                                                                                                                                                                                                                                return discard3(t_("From the following request, the minimal polynomial of "))(function() {
-                                                                                                                                                                                                                                                                                  return discard3(m_("\\sqrt[3]{2}+\\sqrt{3}"))(function() {
-                                                                                                                                                                                                                                                                                    return discard3(t_(" is"))(function() {
-                                                                                                                                                                                                                                                                                      return discard3(equation_("P_2(X)=X^6-9X^4-4X^3+27X^2-36X-23"))(function() {
-                                                                                                                                                                                                                                                                                        return discard3(pre_2("> minimalPolynomial fw2\n(1 % 1)\xD7z^6+(-9 % 1)\xD7z^4+(-4 % 1)\xD7z^3+(27 % 1)\xD7z^2+(-36 % 1)\xD7z+(-23 % 1)"))(function() {
-                                                                                                                                                                                                                                                                                          return discard3(t_("From the following request, if we define "))(function() {
-                                                                                                                                                                                                                                                                                            return discard3(equation_("Q_0(X)=-\\frac{2 }{51}X^5-\\frac{1 }{102}X^4+\\frac{20}{51}X^3+\\frac{13}{51}X^2-\\frac{38}{51}X+\\frac{91}{102}"))(function() {
-                                                                                                                                                                                                                                                                                              return discard3(t_("and"))(function() {
-                                                                                                                                                                                                                                                                                                return discard3(equation_("Q_1(X)=\\frac{2 }{51}X^5+\\frac{1 }{102}X^4-\\frac{20}{51}X^3-\\frac{13}{51}X^2+\\frac{89}{51}X-\\frac{91}{102}"))(function() {
-                                                                                                                                                                                                                                                                                                  return discard3(t_("then"))(function() {
-                                                                                                                                                                                                                                                                                                    return discard3(equation_("Q_0(\\sqrt[3]{2}+\\sqrt{3})=\\sqrt[3]{2}"))(function() {
-                                                                                                                                                                                                                                                                                                      return discard3(t_("and"))(function() {
-                                                                                                                                                                                                                                                                                                        return discard3(equation_("Q_1(\\sqrt[3]{2}+\\sqrt{3})=\\sqrt{3}"))(function() {
-                                                                                                                                                                                                                                                                                                          return discard3(pre_2("> toPrimitive fw2\n[(-2 % 51)\xD7z^5+(-1 % 102)\xD7z^4+(20 % 51)\xD7z^3+(13 % 51)\xD7z^2+(-38 % 51)\xD7z+91 % 102,(2 % 51)\xD7z^5+(1 % 102)\xD7z^4+(-20 % 51)\xD7z^3+(-13 % 51)\xD7z^2+(89 % 51)\xD7z+(-91 % 102)]"))(function() {
-                                                                                                                                                                                                                                                                                                            return discard3(nl)(function() {
-                                                                                                                                                                                                                                                                                                              return discard3(t_("Going back to our initial problem"))(function() {
-                                                                                                                                                                                                                                                                                                                return discard3(pre_2("> :paste\n\u2026 test2 :: forall f. Expression f _\n\u2026 test2 = const $\n\u2026    let cbrt2 = element (bigOne ^ 0 ^ 1)\n\u2026        sqrt3 = element (bigOne ^ 1 ^ 0)\n\u2026     in (recip $ cbrt2 * cbrt2 + cbrt2 - sqrt3)\n\u2026"))(function() {
-                                                                                                                                                                                                                                                                                                                  return discard3(pre_2('> display ["cr2", "sr3"] $ run $ reifyType fw2 (build test2)\n"((1 % 3)\xD7sr3+(-1 % 3))\xD7cr2^2+(1 % 3)\xD7cr2+(-1 % 3)\xD7sr3+2 % 3"'))(function() {
-                                                                                                                                                                                                                                                                                                                    return discard3(t_("the expression we're looking for is"))(function() {
-                                                                                                                                                                                                                                                                                                                      return discard3(equation_("\\frac{1}{3}\\sqrt{3}\\sqrt[3]{4}-\\frac{1}{3}\\sqrt[3]{4}+\\frac{1}{3}\\sqrt[3]{2}-\\frac{1}{ 3}\\sqrt{3}+\\frac{2}{3}."))(function() {
-                                                                                                                                                                                                                                                                                                                        return discard3(tell3(h3_([execWriter(discard3(t_("Troubleshooting (is "))(function() {
-                                                                                                                                                                                                                                                                                                                          return discard3(m_("P"))(function() {
-                                                                                                                                                                                                                                                                                                                            return t_(" minimal ?)");
-                                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                                        }))])))(function() {
-                                                                                                                                                                                                                                                                                                                          return discard3(t_("Given an algebraic expression, it is sometimes harder than it seems to choose the minimal polynomial for it."))(function() {
-                                                                                                                                                                                                                                                                                                                            return discard3(nl)(function() {
-                                                                                                                                                                                                                                                                                                                              return discard3(t_("For instance, with"))(function() {
-                                                                                                                                                                                                                                                                                                                                return discard3(equation_("\\alpha=\\sqrt{7+\\sqrt{24}}"))(function() {
-                                                                                                                                                                                                                                                                                                                                  return discard3(t_("we can derive"))(function() {
-                                                                                                                                                                                                                                                                                                                                    return discard3(equation_("(\\alpha^2-7)^2=24"))(function() {
-                                                                                                                                                                                                                                                                                                                                      return discard3(t_("and"))(function() {
-                                                                                                                                                                                                                                                                                                                                        return discard3(equation_("\\alpha^4-14\\alpha^2+49=24"))(function() {
-                                                                                                                                                                                                                                                                                                                                          return discard3(t_("However, if we choose"))(function() {
-                                                                                                                                                                                                                                                                                                                                            return discard3(equation_("\\tilde{P}(X)=X^4-14X^2+25"))(function() {
-                                                                                                                                                                                                                                                                                                                                              return discard3(t_("as the minimal polynomial, we can't get the right answer for "))(function() {
-                                                                                                                                                                                                                                                                                                                                                return discard3(m_("\\alpha^3-9\\alpha"))(function() {
-                                                                                                                                                                                                                                                                                                                                                  return discard3(t_(" (which is "))(function() {
-                                                                                                                                                                                                                                                                                                                                                    return discard3(m_("10"))(function() {
-                                                                                                                                                                                                                                                                                                                                                      return discard3(t_(", but we don't know it yet.)"))(function() {
-                                                                                                                                                                                                                                                                                                                                                        return discard3(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                          return discard3(t_("The reason of this issue is due to required irreductibility of the minimal polynomial, but that's not the case for "))(function() {
-                                                                                                                                                                                                                                                                                                                                                            return discard3(m_("\\tilde{P}"))(function() {
-                                                                                                                                                                                                                                                                                                                                                              return discard3(t_(" by looking at the result of the `factor` function which displays some non-trivial  factors of "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                return discard3(m_("\\tilde{P}"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                  return discard3(t_(":"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                    return discard3(pre_2("> frac n = fromInt n % fromInt 1\n> ptilde = frac 1^4 - frac 14^2 + frac 25^0\n>\n> factor ptilde\n[(-1 % 1)\xD7x^2+(-2 % 1)\xD7x+5 % 1,(-1 % 1)\xD7x^2+(2 % 1)\xD7x+5 % 1,(1 % 1)\xD7x^2+(2 % 1)\xD7x+(-5 % 1),(1 % 1)\xD7x^2+(-2 % 1)\xD7x+(-5 % 1)]"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                      return discard3(t_("Incidentally, each of these factors can be chosen as a minimal polynomial for "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                        return discard3(m_("\\alpha"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                          return discard3(t_(". Let's choose the last one, and check that it satisfies "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                            return discard3(m_("\\alpha"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                              return discard3(t_("'s definition:"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                return discard3(pre_2('> display ["a"] $ run $ reifyType (framework (frac 1 ^ 0) [one ^ 2 - frac 2 ^ 1 - frac 5 ^ 0]) (build ((const $ let a = element (frac 1 ^ 1) in let kst n = element (frac n ^ 0) in (a*a-kst 7)*(a*a-kst 7)) :: forall f. Expression f _))\n"24 % 1"'))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                  return discard3(t_("Now, the framework is coherent:"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                    return pre_2('> display ["a"] $ run $ reifyType (framework (frac 1 ^ 0) [one ^ 2 - frac 2 ^ 1 - frac 5 ^ 0]) (build ((const $ let a = element (frac 1 ^ 1) in let kst n = element (frac n ^ 0) in a*a*a -kst 9 *a) :: forall f. Expression f _))\n"10 % 1"');
-                                                                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                          });
-                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                });
-                                                                                                                                                                                                              });
-                                                                                                                                                                                                            });
-                                                                                                                                                                                                          });
-                                                                                                                                                                                                        });
-                                                                                                                                                                                                      });
-                                                                                                                                                                                                    });
-                                                                                                                                                                                                  });
-                                                                                                                                                                                                });
-                                                                                                                                                                                              });
-                                                                                                                                                                                            });
-                                                                                                                                                                                          });
-                                                                                                                                                                                        });
-                                                                                                                                                                                      });
-                                                                                                                                                                                    });
-                                                                                                                                                                                  });
-                                                                                                                                                                                });
-                                                                                                                                                                              });
-                                                                                                                                                                            });
-                                                                                                                                                                          });
-                                                                                                                                                                        });
-                                                                                                                                                                      });
-                                                                                                                                                                    });
-                                                                                                                                                                  });
-                                                                                                                                                                });
-                                                                                                                                                              });
-                                                                                                                                                            });
-                                                                                                                                                          });
-                                                                                                                                                        });
-                                                                                                                                                      });
-                                                                                                                                                    });
-                                                                                                                                                  });
-                                                                                                                                                });
-                                                                                                                                              });
-                                                                                                                                            });
-                                                                                                                                          });
-                                                                                                                                        });
-                                                                                                                                      });
-                                                                                                                                    });
-                                                                                                                                  });
-                                                                                                                                });
-                                                                                                                              });
-                                                                                                                            });
-                                                                                                                          });
-                                                                                                                        });
-                                                                                                                      });
-                                                                                                                    });
-                                                                                                                  });
-                                                                                                                });
-                                                                                                              });
-                                                                                                            });
-                                                                                                          });
-                                                                                                        });
-                                                                                                      });
-                                                                                                    });
-                                                                                                  });
-                                                                                                });
-                                                                                              });
-                                                                                            });
-                                                                                          });
-                                                                                        });
-                                                                                      });
-                                                                                    });
-                                                                                  });
-                                                                                });
-                                                                              });
-                                                                            });
-                                                                          });
-                                                                        });
-                                                                      });
-                                                                    });
-                                                                  });
-                                                                });
-                                                              });
-                                                            });
-                                                          });
-                                                        });
-                                                      });
-                                                    });
-                                                  });
-                                                });
-                                              });
-                                            });
-                                          });
-                                        });
-                                      });
-                                    });
-                                  });
-                                });
-                              });
-                            });
-                          });
-                        });
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    });
+  var documentation = /* @__PURE__ */ discard(discardUnit)(/* @__PURE__ */ bindWriterT(semigroupNut)(bindIdentity))(/* @__PURE__ */ setTitle_("Data.Algebraic.NumberField"))(function() {
+    return nl;
   });
   var main2 = /* @__PURE__ */ runInBody(/* @__PURE__ */ execWriter(documentation));
 

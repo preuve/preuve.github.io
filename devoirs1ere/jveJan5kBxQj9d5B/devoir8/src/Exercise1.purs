@@ -3,9 +3,7 @@ module Exercise1 where
 import Prelude
 
 import Article (m, m_, nl, t_, t, b_, em_, equation, openSection_)
-
-import Control.Monad.State.Class(class MonadState)
-
+import Control.Monad.Writer (Writer)
 import Data.Array (length, unsafeIndex)
 import Data.Int (pow)
 import Data.Tuple (fst) 
@@ -71,10 +69,7 @@ rshow r =
                     <> show d
                     <> "}"
 
-exo1 :: forall st.  
-  Functor st =>
-  MonadState (Array Nut) st =>
-  Event (Rand /\ Boolean) -> st Unit
+exo1 :: Event (Rand /\ Boolean) -> Writer Nut Unit
 exo1 f0 = do
   openSection_ "Exercice I" "5 points"
 

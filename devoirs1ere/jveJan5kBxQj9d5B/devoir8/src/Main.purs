@@ -2,9 +2,10 @@ module Main where
 
 import Prelude
 
-import Article (fromIncremental, get, nl, t_, m_, put, setTitle_, toSeed, splits)
+import Article (nl, t_, m_, setTitle_, toSeed)
 
 import Control.Alt ((<|>))
+import Control.Monad.Writer (Writer, execWriter, tell)
 
 import Data.Array((!!)) as Array
 import Data.Maybe(Maybe (..))
@@ -26,6 +27,8 @@ import Exercise1 (exo1)
 import Exercise2 (exo2)
 import Exercise3 (exo3)
 import Exercise4 (exo4)
+
+import FRP.Event.Class ((<**>))
 
 import Rand(Rand, rand, consume)
 import Record (set)
@@ -52,23 +55,31 @@ fromRelative n =
 
 main :: Effect Unit
 main = do
-  runInBody (D.div_ header)
+  runInBody $ execWriter header
+
   runInBody Deku.do
     setState /\ state <- useState { textContent: "", enabled: false }
 
     let doc seed enabled = 
           D.div [(if _ then D.Style := "display: block;" else D.Style := "display: none;") <$> enabled] $ 
-              let f0 = (fromRelative /\ (_ < 0)) `splits` seed
+              let f0 = seed <**> (pure \x -> fromRelative x /\ (x < 0))
                   f1 = (\(a/\b) -> consume 30 a /\ b) <$> f0
                   f2 = (\(a/\b) -> consume 30 a /\ b) <$> f1
                   f3 = (\(a/\b) -> consume 30 a /\ b) <$> f2
-              in fromIncremental $ do    
-                nl    
-                exo1 f1
-                exo2 f2
-                exo3 f3
-                exo4 f0 -- no seed needed for this exo
-                get
+              in 
+                [ execWriter $ do    
+                    nl    
+                    exo1 f1
+                    nl    
+                    nl    
+                    exo2 f2
+                    nl    
+                    nl    
+                    exo3 f3
+                    nl    
+                    nl    
+                    exo4 f0 -- no seed needed for this exo
+                ]
                 
     D.div_
           [ D.div_  
@@ -93,18 +104,21 @@ main = do
             , doc ((toSeed <$> (_.textContent)) <$> state) (pure false <|> (_.enabled) <$> state)
           ]
 
-header :: Array Nut
-header = fromIncremental $ do
+header :: Writer Nut Unit
+header = do
   setTitle_ "Devoir 8 : Produit scalaire / Suites numériques"
   nl
-  put $ D.div [D.Style !:= "display: grid; grid-template-columns: 1fr 1fr 1fr;"]
+  
+  tell $ D.div [D.Style !:= "display: grid; grid-template-columns: 1fr 1fr 1fr;"]
       [ D.label_ [text_ "Nom:"]
       , D.label_ [text_ "Prénom:"]
       , D.label_ [text_ "Classe:"]
       ]
-  put $ D.ul_
+  
+  tell $ D.ul_
       [ D.li_ [text_ "4 exercices"]
-      , D.li_ (fromIncremental $ do
+      , D.li_ 
+        [ execWriter $ do
            t_ "5 points par exercice ("
            m_ "\\bullet"
            t_ ": 1 point, "
@@ -112,9 +126,8 @@ header = fromIncremental $ do
            t_ ": "
            m_ "\\frac{1}{2}"
            t_ " point)"
-           get
-           )
+        ]
       , D.li_ [text_ "sans document"]
       , D.li_ [text_ "calculatrice nécessaire"]
       ]
-  get
+
