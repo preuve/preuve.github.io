@@ -4,7 +4,7 @@ import Prelude
 
 import Control.Monad.Writer (Writer, tell)
 
-import Data.Array ((:), elemIndex, (..), length, unsafeIndex)
+import Data.Array ((:), elemIndex, (..), length)
 import Data.Foldable (foldr)
 import Data.Geometry.Plane 
   (Point
@@ -13,8 +13,6 @@ import Data.Geometry.Plane
 import Data.Int (round)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Number (acos, pi, isNaN, fromString)
-import Data.Tuple (fst, snd)
-import Data.Tuple.Nested ((/\), type (/\))
 
 import Deku.Attribute ((:=), (!:=), unsafeAttribute, prop', Attribute)
 import Deku.Control (text_)

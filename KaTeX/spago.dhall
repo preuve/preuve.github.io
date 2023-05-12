@@ -1,12 +1,11 @@
 { name = "KaTeX"
 , dependencies =
   [ "arrays"
-  , "control"
   , "deku"
   , "effect"
-  , "event"
   , "foldable-traversable"
   , "geometry-plane"
+  , "hyrule"
   , "integers"
   , "maybe"
   , "numbers"
@@ -15,9 +14,6 @@
   , "transformers"
   , "tuples"
   , "web-dom"
-  , "web-events"
-  , "web-html"
-  , "web-uievents"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]
