@@ -1,4 +1,4 @@
-module Touch51.Main where
+module Main where
 
 import Prelude
 
@@ -41,9 +41,9 @@ import Unsafe.Coerce (unsafeCoerce)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
 import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
 import Web.TouchEvent.TouchList (item) as Touch
---import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent, buttons)
+import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent)
 
-type Event a = (a -> Effect Unit) -> Effect (Effect Unit)
+--type Event a = (a -> Effect Unit) -> Effect (Effect Unit)
 
 data Use a = Special a | Regular a | None
 
@@ -52,7 +52,7 @@ for (Special x) f = f x
 for (Regular x) f = f x 
 for _ _ = pure unit
 
-touchListener ::  forall a.              
+touchListener :: forall a.              
         ({ x :: Number         
          , y :: Number         
          }                     
@@ -70,6 +70,23 @@ touchListener f =
                         y = toNumber $ Touch.clientY t
                     f { x, y }
                           
+mouseListener :: forall a.              
+        ({ x :: Number         
+         , y :: Number         
+         }                     
+         -> Effect a     
+        )                      
+        -> Effect EventListener
+
+mouseListener f =  
+    eventListener \e -> do
+        preventDefault e
+        for_ (fromEvent e)
+            \me -> do
+                    let x = toNumber $ clientX me
+                        y = toNumber $ clientY me
+                    f { x, y }
+
 main :: Effect Unit
 main = do
     emctx <- new Nothing
@@ -86,7 +103,7 @@ main = do
                     beginPath ctx
                     arc ctx 
                         { end: 2.0 * pi
-                        , radius: 40.0
+                        , radius: 41.0
                         , start: 0.0
                         , useCounterClockwise: false
                         , x
@@ -105,7 +122,7 @@ main = do
                         lineTo ctx x y
                         closePath ctx
 
-            setOrigin $ Regular { x, y }
+                setOrigin $ Regular { x, y }
         
         D.div_
             [ D.canvas
@@ -119,12 +136,22 @@ main = do
                     setLineWidth initialCtx 12.0
                     write (Just initialCtx) emctx
                     
-                    start <- touchListener $ 
+                    startTouch <- touchListener $ 
                                 setOrigin <<< Special
-                    addEventListener (EventType "touchstart") start true (HTMLCanvasElement.toEventTarget elt)
+                    addEventListener (EventType "touchstart") startTouch true (HTMLCanvasElement.toEventTarget elt)
 
-                    move <- touchListener setPosition
-                    addEventListener (EventType "touchmove") move true (HTMLCanvasElement.toEventTarget elt)
+                    moveTouch <- touchListener setPosition
+                    addEventListener (EventType "touchmove") moveTouch true (HTMLCanvasElement.toEventTarget elt)
+
+                    startMouse <- mouseListener $ 
+                                setOrigin <<< Special
+                    addEventListener (EventType "mousedown") startMouse true (HTMLCanvasElement.toEventTarget elt)
+
+                    moveMouse <- mouseListener setPosition
+                    addEventListener (EventType "mousemove") moveMouse true (HTMLCanvasElement.toEventTarget elt)
+
+                    stopMouse <- eventListener \_ -> setOrigin None
+                    addEventListener (EventType "mouseup") stopMouse true (HTMLCanvasElement.toEventTarget elt)
                 ]
                 []
             , D.button 

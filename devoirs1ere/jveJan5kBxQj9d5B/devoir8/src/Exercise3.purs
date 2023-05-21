@@ -11,7 +11,7 @@ import Data.FoldableWithIndex (forWithIndex_, foldMapWithIndex)
 import Data.Tuple (fst) 
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Control (switcher)
+import Deku.Control ((<#~>))
 import Deku.Core (Nut)
 import Deku.DOM as D
 
@@ -65,35 +65,41 @@ exo3 f0 = do
                     (\i -> unsafePartial $ unsafeIndex problems i) <$> arr
             ) <<< chooseIndices
     
-    tell $ 
-        switcher 
-            (\f ->
-                let chosenProblems = chooseProblems f
-                in execWriter $ forWithIndex_ chosenProblems (\i p -> do
-                    b_ $ (show $ i+1)
-                    m_ "\\bullet\\bullet\\circ\\;"
-                    t_ "Soit "
-                    m_ "(u_n)"
-                    t_ " la suite définie par "
-                    m_ p.sequence
-                    t_ " pour tout "
-                    m_ p.domain
-                    t_ "."
-                    nl
-                    t_ " Etudier les variations de "
-                    m_ "(u_n)"
-                    t_ "."
-                    nl
-                    )
-                ) f0
+    tell $ f0 <#~> \f ->
+        execWriter $ forWithIndex_ (chooseProblems f) \i p -> do
+            b_ $ (show $ i+1)
+            m_ "\\bullet\\bullet\\circ\\;"
+            t_ "Soit "
+            m_ "(u_n)"
+            t_ " la suite définie par "
+            m_ p.sequence
+            t_ " pour tout "
+            m_ p.domain
+            t_ "."
+            nl
+            t_ " Etudier les variations de "
+            m_ "(u_n)"
+            t_ "."
+            nl
 
-    tell $ D.label [(\ ((_r /\ m) /\ arr) -> t' $
-        if m 
-           then "réponses: " <> foldMapWithIndex (\i p ->
-                " " <> show (i+1)
-                    <> ") "
-                    <> p.answer)  arr
-           else ""
-        ) <$> ((pure \x -> x /\ chooseProblems x) <*> f0)] []
+    tell $ 
+        D.label 
+            [ f0 
+                <#> (\ x -> x /\ chooseProblems x) 
+                <#> (\ ((_r /\ m) /\ arr) -> t' $
+                        if m 
+                            then 
+                                "réponses: " 
+                                    <> foldMapWithIndex 
+                                        ( \i a -> " " 
+                                            <> show (i+1) 
+                                            <> ") ("
+                                            <> a.answer
+                                            <> ")"
+                                        ) arr
+                            else ""
+                    ) 
+            ] 
+            []
         
 

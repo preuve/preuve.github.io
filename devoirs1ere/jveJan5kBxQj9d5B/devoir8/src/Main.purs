@@ -28,8 +28,6 @@ import Exercise2 (exo2)
 import Exercise3 (exo3)
 import Exercise4 (exo4)
 
-import FRP.Event.Class ((<**>))
-
 import Rand(Rand, rand, consume)
 import Record (set)
 import Type.Proxy (Proxy (..))
@@ -56,35 +54,12 @@ fromRelative n =
 main :: Effect Unit
 main = do
   runInBody $ execWriter header
-
   runInBody Deku.do
     setState /\ state <- useState { textContent: "", enabled: false }
-
-    let doc seed enabled = 
-          D.div [(if _ then D.Style := "display: block;" else D.Style := "display: none;") <$> enabled] $ 
-              let f0 = seed <**> (pure \x -> fromRelative x /\ (x < 0))
-                  f1 = (\(a/\b) -> consume 30 a /\ b) <$> f0
-                  f2 = (\(a/\b) -> consume 30 a /\ b) <$> f1
-                  f3 = (\(a/\b) -> consume 30 a /\ b) <$> f2
-              in 
-                [ execWriter $ do    
-                    nl    
-                    exo1 f1
-                    nl    
-                    nl    
-                    exo2 f2
-                    nl    
-                    nl    
-                    exo3 f3
-                    nl    
-                    nl    
-                    exo4 f0 -- no seed needed for this exo
-                ]
-                
     D.div_
-          [ D.div_  
-            [ D.label_ [text_ "Enoncé n° "]
-            , D.input
+      [ D.div_  
+          [ D.label_ [text_ "Enoncé n° "]
+          , D.input
               [ textInput $
                   ( (setState <<< _) <<< flip 
                       (set (Proxy :: _ "textContent")
@@ -100,9 +75,33 @@ main = do
               , D.Autofocus !:= ""
               ]
               []
-            ]
-            , doc ((toSeed <$> (_.textContent)) <$> state) (pure false <|> (_.enabled) <$> state)
           ]
+        
+      , D.div 
+          [ (if _ 
+                then D.Style := "display: block;" 
+                else D.Style := "display: none;"
+            ) <$> (pure false <|> (_.enabled) <$> state)
+          ] $ 
+            let f0 = (\x -> fromRelative x /\ (x < 0)) <$> ((toSeed <$> (_.textContent)) <$> state)
+                f1 = (\(a/\b) -> consume 30 a /\ b) <$> f0
+                f2 = (\(a/\b) -> consume 30 a /\ b) <$> f1
+                f3 = (\(a/\b) -> consume 30 a /\ b) <$> f2
+            in 
+              [ execWriter $ do    
+                  nl
+                  exo1 f1
+                  nl    
+                  nl    
+                  exo2 f2
+                  nl    
+                  nl    
+                  exo3 f3
+                  nl    
+                  nl    
+                  exo4 f0 -- no seed needed for this exo
+              ]
+      ]
 
 header :: Writer Nut Unit
 header = do

@@ -12,7 +12,7 @@ to generate this file without the comments in this block.
 -}
 { name = "my-project"
 , dependencies =
-  [ "canvas"
+  [ "arrays"
   , "console"
   , "deku"
   , "effect"
@@ -21,9 +21,7 @@ to generate this file without the comments in this block.
   , "maybe"
   , "numbers"
   , "prelude"
-  , "refs"
   , "tuples"
-  , "unsafe-coerce"
   , "web-events"
   , "web-html"
   , "web-touchevents"

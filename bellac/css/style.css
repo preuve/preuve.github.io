@@ -90,6 +90,10 @@ img.cadre {
   height: 450px;
 }
 
+img.mail {
+  width: 800px;
+}
+
 h1 {
   text-shadow: 10px 10px 10px black;
 }

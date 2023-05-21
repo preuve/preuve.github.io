@@ -13,7 +13,7 @@ import Data.Tuple (fst)
 import Data.Tuple.Nested ((/\), type (/\))
 
 import Deku.Attribute ((!:=), Attribute)
-import Deku.Control (switcher)
+import Deku.Control ((<#~>))
 import Deku.Core (Nut)
 import Deku.DOM as D
 
@@ -173,7 +173,7 @@ problems =
         , r: "c"
         }
     ]
-           
+
 exo2 :: Event (Rand /\ Boolean) -> Writer Nut Unit
 exo2 f0 = do  
     openSection_ "Exercice II" "5 points"
@@ -195,45 +195,53 @@ exo2 f0 = do
     nl 
     nl
     
-    tell $ 
-        switcher 
-            (\f ->
-                let chosenProblems = chooseProblems f
-                in execWriter $ forWithIndex_ chosenProblems (\i p -> do
-                    b_ $ (show $ i+1)
-                    m_ "\\bullet\\;"
-                    
-                    for_ p.q \a ->
-                        tell $ D.label [pure a] []
+    tell $ f0 <#~> \f ->
+        execWriter $ forWithIndex_ (chooseProblems f) \i p -> do
+            b_ $ (show $ i+1)
+            m_ "\\bullet\\;"
+            
+            for_ p.q \a ->
+                tell $ D.label [pure a] []
 
-                    t_ " :"
-                    nl
-                    nl
-                    tell $ D.div [D.Style !:=  "display: grid; grid-template-columns: 1fr 1fr 1fr;"]
-                        [ D.label_ 
-                            [ execWriter $ do 
-                                t_ "(a) "
-                                m_ $ (_.a) p
-                            ]
-                        , D.label_ 
-                            [ execWriter $ do 
-                                t_ "(b) "
-                                m_ $ (_.b) p
-                            ]
-                        , D.label_ 
-                            [ execWriter $ do 
-                                t_ "(c) "
-                                m_ $ (_.c) p
-                            ]
-                        ]
-                    nl
-                    nl
-                    )
-            ) f0
-                               
-    tell $ D.label [(\ ((_r /\ m) /\ arr) -> t' $
-        if m 
-           then "réponses: " <> foldMapWithIndex (\i a -> " " <> show (i+1) <> ") ("<> a.r <> ")") arr
-           else ""
-        ) <$> ((pure \ x -> x /\ chooseProblems x) <*> f0)] []
-    
+            t_ " :"
+            nl
+            nl
+            tell $ D.div [D.Style !:=  "display: grid; grid-template-columns: 1fr 1fr 1fr;"]
+                [ D.label_ 
+                    [ execWriter $ do 
+                        t_ "(a) "
+                        m_ $ (_.a) p
+                    ]
+                , D.label_ 
+                    [ execWriter $ do 
+                        t_ "(b) "
+                        m_ $ (_.b) p
+                    ]
+                , D.label_ 
+                    [ execWriter $ do 
+                        t_ "(c) "
+                        m_ $ (_.c) p
+                    ]
+                ]
+            nl
+            nl
+
+    tell $ 
+        D.label 
+            [ f0 
+                <#> (\ x -> x /\ chooseProblems x) 
+                <#> (\ ((_r /\ m) /\ arr) -> t' $
+                        if m 
+                            then 
+                                "réponses: " 
+                                    <> foldMapWithIndex 
+                                        ( \i a -> " " 
+                                            <> show (i+1) 
+                                            <> ") ("
+                                            <> a.r 
+                                            <> ")"
+                                        ) arr
+                            else ""
+                    ) 
+            ] 
+            []
