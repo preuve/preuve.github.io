@@ -2,40 +2,56 @@ module Main where
 
 import Prelude
 
-import Data.Array (uncons, sortBy, (!!))
-import Data.Foldable (class Foldable, for_, traverse_, fold)
+import Data.Array (uncons, sortBy, (!!), length)
+import Data.Foldable (class Foldable, for_, traverse_, oneOf, maximum, sum)
+import Data.FunctorWithIndex (mapWithIndex)
+import Data.Geometry.Plane 
+    ( Point (..)
+    , abs
+    , circle
+    , halfline
+    , line
+    , meets
+    , middle
+    , normalTo
+    , ord
+    , point
+    , projection
+    , segment
+    , vector
+    , (<+|)
+    )
 import Data.Int (toNumber)
-import Data.Maybe (Maybe (..))
+import Data.Maybe (Maybe (..), fromMaybe)
 import Data.Number (sqrt)
-import Data.Tuple (snd)
+import Data.String (length) as String
+import Data.Tuple (fst, snd)
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Attribute (Attribute, (!:=), (:=))
+import Deku.Attribute (Attribute, (!:=), (:=), (<:=>))
 import Deku.Attributes (klass, style_)
 import Deku.Control (text_)
 import Deku.Do as Deku
 import Deku.DOM as D
-import Deku.Hooks (useState, useState', useEffect, useRef)
+import Deku.Hooks (useEffect, useRef, useHot, useHot', useMemoized)
 import Deku.Listeners (click)
 import Deku.Toplevel (runInBody)
 
 import Effect (Effect)
 import Effect.Timer (setTimeout)
 
-import FRP.Event (Event)
-
-import Data.Geometry.Plane (point, segment, middle, line, meets, vector, normalTo, (<+|), scale, abs, ord, Segment)
+import FRP.Event (Event, keepLatest)
 
 import Web.DOM.Element (getBoundingClientRect)
 
 import Web.Event.Event (EventType(..), preventDefault)
 import Web.Event.EventTarget (EventListener, addEventListener, eventListener)
-import Web.HTML.HTMLDivElement as HTMLDivElement
 
 import Web.HTML (window)
-import Web.HTML.Window (navigator)
-import Web.PointerEvent.Navigator (maxTouchPoints)
+import Web.HTML.HTMLDivElement as HTMLDivElement
+import Web.HTML.Window (navigator, innerWidth, innerHeight)
 
+import Web.PointerEvent.Navigator (maxTouchPoints)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
 import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
 import Web.TouchEvent.TouchList (item) as Touch
@@ -55,6 +71,12 @@ type ViewBox =
     }
 
 type Vertex = { x :: Number, y :: Number }
+
+fromVertex :: Vertex -> Point
+fromVertex { x, y } = point "" x y
+
+toVertex :: Point -> Vertex
+toVertex z = { x: abs z, y: ord z }
 
 mouseListener :: forall f.
     Foldable f =>
@@ -99,25 +121,22 @@ closest r vs =
             Just { head, tail: _ } -> Just head
             _ -> Nothing
 
-styleItem = "display: grid; grid-template-columns: 1fr 1fr 1fr;" :: String
+styleItem = "display: grid; grid-template-columns: 30% 33% 37%; " :: String
 
-                        
+pointName :: Point -> String
+pointName (Point rec) = rec.name
+
 main :: Effect Unit
 main = do
-    w <- window
-    nav <- navigator w
+    
+    win <- window
+    
+    width <- toNumber <$> innerWidth win
+    height <- toNumber <$> innerHeight win
+    nav <- navigator win
     tp <- maxTouchPoints nav
     
     let isMobile = tp > 1
-        width = 
-            if isMobile
-               then widthMobile
-               else widthDesktop
-        height =
-            if isMobile
-               then heightMobile
-               else heightDesktop
-
         viewBox =
             case compare (specBox.width * height) (specBox.height * width) of
                 GT ->
@@ -150,50 +169,153 @@ main = do
                 , segment bl tl Nothing
                 ]
 
-        styleButton :: (Boolean -> Effect Unit) -> Event Boolean -> Array (Event (Attribute D.Button_))
-        styleButton setter ev =  
+        styleButton :: ((Boolean -> Effect Unit) /\ Event Boolean) -> Array (Event (Attribute D.Button_))
+        styleButton (setter /\ ev) =  
             [ style_ $ 
                 if isMobile 
-                   then "font-size: 80px; font-weight: 900;"
-                   else "font-size: 40px;"
+                   then "font-size: " <> mobileButtonFontSize <> "font-weight: 900;"
+                   else "font-size: " <> desktopButtonFontSize
             , click $ (\b -> setter (not b)) <$> ev
             , klass $ (\b -> if b then "selected" else "general") <$> ev
             ]
 
     runInBody Deku.do
-        setOffset /\ eoffset <- useState Nothing
+        setOffset /\ eoffset <- useHot Nothing
         offset <- useRef Nothing eoffset
         
-        setOrigin /\ origin <- useState Nothing
-        setPosition /\ position <- useState'
+        setOrigin /\ origin <- useHot Nothing
+        setPosition /\ position <- useHot'
         
-        setA /\ eA <- useState iniA
-        ptA <- useRef iniA eA
-        setB /\ eB <- useState iniB
-        ptB <- useRef iniB eB
-        setC /\ eC <- useState iniC
-        ptC <- useRef iniC eC
+        setA /\ eA <- useHot (toVertex iniA)
+        ptA <- useRef (toVertex iniA) eA
+        setB /\ eB <- useHot (toVertex iniB)
+        ptB <- useRef (toVertex iniB) eB
+        setC /\ eC <- useHot (toVertex iniC)
+        ptC <- useRef (toVertex iniC) eC
         
-        setAction /\ eaction <- useState (const $ pure unit)
+        setAction /\ eaction <- useHot (const $ pure unit)
         action <- useRef (const $ pure unit) eaction
         
-        setHauteurs /\ hauteurs <- useState false
-        setMedianes /\ medianes <- useState false
-        setMediatrices /\ mediatrices <- useState false
-        setBissectrices /\ bissectrices <- useState false
+        hauteurs <- useHot false
+        medianes <- useHot false
+        mediatrices <- useHot false
+        bissectrices <- useHot false
                 
-        setOrthocentre /\ orthocentre <- useState false
-        setGravite /\ gravite <- useState false
-        setCircumcenter /\ circumcenter <- useState false
-        setInscenter /\ inscenter <- useState false
+        orthocentre <- useHot false
+        gravite <- useHot false
+        circumcenter <- useHot false
+        inscenter <- useHot false
         
-        setPropO /\ propO <- useState false
-        setPropG /\ propG <- useState false
-        setPropC /\ propC <- useState false
-        setPropI /\ propI <- useState false
+        propO <- useHot false
+        propG <- useHot false
+        propC <- useHot false
+        propI <- useHot false
         
-        useEffect origin $ case _ of
-            Just v -> do
+        let anyProperty = 
+                ((\ a b c d -> a||b||c||d) 
+                        <$> snd propO 
+                        <*> snd propG
+                        <*> snd propC
+                        <*> snd propI
+                )
+        
+        eocenter <- useMemoized $ 
+            (\ p q r  -> 
+                let u p' q' r' = 
+                        fromVertex q' <+| projection 
+                            (vector (fromVertex q') (fromVertex r')) 
+                            (vector (fromVertex q') (fromVertex p'))
+                    hp = u p q r
+                    hq = u q p r
+                    o = line (fromVertex p) hp `meets` line (fromVertex q) hq
+                in 
+                    { x: sum $ abs <$> o
+                    , y: sum $ ord <$> o
+                    }
+            ) <$> eA <*> eB <*> eC
+
+        egravity <- useMemoized $    
+            (\p q r ->
+                { x: (p.x + q.x + r.x) / 3.0
+                , y: (p.y + q.y + r.y) / 3.0
+                }
+            ) <$> eA <*> eB <*> eC
+            
+        eccenter <- useMemoized $    
+            (\p q r ->
+                let m p' q' = middle "" $ segment (fromVertex p') (fromVertex q') Nothing
+                    n p' q' = normalTo $ vector (fromVertex p') (fromVertex q')
+                    u p' q' = m p' q' <+| n p' q'
+                    c = line (m p q) (u p q) `meets` line (m p r) (u p r)
+                in 
+                    { x: sum $ abs <$> c
+                    , y: sum $ ord <$> c
+                    }
+            ) <$> eA <*> eB <*> eC
+             
+        eicenter <- useMemoized $
+            (\ p q r ->
+                let aux p' q' r' = 
+                        let pt = fromVertex p'
+                            c = circle pt 1.0
+                        in bothWithDefault
+                            ((c `meets` halfline pt (vector pt $ fromVertex q'))
+                                <> (c `meets` halfline pt (vector pt $ fromVertex r')))
+                            (fromVertex q' /\ fromVertex r')
+                    s /\ t = aux q r p
+                    u /\ v = aux r p q
+                    cci = line (fromVertex q) (middle "" $ segment s t Nothing) 
+                        `meets` line (fromVertex r) (middle "" $ segment u v Nothing) 
+                in 
+                    { x: sum $ abs <$> cci
+                    , y: sum $ ord <$> cci
+                    }
+            ) <$> eA <*> eB <*> eC
+            
+        let emiddle eP eQ = useMemoized $
+                (\ p q -> 
+                    { x: (p.x + q.x) / 2.0
+                    , y: (p.y + q.y) / 2.0
+                    }
+                ) <$> eP <*> eQ
+                
+        eA' <- emiddle eB eC
+        eB' <- emiddle eA eC
+        eC' <- emiddle eA eB
+        
+        let eproj eP eQ eR = useMemoized $
+                (\ p q r -> toVertex $ 
+                            fromVertex q <+| 
+                                projection (vector (fromVertex q) $ fromVertex r)
+                                            (vector (fromVertex q) $ fromVertex p)
+                ) <$> eP <*> eQ <*> eR
+                
+        eJ <- eproj eicenter eB eC
+        eK <- eproj eicenter eA eC
+        eL <- eproj eicenter eA eB
+            
+        let styleRadio :: ((Boolean -> Effect Unit) /\ Event Boolean) -> Array (Event (Attribute D.Button_))
+            styleRadio (setter /\ ev) =  
+                [ style_ $ 
+                    if isMobile 
+                    then "font-size: " <> mobileButtonFontSize <> "font-weight: 900;"
+                    else "font-size: " <> desktopButtonFontSize
+                , click $ 
+                    (\this -> 
+                        if this 
+                        then setter false
+                        else do
+                            fst propO false
+                            fst propG false
+                            fst propC false
+                            fst propI false
+                            setter true
+                    ) <$> ev
+                , klass $ (\b -> if b then "selected" else "general") <$> ev
+                ]
+            
+        useEffect origin $
+            traverse_ \ v -> do
                 a <- ptA
                 b <- ptB
                 c <- ptC
@@ -203,135 +325,235 @@ main = do
                     s v'
                     setAction s
                         
-            _ -> pure unit
-            
         useEffect position \ v -> do
             s <- action
             s $ remap v
 
         let visibleLine p q =
-                let pt z = point "" z.x z.y
-                    d = line (pt p) (pt q)
+                let d = line (fromVertex p) (fromVertex q)
                     ms = do
                         s <- segmentsBox
-                        (\ m -> { x: abs m, y: ord m }) <$> d `meets` s
+                        toVertex <$> d `meets` s
                 
                 in bothWithDefault ms (p /\ q)
+                
+            meetingPoint eshow eprop ecoord = 
+                D.circle
+                    [ (\ s p -> D.Visibility := (if s || p then "visible" else "hidden"))
+                        <$> snd eshow <*> snd eprop
+                    , D.R !:= show (pointRadius / 2.0)
+                    , D.Fill !:= "black"
+                    , keepLatest $
+                        (\ { x, y } -> oneOf
+                            [ D.Cx !:= show x
+                            , D.Cy !:= show y 
+                            ]
+                        ) <$> ecoord
+                    ]
+                    []
+            
+            hauteur eP =
+                D.line
+                        [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd hauteurs
+                        , D.Stroke !:= "black"
+                        , D.StrokeWidth !:= show lineWidth
+                        , keepLatest $
+                            (\o p -> 
+                                let a /\ b = visibleLine o p
+                                in oneOf
+                                    [ D.X1 !:= show a.x
+                                    , D.Y1 !:= show a.y
+                                    , D.X2 !:= show b.x
+                                    , D.Y2 !:= show b.y
+                                    ]
+                            ) <$> eocenter <*> eP
+                        ]
+                        []
             
             mediane eP eQ eR = 
                 D.line
-                    ([ (\v -> D.Visibility := if v then "visible" else "hidden") <$> medianes 
-                    ] <>
-                    ((\e1 e2 e3 ->
-                    [
-                    (\p q r -> 
-                        let (a /\ _) = visibleLine { x: (p.x + q.x) / 2.0, y: (p.y + q.y) / 2.0 } r
-                        in D.X1 := show a.x) <$> e1 <*> e2 <*> e3
-                    , (\p q r -> 
-                        let (a /\ _) = visibleLine { x: (p.x + q.x) / 2.0, y: (p.y + q.y) / 2.0 } r
-                        in D.Y1 := show a.y) <$> e1 <*> e2 <*> e3
-                    , (\p q r -> 
-                        let (_ /\ b) = visibleLine { x: (p.x + q.x) / 2.0, y: (p.y + q.y) / 2.0 } r
-                        in D.X2 := show b.x) <$> e1 <*> e2 <*> e3
-                    , (\p q r -> 
-                        let (_ /\ b) = visibleLine { x: (p.x + q.x) / 2.0, y: (p.y + q.y) / 2.0 } r
-                        in D.Y2 := show b.y) <$> e1 <*> e2 <*> e3
-                    ]) eP eQ eR)
-                    <> [ D.Stroke !:= "black"
-                    , D.StrokeWidth !:= show lineWidth
-                    ])
-                    []
-
-            g eP eQ eR = 
-                D.circle
-                        [ (\v -> D.Visibility := if v then "visible" else "hidden") <$> gravite 
-                        , (\p q r -> D.Cx := (show $ (p.x + q.x + r.x) / 3.0)) <$> eP <*> eQ <*> eR
-                        , (\p q r -> D.Cy := (show $ (p.y + q.y + r.y) / 3.0)) <$> eP <*> eQ <*> eR
-                        , D.R !:= show (pointRadius / 2.0)
-                        , D.Fill !:= "black"
-                        ]
-                        []
-
-            mediatrice eP eQ =
-                let pt z = point "" z.x z.y
-                    m p q = middle "" $ segment (pt p) (pt q) Nothing
-                    n p q = normalTo $ vector (pt p) (pt q)
-                    u p q = m p q <+| scale (10.0) (n p q)
-                    v p q = m p q <+| scale (-10.0) (n p q)
-                in D.line
-                    [ (\b -> D.Visibility := if b then "visible" else "hidden") <$> mediatrices 
-                    , (\p q -> D.X1 := (show $ abs $ u p q)) <$> eP <*> eQ
-                    , (\p q -> D.Y1 := (show $ ord $ u p q)) <$> eP <*> eQ
-                    , (\p q -> D.X2 := (show $ abs $ v p q)) <$> eP <*> eQ
-                    , (\p q -> D.Y2 := (show $ ord $ v p q)) <$> eP <*> eQ
+                    [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd medianes 
                     , D.Stroke !:= "black"
                     , D.StrokeWidth !:= show lineWidth
+                    , keepLatest $
+                        (\ p q r ->
+                            let a /\ b =  
+                                    visibleLine 
+                                        { x: (p.x + q.x) / 2.0
+                                        , y: (p.y + q.y) / 2.0 
+                                        } r 
+                            in oneOf
+                                [ D.X1 !:= show a.x
+                                , D.Y1 !:= show a.y
+                                , D.X2 !:= show b.x
+                                , D.Y2 !:= show b.y
+                                ]    
+                        ) <$> eP <*> eQ <*> eR
                     ]
                     []
-                    
-            ccenter eP eQ eR =
-                let pt z = point "" z.x z.y
-                    m p q = middle "" $ segment (pt p) (pt q) Nothing
-                    n p q = normalTo $ vector (pt p) (pt q)
-                    u p q = m p q <+| scale (10.0) (n p q)
-                    v p q = m p q <+| scale (-10.0) (n p q)
-                    c p q r =
-                        let u' = u p q
-                            v' = v p q
-                            u'' = u p r
-                            v'' = v p r
-                        in line u' v' `meets` line u'' v''
-                in D.circle
-                        [ (\b -> D.Visibility := if b then "visible" else "hidden") <$> circumcenter 
-                        , (\p q r -> D.Cx := (fold $ show <<< abs <$> c p q r)) <$> eP <*> eQ <*> eR
-                        , (\p q r -> D.Cy := (fold $ show <<< ord <$> c p q r)) <$> eP <*> eQ <*> eR
-                        , D.R !:= show (pointRadius / 2.0)
-                        , D.Fill !:= "black"
+
+            mediatrice eM =
+                D.line
+                    [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd mediatrices
+                    , D.Stroke !:= "black"
+                    , D.StrokeWidth !:= show lineWidth
+                    , keepLatest $
+                        (\c m -> 
+                            let a /\ b = visibleLine c m
+                            in oneOf
+                                [ D.X1 !:= show a.x
+                                , D.Y1 !:= show a.y
+                                , D.X2 !:= show b.x
+                                , D.Y2 !:= show b.y
+                                ]
+                        ) <$> eccenter <*> eM
+                    ]
+                    []
+                                           
+            bissectrice eP =
+                D.line 
+                    [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd bissectrices
+                    , D.Stroke !:= "black"
+                    , D.StrokeWidth !:= show lineWidth
+                    , keepLatest $
+                        (\ i p ->
+                            let a /\ b = visibleLine p i
+                            in oneOf
+                                [ D.X1 !:= show a.x
+                                , D.Y1 !:= show a.y
+                                , D.X2 !:= show b.x
+                                , D.Y2 !:= show b.y
+                                ]
+                        ) <$> eicenter <*> eP
+                    ]
+                    []
+
+            droiteEuler =
+                D.line
+                    [ (\ c o gr -> 
+                        (D.Visibility := (if c && o && gr then "visible" else "hidden") ))
+                            <$> snd circumcenter <*> snd orthocentre <*> snd gravite
+                    , D.Stroke !:= "purple"
+                    , D.StrokeWidth !:= show (lineWidth / 2.0)
+                    , keepLatest $ 
+                        (\ c o ->
+                            let a /\ b = visibleLine c o
+                            in oneOf
+                                [ D.X1 !:= show a.x
+                                , D.Y1 !:= show a.y
+                                , D.X2 !:= show b.x
+                                , D.Y2 !:= show b.y
+                                ]
+                        ) <$> eccenter <*> eocenter
+                    ]
+                    []
+
+            property eprop content =
+                let nLines = 2 * length content + 1
+                    labelHeight = toNumber nLines * (svgFontSize / 2.0)
+                    nColumns = fromMaybe 0 $ maximum $ (String.length <$> content)
+                    labelWidth = toNumber nColumns * (svgFontSize / 3.5)
+                    labelX = viewBox.x + labelWidth / 20.0
+                    labelY = viewBox.y + labelHeight / 40.0
+                in D.g 
+                    [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd eprop 
+                    ] $
+                    [ D.rect 
+                        [ D.X !:= show labelX
+                        , D.Y !:= show labelY
+                        , D.Width !:= show labelWidth
+                        , D.Height !:= show labelHeight
+                        , D.Rx !:= show 0.1
+                        , D.Fill !:= "#AAAA"
                         ]
                         []
+                    ] <>
+                    ((\j str -> D.text 
+                        [ D.Style !:= ("font-family: sans-serif; font-size: " <> show (svgFontSize / 2.0) <> "px; ")
+                        , D.X !:= (show $ labelX + labelWidth / 10.0)
+                        , D.Y !:= (show $ labelY + labelHeight / 10.0 
+                                                    + (2.0 * toNumber j + 1.0) * (svgFontSize / 2.0))
+                        ]
+                        [text_ str]) `mapWithIndex` content)
 
+            screenPoint eP eCond color size = 
+                D.circle
+                    [ (\ po -> 
+                            (D.Visibility := (if po then "visible" else "hidden") ))
+                                <$> eCond
+                    , (\p -> D.Cx := show p.x) <$> eP
+                    , (\p -> D.Cy := show p.y) <$> eP
+                    , D.R !:= show (size * pointRadius)
+                    , D.Fill !:= color
+                    ]
+                    []
+
+            screenPointName eP eCond str = 
+                D.text 
+                    [  (\ po -> 
+                        (D.Visibility := (if po then "visible" else "hidden") ))
+                            <$> eCond
+                    , D.Style !:= ("font-family: sans-serif; font-size: " <> show svgFontSize <> "px; ")
+                    , (\p -> D.X := show (p.x + svgFontSize/2.5)) <$> eP
+                    , (\p -> D.Y := show (p.y - svgFontSize/2.5)) <$> eP
+                    ]
+                    [text_ str]
+
+            screenSegment eP eQ eCond = 
+                D.line
+                    [ (\ po -> 
+                            (D.Visibility := (if po then "visible" else "hidden") ))
+                                <$> eCond
+                    , D.Stroke !:= "black"
+                    , D.StrokeWidth !:= show (lineWidth / 2.0)
+                    , keepLatest $
+                        (\ p q ->  
+                            oneOf 
+                                [ D.X1 !:= show p.x
+                                , D.Y1 !:= show p.y
+                                , D.X2 !:= show q.x
+                                , D.Y2 !:= show q.y
+                                ]
+                        ) <$> eP <*> eQ
+                    ]
+                    []
         D.div_
-            [ D.div
-                [ D.Self !:= Just >>> traverse_ \elt -> do
-                    setTimeout 500 $ do
-                        t <- (_.bottom) <$> getBoundingClientRect elt
-                        setOffset $ Just t
-                ]
+            [ D.div_
                 [ D.div
                     [ style_ styleItem]
-                    [ D.button (styleButton setHauteurs hauteurs) [text_ "hauteurs"]
-                    , D.button (styleButton setOrthocentre orthocentre) [text_ "orthocentre"]
-                    , D.button (styleButton setPropO propO) [text_ "propriété"]
+                    [ D.button (styleButton hauteurs) [text_ "hauteurs"]
+                    , D.button (styleButton orthocentre) [text_ "orthocentre"]
+                    , D.button (styleRadio propO) [text_ "propriété"]
                     ]
                 , D.div
                     [ style_ styleItem]
-                    [ D.button (styleButton setMedianes medianes) [text_ "médianes"]
-                    , D.button (styleButton setGravite gravite) [text_ "centre de gravité"]
-                    , D.button (styleButton setPropG propG) [text_ "propriété"]
+                    [ D.button (styleButton medianes) [text_ "médianes"]
+                    , D.button (styleButton gravite) [text_ "centre de gravité"]
+                    , D.button (styleRadio propG) [text_ "propriété"]
                     ]
                 , D.div
                     [ style_ styleItem]
-                    [ D.button (styleButton setMediatrices mediatrices) [text_ "médiatrices"]
-                    , D.button (styleButton setCircumcenter circumcenter) [text_ "centre du cercle circonscrit"]
-                    , D.button (styleButton setPropC propC) [text_ "propriété"]
+                    [ D.button (styleButton mediatrices) [text_ "médiatrices"]
+                    , D.button (styleButton circumcenter) [text_ "centre du cercle circonscrit"]
+                    , D.button (styleRadio propC) [text_ "propriété"]
                     ]
                 , D.div
                     [ style_ styleItem]
-                    [ D.button (styleButton setBissectrices bissectrices) [text_ "bissectrices"]
-                    , D.button (styleButton setInscenter inscenter) [text_ "centre du cercle inscrit"]
-                    , D.button (styleButton setPropI propI) [text_ "propriété"]
+                    [ D.button (styleButton bissectrices) [text_ "bissectrices"]
+                    , D.button (styleButton inscenter) [text_ "centre du cercle inscrit"]
+                    , D.button (styleRadio propI) [text_ "propriété"]
                     ]
                 ]
             , D.div
-                [ D.Self !:= HTMLDivElement.fromElement >>> traverse_ \elt -> do
-                    let 
-                        add e f = 
+                [ D.Style !:= "height: 100%;" 
+                , D.Self !:= HTMLDivElement.fromElement >>> traverse_ \elt -> do
+                    
+                    let add e f = 
                             addEventListener 
                                 (EventType e) 
                                 f 
                                 true 
                                 (HTMLDivElement.toEventTarget elt)
-                    
                     
                     startMouse <- mouseListener offset $ 
                                 setOrigin <<< Just
@@ -352,8 +574,12 @@ main = do
                     moveTouch <- touchListener offset setPosition
                     add "touchmove" moveTouch
                 ]
-                [ D.svg 
-                    [ D.Width !:= show width
+                [ D.svg
+                    [ D.Self !:= Just >>> traverse_ \elt -> do
+                            setTimeout 400 $ do
+                                t <- (_.top) <$> getBoundingClientRect elt
+                                setOffset $ Just t
+                    , D.Width !:= show width
                     , D.Height !:= show height
                     , D.ViewBox !:= 
                         ( show viewBox.x <> " "
@@ -362,27 +588,13 @@ main = do
                         <> show viewBox.height
                         )
                     ]
-                    [ D.circle
-                            [ (\p -> D.Cx := show p.x) <$> eA
-                            , (\p -> D.Cy := show p.y) <$> eA
-                            , D.R !:= show pointRadius
-                            , D.Fill !:= "red"
-                            ]
-                            []
-                    , D.circle
-                            [ (\p -> D.Cx := show p.x) <$> eB
-                            , (\p -> D.Cy := show p.y) <$> eB
-                            , D.R !:= show pointRadius
-                            , D.Fill !:= "green"
-                            ]
-                            []
-                    , D.circle
-                            [ (\p -> D.Cx := show p.x) <$> eC
-                            , (\p -> D.Cy := show p.y) <$> eC
-                            , D.R !:= show pointRadius
-                            , D.Fill !:= "blue"
-                            ]
-                            []
+                    [ screenPoint eA (pure true) "red" 1.0
+                    , screenPointName eA anyProperty (pointName iniA)
+                    , screenPoint eB (pure true) "green" 1.0
+                    , screenPointName eB anyProperty (pointName iniB)
+                    , screenPoint eC (pure true) "blue" 1.0
+                    , screenPointName eC anyProperty (pointName iniC)
+
                     , D.line 
                         [ (\p -> D.X1 := show p.x) <$> eA
                         , (\p -> D.Y1 := show p.y) <$> eA
@@ -410,30 +622,113 @@ main = do
                         , D.StrokeWidth !:= show lineWidth
                         ]
                         []
+                        
                     , mediane eA eB eC
                     , mediane eB eC eA
                     , mediane eC eA eB
-                    , g eA eB eC
-                    , mediatrice eA eB
-                    , mediatrice eC eB
-                    , mediatrice eA eC
-                    , ccenter eA eB eC
+                    , meetingPoint gravite propG egravity
+                    , screenPointName egravity (snd propG) "G"
+                    , property propG 
+                        ["si G=grav(ABC), A' milieu de [BC], B' milieu de [AC], et C' milieu de [AB]"
+                        , "alors"
+                        , "Aire(A'GC)=Aire(A'GB)=Aire(C'GB)=Aire(C'GA)=Aire(B'GA)=Aire(B'GC)"
+                        ]
+                    
+                    , mediatrice eA'
+                    , mediatrice eB'
+                    , mediatrice eC'
+                    , meetingPoint circumcenter propC eccenter
+                    , screenPointName eccenter (snd propC) "O"
+                    , property propC ["si O=ccc(ABC)", "alors", "OA=OB=OC"]
+                    
+                    , hauteur eA
+                    , hauteur eB
+                    , hauteur eC
+                    , meetingPoint orthocentre propO eocenter
+                    , screenPointName eocenter (snd propO) "H"
+                    , property propO ["si H=orth(ABC)", "alors", "A=orth(HBC), B=orth(AHC) et C=orth(ABH)"]
+                    
+                    , bissectrice eA
+                    , bissectrice eB
+                    , bissectrice eC
+                    , meetingPoint inscenter propI eicenter
+                    , screenPointName eicenter (snd propI) "I"
+                    , property propI ["si I=cci(ABC)", "alors", "dist(I,(AB))=dist(I,(BC))=dist(I,(AC))"]
+                    
+                    , droiteEuler
+                    
+                    , D.circle
+                            [ keepLatest $
+                                (\ o p -> 
+                                    let 
+                                        r = sqrt ((o.x - p.x) * (o.x - p.x) + (o.y - p.y) * (o.y - p.y))
+                                    in oneOf
+                                        [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd propC
+                                        , D.Cx !:= show o.x
+                                        , D.Cy !:= show o.y
+                                        , D.R !:= show r
+                                        , D.Fill !:= "none"
+                                        , D.Stroke !:= "orange"
+                                        , D.StrokeWidth !:= show (lineWidth / 2.0)
+                                        ]
+                                ) <$> eccenter <*> eA
+                            ]
+                            []
+                            
+                    , screenPoint eA' (snd propG) "black" 0.5
+                    , screenPointName eA' (snd propG) "A'"
+                    , screenPoint eB' (snd propG) "black" 0.5
+                    , screenPointName eB' (snd propG) "B'"
+                    , screenPoint eC' (snd propG) "black" 0.5
+                    , screenPointName eC' (snd propG) "C'"
+                    
+                    , screenSegment eA eA' (snd propG)
+                    , screenSegment eB eB' (snd propG)
+                    , screenSegment eC eC' (snd propG)
+                    
+                    , screenSegment eocenter eA (snd propO)
+                    , screenSegment eocenter eB (snd propO)
+                    , screenSegment eocenter eC (snd propO)
+                    
+                    , D.circle
+                            [ keepLatest $
+                                (\ i p q -> 
+                                    let h = toVertex $ fromVertex p <+|
+                                                projection 
+                                                    (vector (fromVertex p) $ fromVertex q) 
+                                                    (vector (fromVertex p) $ fromVertex i)
+                                        r = sqrt ((i.x - h.x) * (i.x - h.x) + (i.y - h.y) * (i.y - h.y))
+                                    in oneOf
+                                        [ (D.Visibility <:=> (if _ then "visible" else "hidden")) <$> snd propI
+                                        , D.Cx !:= show i.x
+                                        , D.Cy !:= show i.y
+                                        , D.R !:= show r
+                                        , D.Fill !:= "none"
+                                        , D.Stroke !:= "indigo"
+                                        , D.StrokeWidth !:= show (lineWidth / 2.0)
+                                        ]
+                                ) <$> eicenter <*> eA <*> eB
+                            ]
+                            []
+                    
+                    , screenSegment eicenter eJ (snd propI)
+                    , screenSegment eicenter eK (snd propI)
+                    , screenSegment eicenter eL (snd propI)
+
                     ]
                 ]
             ]
 
-widthDesktop = 2000.0 :: Number
-heightDesktop = 1000.0 :: Number
-
-widthMobile = 1600.0 :: Number
-heightMobile = 3000.0 :: Number
+mobileButtonFontSize = "80px; " :: String
+desktopButtonFontSize = "40px; " :: String
+svgFontSize = 0.4 :: Number 
 
 specBox = { x: -3.0, y: -3.0, width: 6.0, height: 6.0 } :: ViewBox
 
-pointRadius = 0.4 :: Number
-lineWidth = 0.1 :: Number
+pointRadius = 0.2 :: Number
+lineWidth = 0.05 :: Number
 
-iniA = { x: 2.0, y: 0.0 } :: Vertex
-iniB = { x: - 1.0, y: sqrt 3.0 } :: Vertex
-iniC = { x: - 1.0, y: - sqrt 3.0 } :: Vertex
+iniA = point "A" 2.0 0.0 :: Point
+iniB = point "B" (-1.0) (sqrt 3.0) :: Point
+iniC = point "C" (-1.0) (-sqrt 3.0) :: Point
 

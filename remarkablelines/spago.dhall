@@ -24,6 +24,7 @@ to generate this file without the comments in this block.
   , "maybe"
   , "numbers"
   , "prelude"
+  , "strings"
   , "tuples"
   , "web-dom"
   , "web-events"
