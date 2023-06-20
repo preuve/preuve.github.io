@@ -28,7 +28,7 @@ import Data.String (length) as String
 import Data.Tuple (fst, snd)
 import Data.Tuple.Nested ((/\), type (/\))
 
-import Deku.Attribute (Attribute, (!:=), (:=), (<:=>))
+import Deku.Attribute (Attribute, Cb, (!:=), (:=), (<:=>), cb)
 import Deku.Attributes (klass, style_)
 import Deku.Control (text_)
 import Deku.Do as Deku
@@ -45,7 +45,7 @@ import FRP.Event (Event, keepLatest)
 import Web.DOM.Element (getBoundingClientRect)
 
 import Web.Event.Event (EventType(..), preventDefault)
-import Web.Event.EventTarget (EventListener, addEventListener, eventListener)
+import Web.Event.EventTarget (EventListener, eventListener, addEventListener)
 
 import Web.HTML (window)
 import Web.HTML.HTMLDivElement as HTMLDivElement
@@ -78,12 +78,11 @@ fromVertex { x, y } = point "" x y
 toVertex :: Point -> Vertex
 toVertex z = { x: abs z, y: ord z }
 
-mouseListener :: forall f.
+mouseCb :: forall f.
     Foldable f =>
-    Effect (f Number) -> (Vertex -> Effect Unit) -> Effect EventListener
-
-mouseListener off f =  
-    eventListener \e -> do
+    Effect (f Number) -> (Vertex -> Effect Unit) -> Cb
+mouseCb off f = 
+    cb \e -> do
         preventDefault e
         
         for_ (fromEvent e) \me -> do
@@ -94,7 +93,7 @@ mouseListener off f =
                 if y < 0.0
                    then pure unit
                    else f { x, y }
-
+    
 touchListener :: forall f.              
     Foldable f =>
     Effect (f Number) -> (Vertex -> Effect Unit) -> Effect EventListener
@@ -518,7 +517,12 @@ main = do
                     ]
                     []
         D.div_
-            [ D.div_
+            [ D.div
+                [ D.Self !:= Just >>> traverse_ \elt -> do
+                            setTimeout 400 $ do
+                                t <- (_.bottom) <$> getBoundingClientRect elt
+                                setOffset $ Just t
+                ]
                 [ D.div
                     [ style_ styleItem]
                     [ D.button (styleButton hauteurs) [text_ "hauteurs"]
@@ -545,41 +549,29 @@ main = do
                     ]
                 ]
             , D.div
-                [ D.Style !:= "height: 100%;" 
+                [ D.Style !:= "height: 100%;"
+                , D.OnMousedown !:= mouseCb offset (setOrigin <<< Just)
+                , D.OnMousemove !:= mouseCb offset setPosition
+                , D.OnMouseup !:= cb \_ -> do
+                    setOrigin Nothing
+                    setAction (const $ pure unit)
                 , D.Self !:= HTMLDivElement.fromElement >>> traverse_ \elt -> do
-                    
-                    let add e f = 
-                            addEventListener 
-                                (EventType e) 
-                                f 
-                                true 
-                                (HTMLDivElement.toEventTarget elt)
-                    
-                    startMouse <- mouseListener offset $ 
-                                setOrigin <<< Just
-                    add "mousedown" startMouse
+                        
+                        let add e f = 
+                                addEventListener 
+                                    (EventType e) 
+                                    f 
+                                    true 
+                                    (HTMLDivElement.toEventTarget elt)
+                        startTouch <- touchListener offset $ 
+                                    setOrigin <<< Just
+                        add "touchstart" startTouch
 
-                    moveMouse <- mouseListener offset setPosition
-                    add "mousemove" moveMouse
-
-                    stopMouse <- eventListener \_ -> do
-                        setOrigin Nothing
-                        setAction (const $ pure unit)
-                    add "mouseup" stopMouse
-                
-                    startTouch <- touchListener offset $ 
-                                setOrigin <<< Just
-                    add "touchstart" startTouch
-
-                    moveTouch <- touchListener offset setPosition
-                    add "touchmove" moveTouch
+                        moveTouch <- touchListener offset setPosition
+                        add "touchmove" moveTouch
                 ]
                 [ D.svg
-                    [ D.Self !:= Just >>> traverse_ \elt -> do
-                            setTimeout 400 $ do
-                                t <- (_.top) <$> getBoundingClientRect elt
-                                setOffset $ Just t
-                    , D.Width !:= show width
+                    [ D.Width !:= show width
                     , D.Height !:= show height
                     , D.ViewBox !:= 
                         ( show viewBox.x <> " "

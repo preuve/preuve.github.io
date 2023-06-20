@@ -4563,6 +4563,9 @@
 
   // output/Deku.Attribute/index.js
   var pure4 = /* @__PURE__ */ pure(applicativeEvent);
+  var Cb = function(x) {
+    return x;
+  };
   var Prop$prime = /* @__PURE__ */ function() {
     function Prop$prime2(value0) {
       this.value0 = value0;
@@ -4600,6 +4603,12 @@
   }();
   var cb$prime = /* @__PURE__ */ function() {
     return Cb$prime.create;
+  }();
+  var cb = /* @__PURE__ */ function() {
+    var $27 = map(functorFn)(map(functorEffect)($$const(true)));
+    return function($28) {
+      return Cb($27($28));
+    };
   }();
   var attr = function(dict) {
     return dict.attr;
@@ -5562,6 +5571,63 @@
         return unsafeAttribute({
           key: "click",
           value: cb$prime($$const(voidLeft2(value12)(true)))
+        });
+      };
+    }
+  };
+
+  // output/Deku.DOM.Attr.OnMousedown/index.js
+  var OnMousedown = /* @__PURE__ */ function() {
+    function OnMousedown2() {
+    }
+    ;
+    OnMousedown2.value = new OnMousedown2();
+    return OnMousedown2;
+  }();
+  var attrOnMousedownCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "mousedown",
+          value: cb$prime(value12)
+        });
+      };
+    }
+  };
+
+  // output/Deku.DOM.Attr.OnMousemove/index.js
+  var OnMousemove = /* @__PURE__ */ function() {
+    function OnMousemove2() {
+    }
+    ;
+    OnMousemove2.value = new OnMousemove2();
+    return OnMousemove2;
+  }();
+  var attrOnMousemoveCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "mousemove",
+          value: cb$prime(value12)
+        });
+      };
+    }
+  };
+
+  // output/Deku.DOM.Attr.OnMouseup/index.js
+  var OnMouseup = /* @__PURE__ */ function() {
+    function OnMouseup2() {
+    }
+    ;
+    OnMouseup2.value = new OnMouseup2();
+    return OnMouseup2;
+  }();
+  var attrOnMouseupCb = {
+    attr: function(v) {
+      return function(value12) {
+        return unsafeAttribute({
+          key: "mouseup",
+          value: cb$prime(value12)
         });
       };
     }
@@ -8675,20 +8741,23 @@
   var pureAttr17 = /* @__PURE__ */ pureAttr(attrCircle_CxString);
   var pureAttr18 = /* @__PURE__ */ pureAttr(attrCircle_CyString);
   var mapAttr22 = /* @__PURE__ */ mapAttr2(attrLine_VisibilityString);
+  var pureAttr19 = /* @__PURE__ */ pureAttr(attrSelfElementFunctionEf);
   var style_1 = /* @__PURE__ */ style_(attrDiv_StyleString);
-  var pureAttr19 = /* @__PURE__ */ pureAttr(attrDiv_StyleString);
-  var pureAttr20 = /* @__PURE__ */ pureAttr(attrSelfElementFunctionEf);
-  var pureAttr21 = /* @__PURE__ */ pureAttr(attrSvg_WidthString);
-  var pureAttr222 = /* @__PURE__ */ pureAttr(attrSvg_HeightString);
-  var pureAttr23 = /* @__PURE__ */ pureAttr(attrSvg_ViewBoxString);
+  var pureAttr20 = /* @__PURE__ */ pureAttr(attrDiv_StyleString);
+  var pureAttr21 = /* @__PURE__ */ pureAttr(attrOnMousedownCb);
+  var pureAttr222 = /* @__PURE__ */ pureAttr(attrOnMousemoveCb);
+  var pureAttr23 = /* @__PURE__ */ pureAttr(attrOnMouseupCb);
+  var pureAttr24 = /* @__PURE__ */ pureAttr(attrSvg_WidthString);
+  var pureAttr25 = /* @__PURE__ */ pureAttr(attrSvg_HeightString);
+  var pureAttr26 = /* @__PURE__ */ pureAttr(attrSvg_ViewBoxString);
   var pure14 = /* @__PURE__ */ pure(applicativeEvent);
   var attr7 = /* @__PURE__ */ attr(attrLine_X1String);
   var attr8 = /* @__PURE__ */ attr(attrLine_Y1String);
   var attr9 = /* @__PURE__ */ attr(attrLine_X2String);
   var attr10 = /* @__PURE__ */ attr(attrLine_Y2String);
   var mapAttr3 = /* @__PURE__ */ mapAttr2(attrCircle_VisibilityStri);
-  var pureAttr24 = /* @__PURE__ */ pureAttr(attrCircle_StrokeString);
-  var pureAttr25 = /* @__PURE__ */ pureAttr(attrCircle_StrokeWidthStr);
+  var pureAttr27 = /* @__PURE__ */ pureAttr(attrCircle_StrokeString);
+  var pureAttr28 = /* @__PURE__ */ pureAttr(attrCircle_StrokeWidthStr);
   var touchListener = function(dictFoldable) {
     var for_24 = for_5(dictFoldable);
     return function(off) {
@@ -8703,8 +8772,8 @@
                   return for_24(o)(function(h) {
                     var y = toNumber(clientY(t)) - h;
                     var x = toNumber(clientX(t));
-                    var $132 = y < 0;
-                    if ($132) {
+                    var $135 = y < 0;
+                    if ($135) {
                       return pure10(unit);
                     }
                     ;
@@ -8742,11 +8811,11 @@
   var pointName = function(v) {
     return v.name;
   };
-  var mouseListener = function(dictFoldable) {
+  var mouseCb = function(dictFoldable) {
     var for_24 = for_5(dictFoldable);
     return function(off) {
       return function(f) {
-        return eventListener(function(e) {
+        return cb(function(e) {
           return function __do4() {
             preventDefault(e)();
             return for_13(fromEvent3(e))(function(me) {
@@ -8755,8 +8824,8 @@
                 return for_24(o)(function(h) {
                   var y = toNumber(clientY2(me)) - h;
                   var x = toNumber(clientX2(me));
-                  var $134 = y < 0;
-                  if ($134) {
+                  var $137 = y < 0;
+                  if ($137) {
                     return pure10(unit);
                   }
                   ;
@@ -8772,7 +8841,7 @@
       };
     };
   };
-  var mouseListener1 = /* @__PURE__ */ mouseListener(foldableMaybe);
+  var mouseCb1 = /* @__PURE__ */ mouseCb(foldableMaybe);
   var mobileButtonFontSize = "80px; ";
   var lineWidth = 0.05;
   var iniC = /* @__PURE__ */ function() {
@@ -9161,8 +9230,8 @@
                                                                                   return circle2([apply5(map24(function(s2) {
                                                                                     return function(p2) {
                                                                                       return attr4(Visibility.value)(function() {
-                                                                                        var $189 = s2 || p2;
-                                                                                        if ($189) {
+                                                                                        var $192 = s2 || p2;
+                                                                                        if ($192) {
                                                                                           return "visible";
                                                                                         }
                                                                                         ;
@@ -9230,8 +9299,8 @@
                                                                               return function(o) {
                                                                                 return function(gr) {
                                                                                   return attr2(Visibility.value)(function() {
-                                                                                    var $205 = c && (o && gr);
-                                                                                    if ($205) {
+                                                                                    var $208 = c && (o && gr);
+                                                                                    if ($208) {
                                                                                       return "visible";
                                                                                     }
                                                                                     ;
@@ -9259,51 +9328,45 @@
                                                                                 };
                                                                               })(eicenter))(eP))])([]);
                                                                             };
-                                                                            return div_([div_([div2([style_1(styleItem)])([button(styleButton(hauteurs))([text_("hauteurs")]), button(styleButton(orthocentre))([text_("orthocentre")]), button(styleRadio(propO))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(medianes))([text_("m\xE9dianes")]), button(styleButton(gravite))([text_("centre de gravit\xE9")]), button(styleRadio(propG))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(mediatrices))([text_("m\xE9diatrices")]), button(styleButton(circumcenter))([text_("centre du cercle circonscrit")]), button(styleRadio(propC))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(bissectrices))([text_("bissectrices")]), button(styleButton(inscenter))([text_("centre du cercle inscrit")]), button(styleRadio(propI))([text_("propri\xE9t\xE9")])])]), div2([pureAttr19(Style.value)("height: 100%;"), pureAttr20(Self.value)(function() {
-                                                                              var $229 = traverse_3(function(elt) {
+                                                                            return div_([div2([pureAttr19(Self.value)(function() {
+                                                                              var $232 = traverse_3(function(elt) {
+                                                                                return setTimeout2(400)(function __do4() {
+                                                                                  var t = map110(function(v7) {
+                                                                                    return v7.bottom;
+                                                                                  })(getBoundingClientRect(elt))();
+                                                                                  return v.value0(new Just(t))();
+                                                                                });
+                                                                              });
+                                                                              return function($233) {
+                                                                                return $232(Just.create($233));
+                                                                              };
+                                                                            }())])([div2([style_1(styleItem)])([button(styleButton(hauteurs))([text_("hauteurs")]), button(styleButton(orthocentre))([text_("orthocentre")]), button(styleRadio(propO))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(medianes))([text_("m\xE9dianes")]), button(styleButton(gravite))([text_("centre de gravit\xE9")]), button(styleRadio(propG))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(mediatrices))([text_("m\xE9diatrices")]), button(styleButton(circumcenter))([text_("centre du cercle circonscrit")]), button(styleRadio(propC))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(bissectrices))([text_("bissectrices")]), button(styleButton(inscenter))([text_("centre du cercle inscrit")]), button(styleRadio(propI))([text_("propri\xE9t\xE9")])])]), div2([pureAttr20(Style.value)("height: 100%;"), pureAttr21(OnMousedown.value)(mouseCb1(offset)(function($234) {
+                                                                              return v1.value0(Just.create($234));
+                                                                            })), pureAttr222(OnMousemove.value)(mouseCb1(offset)(v2.value0)), pureAttr23(OnMouseup.value)(cb(function(v7) {
+                                                                              return function __do4() {
+                                                                                v1.value0(Nothing.value)();
+                                                                                return v6.value0($$const(pure10(unit)))();
+                                                                              };
+                                                                            })), pureAttr19(Self.value)(function() {
+                                                                              var $235 = traverse_3(function(elt) {
                                                                                 var add22 = function(e) {
                                                                                   return function(f) {
                                                                                     return addEventListener(e)(f)(true)(toEventTarget(elt));
                                                                                   };
                                                                                 };
                                                                                 return function __do4() {
-                                                                                  var startMouse = mouseListener1(offset)(function($231) {
-                                                                                    return v1.value0(Just.create($231));
-                                                                                  })();
-                                                                                  add22("mousedown")(startMouse)();
-                                                                                  var moveMouse = mouseListener1(offset)(v2.value0)();
-                                                                                  add22("mousemove")(moveMouse)();
-                                                                                  var stopMouse = eventListener(function(v7) {
-                                                                                    return function __do5() {
-                                                                                      v1.value0(Nothing.value)();
-                                                                                      return v6.value0($$const(pure10(unit)))();
-                                                                                    };
-                                                                                  })();
-                                                                                  add22("mouseup")(stopMouse)();
-                                                                                  var startTouch = touchListener1(offset)(function($232) {
-                                                                                    return v1.value0(Just.create($232));
+                                                                                  var startTouch = touchListener1(offset)(function($237) {
+                                                                                    return v1.value0(Just.create($237));
                                                                                   })();
                                                                                   add22("touchstart")(startTouch)();
                                                                                   var moveTouch = touchListener1(offset)(v2.value0)();
                                                                                   return add22("touchmove")(moveTouch)();
                                                                                 };
                                                                               });
-                                                                              return function($230) {
-                                                                                return $229(fromElement($230));
+                                                                              return function($236) {
+                                                                                return $235(fromElement($236));
                                                                               };
-                                                                            }())])([svg([pureAttr20(Self.value)(function() {
-                                                                              var $233 = traverse_3(function(elt) {
-                                                                                return setTimeout2(400)(function __do4() {
-                                                                                  var t = map110(function(v7) {
-                                                                                    return v7.top;
-                                                                                  })(getBoundingClientRect(elt))();
-                                                                                  return v.value0(new Just(t))();
-                                                                                });
-                                                                              });
-                                                                              return function($234) {
-                                                                                return $233(Just.create($234));
-                                                                              };
-                                                                            }()), pureAttr21(Width.value)(show3(width8)), pureAttr222(Height.value)(show3(height8)), pureAttr23(ViewBox.value)(show3(viewBox.x) + (" " + (show3(viewBox.y) + (" " + (show3(viewBox.width) + (" " + show3(viewBox.height)))))))])([screenPoint(v3.value1)(pure14(true))("red")(1), screenPointName(v3.value1)(anyProperty)(pointName(iniA)), screenPoint(v4.value1)(pure14(true))("green")(1), screenPointName(v4.value1)(anyProperty)(pointName(iniB)), screenPoint(v5.value1)(pure14(true))("blue")(1), screenPointName(v5.value1)(anyProperty)(pointName(iniC)), line2([map24(function(p2) {
+                                                                            }())])([svg([pureAttr24(Width.value)(show3(width8)), pureAttr25(Height.value)(show3(height8)), pureAttr26(ViewBox.value)(show3(viewBox.x) + (" " + (show3(viewBox.y) + (" " + (show3(viewBox.width) + (" " + show3(viewBox.height)))))))])([screenPoint(v3.value1)(pure14(true))("red")(1), screenPointName(v3.value1)(anyProperty)(pointName(iniA)), screenPoint(v4.value1)(pure14(true))("green")(1), screenPointName(v4.value1)(anyProperty)(pointName(iniB)), screenPoint(v5.value1)(pure14(true))("blue")(1), screenPointName(v5.value1)(anyProperty)(pointName(iniC)), line2([map24(function(p2) {
                                                                               return attr7(X1.value)(show3(p2.x));
                                                                             })(v3.value1), map24(function(p2) {
                                                                               return attr8(Y1.value)(show3(p2.y));
@@ -9336,7 +9399,7 @@
                                                                                   }
                                                                                   ;
                                                                                   return "hidden";
-                                                                                }))(snd(propC)), pureAttr17(Cx.value)(show3(o.x)), pureAttr18(Cy.value)(show3(o.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr24(Stroke.value)("orange"), pureAttr25(StrokeWidth.value)(show3(lineWidth / 2))]);
+                                                                                }))(snd(propC)), pureAttr17(Cx.value)(show3(o.x)), pureAttr18(Cy.value)(show3(o.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr27(Stroke.value)("orange"), pureAttr28(StrokeWidth.value)(show3(lineWidth / 2))]);
                                                                               };
                                                                             })(eccenter))(v3.value1))])([]), screenPoint(eA$prime)(snd(propG))("black")(0.5), screenPointName(eA$prime)(snd(propG))("A'"), screenPoint(eB$prime)(snd(propG))("black")(0.5), screenPointName(eB$prime)(snd(propG))("B'"), screenPoint(eC$prime)(snd(propG))("black")(0.5), screenPointName(eC$prime)(snd(propG))("C'"), screenSegment(v3.value1)(eA$prime)(snd(propG)), screenSegment(v4.value1)(eB$prime)(snd(propG)), screenSegment(v5.value1)(eC$prime)(snd(propG)), screenSegment(eocenter)(v3.value1)(snd(propO)), screenSegment(eocenter)(v4.value1)(snd(propO)), screenSegment(eocenter)(v5.value1)(snd(propO)), circle2([keepLatest5(apply5(apply5(map24(function(i2) {
                                                                               return function(p2) {
@@ -9349,7 +9412,7 @@
                                                                                     }
                                                                                     ;
                                                                                     return "hidden";
-                                                                                  }))(snd(propI)), pureAttr17(Cx.value)(show3(i2.x)), pureAttr18(Cy.value)(show3(i2.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr24(Stroke.value)("indigo"), pureAttr25(StrokeWidth.value)(show3(lineWidth / 2))]);
+                                                                                  }))(snd(propI)), pureAttr17(Cx.value)(show3(i2.x)), pureAttr18(Cy.value)(show3(i2.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr27(Stroke.value)("indigo"), pureAttr28(StrokeWidth.value)(show3(lineWidth / 2))]);
                                                                                 };
                                                                               };
                                                                             })(eicenter))(v3.value1))(v4.value1))])([]), screenSegment(eicenter)(eJ)(snd(propI)), screenSegment(eicenter)(eK)(snd(propI)), screenSegment(eicenter)(eL)(snd(propI))])])]);
