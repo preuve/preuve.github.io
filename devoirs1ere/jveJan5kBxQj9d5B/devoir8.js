@@ -1100,39 +1100,33 @@
   };
 
   // output/Data.Array/foreign.js
-  var range = function(start2) {
-    return function(end) {
-      var step3 = start2 > end ? -1 : 1;
-      var result = new Array(step3 * (end - start2) + 1);
-      var i2 = start2, n = 0;
-      while (i2 !== end) {
-        result[n++] = i2;
-        i2 += step3;
-      }
-      result[n] = i2;
-      return result;
-    };
+  var rangeImpl = function(start2, end) {
+    var step3 = start2 > end ? -1 : 1;
+    var result = new Array(step3 * (end - start2) + 1);
+    var i2 = start2, n = 0;
+    while (i2 !== end) {
+      result[n++] = i2;
+      i2 += step3;
+    }
+    result[n] = i2;
+    return result;
   };
-  var replicateFill = function(count2) {
-    return function(value12) {
-      if (count2 < 1) {
-        return [];
-      }
-      var result = new Array(count2);
-      return result.fill(value12);
-    };
+  var replicateFill = function(count2, value12) {
+    if (count2 < 1) {
+      return [];
+    }
+    var result = new Array(count2);
+    return result.fill(value12);
   };
-  var replicatePolyfill = function(count2) {
-    return function(value12) {
-      var result = [];
-      var n = 0;
-      for (var i2 = 0; i2 < count2; i2++) {
-        result[n++] = value12;
-      }
-      return result;
-    };
+  var replicatePolyfill = function(count2, value12) {
+    var result = [];
+    var n = 0;
+    for (var i2 = 0; i2 < count2; i2++) {
+      result[n++] = value12;
+    }
+    return result;
   };
-  var replicate = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
+  var replicateImpl = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
   var fromFoldableImpl = function() {
     function Cons3(head5, tail2) {
       this.head = head5;
@@ -1154,49 +1148,29 @@
       }
       return result;
     }
-    return function(foldr6) {
-      return function(xs) {
-        return listToArray(foldr6(curryCons)(emptyList)(xs));
-      };
+    return function(foldr6, xs) {
+      return listToArray(foldr6(curryCons)(emptyList)(xs));
     };
   }();
   var length = function(xs) {
     return xs.length;
   };
-  var indexImpl = function(just) {
-    return function(nothing) {
-      return function(xs) {
-        return function(i2) {
-          return i2 < 0 || i2 >= xs.length ? nothing : just(xs[i2]);
-        };
-      };
-    };
+  var indexImpl = function(just, nothing, xs, i2) {
+    return i2 < 0 || i2 >= xs.length ? nothing : just(xs[i2]);
   };
-  var findIndexImpl = function(just) {
-    return function(nothing) {
-      return function(f) {
-        return function(xs) {
-          for (var i2 = 0, l = xs.length; i2 < l; i2++) {
-            if (f(xs[i2]))
-              return just(i2);
-          }
-          return nothing;
-        };
-      };
-    };
+  var findIndexImpl = function(just, nothing, f, xs) {
+    for (var i2 = 0, l = xs.length; i2 < l; i2++) {
+      if (f(xs[i2]))
+        return just(i2);
+    }
+    return nothing;
   };
-  var _deleteAt = function(just) {
-    return function(nothing) {
-      return function(i2) {
-        return function(l) {
-          if (i2 < 0 || i2 >= l.length)
-            return nothing;
-          var l1 = l.slice();
-          l1.splice(i2, 1);
-          return just(l1);
-        };
-      };
-    };
+  var _deleteAt = function(just, nothing, i2, l) {
+    if (i2 < 0 || i2 >= l.length)
+      return nothing;
+    var l1 = l.slice();
+    l1.splice(i2, 1);
+    return just(l1);
   };
   var sortByImpl = function() {
     function mergeFromTo(compare3, fromOrdering, xs1, xs2, from3, to2) {
@@ -1234,30 +1208,20 @@
         xs1[k++] = xs2[j++];
       }
     }
-    return function(compare3) {
-      return function(fromOrdering) {
-        return function(xs) {
-          var out;
-          if (xs.length < 2)
-            return xs;
-          out = xs.slice(0);
-          mergeFromTo(compare3, fromOrdering, out, xs.slice(0), 0, xs.length);
-          return out;
-        };
-      };
+    return function(compare3, fromOrdering, xs) {
+      var out;
+      if (xs.length < 2)
+        return xs;
+      out = xs.slice(0);
+      mergeFromTo(compare3, fromOrdering, out, xs.slice(0), 0, xs.length);
+      return out;
     };
   }();
-  var slice = function(s2) {
-    return function(e) {
-      return function(l) {
-        return l.slice(s2, e);
-      };
-    };
+  var sliceImpl = function(s2, e, l) {
+    return l.slice(s2, e);
   };
-  var unsafeIndexImpl = function(xs) {
-    return function(n) {
-      return xs[n];
-    };
+  var unsafeIndexImpl = function(xs, n) {
+    return xs[n];
   };
 
   // output/Control.Monad.ST.Internal/foreign.js
@@ -1385,30 +1349,16 @@
   function newSTArray() {
     return [];
   }
-  var pushAll = function(as) {
-    return function(xs) {
-      return function() {
-        return xs.push.apply(xs, as);
-      };
-    };
+  var pushAllImpl = function(as, xs) {
+    return xs.push.apply(xs, as);
   };
-  var splice = function(i2) {
-    return function(howMany) {
-      return function(bs) {
-        return function(xs) {
-          return function() {
-            return xs.splice.apply(xs, [i2, howMany].concat(bs));
-          };
-        };
-      };
-    };
+  var spliceImpl = function(i2, howMany, bs, xs) {
+    return xs.splice.apply(xs, [i2, howMany].concat(bs));
   };
   function copyImpl(xs) {
-    return function() {
-      return xs.slice();
-    };
+    return xs.slice();
   }
-  var freeze = copyImpl;
+  var freezeImpl = copyImpl;
   var sortByImpl2 = function() {
     function mergeFromTo(compare3, fromOrdering, xs1, xs2, from3, to2) {
       var mid;
@@ -1445,24 +1395,51 @@
         xs1[k++] = xs2[j++];
       }
     }
-    return function(compare3) {
-      return function(fromOrdering) {
-        return function(xs) {
-          return function() {
-            if (xs.length < 2)
-              return xs;
-            mergeFromTo(compare3, fromOrdering, xs, xs.slice(0), 0, xs.length);
-            return xs;
+    return function(compare3, fromOrdering, xs) {
+      if (xs.length < 2)
+        return xs;
+      mergeFromTo(compare3, fromOrdering, xs, xs.slice(0), 0, xs.length);
+      return xs;
+    };
+  }();
+
+  // output/Control.Monad.ST.Uncurried/foreign.js
+  var runSTFn1 = function runSTFn12(fn) {
+    return function(a2) {
+      return function() {
+        return fn(a2);
+      };
+    };
+  };
+  var runSTFn2 = function runSTFn22(fn) {
+    return function(a2) {
+      return function(b2) {
+        return function() {
+          return fn(a2, b2);
+        };
+      };
+    };
+  };
+  var runSTFn4 = function runSTFn42(fn) {
+    return function(a2) {
+      return function(b2) {
+        return function(c) {
+          return function(d) {
+            return function() {
+              return fn(a2, b2, c, d);
+            };
           };
         };
       };
     };
-  }();
+  };
 
   // output/Data.Array.ST/index.js
+  var splice = /* @__PURE__ */ runSTFn4(spliceImpl);
   var push = function(a2) {
-    return pushAll([a2]);
+    return runSTFn2(pushAllImpl)([a2]);
   };
+  var freeze = /* @__PURE__ */ runSTFn1(freezeImpl);
 
   // output/Data.Foldable/foreign.js
   var foldrArray = function(f) {
@@ -1604,6 +1581,35 @@
     return dict.foldMap;
   };
 
+  // output/Data.Function.Uncurried/foreign.js
+  var runFn2 = function(fn) {
+    return function(a2) {
+      return function(b2) {
+        return fn(a2, b2);
+      };
+    };
+  };
+  var runFn3 = function(fn) {
+    return function(a2) {
+      return function(b2) {
+        return function(c) {
+          return fn(a2, b2, c);
+        };
+      };
+    };
+  };
+  var runFn4 = function(fn) {
+    return function(a2) {
+      return function(b2) {
+        return function(c) {
+          return function(d) {
+            return fn(a2, b2, c, d);
+          };
+        };
+      };
+    };
+  };
+
   // output/Data.FunctorWithIndex/foreign.js
   var mapWithIndexArray = function(f) {
     return function(xs) {
@@ -1681,30 +1687,32 @@
   var fromJust2 = /* @__PURE__ */ fromJust();
   var append2 = /* @__PURE__ */ append(semigroupArray);
   var unsafeIndex = function() {
-    return unsafeIndexImpl;
+    return runFn2(unsafeIndexImpl);
   };
+  var slice = /* @__PURE__ */ runFn3(sliceImpl);
   var take = function(n) {
     return function(xs) {
-      var $149 = n < 1;
-      if ($149) {
+      var $152 = n < 1;
+      if ($152) {
         return [];
       }
       ;
       return slice(0)(n)(xs);
     };
   };
+  var range2 = /* @__PURE__ */ runFn2(rangeImpl);
   var index = /* @__PURE__ */ function() {
-    return indexImpl(Just.create)(Nothing.value);
+    return runFn4(indexImpl)(Just.create)(Nothing.value);
   }();
   var last = function(xs) {
     return index(xs)(length(xs) - 1 | 0);
   };
   var foldr2 = /* @__PURE__ */ foldr(foldableArray);
   var findIndex = /* @__PURE__ */ function() {
-    return findIndexImpl(Just.create)(Nothing.value);
+    return runFn4(findIndexImpl)(Just.create)(Nothing.value);
   }();
   var deleteAt = /* @__PURE__ */ function() {
-    return _deleteAt(Just.create)(Nothing.value);
+    return runFn4(_deleteAt)(Just.create)(Nothing.value);
   }();
   var deleteBy = function(v) {
     return function(v1) {
@@ -4288,32 +4296,28 @@
       }
       return arr;
     }
-    return function(apply5) {
-      return function(map26) {
-        return function(f) {
-          var buildFrom = function(x, ys) {
-            return apply5(map26(consList)(f(x)))(ys);
-          };
-          var go2 = function(acc, currentLen, xs) {
-            if (currentLen === 0) {
-              return acc;
-            } else {
-              var last2 = xs[currentLen - 1];
-              return new Cont(function() {
-                var built = go2(buildFrom(last2, acc), currentLen - 1, xs);
-                return built;
-              });
-            }
-          };
-          return function(array) {
-            var acc = map26(finalCell)(f(array[array.length - 1]));
-            var result = go2(acc, array.length - 1, array);
-            while (result instanceof Cont) {
-              result = result.fn();
-            }
-            return map26(listToArray)(result);
-          };
-        };
+    return function(apply5, map26, f) {
+      var buildFrom = function(x, ys) {
+        return apply5(map26(consList)(f(x)))(ys);
+      };
+      var go2 = function(acc, currentLen, xs) {
+        if (currentLen === 0) {
+          return acc;
+        } else {
+          var last2 = xs[currentLen - 1];
+          return new Cont(function() {
+            var built = go2(buildFrom(last2, acc), currentLen - 1, xs);
+            return built;
+          });
+        }
+      };
+      return function(array) {
+        var acc = map26(finalCell)(f(array[array.length - 1]));
+        var result = go2(acc, array.length - 1, array);
+        while (result instanceof Cont) {
+          result = result.fn();
+        }
+        return map26(listToArray)(result);
       };
     };
   }();
@@ -4769,7 +4773,7 @@
                   return new Tuple(empty5, v.parent.value0);
                 }
                 ;
-                throw new Error("Failed pattern match at Deku.Core (line 451, column 38 - line 467, column 40): " + [v.parent.constructor.name]);
+                throw new Error("Failed pattern match at Deku.Core (line 456, column 38 - line 472, column 40): " + [v.parent.constructor.name]);
               }();
               var unsub = v2(merge3([v3.value0, pure12(v1.makeDynBeacon({
                 id: me,
@@ -6307,6 +6311,9 @@
   var fromEventTarget = /* @__PURE__ */ unsafeReadProtoTagged("HTMLInputElement");
 
   // output/Web.UIEvent.KeyboardEvent/foreign.js
+  function key(e) {
+    return e.key;
+  }
   function code2(e) {
     return e.code;
   }
@@ -7863,12 +7870,6 @@
     return $$void6(runInBody$prime(a2));
   };
 
-  // output/Data.Rational/index.js
-  var reduce2 = /* @__PURE__ */ reduce(ordInt)(euclideanRingInt);
-  var fromInt2 = function(i2) {
-    return reduce2(i2)(1);
-  };
-
   // output/Rand/index.js
   var fromJust4 = /* @__PURE__ */ fromJust();
   var mod3 = /* @__PURE__ */ mod(euclideanRingInt);
@@ -7923,7 +7924,7 @@
           };
         };
       };
-      return shake(range(0)(n - 1 | 0))(r)([]);
+      return shake(range2(0)(n - 1 | 0))(r)([]);
     };
   };
   var consume = function(v) {
@@ -7940,12 +7941,13 @@
   var show3 = /* @__PURE__ */ show(showInt);
   var unsafeIndex3 = /* @__PURE__ */ unsafeIndex();
   var mod4 = /* @__PURE__ */ mod(euclideanRingInt);
+  var reduce2 = /* @__PURE__ */ reduce(ordInt)(euclideanRingInt);
   var discard3 = /* @__PURE__ */ discard(discardUnit)(/* @__PURE__ */ bindWriterT(semigroupNut)(bindIdentity));
   var map20 = /* @__PURE__ */ map(functorEvent);
   var div4 = /* @__PURE__ */ div(/* @__PURE__ */ euclideanRingRatio(ordInt)(euclideanRingInt));
   var showInt2 = function(n) {
-    var $31 = n < 0;
-    if ($31) {
+    var $33 = n < 0;
+    if ($33) {
       return show3(n);
     }
     ;
@@ -7960,13 +7962,13 @@
       return "\\frac{2\\pi}{3}";
     }
     ;
-    throw new Error("Failed pattern match at Exercise1 (line 49, column 13 - line 51, column 30): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Exercise1 (line 52, column 13 - line 54, column 30): " + [v.constructor.name]);
   };
   var rshow = function(r) {
     var n = numerator(r);
     var d = denominator(r);
-    var $33 = d === 1;
-    if ($33) {
+    var $35 = d === 1;
+    if ($35) {
       return show3(n);
     }
     ;
@@ -8081,6 +8083,9 @@
       a: a2
     };
   };
+  var fromInt2 = function(i2) {
+    return reduce2(i2)(1);
+  };
   var exo1 = function(f0) {
     return discard3(openSection_("Exercice I")("5 points"))(function() {
       return discard3(t_("Soit "))(function() {
@@ -8088,30 +8093,30 @@
           return discard3(t_(" un triangle tel que "))(function() {
             var r0 = map20(fst)(f0);
             var p0 = map20(randomParam)(r0);
-            return discard3(m(map20(function($57) {
+            return discard3(m(map20(function($59) {
               return function(v) {
                 return "AB = " + v;
               }(show3(function(v) {
                 return v.ab;
-              }($57)));
+              }($59)));
             })(p0)))(function() {
               return discard3(t_(", "))(function() {
-                return discard3(m(map20(function($58) {
+                return discard3(m(map20(function($60) {
                   return function(v) {
                     return "AC = " + v;
                   }(show3(function(v) {
                     return v.ac;
-                  }($58)));
+                  }($60)));
                 })(p0)))(function() {
                   return discard3(t_(" et "))(function() {
-                    return discard3(m(map20(function($59) {
+                    return discard3(m(map20(function($61) {
                       return function(v) {
                         return v + ".";
                       }(function(v) {
                         return "\\widehat{ABC} = " + v;
                       }(showAngle(function(v) {
                         return v.a;
-                      }($59))));
+                      }($61))));
                     })(p0)))(function() {
                       return discard3(nl)(function() {
                         return discard3(t_("On note "))(function() {
@@ -8596,29 +8601,29 @@
       enabled: false
     }))(function(v) {
       return div_([div_([label_([text_("Enonc\xE9 n\xB0 ")]), input([textInput(map25(function() {
-        var $59 = flip(set3($$Proxy.value));
-        return function($60) {
+        var $60 = flip(set3($$Proxy.value));
+        return function($61) {
           return function(v1) {
-            return function($61) {
-              return v.value0(v1($61));
+            return function($62) {
+              return v.value0(v1($62));
             };
-          }($59($60));
+          }($60($61));
         };
       }())(v.value1)), keyDown(map25(function() {
-        var $62 = flip(function() {
-          var $64 = set1($$Proxy.value);
-          return function($65) {
-            return $64(function(key2) {
-              return code2(key2) === "Enter";
-            }($65));
+        var $63 = flip(function() {
+          var $65 = set1($$Proxy.value);
+          return function($66) {
+            return $65(function(k) {
+              return code2(k) === "Enter" || key(k) === "Enter";
+            }($66));
           };
         }());
-        return function($63) {
+        return function($64) {
           return function(v1) {
-            return function($66) {
-              return v.value0(v1($66));
+            return function($67) {
+              return v.value0(v1($67));
             };
-          }($62($63));
+          }($63($64));
         };
       }())(v.value1)), pureAttr12(Size.value)("56"), pureAttr22(Autofocus.value)("")])([])]), div2([map25(function(v1) {
         if (v1) {

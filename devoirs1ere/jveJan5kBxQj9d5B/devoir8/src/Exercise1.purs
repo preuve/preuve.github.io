@@ -8,7 +8,7 @@ import Data.Array (length, unsafeIndex)
 import Data.Int (pow)
 import Data.Tuple (fst) 
 import Data.Tuple.Nested ((/\), type (/\))
-import Data.Rational (Rational, numerator, denominator, fromInt)
+import Data.Ratio (Ratio, (%), numerator, denominator)
 
 import Deku.Core (Nut)
 
@@ -17,6 +17,9 @@ import FRP.Event (Event)
 import Partial.Unsafe (unsafePartial)
 
 import Rand (Rand, rand)
+
+fromInt :: Int -> Ratio Int
+fromInt i = i % 1
 
 type Acute = Boolean -- is angle pi/3 or 2pi/3
 type Param = {ac :: Int, ab :: Int, sqrtD :: Int, a :: Acute}
@@ -58,7 +61,7 @@ showInt n =
     then show n
     else "+" <> show n
 
-rshow :: Rational -> String
+rshow :: Ratio Int -> String
 rshow r =
   let n = numerator r
       d = denominator r

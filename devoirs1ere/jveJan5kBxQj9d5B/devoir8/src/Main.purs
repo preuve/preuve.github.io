@@ -31,7 +31,7 @@ import Exercise4 (exo4)
 import Rand(Rand, rand, consume)
 import Record (set)
 import Type.Proxy (Proxy (..))
-import Web.UIEvent.KeyboardEvent (code)
+import Web.UIEvent.KeyboardEvent (code, key)
 
 class HasDefault a where
   dflt :: a
@@ -68,7 +68,7 @@ main = do
               , keyDown $
                   ( (setState <<< _) <<< flip 
                       (set (Proxy :: _ "enabled") 
-                        <<< (\key -> code key == "Enter")
+                        <<< (\k -> code k == "Enter" || key k == "Enter")
                       )
                   ) <$> state
               , D.Size !:= "56"

@@ -26,6 +26,7 @@ to generate this file without the comments in this block.
   , "prelude"
   , "strings"
   , "tuples"
+  , "web-cssom"
   , "web-dom"
   , "web-events"
   , "web-html"

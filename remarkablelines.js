@@ -8580,6 +8580,14 @@
     return $$void7(runInBody$prime(a2));
   };
 
+  // output/Web.CSSOM.MouseEvent/foreign.js
+  function offsetX(e) {
+    return e.offsetX;
+  }
+  function offsetY(e) {
+    return e.offsetY;
+  }
+
   // output/Web.DOM.Element/foreign.js
   var getProp = function(name15) {
     return function(doctype) {
@@ -8673,14 +8681,6 @@
       return toMaybe(_item(i2, l));
     };
   };
-
-  // output/Web.UIEvent.MouseEvent/foreign.js
-  function clientX2(e) {
-    return e.clientX;
-  }
-  function clientY2(e) {
-    return e.clientY;
-  }
 
   // output/Web.UIEvent.MouseEvent/index.js
   var fromEvent3 = /* @__PURE__ */ unsafeReadProtoTagged("MouseEvent");
@@ -8822,8 +8822,8 @@
               return function __do5() {
                 var o = off();
                 return for_24(o)(function(h) {
-                  var y = toNumber(clientY2(me)) - h;
-                  var x = toNumber(clientX2(me));
+                  var y = toNumber(offsetY(me));
+                  var x = toNumber(offsetX(me));
                   var $137 = y < 0;
                   if ($137) {
                     return pure10(unit);
