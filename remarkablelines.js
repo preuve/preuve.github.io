@@ -206,14 +206,14 @@
   };
   var replicateImpl = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
   var fromFoldableImpl = function() {
-    function Cons3(head5, tail2) {
-      this.head = head5;
+    function Cons2(head4, tail2) {
+      this.head = head4;
       this.tail = tail2;
     }
     var emptyList = {};
-    function curryCons(head5) {
+    function curryCons(head4) {
       return function(tail2) {
-        return new Cons3(head5, tail2);
+        return new Cons2(head4, tail2);
       };
     }
     function listToArray(list) {
@@ -359,20 +359,15 @@
     return dict.alt;
   };
 
-  // output/Control.Lazy/index.js
-  var defer = function(dict) {
-    return dict.defer;
-  };
-
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
     var bind5 = bind(dictMonad.Bind1());
-    var pure11 = pure(dictMonad.Applicative0());
+    var pure10 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a2) {
         return bind5(f)(function(f$prime) {
           return bind5(a2)(function(a$prime) {
-            return pure11(f$prime(a$prime));
+            return pure10(f$prime(a$prime));
           });
         });
       };
@@ -1240,11 +1235,6 @@
     };
     return Tuple2;
   }();
-  var uncurry = function(f) {
-    return function(v) {
-      return f(v.value0)(v.value1);
-    };
-  };
   var snd = function(v) {
     return v.value1;
   };
@@ -1281,13 +1271,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond3 = applySecond(dictApplicative.Apply0());
-    var pure11 = pure(dictApplicative);
+    var pure10 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond3(f($454));
-        })(pure11(unit));
+        })(pure10(unit));
       };
     };
   };
@@ -1487,13 +1477,13 @@
     }
     return function(apply6) {
       return function(map20) {
-        return function(pure11) {
+        return function(pure10) {
           return function(f) {
             return function(array) {
               function go2(bot, top3) {
                 switch (top3 - bot) {
                   case 0:
-                    return pure11([]);
+                    return pure10([]);
                   case 1:
                     return map20(array1)(f(array[bot]));
                   case 2:
@@ -1690,33 +1680,27 @@
   var foldrWithIndex = function(dict) {
     return dict.foldrWithIndex;
   };
-  var foldlWithIndex = function(dict) {
-    return dict.foldlWithIndex;
-  };
-  var foldMapWithIndex = function(dict) {
-    return dict.foldMapWithIndex;
-  };
 
   // output/Data.List.Types/index.js
   var Nil = /* @__PURE__ */ function() {
-    function Nil3() {
+    function Nil2() {
     }
     ;
-    Nil3.value = new Nil3();
-    return Nil3;
+    Nil2.value = new Nil2();
+    return Nil2;
   }();
   var Cons = /* @__PURE__ */ function() {
-    function Cons3(value0, value1) {
+    function Cons2(value0, value1) {
       this.value0 = value0;
       this.value1 = value1;
     }
     ;
-    Cons3.create = function(value0) {
+    Cons2.create = function(value0) {
       return function(value1) {
-        return new Cons3(value0, value1);
+        return new Cons2(value0, value1);
       };
     };
-    return Cons3;
+    return Cons2;
   }();
   var foldableList = {
     foldr: function(f) {
@@ -1801,274 +1785,21 @@
     }
   };
 
-  // output/Data.List/index.js
-  var reverse2 = /* @__PURE__ */ function() {
-    var go2 = function($copy_v) {
-      return function($copy_v1) {
-        var $tco_var_v = $copy_v;
-        var $tco_done = false;
-        var $tco_result;
-        function $tco_loop(v, v1) {
-          if (v1 instanceof Nil) {
-            $tco_done = true;
-            return v;
-          }
-          ;
-          if (v1 instanceof Cons) {
-            $tco_var_v = new Cons(v1.value0, v);
-            $copy_v1 = v1.value1;
-            return;
-          }
-          ;
-          throw new Error("Failed pattern match at Data.List (line 368, column 3 - line 368, column 19): " + [v.constructor.name, v1.constructor.name]);
-        }
-        ;
-        while (!$tco_done) {
-          $tco_result = $tco_loop($tco_var_v, $copy_v1);
-        }
-        ;
-        return $tco_result;
-      };
-    };
-    return go2(Nil.value);
-  }();
-
-  // output/Data.Lazy/foreign.js
-  var defer2 = function(thunk) {
-    var v = null;
-    return function() {
-      if (thunk === void 0)
-        return v;
-      v = thunk();
-      thunk = void 0;
-      return v;
-    };
-  };
-  var force = function(l) {
-    return l();
-  };
-
-  // output/Data.Lazy/index.js
-  var functorLazy = {
-    map: function(f) {
-      return function(l) {
-        return defer2(function(v) {
-          return f(force(l));
-        });
-      };
-    }
-  };
-
-  // output/Data.List.Lazy.Types/index.js
-  var unwrap2 = /* @__PURE__ */ unwrap();
-  var List = function(x) {
-    return x;
-  };
-  var Nil2 = /* @__PURE__ */ function() {
-    function Nil3() {
-    }
-    ;
-    Nil3.value = new Nil3();
-    return Nil3;
-  }();
-  var Cons2 = /* @__PURE__ */ function() {
-    function Cons3(value0, value1) {
-      this.value0 = value0;
-      this.value1 = value1;
-    }
-    ;
-    Cons3.create = function(value0) {
-      return function(value1) {
-        return new Cons3(value0, value1);
-      };
-    };
-    return Cons3;
-  }();
-  var nil = /* @__PURE__ */ defer2(function(v) {
-    return Nil2.value;
-  });
-  var step = function($319) {
-    return force(unwrap2($319));
-  };
-  var lazyList = {
-    defer: function(f) {
-      return defer2(function($320) {
-        return step(f($320));
-      });
-    }
-  };
-  var defer3 = /* @__PURE__ */ defer(lazyList);
-  var cons = function(x) {
-    return function(xs) {
-      return defer2(function(v) {
-        return new Cons2(x, xs);
-      });
-    };
-  };
-  var foldableList2 = {
-    foldr: function(op) {
-      return function(z) {
-        return function(xs) {
-          var rev3 = foldl(foldableList2)(flip(cons))(nil);
-          return foldl(foldableList2)(flip(op))(z)(rev3(xs));
-        };
-      };
-    },
-    foldl: function(op) {
-      var go2 = function($copy_b) {
-        return function($copy_xs) {
-          var $tco_var_b = $copy_b;
-          var $tco_done = false;
-          var $tco_result;
-          function $tco_loop(b2, xs) {
-            var v = step(xs);
-            if (v instanceof Nil2) {
-              $tco_done = true;
-              return b2;
-            }
-            ;
-            if (v instanceof Cons2) {
-              $tco_var_b = op(b2)(v.value0);
-              $copy_xs = v.value1;
-              return;
-            }
-            ;
-            throw new Error("Failed pattern match at Data.List.Lazy.Types (line 127, column 7 - line 129, column 40): " + [v.constructor.name]);
-          }
-          ;
-          while (!$tco_done) {
-            $tco_result = $tco_loop($tco_var_b, $copy_xs);
-          }
-          ;
-          return $tco_result;
-        };
-      };
-      return go2;
-    },
-    foldMap: function(dictMonoid) {
-      var append22 = append(dictMonoid.Semigroup0());
-      var mempty5 = mempty(dictMonoid);
-      return function(f) {
-        return foldl(foldableList2)(function(b2) {
-          return function(a2) {
-            return append22(b2)(f(a2));
-          };
-        })(mempty5);
-      };
-    }
-  };
-  var unfoldable1List = {
-    unfoldr1: /* @__PURE__ */ function() {
-      var go2 = function(f) {
-        return function(b2) {
-          return defer3(function(v) {
-            var v1 = f(b2);
-            if (v1.value1 instanceof Just) {
-              return cons(v1.value0)(go2(f)(v1.value1.value0));
-            }
-            ;
-            if (v1.value1 instanceof Nothing) {
-              return cons(v1.value0)(nil);
-            }
-            ;
-            throw new Error("Failed pattern match at Data.List.Lazy.Types (line 151, column 28 - line 153, column 33): " + [v1.constructor.name]);
-          });
-        };
-      };
-      return go2;
-    }()
-  };
-  var unfoldableList = {
-    unfoldr: /* @__PURE__ */ function() {
-      var go2 = function(f) {
-        return function(b2) {
-          return defer3(function(v) {
-            var v1 = f(b2);
-            if (v1 instanceof Nothing) {
-              return nil;
-            }
-            ;
-            if (v1 instanceof Just) {
-              return cons(v1.value0.value0)(go2(f)(v1.value0.value1));
-            }
-            ;
-            throw new Error("Failed pattern match at Data.List.Lazy.Types (line 157, column 28 - line 159, column 39): " + [v1.constructor.name]);
-          });
-        };
-      };
-      return go2;
-    }(),
-    Unfoldable10: function() {
-      return unfoldable1List;
-    }
-  };
-
-  // output/Data.List.Lazy/index.js
-  var map2 = /* @__PURE__ */ map(functorLazy);
-  var unwrap3 = /* @__PURE__ */ unwrap();
-  var filter2 = function(p2) {
-    var go2 = function($copy_v) {
-      var $tco_done = false;
-      var $tco_result;
-      function $tco_loop(v) {
-        if (v instanceof Nil2) {
-          $tco_done = true;
-          return Nil2.value;
-        }
-        ;
-        if (v instanceof Cons2) {
-          if (p2(v.value0)) {
-            $tco_done = true;
-            return new Cons2(v.value0, filter2(p2)(v.value1));
-          }
-          ;
-          if (otherwise) {
-            $copy_v = step(v.value1);
-            return;
-          }
-          ;
-        }
-        ;
-        throw new Error("Failed pattern match at Data.List.Lazy (line 416, column 3 - line 416, column 15): " + [v.constructor.name]);
-      }
-      ;
-      while (!$tco_done) {
-        $tco_result = $tco_loop($copy_v);
-      }
-      ;
-      return $tco_result;
-    };
-    var $344 = map2(go2);
-    return function($345) {
-      return List($344(unwrap3($345)));
-    };
-  };
-
-  // output/Partial.Unsafe/foreign.js
-  var _unsafePartial = function(f) {
-    return f();
-  };
-
-  // output/Partial/foreign.js
-  var _crashWith = function(msg) {
-    throw new Error(msg);
-  };
-
-  // output/Partial/index.js
-  var crashWith = function() {
-    return _crashWith;
-  };
-
-  // output/Partial.Unsafe/index.js
-  var crashWith2 = /* @__PURE__ */ crashWith();
-  var unsafePartial = _unsafePartial;
-  var unsafeCrashWith = function(msg) {
-    return unsafePartial(function() {
-      return crashWith2(msg);
-    });
-  };
-
   // output/Data.Map.Internal/index.js
+  var $runtime_lazy3 = function(name15, moduleName, init2) {
+    var state4 = 0;
+    var val;
+    return function(lineNumber) {
+      if (state4 === 2)
+        return val;
+      if (state4 === 1)
+        throw new ReferenceError(name15 + " was needed before it finished initializing (module " + moduleName + ", line " + lineNumber + ")", moduleName, lineNumber);
+      state4 = 1;
+      val = init2();
+      state4 = 2;
+      return val;
+    };
+  };
   var Leaf = /* @__PURE__ */ function() {
     function Leaf2() {
     }
@@ -2076,87 +1807,8 @@
     Leaf2.value = new Leaf2();
     return Leaf2;
   }();
-  var Two = /* @__PURE__ */ function() {
-    function Two2(value0, value1, value22, value32) {
-      this.value0 = value0;
-      this.value1 = value1;
-      this.value2 = value22;
-      this.value3 = value32;
-    }
-    ;
-    Two2.create = function(value0) {
-      return function(value1) {
-        return function(value22) {
-          return function(value32) {
-            return new Two2(value0, value1, value22, value32);
-          };
-        };
-      };
-    };
-    return Two2;
-  }();
-  var Three = /* @__PURE__ */ function() {
-    function Three2(value0, value1, value22, value32, value42, value52, value62) {
-      this.value0 = value0;
-      this.value1 = value1;
-      this.value2 = value22;
-      this.value3 = value32;
-      this.value4 = value42;
-      this.value5 = value52;
-      this.value6 = value62;
-    }
-    ;
-    Three2.create = function(value0) {
-      return function(value1) {
-        return function(value22) {
-          return function(value32) {
-            return function(value42) {
-              return function(value52) {
-                return function(value62) {
-                  return new Three2(value0, value1, value22, value32, value42, value52, value62);
-                };
-              };
-            };
-          };
-        };
-      };
-    };
-    return Three2;
-  }();
-  var TwoLeft = /* @__PURE__ */ function() {
-    function TwoLeft2(value0, value1, value22) {
-      this.value0 = value0;
-      this.value1 = value1;
-      this.value2 = value22;
-    }
-    ;
-    TwoLeft2.create = function(value0) {
-      return function(value1) {
-        return function(value22) {
-          return new TwoLeft2(value0, value1, value22);
-        };
-      };
-    };
-    return TwoLeft2;
-  }();
-  var TwoRight = /* @__PURE__ */ function() {
-    function TwoRight2(value0, value1, value22) {
-      this.value0 = value0;
-      this.value1 = value1;
-      this.value2 = value22;
-    }
-    ;
-    TwoRight2.create = function(value0) {
-      return function(value1) {
-        return function(value22) {
-          return new TwoRight2(value0, value1, value22);
-        };
-      };
-    };
-    return TwoRight2;
-  }();
-  var ThreeLeft = /* @__PURE__ */ function() {
-    function ThreeLeft2(value0, value1, value22, value32, value42, value52) {
+  var Node = /* @__PURE__ */ function() {
+    function Node2(value0, value1, value22, value32, value42, value52) {
       this.value0 = value0;
       this.value1 = value1;
       this.value2 = value22;
@@ -2165,149 +1817,356 @@
       this.value5 = value52;
     }
     ;
-    ThreeLeft2.create = function(value0) {
+    Node2.create = function(value0) {
       return function(value1) {
         return function(value22) {
           return function(value32) {
             return function(value42) {
               return function(value52) {
-                return new ThreeLeft2(value0, value1, value22, value32, value42, value52);
+                return new Node2(value0, value1, value22, value32, value42, value52);
               };
             };
           };
         };
       };
     };
-    return ThreeLeft2;
+    return Node2;
   }();
-  var ThreeMiddle = /* @__PURE__ */ function() {
-    function ThreeMiddle2(value0, value1, value22, value32, value42, value52) {
+  var IterLeaf = /* @__PURE__ */ function() {
+    function IterLeaf2() {
+    }
+    ;
+    IterLeaf2.value = new IterLeaf2();
+    return IterLeaf2;
+  }();
+  var IterEmit = /* @__PURE__ */ function() {
+    function IterEmit2(value0, value1, value22) {
       this.value0 = value0;
       this.value1 = value1;
       this.value2 = value22;
-      this.value3 = value32;
-      this.value4 = value42;
-      this.value5 = value52;
     }
     ;
-    ThreeMiddle2.create = function(value0) {
+    IterEmit2.create = function(value0) {
       return function(value1) {
         return function(value22) {
-          return function(value32) {
-            return function(value42) {
-              return function(value52) {
-                return new ThreeMiddle2(value0, value1, value22, value32, value42, value52);
-              };
-            };
-          };
+          return new IterEmit2(value0, value1, value22);
         };
       };
     };
-    return ThreeMiddle2;
+    return IterEmit2;
   }();
-  var ThreeRight = /* @__PURE__ */ function() {
-    function ThreeRight2(value0, value1, value22, value32, value42, value52) {
+  var IterNode = /* @__PURE__ */ function() {
+    function IterNode2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    IterNode2.create = function(value0) {
+      return function(value1) {
+        return new IterNode2(value0, value1);
+      };
+    };
+    return IterNode2;
+  }();
+  var Split = /* @__PURE__ */ function() {
+    function Split2(value0, value1, value22) {
       this.value0 = value0;
       this.value1 = value1;
       this.value2 = value22;
-      this.value3 = value32;
-      this.value4 = value42;
-      this.value5 = value52;
     }
     ;
-    ThreeRight2.create = function(value0) {
+    Split2.create = function(value0) {
       return function(value1) {
         return function(value22) {
-          return function(value32) {
-            return function(value42) {
-              return function(value52) {
-                return new ThreeRight2(value0, value1, value22, value32, value42, value52);
-              };
-            };
-          };
+          return new Split2(value0, value1, value22);
         };
       };
     };
-    return ThreeRight2;
+    return Split2;
   }();
-  var KickUp = /* @__PURE__ */ function() {
-    function KickUp2(value0, value1, value22, value32) {
+  var SplitLast = /* @__PURE__ */ function() {
+    function SplitLast2(value0, value1, value22) {
       this.value0 = value0;
       this.value1 = value1;
       this.value2 = value22;
-      this.value3 = value32;
     }
     ;
-    KickUp2.create = function(value0) {
+    SplitLast2.create = function(value0) {
       return function(value1) {
         return function(value22) {
-          return function(value32) {
-            return new KickUp2(value0, value1, value22, value32);
-          };
+          return new SplitLast2(value0, value1, value22);
         };
       };
     };
-    return KickUp2;
+    return SplitLast2;
   }();
+  var unsafeNode = function(k, v, l, r) {
+    if (l instanceof Leaf) {
+      if (r instanceof Leaf) {
+        return new Node(1, 1, k, v, l, r);
+      }
+      ;
+      if (r instanceof Node) {
+        return new Node(1 + r.value0 | 0, 1 + r.value1 | 0, k, v, l, r);
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 680, column 5 - line 684, column 39): " + [r.constructor.name]);
+    }
+    ;
+    if (l instanceof Node) {
+      if (r instanceof Leaf) {
+        return new Node(1 + l.value0 | 0, 1 + l.value1 | 0, k, v, l, r);
+      }
+      ;
+      if (r instanceof Node) {
+        return new Node(1 + function() {
+          var $277 = l.value0 > r.value0;
+          if ($277) {
+            return l.value0;
+          }
+          ;
+          return r.value0;
+        }() | 0, (1 + l.value1 | 0) + r.value1 | 0, k, v, l, r);
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 686, column 5 - line 690, column 68): " + [r.constructor.name]);
+    }
+    ;
+    throw new Error("Failed pattern match at Data.Map.Internal (line 678, column 32 - line 690, column 68): " + [l.constructor.name]);
+  };
+  var toMapIter = /* @__PURE__ */ function() {
+    return flip(IterNode.create)(IterLeaf.value);
+  }();
+  var stepWith = function(f) {
+    return function(next) {
+      return function(done) {
+        var go2 = function($copy_v) {
+          var $tco_done = false;
+          var $tco_result;
+          function $tco_loop(v) {
+            if (v instanceof IterLeaf) {
+              $tco_done = true;
+              return done(unit);
+            }
+            ;
+            if (v instanceof IterEmit) {
+              $tco_done = true;
+              return next(v.value0, v.value1, v.value2);
+            }
+            ;
+            if (v instanceof IterNode) {
+              $copy_v = f(v.value1)(v.value0);
+              return;
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 918, column 8 - line 924, column 20): " + [v.constructor.name]);
+          }
+          ;
+          while (!$tco_done) {
+            $tco_result = $tco_loop($copy_v);
+          }
+          ;
+          return $tco_result;
+        };
+        return go2;
+      };
+    };
+  };
   var singleton3 = function(k) {
     return function(v) {
-      return new Two(Leaf.value, k, v, Leaf.value);
+      return new Node(1, 1, k, v, Leaf.value, Leaf.value);
     };
   };
-  var toUnfoldable = function(dictUnfoldable) {
-    var unfoldr3 = unfoldr(dictUnfoldable);
-    return function(m) {
-      var go2 = function($copy_v) {
-        var $tco_done = false;
-        var $tco_result;
-        function $tco_loop(v) {
-          if (v instanceof Nil) {
-            $tco_done = true;
-            return Nothing.value;
-          }
-          ;
-          if (v instanceof Cons) {
-            if (v.value0 instanceof Leaf) {
-              $copy_v = v.value1;
-              return;
-            }
-            ;
-            if (v.value0 instanceof Two && (v.value0.value0 instanceof Leaf && v.value0.value3 instanceof Leaf)) {
-              $tco_done = true;
-              return new Just(new Tuple(new Tuple(v.value0.value1, v.value0.value2), v.value1));
-            }
-            ;
-            if (v.value0 instanceof Two && v.value0.value0 instanceof Leaf) {
-              $tco_done = true;
-              return new Just(new Tuple(new Tuple(v.value0.value1, v.value0.value2), new Cons(v.value0.value3, v.value1)));
-            }
-            ;
-            if (v.value0 instanceof Two) {
-              $copy_v = new Cons(v.value0.value0, new Cons(singleton3(v.value0.value1)(v.value0.value2), new Cons(v.value0.value3, v.value1)));
-              return;
-            }
-            ;
-            if (v.value0 instanceof Three) {
-              $copy_v = new Cons(v.value0.value0, new Cons(singleton3(v.value0.value1)(v.value0.value2), new Cons(v.value0.value3, new Cons(singleton3(v.value0.value4)(v.value0.value5), new Cons(v.value0.value6, v.value1)))));
-              return;
-            }
-            ;
-            throw new Error("Failed pattern match at Data.Map.Internal (line 624, column 18 - line 633, column 71): " + [v.value0.constructor.name]);
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 623, column 3 - line 623, column 19): " + [v.constructor.name]);
+  var unsafeBalancedNode = /* @__PURE__ */ function() {
+    var height8 = function(v) {
+      if (v instanceof Leaf) {
+        return 0;
+      }
+      ;
+      if (v instanceof Node) {
+        return v.value0;
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 735, column 12 - line 737, column 26): " + [v.constructor.name]);
+    };
+    var rotateLeft = function(k, v, l, rk, rv, rl, rr) {
+      if (rl instanceof Node && rl.value0 > height8(rr)) {
+        return unsafeNode(rl.value2, rl.value3, unsafeNode(k, v, l, rl.value4), unsafeNode(rk, rv, rl.value5, rr));
+      }
+      ;
+      return unsafeNode(rk, rv, unsafeNode(k, v, l, rl), rr);
+    };
+    var rotateRight = function(k, v, lk, lv, ll, lr, r) {
+      if (lr instanceof Node && height8(ll) <= lr.value0) {
+        return unsafeNode(lr.value2, lr.value3, unsafeNode(lk, lv, ll, lr.value4), unsafeNode(k, v, lr.value5, r));
+      }
+      ;
+      return unsafeNode(lk, lv, ll, unsafeNode(k, v, lr, r));
+    };
+    return function(k, v, l, r) {
+      if (l instanceof Leaf) {
+        if (r instanceof Leaf) {
+          return singleton3(k)(v);
         }
         ;
-        while (!$tco_done) {
-          $tco_result = $tco_loop($copy_v);
+        if (r instanceof Node && r.value0 > 1) {
+          return rotateLeft(k, v, l, r.value2, r.value3, r.value4, r.value5);
         }
         ;
-        return $tco_result;
+        return unsafeNode(k, v, l, r);
+      }
+      ;
+      if (l instanceof Node) {
+        if (r instanceof Node) {
+          if (r.value0 > (l.value0 + 1 | 0)) {
+            return rotateLeft(k, v, l, r.value2, r.value3, r.value4, r.value5);
+          }
+          ;
+          if (l.value0 > (r.value0 + 1 | 0)) {
+            return rotateRight(k, v, l.value2, l.value3, l.value4, l.value5, r);
+          }
+          ;
+        }
+        ;
+        if (r instanceof Leaf && l.value0 > 1) {
+          return rotateRight(k, v, l.value2, l.value3, l.value4, l.value5, r);
+        }
+        ;
+        return unsafeNode(k, v, l, r);
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 695, column 40 - line 716, column 34): " + [l.constructor.name]);
+    };
+  }();
+  var $lazy_unsafeSplit = /* @__PURE__ */ $runtime_lazy3("unsafeSplit", "Data.Map.Internal", function() {
+    return function(comp, k, m) {
+      if (m instanceof Leaf) {
+        return new Split(Nothing.value, Leaf.value, Leaf.value);
+      }
+      ;
+      if (m instanceof Node) {
+        var v = comp(k)(m.value2);
+        if (v instanceof LT) {
+          var v1 = $lazy_unsafeSplit(771)(comp, k, m.value4);
+          return new Split(v1.value0, v1.value1, unsafeBalancedNode(m.value2, m.value3, v1.value2, m.value5));
+        }
+        ;
+        if (v instanceof GT) {
+          var v1 = $lazy_unsafeSplit(774)(comp, k, m.value5);
+          return new Split(v1.value0, unsafeBalancedNode(m.value2, m.value3, m.value4, v1.value1), v1.value2);
+        }
+        ;
+        if (v instanceof EQ) {
+          return new Split(new Just(m.value3), m.value4, m.value5);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Map.Internal (line 769, column 5 - line 777, column 30): " + [v.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 765, column 34 - line 777, column 30): " + [m.constructor.name]);
+    };
+  });
+  var unsafeSplit = /* @__PURE__ */ $lazy_unsafeSplit(764);
+  var $lazy_unsafeSplitLast = /* @__PURE__ */ $runtime_lazy3("unsafeSplitLast", "Data.Map.Internal", function() {
+    return function(k, v, l, r) {
+      if (r instanceof Leaf) {
+        return new SplitLast(k, v, l);
+      }
+      ;
+      if (r instanceof Node) {
+        var v1 = $lazy_unsafeSplitLast(757)(r.value2, r.value3, r.value4, r.value5);
+        return new SplitLast(v1.value0, v1.value1, unsafeBalancedNode(k, v, l, v1.value2));
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 754, column 37 - line 758, column 57): " + [r.constructor.name]);
+    };
+  });
+  var unsafeSplitLast = /* @__PURE__ */ $lazy_unsafeSplitLast(753);
+  var unsafeJoinNodes = function(v, v1) {
+    if (v instanceof Leaf) {
+      return v1;
+    }
+    ;
+    if (v instanceof Node) {
+      var v2 = unsafeSplitLast(v.value2, v.value3, v.value4, v.value5);
+      return unsafeBalancedNode(v2.value0, v2.value1, v2.value2, v1);
+    }
+    ;
+    throw new Error("Failed pattern match at Data.Map.Internal (line 742, column 25 - line 746, column 38): " + [v.constructor.name, v1.constructor.name]);
+  };
+  var $lazy_unsafeUnionWith = /* @__PURE__ */ $runtime_lazy3("unsafeUnionWith", "Data.Map.Internal", function() {
+    return function(comp, app, l, r) {
+      if (l instanceof Leaf) {
+        return r;
+      }
+      ;
+      if (r instanceof Leaf) {
+        return l;
+      }
+      ;
+      if (r instanceof Node) {
+        var v = unsafeSplit(comp, r.value2, l);
+        var l$prime = $lazy_unsafeUnionWith(787)(comp, app, v.value1, r.value4);
+        var r$prime = $lazy_unsafeUnionWith(788)(comp, app, v.value2, r.value5);
+        if (v.value0 instanceof Just) {
+          return unsafeBalancedNode(r.value2, app(v.value0.value0)(r.value3), l$prime, r$prime);
+        }
+        ;
+        if (v.value0 instanceof Nothing) {
+          return unsafeBalancedNode(r.value2, r.value3, l$prime, r$prime);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Map.Internal (line 789, column 5 - line 793, column 46): " + [v.value0.constructor.name]);
+      }
+      ;
+      throw new Error("Failed pattern match at Data.Map.Internal (line 782, column 42 - line 793, column 46): " + [l.constructor.name, r.constructor.name]);
+    };
+  });
+  var unsafeUnionWith = /* @__PURE__ */ $lazy_unsafeUnionWith(781);
+  var unionWith = function(dictOrd) {
+    var compare4 = compare(dictOrd);
+    return function(app) {
+      return function(m1) {
+        return function(m2) {
+          return unsafeUnionWith(compare4, app, m1, m2);
+        };
       };
-      return unfoldr3(go2)(new Cons(m, Nil.value));
     };
   };
-  var toUnfoldable1 = /* @__PURE__ */ toUnfoldable(unfoldableList);
+  var union = function(dictOrd) {
+    return unionWith(dictOrd)($$const);
+  };
+  var mapMaybeWithKey = function(dictOrd) {
+    return function(f) {
+      var go2 = function(v) {
+        if (v instanceof Leaf) {
+          return Leaf.value;
+        }
+        ;
+        if (v instanceof Node) {
+          var v2 = f(v.value2)(v.value3);
+          if (v2 instanceof Just) {
+            return unsafeBalancedNode(v.value2, v2.value0, go2(v.value4), go2(v.value5));
+          }
+          ;
+          if (v2 instanceof Nothing) {
+            return unsafeJoinNodes(go2(v.value4), go2(v.value5));
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Map.Internal (line 659, column 7 - line 663, column 47): " + [v2.constructor.name]);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Map.Internal (line 656, column 8 - line 663, column 47): " + [v.constructor.name]);
+      };
+      return go2;
+    };
+  };
+  var mapMaybe = function(dictOrd) {
+    var $763 = mapMaybeWithKey(dictOrd);
+    return function($764) {
+      return $763($$const($764));
+    };
+  };
   var lookup = function(dictOrd) {
     var compare4 = compare(dictOrd);
     return function(k) {
@@ -2320,50 +2179,27 @@
             return Nothing.value;
           }
           ;
-          if (v instanceof Two) {
-            var v2 = compare4(k)(v.value1);
-            if (v2 instanceof EQ) {
-              $tco_done = true;
-              return new Just(v.value2);
-            }
-            ;
-            if (v2 instanceof LT) {
-              $copy_v = v.value0;
+          if (v instanceof Node) {
+            var v1 = compare4(k)(v.value2);
+            if (v1 instanceof LT) {
+              $copy_v = v.value4;
               return;
             }
             ;
-            $copy_v = v.value3;
-            return;
+            if (v1 instanceof GT) {
+              $copy_v = v.value5;
+              return;
+            }
+            ;
+            if (v1 instanceof EQ) {
+              $tco_done = true;
+              return new Just(v.value3);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 281, column 7 - line 284, column 22): " + [v1.constructor.name]);
           }
           ;
-          if (v instanceof Three) {
-            var v3 = compare4(k)(v.value1);
-            if (v3 instanceof EQ) {
-              $tco_done = true;
-              return new Just(v.value2);
-            }
-            ;
-            var v4 = compare4(k)(v.value4);
-            if (v4 instanceof EQ) {
-              $tco_done = true;
-              return new Just(v.value5);
-            }
-            ;
-            if (v3 instanceof LT) {
-              $copy_v = v.value0;
-              return;
-            }
-            ;
-            if (v4 instanceof GT) {
-              $copy_v = v.value6;
-              return;
-            }
-            ;
-            $copy_v = v.value3;
-            return;
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 241, column 5 - line 241, column 22): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 278, column 8 - line 284, column 22): " + [v.constructor.name]);
         }
         ;
         while (!$tco_done) {
@@ -2375,622 +2211,218 @@
       return go2;
     };
   };
-  var fromZipper = function($copy_dictOrd) {
-    return function($copy_v) {
-      return function($copy_v1) {
-        var $tco_var_dictOrd = $copy_dictOrd;
-        var $tco_var_v = $copy_v;
+  var iterMapL = /* @__PURE__ */ function() {
+    var go2 = function($copy_iter) {
+      return function($copy_v) {
+        var $tco_var_iter = $copy_iter;
         var $tco_done = false;
         var $tco_result;
-        function $tco_loop(dictOrd, v, v1) {
-          if (v instanceof Nil) {
+        function $tco_loop(iter, v) {
+          if (v instanceof Leaf) {
             $tco_done = true;
-            return v1;
+            return iter;
           }
           ;
-          if (v instanceof Cons) {
-            if (v.value0 instanceof TwoLeft) {
-              $tco_var_dictOrd = dictOrd;
-              $tco_var_v = v.value1;
-              $copy_v1 = new Two(v1, v.value0.value0, v.value0.value1, v.value0.value2);
+          if (v instanceof Node) {
+            if (v.value5 instanceof Leaf) {
+              $tco_var_iter = new IterEmit(v.value2, v.value3, iter);
+              $copy_v = v.value4;
               return;
             }
             ;
-            if (v.value0 instanceof TwoRight) {
-              $tco_var_dictOrd = dictOrd;
-              $tco_var_v = v.value1;
-              $copy_v1 = new Two(v.value0.value0, v.value0.value1, v.value0.value2, v1);
-              return;
-            }
-            ;
-            if (v.value0 instanceof ThreeLeft) {
-              $tco_var_dictOrd = dictOrd;
-              $tco_var_v = v.value1;
-              $copy_v1 = new Three(v1, v.value0.value0, v.value0.value1, v.value0.value2, v.value0.value3, v.value0.value4, v.value0.value5);
-              return;
-            }
-            ;
-            if (v.value0 instanceof ThreeMiddle) {
-              $tco_var_dictOrd = dictOrd;
-              $tco_var_v = v.value1;
-              $copy_v1 = new Three(v.value0.value0, v.value0.value1, v.value0.value2, v1, v.value0.value3, v.value0.value4, v.value0.value5);
-              return;
-            }
-            ;
-            if (v.value0 instanceof ThreeRight) {
-              $tco_var_dictOrd = dictOrd;
-              $tco_var_v = v.value1;
-              $copy_v1 = new Three(v.value0.value0, v.value0.value1, v.value0.value2, v.value0.value3, v.value0.value4, v.value0.value5, v1);
-              return;
-            }
-            ;
-            throw new Error("Failed pattern match at Data.Map.Internal (line 462, column 3 - line 467, column 88): " + [v.value0.constructor.name]);
+            $tco_var_iter = new IterEmit(v.value2, v.value3, new IterNode(v.value5, iter));
+            $copy_v = v.value4;
+            return;
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 459, column 1 - line 459, column 80): " + [v.constructor.name, v1.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 929, column 13 - line 936, column 48): " + [v.constructor.name]);
         }
         ;
         while (!$tco_done) {
-          $tco_result = $tco_loop($tco_var_dictOrd, $tco_var_v, $copy_v1);
+          $tco_result = $tco_loop($tco_var_iter, $copy_v);
         }
         ;
         return $tco_result;
       };
+    };
+    return go2;
+  }();
+  var stepAscCps = /* @__PURE__ */ stepWith(iterMapL);
+  var stepUnfoldr = /* @__PURE__ */ function() {
+    var step2 = function(k, v, next) {
+      return new Just(new Tuple(new Tuple(k, v), next));
+    };
+    return stepAscCps(step2)(function(v) {
+      return Nothing.value;
+    });
+  }();
+  var toUnfoldable = function(dictUnfoldable) {
+    var $767 = unfoldr(dictUnfoldable)(stepUnfoldr);
+    return function($768) {
+      return $767(toMapIter($768));
     };
   };
   var insert = function(dictOrd) {
-    var fromZipper1 = fromZipper(dictOrd);
     var compare4 = compare(dictOrd);
     return function(k) {
       return function(v) {
-        var up = function($copy_v1) {
-          return function($copy_v2) {
-            var $tco_var_v1 = $copy_v1;
-            var $tco_done = false;
-            var $tco_result;
-            function $tco_loop(v1, v2) {
-              if (v1 instanceof Nil) {
-                $tco_done = true;
-                return new Two(v2.value0, v2.value1, v2.value2, v2.value3);
-              }
-              ;
-              if (v1 instanceof Cons) {
-                if (v1.value0 instanceof TwoLeft) {
-                  $tco_done = true;
-                  return fromZipper1(v1.value1)(new Three(v2.value0, v2.value1, v2.value2, v2.value3, v1.value0.value0, v1.value0.value1, v1.value0.value2));
-                }
-                ;
-                if (v1.value0 instanceof TwoRight) {
-                  $tco_done = true;
-                  return fromZipper1(v1.value1)(new Three(v1.value0.value0, v1.value0.value1, v1.value0.value2, v2.value0, v2.value1, v2.value2, v2.value3));
-                }
-                ;
-                if (v1.value0 instanceof ThreeLeft) {
-                  $tco_var_v1 = v1.value1;
-                  $copy_v2 = new KickUp(new Two(v2.value0, v2.value1, v2.value2, v2.value3), v1.value0.value0, v1.value0.value1, new Two(v1.value0.value2, v1.value0.value3, v1.value0.value4, v1.value0.value5));
-                  return;
-                }
-                ;
-                if (v1.value0 instanceof ThreeMiddle) {
-                  $tco_var_v1 = v1.value1;
-                  $copy_v2 = new KickUp(new Two(v1.value0.value0, v1.value0.value1, v1.value0.value2, v2.value0), v2.value1, v2.value2, new Two(v2.value3, v1.value0.value3, v1.value0.value4, v1.value0.value5));
-                  return;
-                }
-                ;
-                if (v1.value0 instanceof ThreeRight) {
-                  $tco_var_v1 = v1.value1;
-                  $copy_v2 = new KickUp(new Two(v1.value0.value0, v1.value0.value1, v1.value0.value2, v1.value0.value3), v1.value0.value4, v1.value0.value5, new Two(v2.value0, v2.value1, v2.value2, v2.value3));
-                  return;
-                }
-                ;
-                throw new Error("Failed pattern match at Data.Map.Internal (line 498, column 5 - line 503, column 108): " + [v1.value0.constructor.name, v2.constructor.name]);
-              }
-              ;
-              throw new Error("Failed pattern match at Data.Map.Internal (line 495, column 3 - line 495, column 56): " + [v1.constructor.name, v2.constructor.name]);
+        var go2 = function(v1) {
+          if (v1 instanceof Leaf) {
+            return singleton3(k)(v);
+          }
+          ;
+          if (v1 instanceof Node) {
+            var v2 = compare4(k)(v1.value2);
+            if (v2 instanceof LT) {
+              return unsafeBalancedNode(v1.value2, v1.value3, go2(v1.value4), v1.value5);
             }
             ;
-            while (!$tco_done) {
-              $tco_result = $tco_loop($tco_var_v1, $copy_v2);
+            if (v2 instanceof GT) {
+              return unsafeBalancedNode(v1.value2, v1.value3, v1.value4, go2(v1.value5));
             }
             ;
-            return $tco_result;
-          };
+            if (v2 instanceof EQ) {
+              return new Node(v1.value0, v1.value1, k, v, v1.value4, v1.value5);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 469, column 7 - line 472, column 35): " + [v2.constructor.name]);
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Map.Internal (line 466, column 8 - line 472, column 35): " + [v1.constructor.name]);
         };
-        var down = function($copy_v1) {
-          return function($copy_v2) {
-            var $tco_var_v1 = $copy_v1;
-            var $tco_done1 = false;
-            var $tco_result;
-            function $tco_loop(v1, v2) {
-              if (v2 instanceof Leaf) {
-                $tco_done1 = true;
-                return up(v1)(new KickUp(Leaf.value, k, v, Leaf.value));
-              }
-              ;
-              if (v2 instanceof Two) {
-                var v3 = compare4(k)(v2.value1);
-                if (v3 instanceof EQ) {
-                  $tco_done1 = true;
-                  return fromZipper1(v1)(new Two(v2.value0, k, v, v2.value3));
-                }
-                ;
-                if (v3 instanceof LT) {
-                  $tco_var_v1 = new Cons(new TwoLeft(v2.value1, v2.value2, v2.value3), v1);
-                  $copy_v2 = v2.value0;
-                  return;
-                }
-                ;
-                $tco_var_v1 = new Cons(new TwoRight(v2.value0, v2.value1, v2.value2), v1);
-                $copy_v2 = v2.value3;
-                return;
-              }
-              ;
-              if (v2 instanceof Three) {
-                var v3 = compare4(k)(v2.value1);
-                if (v3 instanceof EQ) {
-                  $tco_done1 = true;
-                  return fromZipper1(v1)(new Three(v2.value0, k, v, v2.value3, v2.value4, v2.value5, v2.value6));
-                }
-                ;
-                var v4 = compare4(k)(v2.value4);
-                if (v4 instanceof EQ) {
-                  $tco_done1 = true;
-                  return fromZipper1(v1)(new Three(v2.value0, v2.value1, v2.value2, v2.value3, k, v, v2.value6));
-                }
-                ;
-                if (v3 instanceof LT) {
-                  $tco_var_v1 = new Cons(new ThreeLeft(v2.value1, v2.value2, v2.value3, v2.value4, v2.value5, v2.value6), v1);
-                  $copy_v2 = v2.value0;
-                  return;
-                }
-                ;
-                if (v3 instanceof GT && v4 instanceof LT) {
-                  $tco_var_v1 = new Cons(new ThreeMiddle(v2.value0, v2.value1, v2.value2, v2.value4, v2.value5, v2.value6), v1);
-                  $copy_v2 = v2.value3;
-                  return;
-                }
-                ;
-                $tco_var_v1 = new Cons(new ThreeRight(v2.value0, v2.value1, v2.value2, v2.value3, v2.value4, v2.value5), v1);
-                $copy_v2 = v2.value6;
-                return;
-              }
-              ;
-              throw new Error("Failed pattern match at Data.Map.Internal (line 478, column 3 - line 478, column 55): " + [v1.constructor.name, v2.constructor.name]);
-            }
-            ;
-            while (!$tco_done1) {
-              $tco_result = $tco_loop($tco_var_v1, $copy_v2);
-            }
-            ;
-            return $tco_result;
-          };
-        };
-        return down(Nil.value);
+        return go2;
       };
-    };
-  };
-  var pop = function(dictOrd) {
-    var fromZipper1 = fromZipper(dictOrd);
-    var compare4 = compare(dictOrd);
-    return function(k) {
-      var up = function($copy_ctxs) {
-        return function($copy_tree) {
-          var $tco_var_ctxs = $copy_ctxs;
-          var $tco_done = false;
-          var $tco_result;
-          function $tco_loop(ctxs, tree) {
-            if (ctxs instanceof Nil) {
-              $tco_done = true;
-              return tree;
-            }
-            ;
-            if (ctxs instanceof Cons) {
-              if (ctxs.value0 instanceof TwoLeft && (ctxs.value0.value2 instanceof Leaf && tree instanceof Leaf)) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(Leaf.value, ctxs.value0.value0, ctxs.value0.value1, Leaf.value));
-              }
-              ;
-              if (ctxs.value0 instanceof TwoRight && (ctxs.value0.value0 instanceof Leaf && tree instanceof Leaf)) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(Leaf.value, ctxs.value0.value1, ctxs.value0.value2, Leaf.value));
-              }
-              ;
-              if (ctxs.value0 instanceof TwoLeft && ctxs.value0.value2 instanceof Two) {
-                $tco_var_ctxs = ctxs.value1;
-                $copy_tree = new Three(tree, ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2.value0, ctxs.value0.value2.value1, ctxs.value0.value2.value2, ctxs.value0.value2.value3);
-                return;
-              }
-              ;
-              if (ctxs.value0 instanceof TwoRight && ctxs.value0.value0 instanceof Two) {
-                $tco_var_ctxs = ctxs.value1;
-                $copy_tree = new Three(ctxs.value0.value0.value0, ctxs.value0.value0.value1, ctxs.value0.value0.value2, ctxs.value0.value0.value3, ctxs.value0.value1, ctxs.value0.value2, tree);
-                return;
-              }
-              ;
-              if (ctxs.value0 instanceof TwoLeft && ctxs.value0.value2 instanceof Three) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(new Two(tree, ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2.value0), ctxs.value0.value2.value1, ctxs.value0.value2.value2, new Two(ctxs.value0.value2.value3, ctxs.value0.value2.value4, ctxs.value0.value2.value5, ctxs.value0.value2.value6)));
-              }
-              ;
-              if (ctxs.value0 instanceof TwoRight && ctxs.value0.value0 instanceof Three) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(new Two(ctxs.value0.value0.value0, ctxs.value0.value0.value1, ctxs.value0.value0.value2, ctxs.value0.value0.value3), ctxs.value0.value0.value4, ctxs.value0.value0.value5, new Two(ctxs.value0.value0.value6, ctxs.value0.value1, ctxs.value0.value2, tree)));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeLeft && (ctxs.value0.value2 instanceof Leaf && (ctxs.value0.value5 instanceof Leaf && tree instanceof Leaf))) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(Leaf.value, ctxs.value0.value0, ctxs.value0.value1, Leaf.value, ctxs.value0.value3, ctxs.value0.value4, Leaf.value));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeMiddle && (ctxs.value0.value0 instanceof Leaf && (ctxs.value0.value5 instanceof Leaf && tree instanceof Leaf))) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(Leaf.value, ctxs.value0.value1, ctxs.value0.value2, Leaf.value, ctxs.value0.value3, ctxs.value0.value4, Leaf.value));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeRight && (ctxs.value0.value0 instanceof Leaf && (ctxs.value0.value3 instanceof Leaf && tree instanceof Leaf))) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(Leaf.value, ctxs.value0.value1, ctxs.value0.value2, Leaf.value, ctxs.value0.value4, ctxs.value0.value5, Leaf.value));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeLeft && ctxs.value0.value2 instanceof Two) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(new Three(tree, ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2.value0, ctxs.value0.value2.value1, ctxs.value0.value2.value2, ctxs.value0.value2.value3), ctxs.value0.value3, ctxs.value0.value4, ctxs.value0.value5));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeMiddle && ctxs.value0.value0 instanceof Two) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(new Three(ctxs.value0.value0.value0, ctxs.value0.value0.value1, ctxs.value0.value0.value2, ctxs.value0.value0.value3, ctxs.value0.value1, ctxs.value0.value2, tree), ctxs.value0.value3, ctxs.value0.value4, ctxs.value0.value5));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeMiddle && ctxs.value0.value5 instanceof Two) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2, new Three(tree, ctxs.value0.value3, ctxs.value0.value4, ctxs.value0.value5.value0, ctxs.value0.value5.value1, ctxs.value0.value5.value2, ctxs.value0.value5.value3)));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeRight && ctxs.value0.value3 instanceof Two) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Two(ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2, new Three(ctxs.value0.value3.value0, ctxs.value0.value3.value1, ctxs.value0.value3.value2, ctxs.value0.value3.value3, ctxs.value0.value4, ctxs.value0.value5, tree)));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeLeft && ctxs.value0.value2 instanceof Three) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(new Two(tree, ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2.value0), ctxs.value0.value2.value1, ctxs.value0.value2.value2, new Two(ctxs.value0.value2.value3, ctxs.value0.value2.value4, ctxs.value0.value2.value5, ctxs.value0.value2.value6), ctxs.value0.value3, ctxs.value0.value4, ctxs.value0.value5));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeMiddle && ctxs.value0.value0 instanceof Three) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(new Two(ctxs.value0.value0.value0, ctxs.value0.value0.value1, ctxs.value0.value0.value2, ctxs.value0.value0.value3), ctxs.value0.value0.value4, ctxs.value0.value0.value5, new Two(ctxs.value0.value0.value6, ctxs.value0.value1, ctxs.value0.value2, tree), ctxs.value0.value3, ctxs.value0.value4, ctxs.value0.value5));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeMiddle && ctxs.value0.value5 instanceof Three) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2, new Two(tree, ctxs.value0.value3, ctxs.value0.value4, ctxs.value0.value5.value0), ctxs.value0.value5.value1, ctxs.value0.value5.value2, new Two(ctxs.value0.value5.value3, ctxs.value0.value5.value4, ctxs.value0.value5.value5, ctxs.value0.value5.value6)));
-              }
-              ;
-              if (ctxs.value0 instanceof ThreeRight && ctxs.value0.value3 instanceof Three) {
-                $tco_done = true;
-                return fromZipper1(ctxs.value1)(new Three(ctxs.value0.value0, ctxs.value0.value1, ctxs.value0.value2, new Two(ctxs.value0.value3.value0, ctxs.value0.value3.value1, ctxs.value0.value3.value2, ctxs.value0.value3.value3), ctxs.value0.value3.value4, ctxs.value0.value3.value5, new Two(ctxs.value0.value3.value6, ctxs.value0.value4, ctxs.value0.value5, tree)));
-              }
-              ;
-              $tco_done = true;
-              return unsafeCrashWith("The impossible happened in partial function `up`.");
-            }
-            ;
-            throw new Error("Failed pattern match at Data.Map.Internal (line 552, column 5 - line 573, column 86): " + [ctxs.constructor.name]);
-          }
-          ;
-          while (!$tco_done) {
-            $tco_result = $tco_loop($tco_var_ctxs, $copy_tree);
-          }
-          ;
-          return $tco_result;
-        };
-      };
-      var removeMaxNode = function($copy_ctx) {
-        return function($copy_m) {
-          var $tco_var_ctx = $copy_ctx;
-          var $tco_done1 = false;
-          var $tco_result;
-          function $tco_loop(ctx, m) {
-            if (m instanceof Two && (m.value0 instanceof Leaf && m.value3 instanceof Leaf)) {
-              $tco_done1 = true;
-              return up(ctx)(Leaf.value);
-            }
-            ;
-            if (m instanceof Two) {
-              $tco_var_ctx = new Cons(new TwoRight(m.value0, m.value1, m.value2), ctx);
-              $copy_m = m.value3;
-              return;
-            }
-            ;
-            if (m instanceof Three && (m.value0 instanceof Leaf && (m.value3 instanceof Leaf && m.value6 instanceof Leaf))) {
-              $tco_done1 = true;
-              return up(new Cons(new TwoRight(Leaf.value, m.value1, m.value2), ctx))(Leaf.value);
-            }
-            ;
-            if (m instanceof Three) {
-              $tco_var_ctx = new Cons(new ThreeRight(m.value0, m.value1, m.value2, m.value3, m.value4, m.value5), ctx);
-              $copy_m = m.value6;
-              return;
-            }
-            ;
-            $tco_done1 = true;
-            return unsafeCrashWith("The impossible happened in partial function `removeMaxNode`.");
-          }
-          ;
-          while (!$tco_done1) {
-            $tco_result = $tco_loop($tco_var_ctx, $copy_m);
-          }
-          ;
-          return $tco_result;
-        };
-      };
-      var maxNode = function($copy_m) {
-        var $tco_done2 = false;
-        var $tco_result;
-        function $tco_loop(m) {
-          if (m instanceof Two && m.value3 instanceof Leaf) {
-            $tco_done2 = true;
-            return {
-              key: m.value1,
-              value: m.value2
-            };
-          }
-          ;
-          if (m instanceof Two) {
-            $copy_m = m.value3;
-            return;
-          }
-          ;
-          if (m instanceof Three && m.value6 instanceof Leaf) {
-            $tco_done2 = true;
-            return {
-              key: m.value4,
-              value: m.value5
-            };
-          }
-          ;
-          if (m instanceof Three) {
-            $copy_m = m.value6;
-            return;
-          }
-          ;
-          $tco_done2 = true;
-          return unsafeCrashWith("The impossible happened in partial function `maxNode`.");
-        }
-        ;
-        while (!$tco_done2) {
-          $tco_result = $tco_loop($copy_m);
-        }
-        ;
-        return $tco_result;
-      };
-      var down = function($copy_ctx) {
-        return function($copy_m) {
-          var $tco_var_ctx = $copy_ctx;
-          var $tco_done3 = false;
-          var $tco_result;
-          function $tco_loop(ctx, m) {
-            if (m instanceof Leaf) {
-              $tco_done3 = true;
-              return Nothing.value;
-            }
-            ;
-            if (m instanceof Two) {
-              var v = compare4(k)(m.value1);
-              if (m.value3 instanceof Leaf && v instanceof EQ) {
-                $tco_done3 = true;
-                return new Just(new Tuple(m.value2, up(ctx)(Leaf.value)));
-              }
-              ;
-              if (v instanceof EQ) {
-                var max6 = maxNode(m.value0);
-                $tco_done3 = true;
-                return new Just(new Tuple(m.value2, removeMaxNode(new Cons(new TwoLeft(max6.key, max6.value, m.value3), ctx))(m.value0)));
-              }
-              ;
-              if (v instanceof LT) {
-                $tco_var_ctx = new Cons(new TwoLeft(m.value1, m.value2, m.value3), ctx);
-                $copy_m = m.value0;
-                return;
-              }
-              ;
-              $tco_var_ctx = new Cons(new TwoRight(m.value0, m.value1, m.value2), ctx);
-              $copy_m = m.value3;
-              return;
-            }
-            ;
-            if (m instanceof Three) {
-              var leaves = function() {
-                if (m.value0 instanceof Leaf && (m.value3 instanceof Leaf && m.value6 instanceof Leaf)) {
-                  return true;
-                }
-                ;
-                return false;
-              }();
-              var v = compare4(k)(m.value4);
-              var v3 = compare4(k)(m.value1);
-              if (leaves && v3 instanceof EQ) {
-                $tco_done3 = true;
-                return new Just(new Tuple(m.value2, fromZipper1(ctx)(new Two(Leaf.value, m.value4, m.value5, Leaf.value))));
-              }
-              ;
-              if (leaves && v instanceof EQ) {
-                $tco_done3 = true;
-                return new Just(new Tuple(m.value5, fromZipper1(ctx)(new Two(Leaf.value, m.value1, m.value2, Leaf.value))));
-              }
-              ;
-              if (v3 instanceof EQ) {
-                var max6 = maxNode(m.value0);
-                $tco_done3 = true;
-                return new Just(new Tuple(m.value2, removeMaxNode(new Cons(new ThreeLeft(max6.key, max6.value, m.value3, m.value4, m.value5, m.value6), ctx))(m.value0)));
-              }
-              ;
-              if (v instanceof EQ) {
-                var max6 = maxNode(m.value3);
-                $tco_done3 = true;
-                return new Just(new Tuple(m.value5, removeMaxNode(new Cons(new ThreeMiddle(m.value0, m.value1, m.value2, max6.key, max6.value, m.value6), ctx))(m.value3)));
-              }
-              ;
-              if (v3 instanceof LT) {
-                $tco_var_ctx = new Cons(new ThreeLeft(m.value1, m.value2, m.value3, m.value4, m.value5, m.value6), ctx);
-                $copy_m = m.value0;
-                return;
-              }
-              ;
-              if (v3 instanceof GT && v instanceof LT) {
-                $tco_var_ctx = new Cons(new ThreeMiddle(m.value0, m.value1, m.value2, m.value4, m.value5, m.value6), ctx);
-                $copy_m = m.value3;
-                return;
-              }
-              ;
-              $tco_var_ctx = new Cons(new ThreeRight(m.value0, m.value1, m.value2, m.value3, m.value4, m.value5), ctx);
-              $copy_m = m.value6;
-              return;
-            }
-            ;
-            throw new Error("Failed pattern match at Data.Map.Internal (line 525, column 16 - line 548, column 80): " + [m.constructor.name]);
-          }
-          ;
-          while (!$tco_done3) {
-            $tco_result = $tco_loop($tco_var_ctx, $copy_m);
-          }
-          ;
-          return $tco_result;
-        };
-      };
-      return down(Nil.value);
     };
   };
   var foldableMap = {
     foldr: function(f) {
       return function(z) {
+        var $lazy_go = $runtime_lazy3("go", "Data.Map.Internal", function() {
+          return function(m$prime, z$prime) {
+            if (m$prime instanceof Leaf) {
+              return z$prime;
+            }
+            ;
+            if (m$prime instanceof Node) {
+              return $lazy_go(170)(m$prime.value4, f(m$prime.value3)($lazy_go(170)(m$prime.value5, z$prime)));
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 167, column 26 - line 170, column 43): " + [m$prime.constructor.name]);
+          };
+        });
+        var go2 = $lazy_go(167);
         return function(m) {
-          if (m instanceof Leaf) {
-            return z;
-          }
-          ;
-          if (m instanceof Two) {
-            return foldr(foldableMap)(f)(f(m.value2)(foldr(foldableMap)(f)(z)(m.value3)))(m.value0);
-          }
-          ;
-          if (m instanceof Three) {
-            return foldr(foldableMap)(f)(f(m.value2)(foldr(foldableMap)(f)(f(m.value5)(foldr(foldableMap)(f)(z)(m.value6)))(m.value3)))(m.value0);
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 133, column 17 - line 136, column 85): " + [m.constructor.name]);
+          return go2(m, z);
         };
       };
     },
     foldl: function(f) {
       return function(z) {
+        var $lazy_go = $runtime_lazy3("go", "Data.Map.Internal", function() {
+          return function(z$prime, m$prime) {
+            if (m$prime instanceof Leaf) {
+              return z$prime;
+            }
+            ;
+            if (m$prime instanceof Node) {
+              return $lazy_go(176)(f($lazy_go(176)(z$prime, m$prime.value4))(m$prime.value3), m$prime.value5);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 173, column 26 - line 176, column 43): " + [m$prime.constructor.name]);
+          };
+        });
+        var go2 = $lazy_go(173);
         return function(m) {
-          if (m instanceof Leaf) {
-            return z;
-          }
-          ;
-          if (m instanceof Two) {
-            return foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(z)(m.value0))(m.value2))(m.value3);
-          }
-          ;
-          if (m instanceof Three) {
-            return foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(f(foldl(foldableMap)(f)(z)(m.value0))(m.value2))(m.value3))(m.value5))(m.value6);
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 137, column 17 - line 140, column 85): " + [m.constructor.name]);
+          return go2(z, m);
         };
       };
     },
     foldMap: function(dictMonoid) {
       var mempty5 = mempty(dictMonoid);
-      var append22 = append(dictMonoid.Semigroup0());
+      var append14 = append(dictMonoid.Semigroup0());
       return function(f) {
-        return function(m) {
-          if (m instanceof Leaf) {
+        var go2 = function(v) {
+          if (v instanceof Leaf) {
             return mempty5;
           }
           ;
-          if (m instanceof Two) {
-            return append22(foldMap(foldableMap)(dictMonoid)(f)(m.value0))(append22(f(m.value2))(foldMap(foldableMap)(dictMonoid)(f)(m.value3)));
+          if (v instanceof Node) {
+            return append14(go2(v.value4))(append14(f(v.value3))(go2(v.value5)));
           }
           ;
-          if (m instanceof Three) {
-            return append22(foldMap(foldableMap)(dictMonoid)(f)(m.value0))(append22(f(m.value2))(append22(foldMap(foldableMap)(dictMonoid)(f)(m.value3))(append22(f(m.value5))(foldMap(foldableMap)(dictMonoid)(f)(m.value6)))));
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 141, column 17 - line 144, column 93): " + [m.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 179, column 10 - line 182, column 28): " + [v.constructor.name]);
         };
+        return go2;
       };
     }
   };
   var foldableWithIndexMap = {
     foldrWithIndex: function(f) {
       return function(z) {
+        var $lazy_go = $runtime_lazy3("go", "Data.Map.Internal", function() {
+          return function(m$prime, z$prime) {
+            if (m$prime instanceof Leaf) {
+              return z$prime;
+            }
+            ;
+            if (m$prime instanceof Node) {
+              return $lazy_go(190)(m$prime.value4, f(m$prime.value2)(m$prime.value3)($lazy_go(190)(m$prime.value5, z$prime)));
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 187, column 26 - line 190, column 45): " + [m$prime.constructor.name]);
+          };
+        });
+        var go2 = $lazy_go(187);
         return function(m) {
-          if (m instanceof Leaf) {
-            return z;
-          }
-          ;
-          if (m instanceof Two) {
-            return foldrWithIndex(foldableWithIndexMap)(f)(f(m.value1)(m.value2)(foldrWithIndex(foldableWithIndexMap)(f)(z)(m.value3)))(m.value0);
-          }
-          ;
-          if (m instanceof Three) {
-            return foldrWithIndex(foldableWithIndexMap)(f)(f(m.value1)(m.value2)(foldrWithIndex(foldableWithIndexMap)(f)(f(m.value4)(m.value5)(foldrWithIndex(foldableWithIndexMap)(f)(z)(m.value6)))(m.value3)))(m.value0);
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 147, column 26 - line 150, column 120): " + [m.constructor.name]);
+          return go2(m, z);
         };
       };
     },
     foldlWithIndex: function(f) {
       return function(z) {
+        var $lazy_go = $runtime_lazy3("go", "Data.Map.Internal", function() {
+          return function(z$prime, m$prime) {
+            if (m$prime instanceof Leaf) {
+              return z$prime;
+            }
+            ;
+            if (m$prime instanceof Node) {
+              return $lazy_go(196)(f(m$prime.value2)($lazy_go(196)(z$prime, m$prime.value4))(m$prime.value3), m$prime.value5);
+            }
+            ;
+            throw new Error("Failed pattern match at Data.Map.Internal (line 193, column 26 - line 196, column 45): " + [m$prime.constructor.name]);
+          };
+        });
+        var go2 = $lazy_go(193);
         return function(m) {
-          if (m instanceof Leaf) {
-            return z;
-          }
-          ;
-          if (m instanceof Two) {
-            return foldlWithIndex(foldableWithIndexMap)(f)(f(m.value1)(foldlWithIndex(foldableWithIndexMap)(f)(z)(m.value0))(m.value2))(m.value3);
-          }
-          ;
-          if (m instanceof Three) {
-            return foldlWithIndex(foldableWithIndexMap)(f)(f(m.value4)(foldlWithIndex(foldableWithIndexMap)(f)(f(m.value1)(foldlWithIndex(foldableWithIndexMap)(f)(z)(m.value0))(m.value2))(m.value3))(m.value5))(m.value6);
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 151, column 26 - line 154, column 120): " + [m.constructor.name]);
+          return go2(z, m);
         };
       };
     },
     foldMapWithIndex: function(dictMonoid) {
       var mempty5 = mempty(dictMonoid);
-      var append22 = append(dictMonoid.Semigroup0());
+      var append14 = append(dictMonoid.Semigroup0());
       return function(f) {
-        return function(m) {
-          if (m instanceof Leaf) {
+        var go2 = function(v) {
+          if (v instanceof Leaf) {
             return mempty5;
           }
           ;
-          if (m instanceof Two) {
-            return append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value0))(append22(f(m.value1)(m.value2))(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value3)));
+          if (v instanceof Node) {
+            return append14(go2(v.value4))(append14(f(v.value2)(v.value3))(go2(v.value5)));
           }
           ;
-          if (m instanceof Three) {
-            return append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value0))(append22(f(m.value1)(m.value2))(append22(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value3))(append22(f(m.value4)(m.value5))(foldMapWithIndex(foldableWithIndexMap)(dictMonoid)(f)(m.value6)))));
-          }
-          ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 155, column 26 - line 158, column 128): " + [m.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 199, column 10 - line 202, column 30): " + [v.constructor.name]);
         };
+        return go2;
       };
     },
     Foldable0: function() {
       return foldableMap;
     }
   };
-  var foldrWithIndex2 = /* @__PURE__ */ foldrWithIndex(foldableWithIndexMap);
-  var foldlWithIndex2 = /* @__PURE__ */ foldlWithIndex(foldableWithIndexMap);
   var keys = /* @__PURE__ */ function() {
-    return foldrWithIndex2(function(k) {
+    return foldrWithIndex(foldableWithIndexMap)(function(k) {
       return function(v) {
         return function(acc) {
           return new Cons(k, acc);
@@ -2998,115 +2430,95 @@
       };
     })(Nil.value);
   }();
+  var filterWithKey = function(dictOrd) {
+    return function(f) {
+      var go2 = function(v) {
+        if (v instanceof Leaf) {
+          return Leaf.value;
+        }
+        ;
+        if (v instanceof Node) {
+          if (f(v.value2)(v.value3)) {
+            return unsafeBalancedNode(v.value2, v.value3, go2(v.value4), go2(v.value5));
+          }
+          ;
+          if (otherwise) {
+            return unsafeJoinNodes(go2(v.value4), go2(v.value5));
+          }
+          ;
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Map.Internal (line 625, column 8 - line 631, column 47): " + [v.constructor.name]);
+      };
+      return go2;
+    };
+  };
+  var filter2 = function(dictOrd) {
+    var $769 = filterWithKey(dictOrd);
+    return function($770) {
+      return $769($$const($770));
+    };
+  };
   var empty2 = /* @__PURE__ */ function() {
     return Leaf.value;
   }();
-  var fromFoldable = function(dictOrd) {
-    var insert1 = insert(dictOrd);
-    return function(dictFoldable) {
-      return foldl(dictFoldable)(function(m) {
-        return function(v) {
-          return insert1(v.value0)(v.value1)(m);
-        };
-      })(empty2);
-    };
-  };
-  var filterWithKey = function(dictOrd) {
-    var fromFoldable1 = fromFoldable(dictOrd)(foldableList2);
-    return function(predicate) {
-      var $927 = filter2(uncurry(predicate));
-      return function($928) {
-        return fromFoldable1($927(toUnfoldable1($928)));
-      };
-    };
-  };
-  var filter3 = function(dictOrd) {
-    var filterWithKey1 = filterWithKey(dictOrd);
-    return function(predicate) {
-      return filterWithKey1($$const(predicate));
-    };
-  };
-  var mapMaybeWithKey = function(dictOrd) {
-    var insert1 = insert(dictOrd);
-    return function(f) {
-      return foldrWithIndex2(function(k) {
-        return function(a2) {
-          return function(acc) {
-            return maybe(acc)(function(b2) {
-              return insert1(k)(b2)(acc);
-            })(f(k)(a2));
-          };
-        };
-      })(empty2);
-    };
-  };
-  var mapMaybe = function(dictOrd) {
-    var $930 = mapMaybeWithKey(dictOrd);
-    return function($931) {
-      return $930($$const($931));
-    };
-  };
   var $$delete = function(dictOrd) {
-    var pop1 = pop(dictOrd);
+    var compare4 = compare(dictOrd);
     return function(k) {
-      return function(m) {
-        return maybe(m)(snd)(pop1(k)(m));
+      var go2 = function(v) {
+        if (v instanceof Leaf) {
+          return Leaf.value;
+        }
+        ;
+        if (v instanceof Node) {
+          var v1 = compare4(k)(v.value2);
+          if (v1 instanceof LT) {
+            return unsafeBalancedNode(v.value2, v.value3, go2(v.value4), v.value5);
+          }
+          ;
+          if (v1 instanceof GT) {
+            return unsafeBalancedNode(v.value2, v.value3, v.value4, go2(v.value5));
+          }
+          ;
+          if (v1 instanceof EQ) {
+            return unsafeJoinNodes(v.value4, v.value5);
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Map.Internal (line 496, column 7 - line 499, column 43): " + [v1.constructor.name]);
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Map.Internal (line 493, column 8 - line 499, column 43): " + [v.constructor.name]);
       };
+      return go2;
     };
   };
   var alter = function(dictOrd) {
-    var lookup1 = lookup(dictOrd);
-    var delete1 = $$delete(dictOrd);
-    var insert1 = insert(dictOrd);
+    var compare4 = compare(dictOrd);
     return function(f) {
       return function(k) {
         return function(m) {
-          var v = f(lookup1(k)(m));
-          if (v instanceof Nothing) {
-            return delete1(k)(m);
+          var v = unsafeSplit(compare4, k, m);
+          var v2 = f(v.value0);
+          if (v2 instanceof Nothing) {
+            return unsafeJoinNodes(v.value1, v.value2);
           }
           ;
-          if (v instanceof Just) {
-            return insert1(k)(v.value0)(m);
+          if (v2 instanceof Just) {
+            return unsafeBalancedNode(k, v2.value0, v.value1, v.value2);
           }
           ;
-          throw new Error("Failed pattern match at Data.Map.Internal (line 596, column 15 - line 598, column 25): " + [v.constructor.name]);
+          throw new Error("Failed pattern match at Data.Map.Internal (line 512, column 3 - line 516, column 41): " + [v2.constructor.name]);
         };
       };
     };
-  };
-  var unionWith = function(dictOrd) {
-    var alter1 = alter(dictOrd);
-    return function(f) {
-      return function(m1) {
-        return function(m2) {
-          var go2 = function(k) {
-            return function(m) {
-              return function(v) {
-                return alter1(function() {
-                  var $936 = maybe(v)(f(v));
-                  return function($937) {
-                    return Just.create($936($937));
-                  };
-                }())(k)(m);
-              };
-            };
-          };
-          return foldlWithIndex2(go2)(m2)(m1);
-        };
-      };
-    };
-  };
-  var union = function(dictOrd) {
-    return unionWith(dictOrd)($$const);
   };
 
   // output/Data.Sparse.Polynomial/index.js
-  var filter4 = /* @__PURE__ */ filter3(ordInt);
+  var filter3 = /* @__PURE__ */ filter2(ordInt);
   var unionWith2 = /* @__PURE__ */ unionWith(ordInt);
   var foldr2 = /* @__PURE__ */ foldr(foldableArray);
-  var map3 = /* @__PURE__ */ map(functorArray);
-  var foldrWithIndex3 = /* @__PURE__ */ foldrWithIndex(foldableWithIndexMap);
+  var map2 = /* @__PURE__ */ map(functorArray);
+  var foldrWithIndex2 = /* @__PURE__ */ foldrWithIndex(foldableWithIndexMap);
   var insert2 = /* @__PURE__ */ insert(ordInt);
   var toUnfoldable2 = /* @__PURE__ */ toUnfoldable(unfoldableArray);
   var mapMaybe2 = /* @__PURE__ */ mapMaybe(ordInt);
@@ -3120,17 +2532,17 @@
       return {
         add: function(v) {
           return function(v1) {
-            return filter4(function(v2) {
+            return filter3(function(v2) {
               return notEq1(v2)(zero2);
             })(unionWith2(add1)(v)(v1));
           };
         },
         mul: function(v) {
           return function(v1) {
-            return filter4(function(v2) {
+            return filter3(function(v2) {
               return notEq1(v2)(zero2);
-            })(foldr2(unionWith2(add1))(empty2)(map3(function(v2) {
-              return foldrWithIndex3(function(j) {
+            })(foldr2(unionWith2(add1))(empty2)(map2(function(v2) {
+              return foldrWithIndex2(function(j) {
                 return function(w) {
                   return function(acc) {
                     return insert2(v2.value0 + j | 0)(mul22(v2.value1)(w))(acc);
@@ -3154,7 +2566,7 @@
       };
     }
   };
-  var map32 = /* @__PURE__ */ map(functorPolynomial);
+  var map3 = /* @__PURE__ */ map(functorPolynomial);
   var ringPolynomial = function(dictEq) {
     var semiringPolynomial1 = semiringPolynomial(dictEq);
     return function(dictRing) {
@@ -3167,7 +2579,7 @@
       return {
         sub: function(p1) {
           return function(p2) {
-            return add1(p1)(map32(function(v) {
+            return add1(p1)(map3(function(v) {
               return mul22(v)(negate1(one1));
             })(p2));
           };
@@ -3246,7 +2658,7 @@
   var meets = function(dict) {
     return dict.meets;
   };
-  var length3 = function(dict) {
+  var length2 = function(dict) {
     return dict.length;
   };
   var interLineLine = {
@@ -3344,7 +2756,7 @@
       return sqrt(abs22(v) * abs22(v) + ord1(v) * ord1(v));
     }
   };
-  var length1 = /* @__PURE__ */ length3(measurableVector);
+  var length1 = /* @__PURE__ */ length2(measurableVector);
   var cosAngle = function(u2) {
     return function(v) {
       return (abs22(u2) * abs22(v) + ord1(u2) * ord1(v)) / (length1(u2) * length1(v));
@@ -3535,7 +2947,7 @@
   }();
 
   // output/Data.String.CodeUnits/foreign.js
-  var length4 = function(s2) {
+  var length3 = function(s2) {
     return s2.length;
   };
   var drop = function(n) {
@@ -3569,7 +2981,7 @@
     return 55296 <= cu && cu <= 56319;
   };
   var uncons2 = function(s2) {
-    var v = length4(s2);
+    var v = length3(s2);
     if (v === 0) {
       return Nothing.value;
     }
@@ -3606,7 +3018,7 @@
   };
   var unsafeCodePointAt0Fallback = function(s2) {
     var cu0 = fromEnum2(charAt(0)(s2));
-    var $47 = isLead(cu0) && length4(s2) > 1;
+    var $47 = isLead(cu0) && length3(s2) > 1;
     if ($47) {
       var cu1 = fromEnum2(charAt(1)(s2));
       var $48 = isTrail(cu1);
@@ -3621,7 +3033,7 @@
   };
   var unsafeCodePointAt0 = /* @__PURE__ */ _unsafeCodePointAt0(unsafeCodePointAt0Fallback);
   var toCodePointArray = /* @__PURE__ */ _toCodePointArray(toCodePointArrayFallback)(unsafeCodePointAt0);
-  var length5 = function($74) {
+  var length4 = function($74) {
     return length(toCodePointArray($74));
   };
 
@@ -3663,22 +3075,50 @@
     return dict.liftST;
   };
 
+  // output/Data.List/index.js
+  var reverse2 = /* @__PURE__ */ function() {
+    var go2 = function($copy_v) {
+      return function($copy_v1) {
+        var $tco_var_v = $copy_v;
+        var $tco_done = false;
+        var $tco_result;
+        function $tco_loop(v, v1) {
+          if (v1 instanceof Nil) {
+            $tco_done = true;
+            return v;
+          }
+          ;
+          if (v1 instanceof Cons) {
+            $tco_var_v = new Cons(v1.value0, v);
+            $copy_v1 = v1.value1;
+            return;
+          }
+          ;
+          throw new Error("Failed pattern match at Data.List (line 368, column 3 - line 368, column 19): " + [v.constructor.name, v1.constructor.name]);
+        }
+        ;
+        while (!$tco_done) {
+          $tco_result = $tco_loop($tco_var_v, $copy_v1);
+        }
+        ;
+        return $tco_result;
+      };
+    };
+    return go2(Nil.value);
+  }();
+
   // output/Data.Filterable/index.js
   var filterMap = function(dict) {
     return dict.filterMap;
   };
 
   // output/Data.Set/index.js
+  var coerce3 = /* @__PURE__ */ coerce();
   var foldMap2 = /* @__PURE__ */ foldMap(foldableList);
   var foldl2 = /* @__PURE__ */ foldl(foldableList);
   var foldr3 = /* @__PURE__ */ foldr(foldableList);
   var union2 = function(dictOrd) {
-    var union1 = union(dictOrd);
-    return function(v) {
-      return function(v1) {
-        return union1(v)(v1);
-      };
-    };
+    return coerce3(union(dictOrd));
   };
   var toList = function(v) {
     return keys(v);
@@ -3695,25 +3135,25 @@
     foldMap: function(dictMonoid) {
       var foldMap12 = foldMap2(dictMonoid);
       return function(f) {
-        var $129 = foldMap12(f);
-        return function($130) {
-          return $129(toList($130));
+        var $98 = foldMap12(f);
+        return function($99) {
+          return $98(toList($99));
         };
       };
     },
     foldl: function(f) {
       return function(x) {
-        var $131 = foldl2(f)(x);
-        return function($132) {
-          return $131(toList($132));
+        var $100 = foldl2(f)(x);
+        return function($101) {
+          return $100(toList($101));
         };
       };
     },
     foldr: function(f) {
       return function(x) {
-        var $133 = foldr3(f)(x);
-        return function($134) {
-          return $133(toList($134));
+        var $102 = foldr3(f)(x);
+        return function($103) {
+          return $102(toList($103));
         };
       };
     }
@@ -3729,12 +3169,7 @@
     };
   };
   var $$delete2 = function(dictOrd) {
-    var delete1 = $$delete(dictOrd);
-    return function(a2) {
-      return function(v) {
-        return delete1(a2)(v);
-      };
-    };
+    return coerce3($$delete(dictOrd));
   };
 
   // output/Effect.Timer/foreign.js
@@ -3829,7 +3264,7 @@
   var unsafeRefEq = reallyUnsafeRefEq;
 
   // output/FRP.Event/index.js
-  var $runtime_lazy3 = function(name15, moduleName, init2) {
+  var $runtime_lazy4 = function(name15, moduleName, init2) {
     var state4 = 0;
     var val;
     return function(lineNumber) {
@@ -3997,7 +3432,7 @@
     }
   };
   var map1 = /* @__PURE__ */ map(functorEvent);
-  var filter6 = function(p2) {
+  var filter5 = function(p2) {
     return function(v) {
       return function(tf, k) {
         return v(tf, function(a2) {
@@ -4016,7 +3451,7 @@
     };
   };
   var filter$prime = function(f) {
-    return filter6(function(a2) {
+    return filter5(function(a2) {
       var v = f(a2);
       if (v) {
         return new Just(a2);
@@ -4054,7 +3489,7 @@
       }
     };
   };
-  var fix3 = function(f) {
+  var fix2 = function(f) {
     return function(tf, k) {
       var v = create$prime();
       var v1 = f(v.event);
@@ -4067,10 +3502,10 @@
     };
   };
   var compactableEvent = {
-    compact: /* @__PURE__ */ filter6(/* @__PURE__ */ identity(categoryFn)),
+    compact: /* @__PURE__ */ filter5(/* @__PURE__ */ identity(categoryFn)),
     separate: function(xs) {
       return {
-        left: filter6(function(v) {
+        left: filter5(function(v) {
           if (v instanceof Left) {
             return new Just(v.value0);
           }
@@ -4081,7 +3516,7 @@
           ;
           throw new Error("Failed pattern match at FRP.Event (line 124, column 13 - line 126, column 33): " + [v.constructor.name]);
         })(xs),
-        right: filter6(function(v) {
+        right: filter5(function(v) {
           if (v instanceof Right) {
             return new Just(v.value0);
           }
@@ -4097,7 +3532,7 @@
   };
   var filterableEvent = {
     filter: filter$prime,
-    filterMap: filter6,
+    filterMap: filter5,
     partition: function(p2) {
       return function(xs) {
         return {
@@ -4196,7 +3631,7 @@
       return v;
     }($lazy_backdoor(345).subscribe)(i2);
   };
-  var $lazy_backdoor = /* @__PURE__ */ $runtime_lazy3("backdoor", "FRP.Event", function() {
+  var $lazy_backdoor = /* @__PURE__ */ $runtime_lazy4("backdoor", "FRP.Event", function() {
     var create_ = function __do4() {
       var subscribers = objHack();
       var idx = $$new(0)();
@@ -4429,7 +3864,7 @@
       }()
     };
   });
-  var $lazy_create = /* @__PURE__ */ $runtime_lazy3("create", "FRP.Event", function() {
+  var $lazy_create = /* @__PURE__ */ $runtime_lazy4("create", "FRP.Event", function() {
     return function __do4() {
       unit;
       return function(v) {
@@ -4447,11 +3882,6 @@
       return v;
     }(backdoor.makeEvent)(i2);
   };
-  var makeEventO = function(i2) {
-    return function(v) {
-      return v;
-    }(backdoor.makeEventO)(i2);
-  };
   var makeLemmingEvent = function(i2) {
     return function(v) {
       return v;
@@ -4467,11 +3897,6 @@
       return v;
     }(backdoor.memoize)(i2);
   };
-  var subscribeO = /* @__PURE__ */ function() {
-    return function(v) {
-      return v;
-    }(backdoor.subscribeO);
-  }();
   var applyEvent = {
     apply: function(a2) {
       return function(b2) {
@@ -4552,7 +3977,7 @@
     keepLatest: keepLatest2,
     sampleOnRight: sampleOnRight2,
     sampleOnLeft,
-    fix: fix3,
+    fix: fix2,
     Alternative0: function() {
       return alternativeEvent;
     },
@@ -4832,12 +4257,12 @@
       this.fn = fn;
     }
     var emptyList = {};
-    var ConsCell = function(head5, tail2) {
-      this.head = head5;
+    var ConsCell = function(head4, tail2) {
+      this.head = head4;
       this.tail = tail2;
     };
-    function finalCell(head5) {
-      return new ConsCell(head5, emptyList);
+    function finalCell(head4) {
+      return new ConsCell(head4, emptyList);
     }
     function consList(x) {
       return function(xs) {
@@ -5025,7 +4450,7 @@
   var for_12 = /* @__PURE__ */ for_3(foldableMaybe);
   var $$void4 = /* @__PURE__ */ $$void(functorST);
   var for_23 = /* @__PURE__ */ for_3(foldableArray);
-  var map33 = /* @__PURE__ */ map(functorArray);
+  var map32 = /* @__PURE__ */ map(functorArray);
   var append3 = /* @__PURE__ */ append(/* @__PURE__ */ semigroupST(semigroupString));
   var traverse_2 = /* @__PURE__ */ traverse_(applicativeST)(foldableArray);
   var append12 = /* @__PURE__ */ append(semigroupArray);
@@ -5060,7 +4485,7 @@
         };
         return function(v1) {
           if (v1 instanceof FixedChildren$prime) {
-            return merge2(map33(flatten(v)(psr)(interpreter))(v1.value0));
+            return merge2(map32(flatten(v)(psr)(interpreter))(v1.value0));
           }
           ;
           if (v1 instanceof EventfulElement$prime) {
@@ -5235,8 +4660,8 @@
   var pure6 = /* @__PURE__ */ pure(applicativeEvent);
   var empty5 = /* @__PURE__ */ empty(plusEvent);
   var pure12 = /* @__PURE__ */ pure(applicativeST);
-  var coerce3 = /* @__PURE__ */ coerce();
-  var unwrap4 = /* @__PURE__ */ unwrap();
+  var coerce4 = /* @__PURE__ */ coerce();
+  var unwrap2 = /* @__PURE__ */ unwrap();
   var eq13 = /* @__PURE__ */ eq(eqScope);
   var alt2 = /* @__PURE__ */ alt(altEvent);
   var append4 = /* @__PURE__ */ append(semigroupArray);
@@ -5341,7 +4766,7 @@
       ids: function($150) {
         return function(v) {
           return v.ids;
-        }(unwrap4($150));
+        }(unwrap2($150));
       },
       disconnectElement: function(v) {
         return function(v1) {
@@ -5451,7 +4876,7 @@
           return merge3(v);
         };
         var step1 = function(arr) {
-          return new Element$prime(elementify(en)(aa(attributes))(fixed(coerce3(arr))));
+          return new Element$prime(elementify(en)(aa(attributes))(fixed(coerce4(arr))));
         };
         return step1(mapWithIndex3(map13(map13(function(v) {
           return v;
@@ -6010,7 +5435,6 @@
       return f(a2);
     };
   };
-  var discard3 = bind3;
 
   // output/Effect.Aff/foreign.js
   var Aff = function() {
@@ -6189,7 +5613,7 @@
     function Fiber(util, supervisor, aff) {
       var runTick = 0;
       var status = SUSPENDED;
-      var step3 = aff;
+      var step2 = aff;
       var fail = null;
       var interrupt = null;
       var bhead = null;
@@ -6209,7 +5633,7 @@
             case STEP_BIND:
               status = CONTINUE;
               try {
-                step3 = bhead(step3);
+                step2 = bhead(step2);
                 if (btail === null) {
                   bhead = null;
                 } else {
@@ -6219,47 +5643,47 @@
               } catch (e) {
                 status = RETURN;
                 fail = util.left(e);
-                step3 = null;
+                step2 = null;
               }
               break;
             case STEP_RESULT:
-              if (util.isLeft(step3)) {
+              if (util.isLeft(step2)) {
                 status = RETURN;
-                fail = step3;
-                step3 = null;
+                fail = step2;
+                step2 = null;
               } else if (bhead === null) {
                 status = RETURN;
               } else {
                 status = STEP_BIND;
-                step3 = util.fromRight(step3);
+                step2 = util.fromRight(step2);
               }
               break;
             case CONTINUE:
-              switch (step3.tag) {
+              switch (step2.tag) {
                 case BIND:
                   if (bhead) {
                     btail = new Aff2(CONS, bhead, btail);
                   }
-                  bhead = step3._2;
+                  bhead = step2._2;
                   status = CONTINUE;
-                  step3 = step3._1;
+                  step2 = step2._1;
                   break;
                 case PURE:
                   if (bhead === null) {
                     status = RETURN;
-                    step3 = util.right(step3._1);
+                    step2 = util.right(step2._1);
                   } else {
                     status = STEP_BIND;
-                    step3 = step3._1;
+                    step2 = step2._1;
                   }
                   break;
                 case SYNC:
                   status = STEP_RESULT;
-                  step3 = runSync(util.left, util.right, step3._1);
+                  step2 = runSync(util.left, util.right, step2._1);
                   break;
                 case ASYNC:
                   status = PENDING;
-                  step3 = runAsync(util.left, step3._1, function(result2) {
+                  step2 = runAsync(util.left, step2._1, function(result2) {
                     return function() {
                       if (runTick !== localRunTick) {
                         return;
@@ -6270,7 +5694,7 @@
                           return;
                         }
                         status = STEP_RESULT;
-                        step3 = result2;
+                        step2 = result2;
                         run3(runTick);
                       });
                     };
@@ -6278,46 +5702,46 @@
                   return;
                 case THROW:
                   status = RETURN;
-                  fail = util.left(step3._1);
-                  step3 = null;
+                  fail = util.left(step2._1);
+                  step2 = null;
                   break;
                 case CATCH:
                   if (bhead === null) {
-                    attempts = new Aff2(CONS, step3, attempts, interrupt);
+                    attempts = new Aff2(CONS, step2, attempts, interrupt);
                   } else {
-                    attempts = new Aff2(CONS, step3, new Aff2(CONS, new Aff2(RESUME, bhead, btail), attempts, interrupt), interrupt);
+                    attempts = new Aff2(CONS, step2, new Aff2(CONS, new Aff2(RESUME, bhead, btail), attempts, interrupt), interrupt);
                   }
                   bhead = null;
                   btail = null;
                   status = CONTINUE;
-                  step3 = step3._1;
+                  step2 = step2._1;
                   break;
                 case BRACKET:
                   bracketCount++;
                   if (bhead === null) {
-                    attempts = new Aff2(CONS, step3, attempts, interrupt);
+                    attempts = new Aff2(CONS, step2, attempts, interrupt);
                   } else {
-                    attempts = new Aff2(CONS, step3, new Aff2(CONS, new Aff2(RESUME, bhead, btail), attempts, interrupt), interrupt);
+                    attempts = new Aff2(CONS, step2, new Aff2(CONS, new Aff2(RESUME, bhead, btail), attempts, interrupt), interrupt);
                   }
                   bhead = null;
                   btail = null;
                   status = CONTINUE;
-                  step3 = step3._1;
+                  step2 = step2._1;
                   break;
                 case FORK:
                   status = STEP_RESULT;
-                  tmp = Fiber(util, supervisor, step3._2);
+                  tmp = Fiber(util, supervisor, step2._2);
                   if (supervisor) {
                     supervisor.register(tmp);
                   }
-                  if (step3._1) {
+                  if (step2._1) {
                     tmp.run();
                   }
-                  step3 = util.right(tmp);
+                  step2 = util.right(tmp);
                   break;
                 case SEQ:
                   status = CONTINUE;
-                  step3 = sequential2(util, supervisor, step3._1);
+                  step2 = sequential2(util, supervisor, step2._1);
                   break;
               }
               break;
@@ -6326,7 +5750,7 @@
               btail = null;
               if (attempts === null) {
                 status = COMPLETED;
-                step3 = interrupt || fail || step3;
+                step2 = interrupt || fail || step2;
               } else {
                 tmp = attempts._3;
                 attempt = attempts._1;
@@ -6337,7 +5761,7 @@
                       status = RETURN;
                     } else if (fail) {
                       status = CONTINUE;
-                      step3 = attempt._2(util.fromLeft(fail));
+                      step2 = attempt._2(util.fromLeft(fail));
                       fail = null;
                     }
                     break;
@@ -6348,43 +5772,43 @@
                       bhead = attempt._1;
                       btail = attempt._2;
                       status = STEP_BIND;
-                      step3 = util.fromRight(step3);
+                      step2 = util.fromRight(step2);
                     }
                     break;
                   case BRACKET:
                     bracketCount--;
                     if (fail === null) {
-                      result = util.fromRight(step3);
+                      result = util.fromRight(step2);
                       attempts = new Aff2(CONS, new Aff2(RELEASE, attempt._2, result), attempts, tmp);
                       if (interrupt === tmp || bracketCount > 0) {
                         status = CONTINUE;
-                        step3 = attempt._3(result);
+                        step2 = attempt._3(result);
                       }
                     }
                     break;
                   case RELEASE:
-                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step3, fail), attempts, interrupt);
+                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail), attempts, interrupt);
                     status = CONTINUE;
                     if (interrupt && interrupt !== tmp && bracketCount === 0) {
-                      step3 = attempt._1.killed(util.fromLeft(interrupt))(attempt._2);
+                      step2 = attempt._1.killed(util.fromLeft(interrupt))(attempt._2);
                     } else if (fail) {
-                      step3 = attempt._1.failed(util.fromLeft(fail))(attempt._2);
+                      step2 = attempt._1.failed(util.fromLeft(fail))(attempt._2);
                     } else {
-                      step3 = attempt._1.completed(util.fromRight(step3))(attempt._2);
+                      step2 = attempt._1.completed(util.fromRight(step2))(attempt._2);
                     }
                     fail = null;
                     bracketCount++;
                     break;
                   case FINALIZER:
                     bracketCount++;
-                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step3, fail), attempts, interrupt);
+                    attempts = new Aff2(CONS, new Aff2(FINALIZED, step2, fail), attempts, interrupt);
                     status = CONTINUE;
-                    step3 = attempt._1;
+                    step2 = attempt._1;
                     break;
                   case FINALIZED:
                     bracketCount--;
                     status = RETURN;
-                    step3 = attempt._1;
+                    step2 = attempt._1;
                     fail = attempt._2;
                     break;
                 }
@@ -6394,7 +5818,7 @@
               for (var k in joins) {
                 if (joins.hasOwnProperty(k)) {
                   rethrow = rethrow && joins[k].rethrow;
-                  runEff(joins[k].handler(step3));
+                  runEff(joins[k].handler(step2));
                 }
               }
               joins = null;
@@ -6402,10 +5826,10 @@
                 setTimeout(function() {
                   throw util.fromLeft(fail);
                 }, 0);
-              } else if (util.isLeft(step3) && rethrow) {
+              } else if (util.isLeft(step2) && rethrow) {
                 setTimeout(function() {
                   if (rethrow) {
-                    throw util.fromLeft(step3);
+                    throw util.fromLeft(step2);
                   }
                 }, 0);
               }
@@ -6422,7 +5846,7 @@
         return function() {
           if (status === COMPLETED) {
             rethrow = rethrow && join4.rethrow;
-            join4.handler(step3)();
+            join4.handler(step2)();
             return function() {
             };
           }
@@ -6453,7 +5877,7 @@
             case SUSPENDED:
               interrupt = util.left(error2);
               status = COMPLETED;
-              step3 = interrupt;
+              step2 = interrupt;
               run3(runTick);
               break;
             case PENDING:
@@ -6462,10 +5886,10 @@
               }
               if (bracketCount === 0) {
                 if (status === PENDING) {
-                  attempts = new Aff2(CONS, new Aff2(FINALIZER, step3(error2)), attempts, interrupt);
+                  attempts = new Aff2(CONS, new Aff2(FINALIZER, step2(error2)), attempts, interrupt);
                 }
                 status = RETURN;
-                step3 = null;
+                step2 = null;
                 fail = null;
                 run3(++runTick);
               }
@@ -6476,7 +5900,7 @@
               }
               if (bracketCount === 0) {
                 status = RETURN;
-                step3 = null;
+                step2 = null;
                 fail = null;
               }
           }
@@ -6524,8 +5948,8 @@
       var interrupt = null;
       var root = EMPTY;
       function kill(error2, par2, cb3) {
-        var step3 = par2;
-        var head5 = null;
+        var step2 = par2;
+        var head4 = null;
         var tail2 = null;
         var count2 = 0;
         var kills2 = {};
@@ -6533,10 +5957,10 @@
         loop:
           while (true) {
             tmp = null;
-            switch (step3.tag) {
+            switch (step2.tag) {
               case FORKED:
-                if (step3._3 === EMPTY) {
-                  tmp = fibers[step3._1];
+                if (step2._3 === EMPTY) {
+                  tmp = fibers[step2._1];
                   kills2[count2++] = tmp.kill(error2, function(result) {
                     return function() {
                       count2--;
@@ -6546,27 +5970,27 @@
                     };
                   });
                 }
-                if (head5 === null) {
+                if (head4 === null) {
                   break loop;
                 }
-                step3 = head5._2;
+                step2 = head4._2;
                 if (tail2 === null) {
-                  head5 = null;
+                  head4 = null;
                 } else {
-                  head5 = tail2._1;
+                  head4 = tail2._1;
                   tail2 = tail2._2;
                 }
                 break;
               case MAP:
-                step3 = step3._2;
+                step2 = step2._2;
                 break;
               case APPLY:
               case ALT:
-                if (head5) {
-                  tail2 = new Aff2(CONS, head5, tail2);
+                if (head4) {
+                  tail2 = new Aff2(CONS, head4, tail2);
                 }
-                head5 = step3;
-                step3 = step3._1;
+                head4 = step2;
+                step2 = step2._1;
                 break;
             }
           }
@@ -6581,13 +6005,13 @@
         }
         return kills2;
       }
-      function join3(result, head5, tail2) {
-        var fail, step3, lhs, rhs, tmp, kid;
+      function join3(result, head4, tail2) {
+        var fail, step2, lhs, rhs, tmp, kid;
         if (util.isLeft(result)) {
           fail = result;
-          step3 = null;
+          step2 = null;
         } else {
-          step3 = result;
+          step2 = result;
           fail = null;
         }
         loop:
@@ -6599,30 +6023,30 @@
             if (interrupt !== null) {
               return;
             }
-            if (head5 === null) {
-              cb2(fail || step3)();
+            if (head4 === null) {
+              cb2(fail || step2)();
               return;
             }
-            if (head5._3 !== EMPTY) {
+            if (head4._3 !== EMPTY) {
               return;
             }
-            switch (head5.tag) {
+            switch (head4.tag) {
               case MAP:
                 if (fail === null) {
-                  head5._3 = util.right(head5._1(util.fromRight(step3)));
-                  step3 = head5._3;
+                  head4._3 = util.right(head4._1(util.fromRight(step2)));
+                  step2 = head4._3;
                 } else {
-                  head5._3 = fail;
+                  head4._3 = fail;
                 }
                 break;
               case APPLY:
-                lhs = head5._1._3;
-                rhs = head5._2._3;
+                lhs = head4._1._3;
+                rhs = head4._2._3;
                 if (fail) {
-                  head5._3 = fail;
+                  head4._3 = fail;
                   tmp = true;
                   kid = killId++;
-                  kills[kid] = kill(early, fail === lhs ? head5._2 : head5._1, function() {
+                  kills[kid] = kill(early, fail === lhs ? head4._2 : head4._1, function() {
                     return function() {
                       delete kills[kid];
                       if (tmp) {
@@ -6641,33 +6065,33 @@
                 } else if (lhs === EMPTY || rhs === EMPTY) {
                   return;
                 } else {
-                  step3 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
-                  head5._3 = step3;
+                  step2 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
+                  head4._3 = step2;
                 }
                 break;
               case ALT:
-                lhs = head5._1._3;
-                rhs = head5._2._3;
+                lhs = head4._1._3;
+                rhs = head4._2._3;
                 if (lhs === EMPTY && util.isLeft(rhs) || rhs === EMPTY && util.isLeft(lhs)) {
                   return;
                 }
                 if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
-                  fail = step3 === lhs ? rhs : lhs;
-                  step3 = null;
-                  head5._3 = fail;
+                  fail = step2 === lhs ? rhs : lhs;
+                  step2 = null;
+                  head4._3 = fail;
                 } else {
-                  head5._3 = step3;
+                  head4._3 = step2;
                   tmp = true;
                   kid = killId++;
-                  kills[kid] = kill(early, step3 === lhs ? head5._2 : head5._1, function() {
+                  kills[kid] = kill(early, step2 === lhs ? head4._2 : head4._1, function() {
                     return function() {
                       delete kills[kid];
                       if (tmp) {
                         tmp = false;
                       } else if (tail2 === null) {
-                        join3(step3, null, null);
+                        join3(step2, null, null);
                       } else {
-                        join3(step3, tail2._1, tail2._2);
+                        join3(step2, tail2._1, tail2._2);
                       }
                     };
                   });
@@ -6679,9 +6103,9 @@
                 break;
             }
             if (tail2 === null) {
-              head5 = null;
+              head4 = null;
             } else {
-              head5 = tail2._1;
+              head4 = tail2._1;
               tail2 = tail2._2;
             }
           }
@@ -6697,8 +6121,8 @@
       }
       function run3() {
         var status = CONTINUE;
-        var step3 = par;
-        var head5 = null;
+        var step2 = par;
+        var head4 = null;
         var tail2 = null;
         var tmp, fid;
         loop:
@@ -6707,37 +6131,37 @@
             fid = null;
             switch (status) {
               case CONTINUE:
-                switch (step3.tag) {
+                switch (step2.tag) {
                   case MAP:
-                    if (head5) {
-                      tail2 = new Aff2(CONS, head5, tail2);
+                    if (head4) {
+                      tail2 = new Aff2(CONS, head4, tail2);
                     }
-                    head5 = new Aff2(MAP, step3._1, EMPTY, EMPTY);
-                    step3 = step3._2;
+                    head4 = new Aff2(MAP, step2._1, EMPTY, EMPTY);
+                    step2 = step2._2;
                     break;
                   case APPLY:
-                    if (head5) {
-                      tail2 = new Aff2(CONS, head5, tail2);
+                    if (head4) {
+                      tail2 = new Aff2(CONS, head4, tail2);
                     }
-                    head5 = new Aff2(APPLY, EMPTY, step3._2, EMPTY);
-                    step3 = step3._1;
+                    head4 = new Aff2(APPLY, EMPTY, step2._2, EMPTY);
+                    step2 = step2._1;
                     break;
                   case ALT:
-                    if (head5) {
-                      tail2 = new Aff2(CONS, head5, tail2);
+                    if (head4) {
+                      tail2 = new Aff2(CONS, head4, tail2);
                     }
-                    head5 = new Aff2(ALT, EMPTY, step3._2, EMPTY);
-                    step3 = step3._1;
+                    head4 = new Aff2(ALT, EMPTY, step2._2, EMPTY);
+                    step2 = step2._1;
                     break;
                   default:
                     fid = fiberId++;
                     status = RETURN;
-                    tmp = step3;
-                    step3 = new Aff2(FORKED, fid, new Aff2(CONS, head5, tail2), EMPTY);
+                    tmp = step2;
+                    step2 = new Aff2(FORKED, fid, new Aff2(CONS, head4, tail2), EMPTY);
                     tmp = Fiber(util, supervisor, tmp);
                     tmp.onComplete({
                       rethrow: false,
-                      handler: resolve(step3)
+                      handler: resolve(step2)
                     })();
                     fibers[fid] = tmp;
                     if (supervisor) {
@@ -6746,27 +6170,27 @@
                 }
                 break;
               case RETURN:
-                if (head5 === null) {
+                if (head4 === null) {
                   break loop;
                 }
-                if (head5._1 === EMPTY) {
-                  head5._1 = step3;
+                if (head4._1 === EMPTY) {
+                  head4._1 = step2;
                   status = CONTINUE;
-                  step3 = head5._2;
-                  head5._2 = EMPTY;
+                  step2 = head4._2;
+                  head4._2 = EMPTY;
                 } else {
-                  head5._2 = step3;
-                  step3 = head5;
+                  head4._2 = step2;
+                  step2 = head4;
                   if (tail2 === null) {
-                    head5 = null;
+                    head4 = null;
                   } else {
-                    head5 = tail2._1;
+                    head4 = tail2._1;
                     tail2 = tail2._2;
                   }
                 }
             }
           }
-        root = step3;
+        root = step2;
         for (fid = 0; fid < fiberId; fid++) {
           fibers[fid].run();
         }
@@ -6877,9 +6301,7 @@
   var liftST3 = /* @__PURE__ */ liftST(monadSTEffect);
   var $$void5 = /* @__PURE__ */ $$void(functorST);
   var map10 = /* @__PURE__ */ map(functorEvent);
-  var alt3 = /* @__PURE__ */ alt(altEvent);
-  var pure7 = /* @__PURE__ */ pure(applicativeEvent);
-  var coerce4 = /* @__PURE__ */ coerce();
+  var coerce5 = /* @__PURE__ */ coerce();
   var for_4 = /* @__PURE__ */ for_(applicativeST)(foldableMaybe);
   var useRef = function(a2) {
     return function(e) {
@@ -6918,7 +6340,7 @@
     };
   };
   var useHot$prime = function(f) {
-    var ee = envy(coerce4(makeLemmingEventO(function(v, k) {
+    var ee = envy(coerce5(makeLemmingEventO(function(v, k) {
       var v1 = createPure();
       var current = newSTRef(Nothing.value)();
       var writeVal = function(v2) {
@@ -6950,7 +6372,7 @@
   };
   var useHot = function(a2) {
     return function(f) {
-      var ee = envy(coerce4(makeLemmingEventO(function(v, k) {
+      var ee = envy(coerce5(makeLemmingEventO(function(v, k) {
         var v1 = createPure();
         var current = newSTRef(Nothing.value)();
         var writeVal = function(v2) {
@@ -6975,23 +6397,6 @@
         });
       })));
       return ee;
-    };
-  };
-  var useEffect = function(e) {
-    return function(f1) {
-      return function(f2) {
-        var eee = alt3(pure7(f2(unit)))(makeEventO(function(v) {
-          return subscribeO(e, mkEffectFn1(f1));
-        }));
-        var eeee = map10(function(v) {
-          return v;
-        })(eee);
-        var eeeee = map10(function(v) {
-          return v;
-        })(eeee);
-        var ee = envy(eeeee);
-        return ee;
-      };
     };
   };
 
@@ -7245,7 +6650,7 @@
   };
 
   // output/Control.Monad.Free/index.js
-  var $runtime_lazy4 = function(name15, moduleName, init2) {
+  var $runtime_lazy5 = function(name15, moduleName, init2) {
     var state4 = 0;
     var val;
     return function(lineNumber) {
@@ -7407,7 +6812,7 @@
       return $lazy_freeApply(0);
     }
   };
-  var $lazy_freeApply = /* @__PURE__ */ $runtime_lazy4("freeApply", "Control.Monad.Free", function() {
+  var $lazy_freeApply = /* @__PURE__ */ $runtime_lazy5("freeApply", "Control.Monad.Free", function() {
     return {
       apply: ap(freeMonad),
       Functor0: function() {
@@ -7415,10 +6820,10 @@
       }
     };
   });
-  var pure8 = /* @__PURE__ */ pure(freeApplicative);
+  var pure7 = /* @__PURE__ */ pure(freeApplicative);
   var liftF = function(f) {
     return fromView(new Bind(f, function($192) {
-      return pure8($192);
+      return pure7($192);
     }));
   };
 
@@ -8131,11 +7536,11 @@
     };
   };
   var applicativeStateT = function(dictMonad) {
-    var pure11 = pure(dictMonad.Applicative0());
+    var pure10 = pure(dictMonad.Applicative0());
     return {
       pure: function(a2) {
         return function(s2) {
-          return pure11(new Tuple(a2, s2));
+          return pure10(new Tuple(a2, s2));
         };
       },
       Apply0: function() {
@@ -8144,12 +7549,12 @@
     };
   };
   var monadStateStateT = function(dictMonad) {
-    var pure11 = pure(dictMonad.Applicative0());
+    var pure10 = pure(dictMonad.Applicative0());
     var monadStateT1 = monadStateT(dictMonad);
     return {
       state: function(f) {
         return function($200) {
-          return pure11(f($200));
+          return pure10(f($200));
         };
       },
       Monad0: function() {
@@ -8245,8 +7650,8 @@
   var pure13 = /* @__PURE__ */ pure(applicativeEffect);
   var mempty3 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidFn(/* @__PURE__ */ monoidST(monoidUnit)));
   var empty8 = /* @__PURE__ */ empty(plusEvent);
-  var coerce5 = /* @__PURE__ */ coerce();
-  var unwrap5 = /* @__PURE__ */ unwrap();
+  var coerce6 = /* @__PURE__ */ coerce();
+  var unwrap3 = /* @__PURE__ */ unwrap();
   var eq3 = /* @__PURE__ */ eq(eqScope);
   var join2 = /* @__PURE__ */ join(freeBind);
   var pure23 = /* @__PURE__ */ pure(applicativeEvent);
@@ -8285,7 +7690,7 @@
           raiseId: mempty3,
           ctor: envy(empty8)
         };
-        return coerce5(giveNewParent_(Just.create)(runOnJust)(newA))(state4)();
+        return coerce6(giveNewParent_(Just.create)(runOnJust)(newA))(state4)();
       };
     };
   };
@@ -8306,7 +7711,7 @@
           ids: function($82) {
             return function(v) {
               return v.ids;
-            }(unwrap5($82));
+            }(unwrap3($82));
           },
           disconnectElement: function(v) {
             return function(v1) {
@@ -8321,7 +7726,7 @@
           toElt: function(v) {
             return v;
           }
-        })(a2)(b2)(coerce5(c));
+        })(a2)(b2)(coerce6(c));
       };
     };
   };
@@ -8510,7 +7915,7 @@
   var resume2 = /* @__PURE__ */ resume(functorEFunctionOfFFIDOMS);
   var monoidEffect3 = /* @__PURE__ */ monoidEffect(monoidUnit);
   var mempty4 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidEvent(/* @__PURE__ */ monoidFn(monoidEffect3)));
-  var pure9 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure8 = /* @__PURE__ */ pure(applicativeEffect);
   var bind4 = /* @__PURE__ */ bind(bindEffect);
   var mapFlipped3 = /* @__PURE__ */ mapFlipped(functorEffect);
   var liftST4 = /* @__PURE__ */ liftST(monadSTEffect);
@@ -8545,7 +7950,7 @@
           return function __do4() {
             unit;
             bind4(i2(ffi))(k)();
-            return pure9(unit);
+            return pure8(unit);
           };
         }));
       };
@@ -8688,7 +8093,7 @@
   // output/Main/index.js
   var for_5 = /* @__PURE__ */ for_(applicativeEffect);
   var for_13 = /* @__PURE__ */ for_5(foldableMaybe);
-  var pure10 = /* @__PURE__ */ pure(applicativeEffect);
+  var pure9 = /* @__PURE__ */ pure(applicativeEffect);
   var abs4 = /* @__PURE__ */ abs3(basedPoint);
   var ord3 = /* @__PURE__ */ ord(basedPoint);
   var map19 = /* @__PURE__ */ map(functorArray);
@@ -8704,7 +8109,6 @@
   var sum2 = /* @__PURE__ */ sum(foldableArray)(semiringNumber);
   var append13 = /* @__PURE__ */ append(semigroupArray);
   var meets12 = /* @__PURE__ */ meets(interCircleHalfLine);
-  var traverse_3 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableMaybe);
   var bind1 = /* @__PURE__ */ bind(bindArray);
   var meets22 = /* @__PURE__ */ meets(interLineSegment);
   var attr2 = /* @__PURE__ */ attr(attrLine_VisibilityString);
@@ -8742,6 +8146,7 @@
   var pureAttr18 = /* @__PURE__ */ pureAttr(attrCircle_CyString);
   var mapAttr22 = /* @__PURE__ */ mapAttr2(attrLine_VisibilityString);
   var pureAttr19 = /* @__PURE__ */ pureAttr(attrSelfElementFunctionEf);
+  var traverse_3 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableMaybe);
   var style_1 = /* @__PURE__ */ style_(attrDiv_StyleString);
   var pureAttr20 = /* @__PURE__ */ pureAttr(attrDiv_StyleString);
   var pureAttr21 = /* @__PURE__ */ pureAttr(attrOnMousedownCb);
@@ -8772,9 +8177,9 @@
                   return for_24(o)(function(h) {
                     var y = toNumber(clientY(t)) - h;
                     var x = toNumber(clientX(t));
-                    var $135 = y < 0;
-                    if ($135) {
-                      return pure10(unit);
+                    var $132 = y < 0;
+                    if ($132) {
+                      return pure9(unit);
                     }
                     ;
                     return f({
@@ -8811,37 +8216,26 @@
   var pointName = function(v) {
     return v.name;
   };
-  var mouseCb = function(dictFoldable) {
-    var for_24 = for_5(dictFoldable);
-    return function(off) {
-      return function(f) {
-        return cb(function(e) {
-          return function __do4() {
-            preventDefault(e)();
-            return for_13(fromEvent3(e))(function(me) {
-              return function __do5() {
-                var o = off();
-                return for_24(o)(function(h) {
-                  var y = toNumber(offsetY(me));
-                  var x = toNumber(offsetX(me));
-                  var $137 = y < 0;
-                  if ($137) {
-                    return pure10(unit);
-                  }
-                  ;
-                  return f({
-                    x,
-                    y
-                  });
-                })();
-              };
-            })();
-          };
-        });
+  var mouseCb = function(f) {
+    return cb(function(e) {
+      return function __do4() {
+        preventDefault(e)();
+        return for_13(fromEvent3(e))(function(me) {
+          var y = toNumber(offsetY(me));
+          var x = toNumber(offsetX(me));
+          var $134 = y < 0;
+          if ($134) {
+            return pure9(unit);
+          }
+          ;
+          return f({
+            x,
+            y
+          });
+        })();
       };
-    };
+    });
   };
-  var mouseCb1 = /* @__PURE__ */ mouseCb(foldableMaybe);
   var mobileButtonFontSize = "80px; ";
   var lineWidth = 0.05;
   var iniC = /* @__PURE__ */ function() {
@@ -8956,8 +8350,8 @@
                   return bind3(useRef(toVertex(iniB))(v4.value1))(function(ptB) {
                     return bind3(useHot(toVertex(iniC)))(function(v5) {
                       return bind3(useRef(toVertex(iniC))(v5.value1))(function(ptC) {
-                        return bind3(useHot($$const(pure10(unit))))(function(v6) {
-                          return bind3(useRef($$const(pure10(unit)))(v6.value1))(function(action2) {
+                        return bind3(useHot($$const(pure9(unit))))(function(v6) {
+                          return bind3(useRef($$const(pure9(unit)))(v6.value1))(function(action2) {
                             return bind3(useHot(false))(function(hauteurs) {
                               return bind3(useHot(false))(function(medianes) {
                                 return bind3(useHot(false))(function(mediatrices) {
@@ -9115,309 +8509,313 @@
                                                                             return "general";
                                                                           })(v7.value1))];
                                                                         };
-                                                                        return discard3(useEffect(v1.value1)(traverse_3(function(v7) {
+                                                                        var visibleLine = function(p2) {
+                                                                          return function(q2) {
+                                                                            var d = line(fromVertex(p2))(fromVertex(q2));
+                                                                            var ms = bind1(segmentsBox)(function(s2) {
+                                                                              return map19(toVertex)(meets22(d)(s2));
+                                                                            });
+                                                                            return bothWithDefault(ms)(new Tuple(p2, q2));
+                                                                          };
+                                                                        };
+                                                                        var setPositionEtAl = function(p2) {
                                                                           return function __do4() {
-                                                                            var a2 = ptA();
-                                                                            var b2 = ptB();
-                                                                            var c = ptC();
-                                                                            var v$prime = remap(v7);
-                                                                            return for_13(closest(v$prime)([new Tuple(a2, v3.value0), new Tuple(b2, v4.value0), new Tuple(c, v5.value0)]))(function(v8) {
+                                                                            v2.value0(p2)();
+                                                                            var s2 = action2();
+                                                                            return s2(remap(p2))();
+                                                                          };
+                                                                        };
+                                                                        var setOriginEtAl = function(o) {
+                                                                          return function __do4() {
+                                                                            v1.value0(o)();
+                                                                            return for_13(o)(function(v7) {
                                                                               return function __do5() {
-                                                                                v8.value0(v$prime)();
-                                                                                return v6.value0(v8.value0)();
+                                                                                var a2 = ptA();
+                                                                                var b2 = ptB();
+                                                                                var c = ptC();
+                                                                                var v$prime = remap(v7);
+                                                                                return for_13(closest(v$prime)([new Tuple(a2, v3.value0), new Tuple(b2, v4.value0), new Tuple(c, v5.value0)]))(function(v8) {
+                                                                                  return function __do6() {
+                                                                                    v8.value0(v$prime)();
+                                                                                    return v6.value0(v8.value0)();
+                                                                                  };
+                                                                                })();
                                                                               };
                                                                             })();
                                                                           };
-                                                                        })))(function() {
-                                                                          return discard3(useEffect(v2.value1)(function(v7) {
-                                                                            return function __do4() {
-                                                                              var s2 = action2();
-                                                                              return s2(remap(v7))();
-                                                                            };
-                                                                          }))(function() {
-                                                                            var visibleLine = function(p2) {
-                                                                              return function(q2) {
-                                                                                var d = line(fromVertex(p2))(fromVertex(q2));
-                                                                                var ms = bind1(segmentsBox)(function(s2) {
-                                                                                  return map19(toVertex)(meets22(d)(s2));
-                                                                                });
-                                                                                return bothWithDefault(ms)(new Tuple(p2, q2));
-                                                                              };
-                                                                            };
-                                                                            var screenSegment = function(eP) {
-                                                                              return function(eQ) {
-                                                                                return function(eCond) {
-                                                                                  return line2([map24(function(po) {
-                                                                                    return attr2(Visibility.value)(function() {
-                                                                                      if (po) {
-                                                                                        return "visible";
-                                                                                      }
-                                                                                      ;
-                                                                                      return "hidden";
-                                                                                    }());
-                                                                                  })(eCond), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth / 2)), keepLatest5(apply5(map24(function(p2) {
-                                                                                    return function(q2) {
-                                                                                      return oneOf3([pureAttr22(X1.value)(show3(p2.x)), pureAttr3(Y1.value)(show3(p2.y)), pureAttr4(X2.value)(show3(q2.x)), pureAttr5(Y2.value)(show3(q2.y))]);
-                                                                                    };
-                                                                                  })(eP))(eQ))])([]);
-                                                                                };
-                                                                              };
-                                                                            };
-                                                                            var screenPointName = function(eP) {
-                                                                              return function(eCond) {
-                                                                                return function(str) {
-                                                                                  return text2([map24(function(po) {
-                                                                                    return attr1(Visibility.value)(function() {
-                                                                                      if (po) {
-                                                                                        return "visible";
-                                                                                      }
-                                                                                      ;
-                                                                                      return "hidden";
-                                                                                    }());
-                                                                                  })(eCond), pureAttr6(Style.value)("font-family: sans-serif; font-size: " + (show3(svgFontSize) + "px; ")), map24(function(p2) {
-                                                                                    return attr22(X.value)(show3(p2.x + svgFontSize / 2.5));
-                                                                                  })(eP), map24(function(p2) {
-                                                                                    return attr3(Y.value)(show3(p2.y - svgFontSize / 2.5));
-                                                                                  })(eP)])([text_(str)]);
-                                                                                };
-                                                                              };
-                                                                            };
-                                                                            var screenPoint = function(eP) {
-                                                                              return function(eCond) {
-                                                                                return function(color) {
-                                                                                  return function(size5) {
-                                                                                    return circle2([map24(function(po) {
-                                                                                      return attr4(Visibility.value)(function() {
-                                                                                        if (po) {
-                                                                                          return "visible";
-                                                                                        }
-                                                                                        ;
-                                                                                        return "hidden";
-                                                                                      }());
-                                                                                    })(eCond), map24(function(p2) {
-                                                                                      return attr5(Cx.value)(show3(p2.x));
-                                                                                    })(eP), map24(function(p2) {
-                                                                                      return attr6(Cy.value)(show3(p2.y));
-                                                                                    })(eP), pureAttr7(R.value)(show3(size5 * pointRadius)), pureAttr8(Fill.value)(color)])([]);
-                                                                                  };
-                                                                                };
-                                                                              };
-                                                                            };
-                                                                            var property = function(eprop) {
-                                                                              return function(content3) {
-                                                                                var nLines = (2 * length(content3) | 0) + 1 | 0;
-                                                                                var nColumns = fromMaybe(0)(maximum2(map19(length5)(content3)));
-                                                                                var labelWidth = toNumber(nColumns) * (svgFontSize / 3.5);
-                                                                                var labelX = viewBox.x + labelWidth / 20;
-                                                                                var labelHeight = toNumber(nLines) * (svgFontSize / 2);
-                                                                                var labelY = viewBox.y + labelHeight / 40;
-                                                                                return g([map24(mapAttr1(Visibility.value)(function(v7) {
-                                                                                  if (v7) {
+                                                                        };
+                                                                        var screenSegment = function(eP) {
+                                                                          return function(eQ) {
+                                                                            return function(eCond) {
+                                                                              return line2([map24(function(po) {
+                                                                                return attr2(Visibility.value)(function() {
+                                                                                  if (po) {
                                                                                     return "visible";
                                                                                   }
                                                                                   ;
                                                                                   return "hidden";
-                                                                                }))(snd(eprop))])(append13([rect([pureAttr9(X.value)(show3(labelX)), pureAttr10(Y.value)(show3(labelY)), pureAttr11(Width.value)(show3(labelWidth)), pureAttr12(Height.value)(show3(labelHeight)), pureAttr13(Rx.value)(show3(0.1)), pureAttr14(Fill.value)("#AAAA")])([])])(mapWithIndex4(function(j) {
-                                                                                  return function(str) {
-                                                                                    return text2([pureAttr6(Style.value)("font-family: sans-serif; font-size: " + (show3(svgFontSize / 2) + "px; ")), pureAttr15(X.value)(show3(labelX + labelWidth / 10)), pureAttr16(Y.value)(show3(labelY + labelHeight / 10 + (2 * toNumber(j) + 1) * (svgFontSize / 2)))])([text_(str)]);
-                                                                                  };
-                                                                                })(content3)));
-                                                                              };
-                                                                            };
-                                                                            var meetingPoint = function(eshow) {
-                                                                              return function(eprop) {
-                                                                                return function(ecoord) {
-                                                                                  return circle2([apply5(map24(function(s2) {
-                                                                                    return function(p2) {
-                                                                                      return attr4(Visibility.value)(function() {
-                                                                                        var $192 = s2 || p2;
-                                                                                        if ($192) {
-                                                                                          return "visible";
-                                                                                        }
-                                                                                        ;
-                                                                                        return "hidden";
-                                                                                      }());
-                                                                                    };
-                                                                                  })(snd(eshow)))(snd(eprop)), pureAttr7(R.value)(show3(pointRadius / 2)), pureAttr8(Fill.value)("black"), keepLatest5(map24(function(v7) {
-                                                                                    return oneOf3([pureAttr17(Cx.value)(show3(v7.x)), pureAttr18(Cy.value)(show3(v7.y))]);
-                                                                                  })(ecoord))])([]);
+                                                                                }());
+                                                                              })(eCond), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth / 2)), keepLatest5(apply5(map24(function(p2) {
+                                                                                return function(q2) {
+                                                                                  return oneOf3([pureAttr22(X1.value)(show3(p2.x)), pureAttr3(Y1.value)(show3(p2.y)), pureAttr4(X2.value)(show3(q2.x)), pureAttr5(Y2.value)(show3(q2.y))]);
                                                                                 };
-                                                                              };
+                                                                              })(eP))(eQ))])([]);
                                                                             };
-                                                                            var mediatrice = function(eM) {
-                                                                              return line2([map24(mapAttr22(Visibility.value)(function(v7) {
-                                                                                if (v7) {
-                                                                                  return "visible";
-                                                                                }
-                                                                                ;
-                                                                                return "hidden";
-                                                                              }))(snd(mediatrices)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(map24(function(c) {
-                                                                                return function(m) {
-                                                                                  var v7 = visibleLine(c)(m);
-                                                                                  return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
-                                                                                };
-                                                                              })(eccenter))(eM))])([]);
+                                                                          };
+                                                                        };
+                                                                        var screenPointName = function(eP) {
+                                                                          return function(eCond) {
+                                                                            return function(str) {
+                                                                              return text2([map24(function(po) {
+                                                                                return attr1(Visibility.value)(function() {
+                                                                                  if (po) {
+                                                                                    return "visible";
+                                                                                  }
+                                                                                  ;
+                                                                                  return "hidden";
+                                                                                }());
+                                                                              })(eCond), pureAttr6(Style.value)("font-family: sans-serif; font-size: " + (show3(svgFontSize) + "px; ")), map24(function(p2) {
+                                                                                return attr22(X.value)(show3(p2.x + svgFontSize / 2.5));
+                                                                              })(eP), map24(function(p2) {
+                                                                                return attr3(Y.value)(show3(p2.y - svgFontSize / 2.5));
+                                                                              })(eP)])([text_(str)]);
                                                                             };
-                                                                            var mediane = function(eP) {
-                                                                              return function(eQ) {
-                                                                                return function(eR) {
-                                                                                  return line2([map24(mapAttr22(Visibility.value)(function(v7) {
-                                                                                    if (v7) {
+                                                                          };
+                                                                        };
+                                                                        var screenPoint = function(eP) {
+                                                                          return function(eCond) {
+                                                                            return function(color) {
+                                                                              return function(size5) {
+                                                                                return circle2([map24(function(po) {
+                                                                                  return attr4(Visibility.value)(function() {
+                                                                                    if (po) {
                                                                                       return "visible";
                                                                                     }
                                                                                     ;
                                                                                     return "hidden";
-                                                                                  }))(snd(medianes)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(apply5(map24(function(p2) {
-                                                                                    return function(q2) {
-                                                                                      return function(r) {
-                                                                                        var v7 = visibleLine({
-                                                                                          x: (p2.x + q2.x) / 2,
-                                                                                          y: (p2.y + q2.y) / 2
-                                                                                        })(r);
-                                                                                        return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
-                                                                                      };
-                                                                                    };
-                                                                                  })(eP))(eQ))(eR))])([]);
-                                                                                };
+                                                                                  }());
+                                                                                })(eCond), map24(function(p2) {
+                                                                                  return attr5(Cx.value)(show3(p2.x));
+                                                                                })(eP), map24(function(p2) {
+                                                                                  return attr6(Cy.value)(show3(p2.y));
+                                                                                })(eP), pureAttr7(R.value)(show3(size5 * pointRadius)), pureAttr8(Fill.value)(color)])([]);
                                                                               };
                                                                             };
-                                                                            var hauteur = function(eP) {
-                                                                              return line2([map24(mapAttr22(Visibility.value)(function(v7) {
-                                                                                if (v7) {
-                                                                                  return "visible";
-                                                                                }
-                                                                                ;
-                                                                                return "hidden";
-                                                                              }))(snd(hauteurs)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(map24(function(o) {
+                                                                          };
+                                                                        };
+                                                                        var property = function(eprop) {
+                                                                          return function(content3) {
+                                                                            var nLines = (2 * length(content3) | 0) + 1 | 0;
+                                                                            var nColumns = fromMaybe(0)(maximum2(map19(length4)(content3)));
+                                                                            var labelWidth = toNumber(nColumns) * (svgFontSize / 3.5);
+                                                                            var labelX = viewBox.x + labelWidth / 20;
+                                                                            var labelHeight = toNumber(nLines) * (svgFontSize / 2);
+                                                                            var labelY = viewBox.y + labelHeight / 40;
+                                                                            return g([map24(mapAttr1(Visibility.value)(function(v7) {
+                                                                              if (v7) {
+                                                                                return "visible";
+                                                                              }
+                                                                              ;
+                                                                              return "hidden";
+                                                                            }))(snd(eprop))])(append13([rect([pureAttr9(X.value)(show3(labelX)), pureAttr10(Y.value)(show3(labelY)), pureAttr11(Width.value)(show3(labelWidth)), pureAttr12(Height.value)(show3(labelHeight)), pureAttr13(Rx.value)(show3(0.1)), pureAttr14(Fill.value)("#AAAA")])([])])(mapWithIndex4(function(j) {
+                                                                              return function(str) {
+                                                                                return text2([pureAttr6(Style.value)("font-family: sans-serif; font-size: " + (show3(svgFontSize / 2) + "px; ")), pureAttr15(X.value)(show3(labelX + labelWidth / 10)), pureAttr16(Y.value)(show3(labelY + labelHeight / 10 + (2 * toNumber(j) + 1) * (svgFontSize / 2)))])([text_(str)]);
+                                                                              };
+                                                                            })(content3)));
+                                                                          };
+                                                                        };
+                                                                        var meetingPoint = function(eshow) {
+                                                                          return function(eprop) {
+                                                                            return function(ecoord) {
+                                                                              return circle2([apply5(map24(function(s2) {
                                                                                 return function(p2) {
-                                                                                  var v7 = visibleLine(o)(p2);
-                                                                                  return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
-                                                                                };
-                                                                              })(eocenter))(eP))])([]);
-                                                                            };
-                                                                            var droiteEuler = line2([apply5(apply5(map24(function(c) {
-                                                                              return function(o) {
-                                                                                return function(gr) {
-                                                                                  return attr2(Visibility.value)(function() {
-                                                                                    var $208 = c && (o && gr);
-                                                                                    if ($208) {
+                                                                                  return attr4(Visibility.value)(function() {
+                                                                                    var $189 = s2 || p2;
+                                                                                    if ($189) {
                                                                                       return "visible";
                                                                                     }
                                                                                     ;
                                                                                     return "hidden";
                                                                                   }());
                                                                                 };
-                                                                              };
-                                                                            })(snd(circumcenter)))(snd(orthocentre)))(snd(gravite)), pureAttr2(Stroke.value)("purple"), pureAttr1(StrokeWidth.value)(show3(lineWidth / 2)), keepLatest5(apply5(map24(function(c) {
-                                                                              return function(o) {
-                                                                                var v7 = visibleLine(c)(o);
-                                                                                return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
-                                                                              };
-                                                                            })(eccenter))(eocenter))])([]);
-                                                                            var bissectrice = function(eP) {
+                                                                              })(snd(eshow)))(snd(eprop)), pureAttr7(R.value)(show3(pointRadius / 2)), pureAttr8(Fill.value)("black"), keepLatest5(map24(function(v7) {
+                                                                                return oneOf3([pureAttr17(Cx.value)(show3(v7.x)), pureAttr18(Cy.value)(show3(v7.y))]);
+                                                                              })(ecoord))])([]);
+                                                                            };
+                                                                          };
+                                                                        };
+                                                                        var mediatrice = function(eM) {
+                                                                          return line2([map24(mapAttr22(Visibility.value)(function(v7) {
+                                                                            if (v7) {
+                                                                              return "visible";
+                                                                            }
+                                                                            ;
+                                                                            return "hidden";
+                                                                          }))(snd(mediatrices)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(map24(function(c) {
+                                                                            return function(m) {
+                                                                              var v7 = visibleLine(c)(m);
+                                                                              return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
+                                                                            };
+                                                                          })(eccenter))(eM))])([]);
+                                                                        };
+                                                                        var mediane = function(eP) {
+                                                                          return function(eQ) {
+                                                                            return function(eR) {
                                                                               return line2([map24(mapAttr22(Visibility.value)(function(v7) {
                                                                                 if (v7) {
                                                                                   return "visible";
                                                                                 }
                                                                                 ;
                                                                                 return "hidden";
-                                                                              }))(snd(bissectrices)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(map24(function(i2) {
-                                                                                return function(p2) {
-                                                                                  var v7 = visibleLine(p2)(i2);
-                                                                                  return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
-                                                                                };
-                                                                              })(eicenter))(eP))])([]);
-                                                                            };
-                                                                            return div_([div2([pureAttr19(Self.value)(function() {
-                                                                              var $232 = traverse_3(function(elt) {
-                                                                                return setTimeout2(400)(function __do4() {
-                                                                                  var t = map110(function(v7) {
-                                                                                    return v7.bottom;
-                                                                                  })(getBoundingClientRect(elt))();
-                                                                                  return v.value0(new Just(t))();
-                                                                                });
-                                                                              });
-                                                                              return function($233) {
-                                                                                return $232(Just.create($233));
-                                                                              };
-                                                                            }())])([div2([style_1(styleItem)])([button(styleButton(hauteurs))([text_("hauteurs")]), button(styleButton(orthocentre))([text_("orthocentre")]), button(styleRadio(propO))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(medianes))([text_("m\xE9dianes")]), button(styleButton(gravite))([text_("centre de gravit\xE9")]), button(styleRadio(propG))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(mediatrices))([text_("m\xE9diatrices")]), button(styleButton(circumcenter))([text_("centre du cercle circonscrit")]), button(styleRadio(propC))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(bissectrices))([text_("bissectrices")]), button(styleButton(inscenter))([text_("centre du cercle inscrit")]), button(styleRadio(propI))([text_("propri\xE9t\xE9")])])]), div2([pureAttr20(Style.value)("height: 100%;"), pureAttr21(OnMousedown.value)(mouseCb1(offset)(function($234) {
-                                                                              return v1.value0(Just.create($234));
-                                                                            })), pureAttr222(OnMousemove.value)(mouseCb1(offset)(v2.value0)), pureAttr23(OnMouseup.value)(cb(function(v7) {
-                                                                              return function __do4() {
-                                                                                v1.value0(Nothing.value)();
-                                                                                return v6.value0($$const(pure10(unit)))();
-                                                                              };
-                                                                            })), pureAttr19(Self.value)(function() {
-                                                                              var $235 = traverse_3(function(elt) {
-                                                                                var add22 = function(e) {
-                                                                                  return function(f) {
-                                                                                    return addEventListener(e)(f)(true)(toEventTarget(elt));
+                                                                              }))(snd(medianes)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(apply5(map24(function(p2) {
+                                                                                return function(q2) {
+                                                                                  return function(r) {
+                                                                                    var v7 = visibleLine({
+                                                                                      x: (p2.x + q2.x) / 2,
+                                                                                      y: (p2.y + q2.y) / 2
+                                                                                    })(r);
+                                                                                    return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
                                                                                   };
                                                                                 };
-                                                                                return function __do4() {
-                                                                                  var startTouch = touchListener1(offset)(function($237) {
-                                                                                    return v1.value0(Just.create($237));
-                                                                                  })();
-                                                                                  add22("touchstart")(startTouch)();
-                                                                                  var moveTouch = touchListener1(offset)(v2.value0)();
-                                                                                  return add22("touchmove")(moveTouch)();
-                                                                                };
-                                                                              });
-                                                                              return function($236) {
-                                                                                return $235(fromElement($236));
-                                                                              };
-                                                                            }())])([svg([pureAttr24(Width.value)(show3(width8)), pureAttr25(Height.value)(show3(height8)), pureAttr26(ViewBox.value)(show3(viewBox.x) + (" " + (show3(viewBox.y) + (" " + (show3(viewBox.width) + (" " + show3(viewBox.height)))))))])([screenPoint(v3.value1)(pure14(true))("red")(1), screenPointName(v3.value1)(anyProperty)(pointName(iniA)), screenPoint(v4.value1)(pure14(true))("green")(1), screenPointName(v4.value1)(anyProperty)(pointName(iniB)), screenPoint(v5.value1)(pure14(true))("blue")(1), screenPointName(v5.value1)(anyProperty)(pointName(iniC)), line2([map24(function(p2) {
-                                                                              return attr7(X1.value)(show3(p2.x));
-                                                                            })(v3.value1), map24(function(p2) {
-                                                                              return attr8(Y1.value)(show3(p2.y));
-                                                                            })(v3.value1), map24(function(p2) {
-                                                                              return attr9(X2.value)(show3(p2.x));
-                                                                            })(v4.value1), map24(function(p2) {
-                                                                              return attr10(Y2.value)(show3(p2.y));
-                                                                            })(v4.value1), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth))])([]), line2([map24(function(p2) {
-                                                                              return attr7(X1.value)(show3(p2.x));
-                                                                            })(v4.value1), map24(function(p2) {
-                                                                              return attr8(Y1.value)(show3(p2.y));
-                                                                            })(v4.value1), map24(function(p2) {
-                                                                              return attr9(X2.value)(show3(p2.x));
-                                                                            })(v5.value1), map24(function(p2) {
-                                                                              return attr10(Y2.value)(show3(p2.y));
-                                                                            })(v5.value1), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth))])([]), line2([map24(function(p2) {
-                                                                              return attr7(X1.value)(show3(p2.x));
-                                                                            })(v3.value1), map24(function(p2) {
-                                                                              return attr8(Y1.value)(show3(p2.y));
-                                                                            })(v3.value1), map24(function(p2) {
-                                                                              return attr9(X2.value)(show3(p2.x));
-                                                                            })(v5.value1), map24(function(p2) {
-                                                                              return attr10(Y2.value)(show3(p2.y));
-                                                                            })(v5.value1), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth))])([]), mediane(v3.value1)(v4.value1)(v5.value1), mediane(v4.value1)(v5.value1)(v3.value1), mediane(v5.value1)(v3.value1)(v4.value1), meetingPoint(gravite)(propG)(egravity), screenPointName(egravity)(snd(propG))("G"), property(propG)(["si G=grav(ABC), A' milieu de [BC], B' milieu de [AC], et C' milieu de [AB]", "alors", "Aire(A'GC)=Aire(A'GB)=Aire(C'GB)=Aire(C'GA)=Aire(B'GA)=Aire(B'GC)"]), mediatrice(eA$prime), mediatrice(eB$prime), mediatrice(eC$prime), meetingPoint(circumcenter)(propC)(eccenter), screenPointName(eccenter)(snd(propC))("O"), property(propC)(["si O=ccc(ABC)", "alors", "OA=OB=OC"]), hauteur(v3.value1), hauteur(v4.value1), hauteur(v5.value1), meetingPoint(orthocentre)(propO)(eocenter), screenPointName(eocenter)(snd(propO))("H"), property(propO)(["si H=orth(ABC)", "alors", "A=orth(HBC), B=orth(AHC) et C=orth(ABH)"]), bissectrice(v3.value1), bissectrice(v4.value1), bissectrice(v5.value1), meetingPoint(inscenter)(propI)(eicenter), screenPointName(eicenter)(snd(propI))("I"), property(propI)(["si I=cci(ABC)", "alors", "dist(I,(AB))=dist(I,(BC))=dist(I,(AC))"]), droiteEuler, circle2([keepLatest5(apply5(map24(function(o) {
-                                                                              return function(p2) {
-                                                                                var r = sqrt((o.x - p2.x) * (o.x - p2.x) + (o.y - p2.y) * (o.y - p2.y));
-                                                                                return oneOf3([map24(mapAttr3(Visibility.value)(function(v7) {
-                                                                                  if (v7) {
-                                                                                    return "visible";
-                                                                                  }
-                                                                                  ;
-                                                                                  return "hidden";
-                                                                                }))(snd(propC)), pureAttr17(Cx.value)(show3(o.x)), pureAttr18(Cy.value)(show3(o.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr27(Stroke.value)("orange"), pureAttr28(StrokeWidth.value)(show3(lineWidth / 2))]);
-                                                                              };
-                                                                            })(eccenter))(v3.value1))])([]), screenPoint(eA$prime)(snd(propG))("black")(0.5), screenPointName(eA$prime)(snd(propG))("A'"), screenPoint(eB$prime)(snd(propG))("black")(0.5), screenPointName(eB$prime)(snd(propG))("B'"), screenPoint(eC$prime)(snd(propG))("black")(0.5), screenPointName(eC$prime)(snd(propG))("C'"), screenSegment(v3.value1)(eA$prime)(snd(propG)), screenSegment(v4.value1)(eB$prime)(snd(propG)), screenSegment(v5.value1)(eC$prime)(snd(propG)), screenSegment(eocenter)(v3.value1)(snd(propO)), screenSegment(eocenter)(v4.value1)(snd(propO)), screenSegment(eocenter)(v5.value1)(snd(propO)), circle2([keepLatest5(apply5(apply5(map24(function(i2) {
-                                                                              return function(p2) {
-                                                                                return function(q2) {
-                                                                                  var h = toVertex(plus2(fromVertex(p2))(projection(vector(fromVertex(p2))(fromVertex(q2)))(vector(fromVertex(p2))(fromVertex(i2)))));
-                                                                                  var r = sqrt((i2.x - h.x) * (i2.x - h.x) + (i2.y - h.y) * (i2.y - h.y));
-                                                                                  return oneOf3([map24(mapAttr3(Visibility.value)(function(v7) {
-                                                                                    if (v7) {
-                                                                                      return "visible";
-                                                                                    }
-                                                                                    ;
-                                                                                    return "hidden";
-                                                                                  }))(snd(propI)), pureAttr17(Cx.value)(show3(i2.x)), pureAttr18(Cy.value)(show3(i2.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr27(Stroke.value)("indigo"), pureAttr28(StrokeWidth.value)(show3(lineWidth / 2))]);
-                                                                                };
-                                                                              };
-                                                                            })(eicenter))(v3.value1))(v4.value1))])([]), screenSegment(eicenter)(eJ)(snd(propI)), screenSegment(eicenter)(eK)(snd(propI)), screenSegment(eicenter)(eL)(snd(propI))])])]);
+                                                                              })(eP))(eQ))(eR))])([]);
+                                                                            };
+                                                                          };
+                                                                        };
+                                                                        var hauteur = function(eP) {
+                                                                          return line2([map24(mapAttr22(Visibility.value)(function(v7) {
+                                                                            if (v7) {
+                                                                              return "visible";
+                                                                            }
+                                                                            ;
+                                                                            return "hidden";
+                                                                          }))(snd(hauteurs)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(map24(function(o) {
+                                                                            return function(p2) {
+                                                                              var v7 = visibleLine(o)(p2);
+                                                                              return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
+                                                                            };
+                                                                          })(eocenter))(eP))])([]);
+                                                                        };
+                                                                        var droiteEuler = line2([apply5(apply5(map24(function(c) {
+                                                                          return function(o) {
+                                                                            return function(gr) {
+                                                                              return attr2(Visibility.value)(function() {
+                                                                                var $205 = c && (o && gr);
+                                                                                if ($205) {
+                                                                                  return "visible";
+                                                                                }
+                                                                                ;
+                                                                                return "hidden";
+                                                                              }());
+                                                                            };
+                                                                          };
+                                                                        })(snd(circumcenter)))(snd(orthocentre)))(snd(gravite)), pureAttr2(Stroke.value)("purple"), pureAttr1(StrokeWidth.value)(show3(lineWidth / 2)), keepLatest5(apply5(map24(function(c) {
+                                                                          return function(o) {
+                                                                            var v7 = visibleLine(c)(o);
+                                                                            return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
+                                                                          };
+                                                                        })(eccenter))(eocenter))])([]);
+                                                                        var bissectrice = function(eP) {
+                                                                          return line2([map24(mapAttr22(Visibility.value)(function(v7) {
+                                                                            if (v7) {
+                                                                              return "visible";
+                                                                            }
+                                                                            ;
+                                                                            return "hidden";
+                                                                          }))(snd(bissectrices)), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth)), keepLatest5(apply5(map24(function(i2) {
+                                                                            return function(p2) {
+                                                                              var v7 = visibleLine(p2)(i2);
+                                                                              return oneOf3([pureAttr22(X1.value)(show3(v7.value0.x)), pureAttr3(Y1.value)(show3(v7.value0.y)), pureAttr4(X2.value)(show3(v7.value1.x)), pureAttr5(Y2.value)(show3(v7.value1.y))]);
+                                                                            };
+                                                                          })(eicenter))(eP))])([]);
+                                                                        };
+                                                                        return div_([div2([pureAttr19(Self.value)(function() {
+                                                                          var $229 = traverse_3(function(elt) {
+                                                                            return setTimeout2(400)(function __do4() {
+                                                                              var t = map110(function(v7) {
+                                                                                return v7.bottom;
+                                                                              })(getBoundingClientRect(elt))();
+                                                                              return v.value0(new Just(t))();
+                                                                            });
                                                                           });
-                                                                        });
+                                                                          return function($230) {
+                                                                            return $229(Just.create($230));
+                                                                          };
+                                                                        }())])([div2([style_1(styleItem)])([button(styleButton(hauteurs))([text_("hauteurs")]), button(styleButton(orthocentre))([text_("orthocentre")]), button(styleRadio(propO))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(medianes))([text_("m\xE9dianes")]), button(styleButton(gravite))([text_("centre de gravit\xE9")]), button(styleRadio(propG))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(mediatrices))([text_("m\xE9diatrices")]), button(styleButton(circumcenter))([text_("centre du cercle circonscrit")]), button(styleRadio(propC))([text_("propri\xE9t\xE9")])]), div2([style_1(styleItem)])([button(styleButton(bissectrices))([text_("bissectrices")]), button(styleButton(inscenter))([text_("centre du cercle inscrit")]), button(styleRadio(propI))([text_("propri\xE9t\xE9")])])]), div2([pureAttr20(Style.value)("height: 100%;"), pureAttr21(OnMousedown.value)(mouseCb(function($231) {
+                                                                          return setOriginEtAl(Just.create($231));
+                                                                        })), pureAttr222(OnMousemove.value)(mouseCb(setPositionEtAl)), pureAttr23(OnMouseup.value)(cb(function(v7) {
+                                                                          return function __do4() {
+                                                                            setOriginEtAl(Nothing.value)();
+                                                                            return v6.value0($$const(pure9(unit)))();
+                                                                          };
+                                                                        })), pureAttr19(Self.value)(function() {
+                                                                          var $232 = traverse_3(function(elt) {
+                                                                            var add22 = function(e) {
+                                                                              return function(f) {
+                                                                                return addEventListener(e)(f)(true)(toEventTarget(elt));
+                                                                              };
+                                                                            };
+                                                                            return function __do4() {
+                                                                              var startTouch = touchListener1(offset)(function($234) {
+                                                                                return setOriginEtAl(Just.create($234));
+                                                                              })();
+                                                                              add22("touchstart")(startTouch)();
+                                                                              var moveTouch = touchListener1(offset)(setPositionEtAl)();
+                                                                              return add22("touchmove")(moveTouch)();
+                                                                            };
+                                                                          });
+                                                                          return function($233) {
+                                                                            return $232(fromElement($233));
+                                                                          };
+                                                                        }())])([svg([pureAttr24(Width.value)(show3(width8)), pureAttr25(Height.value)(show3(height8)), pureAttr26(ViewBox.value)(show3(viewBox.x) + (" " + (show3(viewBox.y) + (" " + (show3(viewBox.width) + (" " + show3(viewBox.height)))))))])([screenPoint(v3.value1)(pure14(true))("red")(1), screenPointName(v3.value1)(anyProperty)(pointName(iniA)), screenPoint(v4.value1)(pure14(true))("green")(1), screenPointName(v4.value1)(anyProperty)(pointName(iniB)), screenPoint(v5.value1)(pure14(true))("blue")(1), screenPointName(v5.value1)(anyProperty)(pointName(iniC)), line2([map24(function(p2) {
+                                                                          return attr7(X1.value)(show3(p2.x));
+                                                                        })(v3.value1), map24(function(p2) {
+                                                                          return attr8(Y1.value)(show3(p2.y));
+                                                                        })(v3.value1), map24(function(p2) {
+                                                                          return attr9(X2.value)(show3(p2.x));
+                                                                        })(v4.value1), map24(function(p2) {
+                                                                          return attr10(Y2.value)(show3(p2.y));
+                                                                        })(v4.value1), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth))])([]), line2([map24(function(p2) {
+                                                                          return attr7(X1.value)(show3(p2.x));
+                                                                        })(v4.value1), map24(function(p2) {
+                                                                          return attr8(Y1.value)(show3(p2.y));
+                                                                        })(v4.value1), map24(function(p2) {
+                                                                          return attr9(X2.value)(show3(p2.x));
+                                                                        })(v5.value1), map24(function(p2) {
+                                                                          return attr10(Y2.value)(show3(p2.y));
+                                                                        })(v5.value1), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth))])([]), line2([map24(function(p2) {
+                                                                          return attr7(X1.value)(show3(p2.x));
+                                                                        })(v3.value1), map24(function(p2) {
+                                                                          return attr8(Y1.value)(show3(p2.y));
+                                                                        })(v3.value1), map24(function(p2) {
+                                                                          return attr9(X2.value)(show3(p2.x));
+                                                                        })(v5.value1), map24(function(p2) {
+                                                                          return attr10(Y2.value)(show3(p2.y));
+                                                                        })(v5.value1), pureAttr2(Stroke.value)("black"), pureAttr1(StrokeWidth.value)(show3(lineWidth))])([]), mediane(v3.value1)(v4.value1)(v5.value1), mediane(v4.value1)(v5.value1)(v3.value1), mediane(v5.value1)(v3.value1)(v4.value1), meetingPoint(gravite)(propG)(egravity), screenPointName(egravity)(snd(propG))("G"), property(propG)(["si G=grav(ABC), A' milieu de [BC], B' milieu de [AC], et C' milieu de [AB]", "alors", "Aire(A'GC)=Aire(A'GB)=Aire(C'GB)=Aire(C'GA)=Aire(B'GA)=Aire(B'GC)"]), mediatrice(eA$prime), mediatrice(eB$prime), mediatrice(eC$prime), meetingPoint(circumcenter)(propC)(eccenter), screenPointName(eccenter)(snd(propC))("O"), property(propC)(["si O=ccc(ABC)", "alors", "OA=OB=OC"]), hauteur(v3.value1), hauteur(v4.value1), hauteur(v5.value1), meetingPoint(orthocentre)(propO)(eocenter), screenPointName(eocenter)(snd(propO))("H"), property(propO)(["si H=orth(ABC)", "alors", "A=orth(HBC), B=orth(AHC) et C=orth(ABH)"]), bissectrice(v3.value1), bissectrice(v4.value1), bissectrice(v5.value1), meetingPoint(inscenter)(propI)(eicenter), screenPointName(eicenter)(snd(propI))("I"), property(propI)(["si I=cci(ABC)", "alors", "dist(I,(AB))=dist(I,(BC))=dist(I,(AC))"]), droiteEuler, circle2([keepLatest5(apply5(map24(function(o) {
+                                                                          return function(p2) {
+                                                                            var r = sqrt((o.x - p2.x) * (o.x - p2.x) + (o.y - p2.y) * (o.y - p2.y));
+                                                                            return oneOf3([map24(mapAttr3(Visibility.value)(function(v7) {
+                                                                              if (v7) {
+                                                                                return "visible";
+                                                                              }
+                                                                              ;
+                                                                              return "hidden";
+                                                                            }))(snd(propC)), pureAttr17(Cx.value)(show3(o.x)), pureAttr18(Cy.value)(show3(o.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr27(Stroke.value)("orange"), pureAttr28(StrokeWidth.value)(show3(lineWidth / 2))]);
+                                                                          };
+                                                                        })(eccenter))(v3.value1))])([]), screenPoint(eA$prime)(snd(propG))("black")(0.5), screenPointName(eA$prime)(snd(propG))("A'"), screenPoint(eB$prime)(snd(propG))("black")(0.5), screenPointName(eB$prime)(snd(propG))("B'"), screenPoint(eC$prime)(snd(propG))("black")(0.5), screenPointName(eC$prime)(snd(propG))("C'"), screenSegment(v3.value1)(eA$prime)(snd(propG)), screenSegment(v4.value1)(eB$prime)(snd(propG)), screenSegment(v5.value1)(eC$prime)(snd(propG)), screenSegment(eocenter)(v3.value1)(snd(propO)), screenSegment(eocenter)(v4.value1)(snd(propO)), screenSegment(eocenter)(v5.value1)(snd(propO)), circle2([keepLatest5(apply5(apply5(map24(function(i2) {
+                                                                          return function(p2) {
+                                                                            return function(q2) {
+                                                                              var h = toVertex(plus2(fromVertex(p2))(projection(vector(fromVertex(p2))(fromVertex(q2)))(vector(fromVertex(p2))(fromVertex(i2)))));
+                                                                              var r = sqrt((i2.x - h.x) * (i2.x - h.x) + (i2.y - h.y) * (i2.y - h.y));
+                                                                              return oneOf3([map24(mapAttr3(Visibility.value)(function(v7) {
+                                                                                if (v7) {
+                                                                                  return "visible";
+                                                                                }
+                                                                                ;
+                                                                                return "hidden";
+                                                                              }))(snd(propI)), pureAttr17(Cx.value)(show3(i2.x)), pureAttr18(Cy.value)(show3(i2.y)), pureAttr7(R.value)(show3(r)), pureAttr8(Fill.value)("none"), pureAttr27(Stroke.value)("indigo"), pureAttr28(StrokeWidth.value)(show3(lineWidth / 2))]);
+                                                                            };
+                                                                          };
+                                                                        })(eicenter))(v3.value1))(v4.value1))])([]), screenSegment(eicenter)(eJ)(snd(propI)), screenSegment(eicenter)(eK)(snd(propI)), screenSegment(eicenter)(eL)(snd(propI))])])]);
                                                                       });
                                                                     });
                                                                   });

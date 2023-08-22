@@ -33,7 +33,7 @@ import Deku.Attributes (klass, style_)
 import Deku.Control (text_)
 import Deku.Do as Deku
 import Deku.DOM as D
-import Deku.Hooks (useEffect, useRef, useHot, useHot', useMemoized)
+import Deku.Hooks (useRef, useHot, useHot', useMemoized)
 import Deku.Listeners (click)
 import Deku.Toplevel (runInBody)
 
@@ -56,7 +56,7 @@ import Web.PointerEvent.Navigator (maxTouchPoints)
 import Web.TouchEvent.Touch (clientX, clientY) as Touch
 import Web.TouchEvent.TouchEvent (fromEvent, changedTouches) as Touch
 import Web.TouchEvent.TouchList (item) as Touch
-import Web.UIEvent.MouseEvent (clientX, clientY, fromEvent)
+import Web.UIEvent.MouseEvent (fromEvent)
 
 bothWithDefault :: forall a. Array a -> a /\ a -> a /\ a
 bothWithDefault xs (a /\ b) =
@@ -79,26 +79,17 @@ fromVertex { x, y } = point "" x y
 toVertex :: Point -> Vertex
 toVertex z = { x: abs z, y: ord z }
 
-mouseCb ::
-  forall f.
-  Foldable f =>
-  Effect (f Number) ->
-  (Vertex -> Effect Unit) ->
-  Cb
-mouseCb off f =
+mouseCb :: (Vertex -> Effect Unit) -> Cb
+mouseCb f =
   cb \e -> do
     preventDefault e
 
     for_ (fromEvent e) \me -> do
-      o <- off
-      for_ o \h -> do
-        let
-          --x = toNumber $ clientX me
-          --y = (toNumber $ clientY me) - h
-          x = toNumber $ offsetX me
-          y = toNumber $ offsetY me
-        if y < 0.0 then pure unit
-        else f { x, y }
+      let 
+        x = toNumber $ offsetX me
+        y = toNumber $ offsetY me
+      if y < 0.0 then pure unit
+      else f { x, y }
 
 touchListener ::
   forall f.
@@ -200,8 +191,8 @@ main = do
     setOffset /\ eoffset <- useHot Nothing
     offset <- useRef Nothing eoffset
 
-    setOrigin /\ origin <- useHot Nothing
-    setPosition /\ position <- useHot'
+    setOrigin /\ _ <- useHot Nothing
+    setPosition /\ _ <- useHot'
 
     setA /\ eA <- useHot (toVertex iniA)
     ptA <- useRef (toVertex iniA) eA
@@ -339,24 +330,26 @@ main = do
             ) <$> ev
         , klass $ (\b -> if b then "selected" else "general") <$> ev
         ]
+        
+    let 
+      setOriginEtAl o = do
+        setOrigin o
+        for_ o \v -> do
+          a <- ptA
+          b <- ptB
+          c <- ptC
 
-    useEffect origin $
-      traverse_ \v -> do
-        a <- ptA
-        b <- ptB
-        c <- ptC
+          let
+            v' = remap v
+          for_ (closest v' [ a /\ setA, b /\ setB, c /\ setC ]) \(s /\ _) -> do
+            s v'
+            setAction s
+              
+      setPositionEtAl p = do
+        setPosition p
+        s <- action
+        s $ remap p
 
-        let
-          v' = remap v
-        for_ (closest v' [ a /\ setA, b /\ setB, c /\ setC ]) \(s /\ _) -> do
-          s v'
-          setAction s
-
-    useEffect position \v -> do
-      s <- action
-      s $ remap v
-
-    let
       visibleLine p q =
         let
           d = line (fromVertex p) (fromVertex q)
@@ -606,10 +599,10 @@ main = do
           ]
       , D.div
           [ D.Style !:= "height: 100%;"
-          , D.OnMousedown !:= mouseCb offset (setOrigin <<< Just)
-          , D.OnMousemove !:= mouseCb offset setPosition
+          , D.OnMousedown !:= mouseCb (setOriginEtAl <<< Just)
+          , D.OnMousemove !:= mouseCb setPositionEtAl
           , D.OnMouseup !:= cb \_ -> do
-              setOrigin Nothing
+              setOriginEtAl Nothing
               setAction (const $ pure unit)
           , D.Self !:= HTMLDivElement.fromElement >>> traverse_ \elt -> do
 
@@ -621,10 +614,10 @@ main = do
                     true
                     (HTMLDivElement.toEventTarget elt)
               startTouch <- touchListener offset $
-                setOrigin <<< Just
+                setOriginEtAl <<< Just
               add "touchstart" startTouch
 
-              moveTouch <- touchListener offset setPosition
+              moveTouch <- touchListener offset setPositionEtAl
               add "touchmove" moveTouch
           ]
           [ D.svg
