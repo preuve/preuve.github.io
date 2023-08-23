@@ -85,7 +85,7 @@ mouseCb f =
     preventDefault e
 
     for_ (fromEvent e) \me -> do
-      let 
+      let
         x = toNumber $ offsetX me
         y = toNumber $ offsetY me
       if y < 0.0 then pure unit
@@ -330,8 +330,8 @@ main = do
             ) <$> ev
         , klass $ (\b -> if b then "selected" else "general") <$> ev
         ]
-        
-    let 
+
+    let
       setOriginEtAl o = do
         setOrigin o
         for_ o \v -> do
@@ -344,7 +344,7 @@ main = do
           for_ (closest v' [ a /\ setA, b /\ setB, c /\ setC ]) \(s /\ _) -> do
             s v'
             setAction s
-              
+
       setPositionEtAl p = do
         setPosition p
         s <- action
