@@ -1,0 +1,20 @@
+package:
+  dependencies:
+    - affjax
+    - affjax-web
+    - console
+    - effect
+    - fetch
+    - js-timers
+    - prelude
+    - random
+    - unsafe-reference
+    - web-html
+  name: event
+  test:
+    dependencies: []
+    main: Test.Main
+workspace:
+  extra_packages: {}
+  package_set:
+    registry: 42.0.0

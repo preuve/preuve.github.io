@@ -1,0 +1,16 @@
+package:
+  dependencies:
+    - console
+    - effect
+    - filterable
+    - numbers
+    - prelude
+    - tuples
+  name: solve
+  test:
+    dependencies: []
+    main: Test.Main
+workspace:
+  extra_packages: {}
+  package_set:
+    registry: 42.2.1

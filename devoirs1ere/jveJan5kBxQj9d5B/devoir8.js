@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 (() => {
   // output/Control.Semigroupoid/index.js
   var semigroupoidFn = {
@@ -4196,12 +4197,12 @@
           if (ii instanceof Element$prime) {
             return new Element$prime(lcmap2(function(v2) {
               return {
-                pos: i2,
                 dynFamily: v2.dynFamily,
                 ez: v2.ez,
                 parent: v2.parent,
                 raiseId: v2.raiseId,
-                scope: v2.scope
+                scope: v2.scope,
+                pos: i2
               };
             })(ii.value0));
           }

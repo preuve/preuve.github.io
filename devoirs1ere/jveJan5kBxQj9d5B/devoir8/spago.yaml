@@ -1,0 +1,29 @@
+package:
+  dependencies:
+    - arrays
+    - console
+    - control
+    - deku
+    - effect
+    - foldable-traversable
+    - geometry-plane
+    - hyrule
+    - integers
+    - maybe
+    - numbers
+    - partial
+    - prelude
+    - rationals
+    - record
+    - transformers
+    - tuples
+    - web-dom
+    - web-uievents
+  name: devoir8
+  test:
+    dependencies: []
+    main: Test.Main
+workspace:
+  extra_packages: {}
+  package_set:
+    registry: 42.2.1
