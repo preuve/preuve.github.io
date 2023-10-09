@@ -227,50 +227,59 @@ minimize3 (A' graph) lambda epsilon (x0 /\ y0 /\ z0) =
     
     in go (x0 /\ y0 /\ z0)
 
-transpose2D :: forall a b c d. Arrow' ((a /\ b) /\ (c /\ d)) ((a /\ c) /\ (b /\ d))
-transpose2D =
-  dup 
-    >>> 
-      ( 
-        cross exl exr >>> cross exl exl
-      .:. cross exl exr >>> cross exr exr  
-      )
-      
-distance2D2 :: Arrow' ((Number /\ Number) /\ (Number /\ Number)) Number
-distance2D2 = 
-  transpose2D
-    >>> cross (cross identity negate) (cross identity negate) 
-    >>> cross add add 
-    >>> cross dup dup
-    >>> cross mul mul
-    >>> add
+class Transposable a b | a -> b where
+  transpose :: Arrow' a b
+  
+instance
+  ( Transposable ((b/\x)/\(d/\y)) e
+  ) => Transposable ((a/\ (b/\x))/\( c/\ (d/\y))) ((a /\ c) /\ e) where
+    transpose = cross exl exl .:. cross exr exr >>> transpose
 
-distance2D :: Arrow' ((Number /\ Number) /\ (Number /\ Number)) Number
-distance2D = distance2D2 >>> sqrt 
+else instance Transposable ((a/\ b)/\( c/\ d)) ((a/\ c)/\( b/\ d)) where
+  transpose = cross exl exl .:. cross exr exr  
+  
+class Cumulative c a where
+  cumulate :: Arrow' (a /\ c) a
 
-transpose3D :: forall a b c d e f
-  . Arrow' ((a /\ b /\ c) /\ (d /\ e /\ f)) 
-      ((a /\ d) /\ (b /\ e) /\ (c /\ f))
-transpose3D =
-  dup 
-    >>> 
-      ( 
-        cross exl exr >>> cross exl exl
-      .:. cross exl exr >>> cross exr exr >>> transpose2D
-      )
+instance
+  ( Ring a
+  , Cumulative c a
+  ) => Cumulative (a /\ c) a where
+    cumulate = cross identity cumulate >>> add
+    
+else instance Ring a => Cumulative a a where 
+  cumulate = add
 
-distance3D2 :: Arrow' ((Number /\ Number /\ Number) /\ (Number /\ Number /\ Number)) Number
-distance3D2 = 
-  transpose3D
-    >>> cross (cross identity negate) (cross (cross identity negate) (cross identity negate)) 
-    >>> cross add (cross add add) 
-    >>> cross dup (cross dup dup)
-    >>> cross mul (cross mul mul)
-    >>> cross identity add
-    >>> add
+class Fmapable a c b k | b c -> k where
+  fmap :: Arrow' a b -> Arrow' c k
 
-distance3D :: Arrow' ((Number /\ Number /\ Number) /\ (Number /\ Number /\ Number)) Number
-distance3D = distance3D2 >>> sqrt 
+instance Fmapable a a b b where
+  fmap f = f  
+
+else instance
+  ( Fmapable a c b k
+  ) => Fmapable a (a /\ c) b (b /\ k) where
+    fmap f = cross f (fmap f)
+
+distance2 :: forall a b c d t
+  . Transposable a b 
+  => Fmapable (Number /\ Number) b (Number /\ Number) c 
+  => Fmapable (Number /\ Number) c Number (d /\ t) 
+  => Cumulative t d 
+  => Arrow' a d
+distance2 = 
+  transpose 
+    >>> fmap (cross identity negate :: Arrow' (Number /\ Number) (Number /\ Number)) 
+    >>> fmap (add >>> dup >>> mul :: Arrow' (Number /\ Number) Number)
+    >>> cumulate
+ 
+distance :: forall a b c t
+  . Transposable a b 
+  => Fmapable (Number /\ Number) b (Number /\ Number) c 
+  => Fmapable (Number /\ Number) c Number (Number /\ t) 
+  => Cumulative t Number
+  => Arrow' a Number
+distance = distance2 >>> sqrt
 
 argmin :: forall b t. Eq t => Ord t => (b -> t) -> Array b -> Array b
 argmin h rs = 

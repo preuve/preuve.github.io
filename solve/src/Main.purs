@@ -10,9 +10,10 @@ import Data.AD.Types
   , min, max
   , cos, sin, tan, acos, asin, atan
   , cosh, sinh, tanh, acosh, asinh, atanh
-  , argmin
-  , distance2D, distance3D, transpose2D
+  , cumulate, fmap, transpose
+  , distance2, distance
   , minimize2, minimize3
+  , argmin
   )
 import Data.Tuple.Nested ((/\), type (/\))
 import Effect (Effect)
@@ -116,7 +117,7 @@ test8 =
       f /\ f' = graph $ 0.4 /\ 0.3
       fx = f' $ 1.0 /\ 0.0
   in 0.29 < f && f < 0.31
-     && 0.99 < fx && fx < 1.01
+     && -0.01 < fx && fx < 0.01
 
 test9 :: Number /\ Number
 test9 = 
@@ -188,9 +189,9 @@ test18 :: Number /\ Number
 test18 =
   let 
     g1 =
-      ((identity .:. (cst 2.0 .:. cst 4.0)) >>> transpose2D >>> cross mul mul >>> add .:. (cst (-7.0))) >>> add
+      ((identity .:. (cst 2.0 .:. cst 4.0)) >>> transpose >>> cross mul mul >>> add .:. (cst (-7.0))) >>> add
     g2 =
-      ((identity .:. (cst 1.0 .:. cst (-3.0))) >>> transpose2D >>> cross mul mul >>> add .:. (cst 2.0)) >>> add
+      ((identity .:. (cst 1.0 .:. cst (-3.0))) >>> transpose >>> cross mul mul >>> add .:. (cst 2.0)) >>> add
     graph = (g1 .:. g2) >>> cross dup dup >>> cross mul mul >>> add
   in minimize2 graph 1.0 1e-25 (0.0 /\ 0.0)
 
@@ -201,9 +202,9 @@ test19 =
     ptB = (-1.0) /\ (-3.0)
     ptC = 2.0 /\ 2.0
     
-    d1 = (identity .:. cst ptA) >>> distance2D
-    d2 = (identity .:. cst ptB) >>> distance2D
-    d3 = (identity .:. cst ptC) >>> distance2D
+    d1 = (identity .:. cst ptA) >>> distance
+    d2 = (identity .:. cst ptB) >>> distance
+    d3 = (identity .:. cst ptC) >>> distance
     
     g1 = (d1 .:. d2 >>> negate) >>> add
     g2 = (d1 .:. d3 >>> negate) >>> add
@@ -219,10 +220,10 @@ test20 =
     c3D =  2.0 /\ 2.0 /\ 1.0
     d3D = (-3.0) /\ (-2.0) /\ 2.0
 
-    d1 = (identity .:. cst a3D) >>> distance3D
-    d2 = (identity .:. cst b3D) >>> distance3D
-    d3 = (identity .:. cst c3D) >>> distance3D
-    d4 = (identity .:. cst d3D) >>> distance3D
+    d1 = (identity .:. cst a3D) >>> distance
+    d2 = (identity .:. cst b3D) >>> distance
+    d3 = (identity .:. cst c3D) >>> distance
+    d4 = (identity .:. cst d3D) >>> distance
     
     g1 = (d1 .:. d2 >>> negate) >>> add
     g2 = (d2 .:. d3 >>> negate) >>> add
@@ -238,9 +239,9 @@ test21 =
     ptB = (-1.0) /\ (-3.0)
     ptC = 2.0 /\ 2.0
     
-    d1 = (identity .:. cst ptA) >>> distance2D
-    d2 = (identity .:. cst ptB) >>> distance2D
-    d3 = (identity .:. cst ptC) >>> distance2D
+    d1 = (identity .:. cst ptA) >>> distance
+    d2 = (identity .:. cst ptB) >>> distance
+    d3 = (identity .:. cst ptC) >>> distance
     
     graph = ((d1 .:. d2) >>> cross dup dup >>> cross mul mul >>> add .:. d3 >>> dup >>> mul) >>> add
   in minimize2 graph 1.0 1e-25 (1.0 /\ 1.0) -- -1 /\ 0
@@ -252,9 +253,9 @@ test22 =
     ptB = (-1.0) /\ (-3.0)
     ptC = 2.0 /\ 2.0
     
-    d1 = (identity .:. cst ptA) >>> distance2D
-    d2 = (identity .:. cst ptB) >>> distance2D
-    d3 = (identity .:. cst ptC) >>> distance2D
+    d1 = (identity .:. cst ptA) >>> distance
+    d2 = (identity .:. cst ptB) >>> distance
+    d3 = (identity .:. cst ptC) >>> distance
     
     graph = ((d1 .:. d2) >>> add .:. d3) >>> add
   in minimize2 graph 1.0 1e-25 (1.0 /\ 1.0) -- (-213+67sqrt(3))/78 /\ (-9+sqrt(3))/26
@@ -293,3 +294,8 @@ main = do
   log $ show test20
   log $ show test21
   log $ show test22
+  log $ show $
+    let A' graph = 
+          distance2
+        f /\ _ = graph $ (7.0/\2.0/\4.0) /\ (3.0/\5.0/\6.0)
+    in f 
