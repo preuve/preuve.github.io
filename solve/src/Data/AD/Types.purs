@@ -12,6 +12,8 @@ import Data.Number (acos, asin, atan, cos, exp, log, sin, sqrt) as Math
 import Data.Traversable (sequence)
 import Data.Tuple (fst, snd, uncurry)
 import Data.Tuple.Nested ((/\), type (/\))
+import Prim.Int (class Add)
+import Type.Proxy (Proxy(..))
 
 newtype Arrow' a b = A' (a -> b /\ (a -> b))
 
@@ -191,51 +193,119 @@ infix 5 pair as .:.
 cst :: forall a s. Semiring s => s -> Arrow' a s
 cst n = A' $ const $ n  /\ const zero
 
-minimize2 :: Arrow' (Number /\ Number) Number -> Number -> Number -> (Number /\ Number) -> Number /\ Number
-minimize2 (A' graph) lambda epsilon (x0 /\ y0) =
-  let
-    go (x /\ y) =
-      let _ /\ f' = graph $ x /\ y
-          fx /\ fy = (f' (1.0 /\ 0.0)) /\ (f' (0.0 /\ 1.0))
-          _ /\ u' = graph $ (x + lambda * fx) /\ (y + lambda * fy)
-          ux /\ uy = (u' (1.0 /\ 0.0)) /\ (u' (0.0 /\ 1.0))
-        in 
-          if fx * fx + fy * fy < epsilon 
-              then x /\ y
-              else
-              let
-                k = - (fx * ux + fy * uy) / (ux * ux + uy * uy)
-              in go $ (x + k * fx) /\ (y + k * fy) 
-    
-  in go (x0 /\ y0)
+class Countable c where
+  count :: c -> Int
 
-minimize3 :: Arrow' (Number /\ Number /\ Number) Number -> Number -> Number -> (Number /\ Number /\ Number) -> Number /\ Number /\ Number
-minimize3 (A' graph) lambda epsilon (x0 /\ y0 /\ z0) =
+instance 
+  ( Countable b
+  ) => Countable (a /\ b) where
+    count (_ /\ b) = 1 + count b
+else instance Countable c where
+  count _ = 1
+
+axes :: forall @n a. Axes n a => a
+axes = axesImpl @n Proxy
+
+class Axes :: Int -> Type -> Constraint
+class Axes n a | n -> a where
+  axesImpl :: Proxy n -> a
+  
+instance Axes 1 Number where
+  axesImpl _ = 1.0
+else instance Axes 2 ((Number /\ Number) /\ (Number /\ Number)) where
+  axesImpl _ = (1.0 /\ 0.0) /\ (0.0 /\ 1.0)
+else instance
+  ( Axes n (h /\ t)
+  , Add n 1 n1
+  , Fmapable h (h /\ t) (Number /\ h) (h' /\ t')
+  , Fmapable Number h Number h
+  ) => Axes n1 ((Number /\ h) /\ h' /\  t') where
+    axesImpl _ = h'' /\ h' /\ t' 
+     where
+        h /\ t = axesImpl (Proxy :: Proxy n)
+        h' /\ t' =  
+          let A' graph =
+                fmap (dup >>> (cst 0.0 .:. exr) :: Arrow' h (Number /\ h))
+              f /\ _ = graph (h /\ t)
+          in f
+        zeros =
+          let A' graph =
+                fmap (cst 0.0 :: Arrow' Number Number)
+              f /\ _ = graph h
+          in f
+        h'' = 1.0 /\ zeros
+{-
+minimize :: forall a n d t.
+  Axes n (a /\ t) =>
+  Fmapable a (a /\ t) Number a => 
+  Transposable (a /\ a) d =>
+  Fmapable (Number /\ Number) d Number a =>
+  (a /\ t) -> Arrow' a Number -> Number -> Number -> a -> a
+    -}
+    {-
+minimize :: forall t a c b d. 
+  Fmapable t d Number b => 
+  Transposable (t /\ b) a => 
+  Fmapable (Number /\ Number) a Number t => 
+  Transposable (b /\ b) c => 
+  Fmapable (Number /\ Number) c Number Number => 
+  d -> Arrow' t Number -> Number -> Number -> t -> t
+  -}
+  
+minimize ::  forall a c u t v axs. 
+  Fmapable a axs Number v => 
+  Transposable (a /\ v) c => 
+  Fmapable (Number /\ Number) c Number a => 
+  Transposable (v /\ v) u => 
+  Fmapable (Number /\ Number) u Number (Number /\ t) => 
+  Cumulative t Number => 
+  axs -> Arrow' a Number -> Number -> Number -> a -> a
+
+minimize axs (A' cost) lambda epsilon z0 =
   let
-    go (x /\ y /\ z) =
-      let _ /\ f' = graph $ x /\ y /\ z
-          fx /\ fy /\ fz = (f' (1.0 /\ 0.0 /\ 0.0)) /\ (f' (0.0 /\ 1.0 /\ 0.0)) /\ (f' (0.0 /\ 0.0 /\ 1.0))
-          _ /\ u' = graph $ (x + lambda * fx) /\ (y + lambda * fy) /\ (z + lambda * fz)
-          ux /\ uy /\ uz = (u' (1.0 /\ 0.0 /\ 0.0)) /\ (u' (0.0 /\ 1.0 /\ 0.0)) /\ (u' (0.0 /\ 0.0 /\ 1.0))
+    go z =
+      let _ /\ f' = cost z
+          fz = 
+            let
+              A' graph = fmap (linearPropagation f' (const 0.0) :: Arrow' _ Number)
+              f /\ _ = graph axs
+            in f
+          comb xs k ys =
+            let A' graph = 
+                  transpose
+                  >>> fmap (linearPropagation (\(x/\y) -> x + k*y) (const 0.0) :: Arrow' (Number/\Number) Number)
+                f /\ _ = graph $ xs /\ ys
+            in f
+          _ /\ u' = cost $ comb z lambda fz
+          fu = 
+            let
+              A' graph = fmap (linearPropagation u' (const 0.0) :: Arrow' _ Number)
+              f /\ _ = graph axs
+            in f
+          scal xs ys =
+            let A' graph = 
+                  transpose
+                  >>> fmap (linearPropagation (\(x/\y) -> x*y) (const 0.0) :: Arrow' (Number/\Number) Number)
+                  >>> cumulate
+                f /\ _ = graph $ xs /\ ys
+            in f
         in 
-          if fx * fx + fy * fy + fz * fz < epsilon 
-              then x /\ y /\ z
+          if scal fz fz < epsilon 
+              then z
               else
               let
-                k = - (fx * ux + fy * uy + fz * uz) / (ux * ux + uy * uy + uz * uz)
-              in go $ (x + k * fx) /\ (y + k * fy) /\ (z + k * fz) 
-    
-    in go (x0 /\ y0 /\ z0)
+                k = - (scal fz fu) / (scal fu fu)
+              in go $ comb z k fz 
+  in go z0
 
 class Transposable a b | a -> b where
   transpose :: Arrow' a b
   
 instance
-  ( Transposable ((b/\x)/\(d/\y)) e
-  ) => Transposable ((a/\ (b/\x))/\( c/\ (d/\y))) ((a /\ c) /\ e) where
+  ( Transposable ((b /\ x) /\ (d /\ y)) e
+  ) => Transposable ((a /\ (b /\ x)) /\ ( c /\ (d /\ y))) ((a /\ c) /\ e) where
     transpose = cross exl exl .:. cross exr exr >>> transpose
-
-else instance Transposable ((a/\ b)/\( c/\ d)) ((a/\ c)/\( b/\ d)) where
+else instance Transposable ((a /\ b) /\ ( c /\ d)) ((a /\ c) /\ ( b /\ d)) where
   transpose = cross exl exl .:. cross exr exr  
   
 class Cumulative c a where
@@ -288,3 +358,5 @@ argmin h rs =
       sequence ((\m -> filter ((_ == m) <<< snd) (zip rs hs)) <$> minimum hs)
     ) where
       hs = h <$> rs
+
+ 

@@ -3,7 +3,7 @@ module Main where
 import Prelude hiding (negate, recip, add, mul, div, min, max)
 
 import Data.AD.Types 
-  ( Arrow'(..), (.:.), exl, exr, dup, cst, cross
+  ( Arrow'(..), (.:.), exl, exr, dup, cst, cross, linearPropagation
   , negate, recip
   , add, mul, div
   , exp, sqrt, ln, pow, abs, sign
@@ -12,7 +12,8 @@ import Data.AD.Types
   , cosh, sinh, tanh, acosh, asinh, atanh
   , cumulate, fmap, transpose
   , distance2, distance
-  , minimize2, minimize3
+  , count, axes
+  , minimize
   , argmin
   )
 import Data.Tuple.Nested ((/\), type (/\))
@@ -193,7 +194,7 @@ test18 =
     g2 =
       ((identity .:. (cst 1.0 .:. cst (-3.0))) >>> transpose >>> cross mul mul >>> add .:. (cst 2.0)) >>> add
     graph = (g1 .:. g2) >>> cross dup dup >>> cross mul mul >>> add
-  in minimize2 graph 1.0 1e-25 (0.0 /\ 0.0)
+  in minimize (axes @2) graph 1.0 1e-25 (0.0 /\ 0.0)
 
 test19 :: Number /\ Number
 test19 =
@@ -210,10 +211,38 @@ test19 =
     g2 = (d1 .:. d3 >>> negate) >>> add
     
     graph = (g1 .:. g2) >>> cross dup dup >>> cross mul mul >>> add
-  in minimize2 graph 1.0 1e-25 (1.0 /\ 1.0) -- -43/54 /\ 5/18
+  in minimize (axes @2) graph 1.0 1e-25 (1.0 /\ 1.0) -- -43/54 /\ 5/18
 
-test20 :: Number /\ Number /\ Number
+test20 :: Number /\ Number
 test20 =
+  let
+    ptA = (-4.0) /\ 1.0
+    ptB = (-1.0) /\ (-3.0)
+    ptC = 2.0 /\ 2.0
+    
+    d1 = (identity .:. cst ptA) >>> distance
+    d2 = (identity .:. cst ptB) >>> distance
+    d3 = (identity .:. cst ptC) >>> distance
+    
+    graph = ((d1 .:. d2) >>> add .:. d3) >>> add
+  in minimize (axes @2) graph 1.0 1e-25 (1.0 /\ 1.0) -- (-213+67sqrt(3))/78 /\ (-9+sqrt(3))/26
+
+test21 :: Number /\ Number
+test21 =
+  let
+    ptA = (-4.0) /\ 1.0
+    ptB = (-1.0) /\ (-3.0)
+    ptC = 2.0 /\ 2.0
+    
+    d1 = (identity .:. cst ptA) >>> distance
+    d2 = (identity .:. cst ptB) >>> distance
+    d3 = (identity .:. cst ptC) >>> distance
+    
+    graph = ((d1 .:. d2) >>> cross dup dup >>> cross mul mul >>> add .:. d3 >>> dup >>> mul) >>> add
+  in minimize (axes @2) graph 1.0 1e-25 (1.0 /\ 1.0) -- -1 /\ 0
+    
+test22 :: Number /\ Number /\ Number
+test22 =
   let
     a3D = (-2.0) /\ 1.0 /\ (-2.0)
     b3D = (-1.0) /\ (-2.0) /\ 0.0
@@ -229,37 +258,9 @@ test20 =
     g2 = (d2 .:. d3 >>> negate) >>> add
     g3 = (d3 .:. d4 >>> negate) >>> add
     
-    graph = ((g1 .:. g2) >>> cross dup dup >>> cross mul mul >>> add .:. g3 >>> dup >>> mul) >>> add
-  in minimize3 graph 1.1 1e-25 (1.0 /\ 0.0 /\ 0.0) -- -35/24 /\ 29/24 /\ 37/24
-
-test21 :: Number /\ Number
-test21 =
-  let
-    ptA = (-4.0) /\ 1.0
-    ptB = (-1.0) /\ (-3.0)
-    ptC = 2.0 /\ 2.0
-    
-    d1 = (identity .:. cst ptA) >>> distance
-    d2 = (identity .:. cst ptB) >>> distance
-    d3 = (identity .:. cst ptC) >>> distance
-    
-    graph = ((d1 .:. d2) >>> cross dup dup >>> cross mul mul >>> add .:. d3 >>> dup >>> mul) >>> add
-  in minimize2 graph 1.0 1e-25 (1.0 /\ 1.0) -- -1 /\ 0
-
-test22 :: Number /\ Number
-test22 =
-  let
-    ptA = (-4.0) /\ 1.0
-    ptB = (-1.0) /\ (-3.0)
-    ptC = 2.0 /\ 2.0
-    
-    d1 = (identity .:. cst ptA) >>> distance
-    d2 = (identity .:. cst ptB) >>> distance
-    d3 = (identity .:. cst ptC) >>> distance
-    
-    graph = ((d1 .:. d2) >>> add .:. d3) >>> add
-  in minimize2 graph 1.0 1e-25 (1.0 /\ 1.0) -- (-213+67sqrt(3))/78 /\ (-9+sqrt(3))/26
-
+    graph = (g3 >>> dup >>> mul .:. (g1 .:. g2) >>> cross dup dup >>> cross mul mul) >>> cumulate
+  in minimize (axes @3) graph 1.1 1e-25 (1.0 /\ 0.0 /\ 0.0) -- -35/24 /\ 29/24 /\ 37/24
+  
 main :: Effect Unit
 main = do
   log $ show testRing
@@ -289,6 +290,7 @@ main = do
           f /\ _ = graph x
       in f
     ) [0.0, 0.5, 1.0, 1.5, 2.0] 
+ 
   log $ show test18
   log $ show test19
   log $ show test20
@@ -299,3 +301,15 @@ main = do
           distance2
         f /\ _ = graph $ (7.0/\2.0/\4.0) /\ (3.0/\5.0/\6.0)
     in f 
+  log $ show $ count (7.0/\2.0/\4.0)
+  log $ show $ axes @1
+  log $ show $ axes @2
+  log $ show $ axes @3
+  log $ show $ axes @4
+  log $ show $
+    let A' graph = 
+          fmap (linearPropagation (\(x/\y/\z) -> (x+1.0)*(y+2.0)*(z+3.0)) (const 0.0):: Arrow' (Number/\Number/\Number) Number)
+        f /\ _ = graph $ axes @3
+    in f
+  
+  
