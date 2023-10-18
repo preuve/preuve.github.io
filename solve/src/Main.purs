@@ -1,7 +1,22 @@
 module Main where
 
 import Prelude hiding (negate, recip, add, mul, div, min, max)
+import Data.Tuple.Nested ((/\), type (/\))
+import Effect (Effect)
+import Effect.Console (log)
 
+import Data.Number.Dual
+
+main :: Effect Unit
+main = log $ show $
+  let D graph = -- x |-> x^3 + 5
+        ((identity .:. dup >>> mul) >>> mul
+        .:. cst 5) >>> add
+      f /\ f' = graph 2
+    in f /\ f' 1
+    
+
+{-
 import Data.AD.Types 
   ( Arrow'(..), (.:.), exl, exr, dup, cst, cross, linearPropagation
   , negate, recip
@@ -11,7 +26,7 @@ import Data.AD.Types
   , cos, sin, tan, acos, asin, atan
   , cosh, sinh, tanh, acosh, asinh, atanh
   , cumulate, fmap, transpose
-  , distance2, distance
+  , distance2, norm2, distance
   , count, axes
   , minimize
   , argmin
@@ -238,7 +253,7 @@ test21 =
     d2 = (identity .:. cst ptB) >>> distance
     d3 = (identity .:. cst ptC) >>> distance
     
-    graph = ((d1 .:. d2) >>> cross dup dup >>> cross mul mul >>> add .:. d3 >>> dup >>> mul) >>> add
+    graph = (d3 >>> dup >>> mul .:. (d1 .:. d2) >>> cross dup dup >>> cross mul mul) >>> cumulate
   in minimize (axes @2) graph 1.0 1e-25 (1.0 /\ 1.0) -- -1 /\ 0
     
 test22 :: Number /\ Number /\ Number
@@ -258,7 +273,7 @@ test22 =
     g2 = (d2 .:. d3 >>> negate) >>> add
     g3 = (d3 .:. d4 >>> negate) >>> add
     
-    graph = (g3 >>> dup >>> mul .:. (g1 .:. g2) >>> cross dup dup >>> cross mul mul) >>> cumulate
+    graph = (g1 .:. g2 .:. g3) >>> norm2
   in minimize (axes @3) graph 1.1 1e-25 (1.0 /\ 0.0 /\ 0.0) -- -35/24 /\ 29/24 /\ 37/24
   
 main :: Effect Unit
@@ -300,7 +315,7 @@ main = do
     let A' graph = 
           distance2
         f /\ _ = graph $ (7.0/\2.0/\4.0) /\ (3.0/\5.0/\6.0)
-    in f 
+    in f
   log $ show $ count (7.0/\2.0/\4.0)
   log $ show $ axes @1
   log $ show $ axes @2
@@ -311,5 +326,14 @@ main = do
           fmap (linearPropagation (\(x/\y/\z) -> (x+1.0)*(y+2.0)*(z+3.0)) (const 0.0):: Arrow' (Number/\Number/\Number) Number)
         f /\ _ = graph $ axes @3
     in f
+  log $ show $
+    let A' graph = 
+          transpose >>>
+          fmap (linearPropagation (\(x) -> (x+1.0)) (const 0.0):: Arrow' (Number) Number)
+        f /\ _ = graph $ axes @1
+    in f
+  log $ show $
+    minimize (axes @1) ((cos .:. cst 1.0) >>> add >>> abs) 1.0 1e-15 3.0
   
   
+  -}
