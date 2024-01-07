@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>three.js app</title>
+    <style>
+      body { margin: 0; }
+    </style>
+    <script type="importmap">
+    { "imports": 
+      { "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      , "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  </head>
+    <body>
+      <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+        import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+        import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm';
+
+        const params = 
+          { exportToObj: exportToObj
+          , pointIndex: 0
+          , pointIndexO: 0
+          , pointIndexA: 1
+          , pointIndexB: 2
+          };
+  
+        let lastIndexA; 
+        let lastIndexO; 
+        let lastIndexB; 
+
+        const gui = new GUI();
+
+        let h = gui.addFolder( 'Geometry Selection' );
+        h = gui.addFolder( 'Coordinates' );
+        h.add( params, 'pointIndex').name( 'Point index' ).onChange(idx=>console.log(getPoint(idx)));
+
+        h = gui.addFolder( 'Distance' );
+        h.add( params, 'pointIndexA')
+          .name( 'Point index A' )
+          .onChange(idx => {
+          lastIndexA = idx;
+          console.log(dist(idx, lastIndexB));
+          });
+        h.add( params, 'pointIndexB')
+          .name( 'Point index B' )
+          .onChange(idx => {
+          lastIndexB = idx;
+          console.log(dist(lastIndexA, idx));
+          });
+      
+        h = gui.addFolder( 'Angle' );
+        h.add( params, 'pointIndexA')
+          .name( 'Point index A' )
+          .onChange(idx => {
+          lastIndexA = idx;
+          console.log(degrees(idx, lastIndexO, lastIndexB));
+          });
+        h.add( params, 'pointIndexO')
+          .name( 'Point index O' )
+          .onChange(idx => {
+          lastIndexO = idx;
+          console.log(degrees(lastIndexA, idx, lastIndexB));
+          });
+        h.add( params, 'pointIndexB')
+          .name( 'Point index B' )
+          .onChange(idx => {
+          lastIndexB = idx;
+          console.log(degrees(lastIndexA, lastIndexO,idx));
+          });
+      
+        h = gui.addFolder( 'Export' );
+        h.add( params, 'exportToObj' ).name( 'Export OBJ' );
+
+        gui.open();
+
+        const vertices = [];
+        const indices = [];
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+        const myMaterial = 
+          new THREE.MeshStandardMaterial( 
+            { color: 0x00cc00
+            , side: THREE.DoubleSide
+            } 
+          );
+
+        const leftLight = new THREE.DirectionalLight( 0xffffff, 5.8 );
+        leftLight.position.set( 20, -21,150 );
+        scene.add( leftLight );
+
+        const rightLight = new THREE.DirectionalLight( 0xffffff, 5.8 );
+        rightLight.position.set( -21, 20, -150 );
+        scene.add( rightLight );
+
+        
+        const loader = new OBJLoader();
+
+        loader.load(
+          'gardenChair.obj',
+          // called when resource is loaded
+          function ( object ) {
+            scene.add( object );
+          },
+          // called when loading is in progresses
+          function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          },
+          // called when loading has errors
+          function ( error ) {
+            console.log( 'An error happened' );
+          }
+        );
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        function animate() {
+          requestAnimationFrame( animate );
+          renderer.render( scene, camera );
+        }
+        animate();
+
+        const controls = new OrbitControls( camera, renderer.domElement );
+        //const loader = new GLTFLoader();
+
+        function dist (i,j) { 
+          return Math.sqrt((vertices[3*i]-vertices[3*j])**2
+            + (vertices[3*i+1]-vertices[3*j+1])**2
+            + (vertices[3*i+2]-vertices[3*j+2])**2);
+        }
+
+        function getPoint(i) {
+          return { x: vertices[3*i], y: vertices[3*i+1], z: vertices[3*i+2] };
+        }
+
+        function angle(idxA, idxO, idxB) {
+          var pA = getPoint(idxA);
+          var pO = getPoint(idxO);
+          var pB = getPoint(idxB);
+  
+          var OA = { x: pA.x-pO.x, y: pA.y-pO.y, z: pA.z-pO.z };
+          var OB = { x: pB.x-pO.x, y: pB.y-pO.y, z: pB.z-pO.z };
+  
+          var cosAOB = 
+            (OA.x * OB.x + OA.y * OB.y + OA.z * OB.z) 
+            / Math.sqrt(OA.x * OA.x + OA.y * OA.y + OA.z * OA.z) 
+            / Math.sqrt(OB.x * OB.x + OB.y * OB.y + OB.z * OB.z);
+    
+          return Math.acos(cosAOB);
+        }
+
+      function degrees(idxA, idxO, idxB) {
+          return 180.0*angle(idxA, idxO, idxB)/Math.PI;
+      }
+      
+      function exportToObj() {
+
+        const exporter = new OBJExporter();
+        const result = exporter.parse( scene );
+        saveString( result, 'object.obj' );
+      }
+
+      const link = document.createElement( 'a' );
+      link.style.display = 'none';
+      document.body.appendChild( link );
+
+      function save( blob, filename ) {
+        link.href = URL.createObjectURL( blob );
+        link.download = filename;
+        link.click();
+      }
+
+      function saveString( text, filename ) {
+        save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+      }
+
+    </script>
+  </body>
+</html>
