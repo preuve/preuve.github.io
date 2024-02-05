@@ -1,0 +1,121 @@
+package:
+  dependencies:
+    - arrays
+    - deku-core
+    - deku-dom
+    - effect
+    - foldable-traversable
+    - geometry-plane
+    - hyrule
+    - integers
+    - maybe
+    - numbers
+    - partial
+    - prelude
+    - tuples
+    - web-dom
+
+  name: katex
+  test:
+    dependencies: []
+    main: Test.Main
+workspace:
+  package_set:
+    registry: 48.5.0
+  extra_packages:
+    hyrule:
+      git: "https://github.com/mikesol/purescript-hyrule.git"
+      ref: "master"
+      dependencies:
+        - effect
+        - js-timers
+        - unsafe-reference
+        - web-html
+        - web-uievents
+    bolson:
+      git: "https://github.com/mikesol/purescript-bolson.git"
+      ref: "main"
+      dependencies:
+        - hyrule
+        - fast-vect
+        - record
+    deku-core:
+      git: "https://github.com/mikesol/purescript-deku.git"
+      subdir: deku-core
+      ref: "main"
+      dependencies:
+        - bolson
+        - catenable-lists
+        - foreign-object
+        - record
+        - stringutils
+    deku-dom:
+      git: "https://github.com/mikesol/purescript-deku.git"
+      subdir: deku-dom
+      ref: "main"
+      dependencies:
+        - aff
+        - bolson
+        - web-touchevents
+        - web-pointerevents
+    tidy:
+      repo: "https://github.com/natefaubion/purescript-tidy.git"
+      version: "main"
+      dependencies:
+        - arrays
+        - dodo-printer
+        - foldable-traversable
+        - lists
+        - maybe
+        - ordered-collections
+        - partial
+        - prelude
+        - language-cst-parser
+        - strings
+        - tuples
+    tidy-codegen:
+      repo: "https://github.com/natefaubion/purescript-tidy-codegen"
+      version: "type-applications"
+      dependencies:
+        - aff
+        - ansi
+        - arrays
+        - avar
+        - bifunctors
+        - console
+        - control
+        - dodo-printer
+        - effect
+        - either
+        - enums
+        - exceptions
+        - filterable
+        - foldable-traversable
+        - free
+        - identity
+        - integers
+        - language-cst-parser
+        - lazy
+        - lists
+        - maybe
+        - newtype
+        - node-buffer
+        - node-child-process
+        - node-fs-aff
+        - node-path
+        - node-process
+        - node-streams
+        - ordered-collections
+        - parallel
+        - partial
+        - posix-types
+        - prelude
+        - record
+        - safe-coerce
+        - st
+        - strings
+        - tidy
+        - transformers
+        - tuples
+        - type-equality
+        - unicode
