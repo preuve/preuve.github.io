@@ -102,14 +102,6 @@
   var map = function(dict) {
     return dict.map;
   };
-  var mapFlipped = function(dictFunctor) {
-    var map110 = map(dictFunctor);
-    return function(fa) {
-      return function(f) {
-        return map110(f)(fa);
-      };
-    };
-  };
   var $$void = function(dictFunctor) {
     return map(dictFunctor)($$const(unit));
   };
@@ -153,20 +145,20 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map25 = map(dictApply.Functor0());
+    var map24 = map(dictApply.Functor0());
     return function(a2) {
       return function(b2) {
-        return apply1(map25($$const(identity2))(a2))(b2);
+        return apply1(map24($$const(identity2))(a2))(b2);
       };
     };
   };
   var lift2 = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map25 = map(dictApply.Functor0());
+    var map24 = map(dictApply.Functor0());
     return function(f) {
       return function(a2) {
         return function(b2) {
-          return apply1(map25(f)(a2))(b2);
+          return apply1(map24(f)(a2))(b2);
         };
       };
     };
@@ -254,8 +246,8 @@
   };
   var join = function(dictBind) {
     var bind1 = bind(dictBind);
-    return function(m2) {
-      return bind1(m2)(identity3);
+    return function(m) {
+      return bind1(m)(identity3);
     };
   };
 
@@ -810,8 +802,8 @@
   };
   var functorTuple = {
     map: function(f) {
-      return function(m2) {
-        return new Tuple(m2.value0, f(m2.value1));
+      return function(m) {
+        return new Tuple(m.value0, f(m.value1));
       };
     }
   };
@@ -1115,8 +1107,8 @@
   };
   var functorIdentity = {
     map: function(f) {
-      return function(m2) {
-        return f(m2);
+      return function(m) {
+        return f(m);
       };
     }
   };
@@ -1173,10 +1165,10 @@
     };
   };
   var functorWriterT = function(dictFunctor) {
-    var map25 = map(dictFunctor);
+    var map24 = map(dictFunctor);
     return {
       map: function(f) {
-        return mapWriterT(map25(function(v) {
+        return mapWriterT(map24(function(v) {
           return new Tuple(f(v.value0), v.value1);
         }));
       }
@@ -1187,7 +1179,7 @@
     return function(dictApply) {
       var apply5 = apply(dictApply);
       var Functor0 = dictApply.Functor0();
-      var map25 = map(Functor0);
+      var map24 = map(Functor0);
       var functorWriterT1 = functorWriterT(Functor0);
       return {
         apply: function(v) {
@@ -1197,7 +1189,7 @@
                 return new Tuple(v3.value0(v4.value0), append8(v3.value1)(v4.value1));
               };
             };
-            return apply5(map25(k)(v))(v1);
+            return apply5(map24(k)(v))(v1);
           };
         },
         Functor0: function() {
@@ -1212,14 +1204,14 @@
     return function(dictBind) {
       var bind7 = bind(dictBind);
       var Apply0 = dictBind.Apply0();
-      var map25 = map(Apply0.Functor0());
+      var map24 = map(Apply0.Functor0());
       var applyWriterT2 = applyWriterT1(Apply0);
       return {
         bind: function(v) {
           return function(k) {
             return bind7(v)(function(v1) {
               var v2 = k(v1.value0);
-              return map25(function(v3) {
+              return map24(function(v3) {
                 return new Tuple(v3.value0, append8(v1.value1)(v3.value1));
               })(v2);
             });
@@ -1232,14 +1224,14 @@
     };
   };
   var applicativeWriterT = function(dictMonoid) {
-    var mempty4 = mempty(dictMonoid);
+    var mempty5 = mempty(dictMonoid);
     var applyWriterT1 = applyWriterT(dictMonoid.Semigroup0());
     return function(dictApplicative) {
       var pure18 = pure(dictApplicative);
       var applyWriterT2 = applyWriterT1(dictApplicative.Apply0());
       return {
         pure: function(a2) {
-          return pure18(new Tuple(a2, mempty4));
+          return pure18(new Tuple(a2, mempty5));
         },
         Apply0: function() {
           return applyWriterT2;
@@ -1307,8 +1299,8 @@
   var runWriter = function($5) {
     return unwrap2(runWriterT($5));
   };
-  var execWriter = function(m2) {
-    return snd(runWriter(m2));
+  var execWriter = function(m) {
+    return snd(runWriter(m));
   };
 
   // output/Data.Array/foreign.js
@@ -1727,11 +1719,11 @@
       };
     },
     foldMap: function(dictMonoid) {
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
-            return mempty4;
+            return mempty5;
           }
           ;
           if (v1 instanceof Just) {
@@ -1747,13 +1739,13 @@
     var foldr22 = foldr(dictFoldable);
     return function(dictMonoid) {
       var append8 = append(dictMonoid.Semigroup0());
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       return function(f) {
         return foldr22(function(x3) {
           return function(acc) {
             return append8(f(x3))(acc);
           };
-        })(mempty4);
+        })(mempty5);
       };
     };
   };
@@ -1831,7 +1823,7 @@
       };
     }
     return function(apply5) {
-      return function(map25) {
+      return function(map24) {
         return function(pure18) {
           return function(f) {
             return function(array) {
@@ -1840,14 +1832,14 @@
                   case 0:
                     return pure18([]);
                   case 1:
-                    return map25(array1)(f(array[bot]));
+                    return map24(array1)(f(array[bot]));
                   case 2:
-                    return apply5(map25(array2)(f(array[bot])))(f(array[bot + 1]));
+                    return apply5(map24(array2)(f(array[bot])))(f(array[bot + 1]));
                   case 3:
-                    return apply5(apply5(map25(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                    return apply5(apply5(map24(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
                     var pivot = bot + Math.floor((top3 - bot) / 4) * 2;
-                    return apply5(map25(concat2)(go2(bot, pivot)))(go2(pivot, top3));
+                    return apply5(map24(concat2)(go2(bot, pivot)))(go2(pivot, top3));
                 }
               }
               return go2(0, array.length);
@@ -1974,8 +1966,8 @@
   };
   var cos = Math.cos;
   var remainder = function(n) {
-    return function(m2) {
-      return n % m2;
+    return function(m) {
+      return n % m;
     };
   };
   var round = Math.round;
@@ -2190,14 +2182,14 @@
     },
     foldMap: function(dictMonoid) {
       var append23 = append(dictMonoid.Semigroup0());
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       return function(f) {
         return foldl(foldableList)(function(acc) {
           var $286 = append23(acc);
           return function($287) {
             return $286(f($287));
           };
-        })(mempty4);
+        })(mempty5);
       };
     }
   };
@@ -2610,31 +2602,31 @@
     };
   }();
   var $lazy_unsafeSplit = /* @__PURE__ */ $runtime_lazy3("unsafeSplit", "Data.Map.Internal", function() {
-    return function(comp, k, m2) {
-      if (m2 instanceof Leaf) {
+    return function(comp, k, m) {
+      if (m instanceof Leaf) {
         return new Split(Nothing.value, Leaf.value, Leaf.value);
       }
       ;
-      if (m2 instanceof Node) {
-        var v = comp(k)(m2.value2);
+      if (m instanceof Node) {
+        var v = comp(k)(m.value2);
         if (v instanceof LT) {
-          var v1 = $lazy_unsafeSplit(771)(comp, k, m2.value4);
-          return new Split(v1.value0, v1.value1, unsafeBalancedNode(m2.value2, m2.value3, v1.value2, m2.value5));
+          var v1 = $lazy_unsafeSplit(771)(comp, k, m.value4);
+          return new Split(v1.value0, v1.value1, unsafeBalancedNode(m.value2, m.value3, v1.value2, m.value5));
         }
         ;
         if (v instanceof GT) {
-          var v1 = $lazy_unsafeSplit(774)(comp, k, m2.value5);
-          return new Split(v1.value0, unsafeBalancedNode(m2.value2, m2.value3, m2.value4, v1.value1), v1.value2);
+          var v1 = $lazy_unsafeSplit(774)(comp, k, m.value5);
+          return new Split(v1.value0, unsafeBalancedNode(m.value2, m.value3, m.value4, v1.value1), v1.value2);
         }
         ;
         if (v instanceof EQ) {
-          return new Split(new Just(m2.value3), m2.value4, m2.value5);
+          return new Split(new Just(m.value3), m.value4, m.value5);
         }
         ;
         throw new Error("Failed pattern match at Data.Map.Internal (line 769, column 5 - line 777, column 30): " + [v.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Data.Map.Internal (line 765, column 34 - line 777, column 30): " + [m2.constructor.name]);
+      throw new Error("Failed pattern match at Data.Map.Internal (line 765, column 34 - line 777, column 30): " + [m.constructor.name]);
     };
   });
   var unsafeSplit = /* @__PURE__ */ $lazy_unsafeSplit(764);
@@ -2879,8 +2871,8 @@
           };
         });
         var go2 = $lazy_go(167);
-        return function(m2) {
-          return go2(m2, z);
+        return function(m) {
+          return go2(m, z);
         };
       };
     },
@@ -2900,18 +2892,18 @@
           };
         });
         var go2 = $lazy_go(173);
-        return function(m2) {
-          return go2(z, m2);
+        return function(m) {
+          return go2(z, m);
         };
       };
     },
     foldMap: function(dictMonoid) {
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       var append15 = append(dictMonoid.Semigroup0());
       return function(f) {
         var go2 = function(v) {
           if (v instanceof Leaf) {
-            return mempty4;
+            return mempty5;
           }
           ;
           if (v instanceof Node) {
@@ -2941,8 +2933,8 @@
           };
         });
         var go2 = $lazy_go(187);
-        return function(m2) {
-          return go2(m2, z);
+        return function(m) {
+          return go2(m, z);
         };
       };
     },
@@ -2962,18 +2954,18 @@
           };
         });
         var go2 = $lazy_go(193);
-        return function(m2) {
-          return go2(z, m2);
+        return function(m) {
+          return go2(z, m);
         };
       };
     },
     foldMapWithIndex: function(dictMonoid) {
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       var append15 = append(dictMonoid.Semigroup0());
       return function(f) {
         var go2 = function(v) {
           if (v instanceof Leaf) {
-            return mempty4;
+            return mempty5;
           }
           ;
           if (v instanceof Node) {
@@ -3160,8 +3152,8 @@
     var compare3 = compare(dictOrd);
     return function(f) {
       return function(k) {
-        return function(m2) {
-          var v = unsafeSplit(compare3, k, m2);
+        return function(m) {
+          var v = unsafeSplit(compare3, k, m);
           var v2 = f(v.value0);
           if (v2 instanceof Nothing) {
             return unsafeJoinNodes(v.value1, v.value2);
@@ -3422,8 +3414,8 @@
     o.m[o.m.length - 1][k] = v;
   };
   var deleteObjHack = (k, o) => {
-    for (const m2 of o.m) {
-      if (delete m2[k]) {
+    for (const m of o.m) {
+      if (delete m[k]) {
         return true;
       }
     }
@@ -3548,11 +3540,11 @@
     };
   };
   var monoidEffectFn1 = function(dictMonoid) {
-    var mempty4 = mempty(monoidEffect(dictMonoid));
+    var mempty5 = mempty(monoidEffect(dictMonoid));
     var semigroupEffectFn11 = semigroupEffectFn1(dictMonoid.Semigroup0());
     return {
       mempty: mkEffectFn1(function(v) {
-        return mempty4;
+        return mempty5;
       }),
       Semigroup0: function() {
         return semigroupEffectFn11;
@@ -4387,12 +4379,12 @@
     };
   };
   var functorAPoll = function(dictFunctor) {
-    var map25 = map(dictFunctor);
+    var map24 = map(dictFunctor);
     return {
       map: function(f) {
         return function(v) {
           return function(e) {
-            return v(map25(function(v1) {
+            return v(map24(function(v1) {
               return function($478) {
                 return v1(f($478));
               };
@@ -4405,13 +4397,13 @@
   var sampleBy = function(dictPollable) {
     var sample22 = sample(dictPollable);
     return function(dictFunctor) {
-      var map25 = map(functorAPoll(dictFunctor));
+      var map24 = map(functorAPoll(dictFunctor));
       return function(dictFunctor1) {
         var map33 = map(dictFunctor1);
         return function(f) {
           return function(b2) {
             return function(e) {
-              return sample22(map25(f)(b2))(map33(applyFlipped)(e));
+              return sample22(map24(f)(b2))(map33(applyFlipped)(e));
             };
           };
         };
@@ -4556,16 +4548,16 @@
     var sampleBy22 = sampleBy(dictPollable);
     return function(dictIsEvent) {
       var Functor1 = dictIsEvent.Filterable2().Functor1();
-      var map25 = map(Functor1);
+      var map24 = map(Functor1);
       var fix1 = fix(dictIsEvent);
       var sampleBy3 = sampleBy22(Functor1)(Functor1);
       var sham2 = sham(dictIsEvent);
       return function(f) {
         return poll(function(e) {
-          return map25(function(v) {
+          return map24(function(v) {
             return v.value1(v.value0);
           })(fix1(function(ee) {
-            return sampleBy3(Tuple.create)(f(sham2(map25(fst)(ee))))(e);
+            return sampleBy3(Tuple.create)(f(sham2(map24(fst)(ee))))(e);
           }));
         });
       };
@@ -4595,11 +4587,11 @@
     return function(dictCompactable) {
       var filterMap1 = filterMap2(dictCompactable)(dictPollable);
       return function(dictFunctor) {
-        var map25 = map(functorAPoll(dictFunctor));
+        var map24 = map(functorAPoll(dictFunctor));
         var filterMap22 = filterMap1(dictFunctor);
         return function(f) {
           return function(b2) {
-            var fb = map25(f)(b2);
+            var fb = map24(f)(b2);
             return {
               left: filterMap22(either(Just.create)($$const(Nothing.value)))(fb),
               right: filterMap22(either($$const(Nothing.value))(Just.create))(fb)
@@ -4722,18 +4714,18 @@
   var applyAPoll = function(dictApply) {
     var apply5 = apply(dictApply);
     var Functor0 = dictApply.Functor0();
-    var map25 = map(Functor0);
+    var map24 = map(Functor0);
     var voidLeft4 = voidLeft(Functor0);
     var functorAPoll1 = functorAPoll(Functor0);
     return {
       apply: function(v) {
         return function(v1) {
           return function(e) {
-            return apply5(map25(function(ff2) {
+            return apply5(map24(function(ff2) {
               return function(v2) {
                 return v2.value0(ff2(v2.value1));
               };
-            })(v(voidLeft4(e)(identity6))))(v1(map25(Tuple.create)(e)));
+            })(v(voidLeft4(e)(identity6))))(v1(map24(Tuple.create)(e)));
           };
         };
       },
@@ -4743,12 +4735,12 @@
     };
   };
   var applicativeAPoll = function(dictApply) {
-    var map25 = map(dictApply.Functor0());
+    var map24 = map(dictApply.Functor0());
     var applyAPoll1 = applyAPoll(dictApply);
     return {
       pure: function(a2) {
         return function(e) {
-          return map25(applyFlipped(a2))(e);
+          return map24(applyFlipped(a2))(e);
         };
       },
       Apply0: function() {
@@ -4871,9 +4863,9 @@
       }
       return arr;
     }
-    return function(apply5, map25, f) {
+    return function(apply5, map24, f) {
       var buildFrom = function(x3, ys) {
-        return apply5(map25(consList)(f(x3)))(ys);
+        return apply5(map24(consList)(f(x3)))(ys);
       };
       var go2 = function(acc, currentLen, xs) {
         if (currentLen === 0) {
@@ -4887,23 +4879,23 @@
         }
       };
       return function(array) {
-        var acc = map25(finalCell)(f(array[array.length - 1]));
+        var acc = map24(finalCell)(f(array[array.length - 1]));
         var result = go2(acc, array.length - 1, array);
         while (result instanceof Cont) {
           result = result.fn();
         }
-        return map25(listToArray)(result);
+        return map24(listToArray)(result);
       };
     };
   }();
 
   // output/Foreign.Object/foreign.js
-  function _copyST(m2) {
+  function _copyST(m) {
     return function() {
       var r = {};
-      for (var k in m2) {
-        if (hasOwnProperty.call(m2, k)) {
-          r[k] = m2[k];
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r[k] = m[k];
         }
       }
       return r;
@@ -4916,15 +4908,15 @@
   function _foldM(bind7) {
     return function(f) {
       return function(mz) {
-        return function(m2) {
+        return function(m) {
           var acc = mz;
           function g2(k2) {
             return function(z) {
-              return f(z)(k2)(m2[k2]);
+              return f(z)(k2)(m[k2]);
             };
           }
-          for (var k in m2) {
-            if (hasOwnProperty.call(m2, k)) {
+          for (var k in m) {
+            if (hasOwnProperty.call(m, k)) {
               acc = bind7(acc)(g2(k));
             }
           }
@@ -4934,11 +4926,11 @@
     };
   }
   function toArrayWithKey(f) {
-    return function(m2) {
+    return function(m) {
       var r = [];
-      for (var k in m2) {
-        if (hasOwnProperty.call(m2, k)) {
-          r.push(f(k)(m2[k]));
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r.push(f(k)(m[k]));
         }
       }
       return r;
@@ -4953,19 +4945,19 @@
   // output/Foreign.Object.ST/foreign.js
   function poke2(k) {
     return function(v) {
-      return function(m2) {
+      return function(m) {
         return function() {
-          m2[k] = v;
-          return m2;
+          m[k] = v;
+          return m;
         };
       };
     };
   }
   var deleteImpl = function(k) {
-    return function(m2) {
+    return function(m) {
       return function() {
-        delete m2[k];
-        return m2;
+        delete m[k];
+        return m;
       };
     };
   };
@@ -4979,9 +4971,9 @@
   });
   var thawST = _copyST;
   var mutate = function(f) {
-    return function(m2) {
+    return function(m) {
       return runST(function __do6() {
-        var s = thawST(m2)();
+        var s = thawST(m)();
         f(s)();
         return s;
       });
@@ -4995,7 +4987,7 @@
   var fold3 = /* @__PURE__ */ _foldM(applyFlipped);
   var foldMap2 = function(dictMonoid) {
     var append15 = append(dictMonoid.Semigroup0());
-    var mempty4 = mempty(dictMonoid);
+    var mempty5 = mempty(dictMonoid);
     return function(f) {
       return fold3(function(acc) {
         return function(k) {
@@ -5003,7 +4995,7 @@
             return append15(acc)(f(k)(v));
           };
         };
-      })(mempty4);
+      })(mempty5);
     };
   };
   var foldableObject = {
@@ -5016,8 +5008,8 @@
     },
     foldr: function(f) {
       return function(z) {
-        return function(m2) {
-          return foldr5(f)(z)(values(m2));
+        return function(m) {
+          return foldr5(f)(z)(values(m));
         };
       };
     },
@@ -7154,6 +7146,11 @@
       });
     };
   };
+  var switcherFlipped = function(a2) {
+    return function(b2) {
+      return switcher(b2)(a2);
+    };
+  };
   var useState$prime = function(f) {
     var go2 = function(i) {
       return function(di) {
@@ -8215,8 +8212,8 @@
         var u = plus2(v2)(w);
         var o = plus1(v1.center)(w);
         var n = plus1(v1.center)(v2);
-        var m2 = plus1(v1.center)(u);
-        return path2(v.stroke)(v.strokeWidth)(v.fill)("M" + (pathCoord(o) + ("L" + (pathCoord(m2) + ("L" + pathCoord(n))))));
+        var m = plus1(v1.center)(u);
+        return path2(v.stroke)(v.strokeWidth)(v.fill)("M" + (pathCoord(o) + ("L" + (pathCoord(m) + ("L" + pathCoord(n))))));
       };
     }
   };
@@ -8265,12 +8262,12 @@
   var renderSegment = {
     "render'": function(v) {
       return function(v1) {
-        var m2 = middle("")(v1);
+        var m = middle("")(v1);
         return g_(append13([line2(abs4(v1.origin))(ord2(v1.origin))(abs4(v1.extremity))(ord2(v1.extremity))(v.stroke)(v.strokeWidth)])(append13(maybe([])(function(v2) {
           var v3 = arrowTip(v1);
           return [path2(v.stroke)(v.strokeWidth)(v.stroke)("M" + (pathCoord(v3.at1) + ("L" + (pathCoord(v1.extremity) + ("L" + (pathCoord(v3.at2) + "Z"))))))];
         })(v1.asOriented))(maybe([])(function(str) {
-          return [text7(abs4(m2) + 10)(ord2(m2) - 10)(v.textFill)(v.fontStyle)(str), text7(abs4(m2) + 10)(ord2(m2) - 23)(v.textFill)(v.fontStyle)(function() {
+          return [text7(abs4(m) + 10)(ord2(m) - 10)(v.textFill)(v.fontStyle)(str), text7(abs4(m) + 10)(ord2(m) - 23)(v.textFill)(v.fontStyle)(function() {
             var $105 = str === "";
             if ($105) {
               return "";
@@ -8286,11 +8283,10 @@
   // output/Dependances.Article/index.js
   var bind6 = /* @__PURE__ */ bind(bindMaybe);
   var tell2 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
-  var map23 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
   var validateInput = function(inp) {
     return bind6(bind6(inp)(fromString))(function(x3) {
-      var $27 = isNaNImpl(x3);
-      if ($27) {
+      var $11 = isNaNImpl(x3);
+      if ($11) {
         return Nothing.value;
       }
       ;
@@ -8324,11 +8320,10 @@
   var m_ = function(str) {
     return tell2(label4([m$prime(str)])([]));
   };
-  var m = function(p) {
-    return tell2(label4([self(map23(render)(p))])([]));
-  };
-  var equation = function(p) {
-    return tell2(label4([self(map23(display)(p))])([]));
+  var equation_ = function(str) {
+    return tell2(label4([function(txt) {
+      return self_(display(txt));
+    }(str)])([]));
   };
   var b_2 = function(str) {
     return tell2(b_([text_(str)]));
@@ -8379,7 +8374,7 @@
     return e.code;
   }
 
-  // output/Devoir1.Main/index.js
+  // output/Devoir01.Main/index.js
   var foldr6 = /* @__PURE__ */ foldr(foldableArray);
   var append7 = /* @__PURE__ */ append(semigroupString);
   var mod4 = /* @__PURE__ */ mod(euclideanRingInt);
@@ -8388,13 +8383,12 @@
   var tell3 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
   var abs5 = /* @__PURE__ */ abs(ordInt)(ringInt);
   var append14 = /* @__PURE__ */ append(semigroupArray);
+  var map23 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
   var pure17 = /* @__PURE__ */ pure(applicativeEffect);
-  var functorAPoll3 = /* @__PURE__ */ functorAPoll(functorEvent);
-  var map24 = /* @__PURE__ */ map(functorAPoll3);
+  var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyAPoll(applyEvent));
   var renderSequence2 = /* @__PURE__ */ renderSequence(renderPoint);
   var length10 = /* @__PURE__ */ length2(measurableVector);
-  var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyAPoll(applyEvent));
-  var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorAPoll3);
+  var mempty4 = /* @__PURE__ */ mempty(monoidNut);
   var tpi_4 = "\\frac{3\\pi}{4}";
   var tpi_3 = "\\frac{2\\pi}{3}";
   var spi_6 = "\\frac{7\\pi}{6}";
@@ -8499,7 +8493,7 @@
         return a2;
       }
       ;
-      throw new Error("Failed pattern match at Devoir1.Main (line 337, column 5 - line 349, column 26): " + []);
+      throw new Error("Failed pattern match at Devoir01.Main (line 327, column 5 - line 339, column 26): " + []);
     }();
     return next;
   };
@@ -8557,7 +8551,7 @@
         return a2;
       }
       ;
-      throw new Error("Failed pattern match at Devoir1.Main (line 355, column 5 - line 367, column 26): " + []);
+      throw new Error("Failed pattern match at Devoir01.Main (line 345, column 5 - line 357, column 26): " + []);
     }();
     return next;
   };
@@ -8743,7 +8737,7 @@
         return a2;
       }
       ;
-      throw new Error("Failed pattern match at Devoir1.Main (line 380, column 5 - line 386, column 26): " + []);
+      throw new Error("Failed pattern match at Devoir01.Main (line 370, column 5 - line 376, column 26): " + []);
     }();
     return next;
   };
@@ -8896,75 +8890,67 @@
     runInBody(execWriter(header))();
     return runInBody(bind4(useState(""))(function(v) {
       return bind4(useState(false))(function(v1) {
+        var absoluteSeed = map23(toSeed)(v.value1);
+        var seed = map23(fromRelative)(absoluteSeed);
+        var solved = map23(function(v2) {
+          return v2 < 0;
+        })(absoluteSeed);
         return div_([div_([label_([text_("Enonc\xE9 n\xB0 ")]), input([valueOn_(input2)(v.value0), keydown_(function(k) {
           return v1.value0(code(k) === "Enter" || key(k) === "Enter");
         }), size_("56"), self_(function(e) {
-          return maybe(pure17(unit))(function($66) {
-            return focus(toHTMLElement($66));
+          return maybe(pure17(unit))(function($65) {
+            return focus(toHTMLElement($65));
           })(fromElement(e));
-        })])([])]), div2([style(map24(function(v2) {
-          if (v2) {
-            return "display: block;";
-          }
-          ;
-          return "display: none;";
-        })(v1.value1))])(function() {
-          var f0 = map24(function(x3) {
-            return new Tuple(fromRelative(x3), x3 < 0);
-          })(map24(toSeed)(v.value1));
-          var r0 = map24(fst)(f0);
-          return [execWriter(discard1(nl)(function() {
-            return discard1(nl)(function() {
-              return discard1(section_("Exercice 1"))(function() {
-                var ctx = {
-                  strokeWidth: 1,
-                  fill: "none",
-                  fontStyle: defaultContext.fontStyle,
-                  stroke: defaultContext.stroke,
-                  textFill: defaultContext.textFill
-                };
-                var render2 = function(dictRender) {
-                  return render$prime(dictRender)(ctx);
-                };
-                var render1 = render2(renderSequence2);
-                var render22 = render2(renderCircle);
-                var render3 = render2(renderSegment);
-                var render4 = render2(renderRightAngle);
-                var render5 = render2(renderPoint);
-                var angle0 = map24(function() {
-                  var $67 = readWrap(dfltPoint)(points);
-                  return function($68) {
-                    return $67(unSeed($68));
+        })])([])]), div_([switcherFlipped(apply4(apply4(map23(function(a2) {
+          return function(b2) {
+            return function(c) {
+              return new Tuple(a2, new Tuple(b2, c));
+            };
+          };
+        })(v1.value1))(solved))(seed))(function(v2) {
+          if (v2.value0) {
+            return execWriter(discard1(nl)(function() {
+              return discard1(nl)(function() {
+                return discard1(section_("Exercice 1"))(function() {
+                  var ctx = {
+                    strokeWidth: 1,
+                    fill: "none",
+                    fontStyle: defaultContext.fontStyle,
+                    stroke: defaultContext.stroke,
+                    textFill: defaultContext.textFill
                   };
-                }())(r0);
-                return discard1(nl)(function() {
-                  return discard1(b_2("1."))(function() {
-                    return discard1(t_(" On consid\xE8re "))(function() {
-                      return discard1(m_("\\mathcal{C}"))(function() {
-                        return discard1(t_(" le cercle trigonom\xE9trique suivant :"))(function() {
-                          return discard1(nl)(function() {
-                            return discard1(tell3(div2([style_2("display: grid; grid-template-columns: 1fr 5fr ;")])([svg([width_("180"), height_("180"), viewBox_("-10 -10 200 200")])(function() {
-                              var pI = point("I")(80 + 70)(80);
-                              var pJ = point("J")(80)(80 - 70);
-                              var pM = map24(function(a2) {
-                                return point("M")(80 + 70 * cos(a2.approx))(80 - 70 * sin(a2.approx));
-                              })(angle0);
-                              var pO = point("O")(80)(80);
-                              return [render1([pO, pI, pJ]), render22(circle(pO)(length10(vector(pO)(pI)))), render3(segment(pO)(pI)(Nothing.value)), render3(segment(pO)(pJ)(Nothing.value)), render4(rightangle(vector(pO)(pI))(pO)(vector(pO)(pJ))(10)), switcher(render5)(pM), switcher(function(m2) {
-                                return render3(segment(pO)(m2)(Nothing.value));
-                              })(pM)];
-                            }()), div_([execWriter(discard1(nl)(function() {
-                              return discard1(t_("Soit "))(function() {
-                                return discard1(m_("M"))(function() {
-                                  return discard1(t_(" le point de coordonn\xE9es "))(function() {
-                                    return discard1(m(map24(function(a2) {
-                                      return "(" + (a2.cos + ("," + (a2.sin + ").")));
-                                    })(angle0)))(function() {
-                                      return discard1(nl)(function() {
-                                        return discard1(t_("Donner la valeur (en radians) du r\xE9el compris dans l'intervalle "))(function() {
-                                          return discard1(m_("]-\\pi, \\pi]"))(function() {
-                                            return discard1(t_(" correspondant au point "))(function() {
-                                              return m_("M:");
+                  var render2 = function(dictRender) {
+                    return render$prime(dictRender)(ctx);
+                  };
+                  var render1 = render2(renderSequence2);
+                  var render22 = render2(renderCircle);
+                  var render3 = render2(renderSegment);
+                  var render4 = render2(renderRightAngle);
+                  var render5 = render2(renderPoint);
+                  var angle0 = readWrap(dfltPoint)(points)(unSeed(v2.value1.value1));
+                  return discard1(nl)(function() {
+                    return discard1(b_2("1."))(function() {
+                      return discard1(t_(" On consid\xE8re "))(function() {
+                        return discard1(m_("\\mathcal{C}"))(function() {
+                          return discard1(t_(" le cercle trigonom\xE9trique suivant :"))(function() {
+                            return discard1(nl)(function() {
+                              return discard1(tell3(div2([style_2("display: grid; grid-template-columns: 1fr 5fr ;")])([svg([width_("180"), height_("180"), viewBox_("-10 -10 200 200")])(function() {
+                                var pI = point("I")(80 + 70)(80);
+                                var pJ = point("J")(80)(80 - 70);
+                                var pM = point("M")(80 + 70 * cos(angle0.approx))(80 - 70 * sin(angle0.approx));
+                                var pO = point("O")(80)(80);
+                                return [render1([pO, pI, pJ]), render22(circle(pO)(length10(vector(pO)(pI)))), render3(segment(pO)(pI)(Nothing.value)), render3(segment(pO)(pJ)(Nothing.value)), render4(rightangle(vector(pO)(pI))(pO)(vector(pO)(pJ))(10)), render5(pM), render3(segment(pO)(pM)(Nothing.value))];
+                              }()), div_([execWriter(discard1(nl)(function() {
+                                return discard1(t_("Soit "))(function() {
+                                  return discard1(m_("M"))(function() {
+                                    return discard1(t_(" le point de coordonn\xE9es "))(function() {
+                                      return discard1(m_("(" + (angle0.cos + ("," + (angle0.sin + ").")))))(function() {
+                                        return discard1(nl)(function() {
+                                          return discard1(t_("Donner la valeur (en radians) du r\xE9el compris dans l'intervalle "))(function() {
+                                            return discard1(m_("]-\\pi, \\pi]"))(function() {
+                                              return discard1(t_(" correspondant au point "))(function() {
+                                                return m_("M:");
+                                              });
                                             });
                                           });
                                         });
@@ -8972,253 +8958,169 @@
                                     });
                                   });
                                 });
-                              });
-                            }))])])))(function() {
-                              return discard1(nl)(function() {
-                                return discard1(b_2("2."))(function() {
-                                  return discard1(t_(" Compl\xE9ter la phrase en rempla\xE7ant chaque mot manquant par "))(function() {
-                                    return discard1(m_("\\underline{\xE9gaux}"))(function() {
-                                      return discard1(t_(" ou "))(function() {
-                                        return discard1(m_("\\underline{oppos\xE9s}:"))(function() {
-                                          var r1 = map24(lcgNext)(r0);
-                                          var r2 = map24(lcgNext)(r1);
-                                          var r3 = map24(lcgNext)(r2);
-                                          var arr = map24(function(r) {
-                                            var v2 = mod4(unSeed(r))(3);
-                                            if (v2 === 0) {
-                                              return thirds;
-                                            }
-                                            ;
-                                            if (v2 === 1) {
-                                              return fourths;
-                                            }
-                                            ;
-                                            return sixths;
-                                          })(r1);
-                                          var n = map24(length)(arr);
-                                          var i1 = apply4(map24(function(r) {
-                                            return function(nn) {
-                                              return mod4(unSeed(r))(nn);
-                                            };
-                                          })(r2))(n);
-                                          var i2 = apply4(apply4(map24(function(i) {
-                                            return function(r) {
-                                              return function(nn) {
-                                                return mod4((i + 1 | 0) + mod4(unSeed(r))(nn - 1 | 0) | 0)(nn);
-                                              };
-                                            };
-                                          })(i1))(r3))(n);
-                                          var angle2 = apply4(map24(readWrap(dfltPoint))(arr))(i2);
-                                          var angle1 = apply4(map24(readWrap(dfltPoint))(arr))(i1);
-                                          return discard1(nl)(function() {
-                                            return discard1(t_("Les r\xE9els "))(function() {
-                                              return discard1(m(mapFlipped2(angle1)(function(v2) {
-                                                return v2.exact;
-                                              })))(function() {
-                                                return discard1(t_(" et "))(function() {
-                                                  return discard1(m(mapFlipped2(angle2)(function(v2) {
-                                                    return v2.exact;
-                                                  })))(function() {
-                                                    return discard1(t_(" ont leurs cosinus "))(function() {
-                                                      return discard1(m_("\\underline{" + (spacex(16) + "}")))(function() {
-                                                        return discard1(t_(" et leurs sinus "))(function() {
-                                                          return discard1(m_("\\underline{" + (spacex(16) + "}.")))(function() {
-                                                            return discard1(nl)(function() {
+                              }))])])))(function() {
+                                return discard1(nl)(function() {
+                                  return discard1(b_2("2."))(function() {
+                                    return discard1(t_(" Compl\xE9ter la phrase en rempla\xE7ant chaque mot manquant par "))(function() {
+                                      return discard1(m_("\\underline{\xE9gaux}"))(function() {
+                                        return discard1(t_(" ou "))(function() {
+                                          return discard1(m_("\\underline{oppos\xE9s}:"))(function() {
+                                            var r1 = lcgNext(v2.value1.value1);
+                                            var r2 = lcgNext(r1);
+                                            var r3 = lcgNext(r2);
+                                            var arr = function() {
+                                              var v3 = mod4(unSeed(r1))(3);
+                                              if (v3 === 0) {
+                                                return thirds;
+                                              }
+                                              ;
+                                              if (v3 === 1) {
+                                                return fourths;
+                                              }
+                                              ;
+                                              return sixths;
+                                            }();
+                                            var n = length(arr);
+                                            var i1 = mod4(unSeed(r2))(n);
+                                            var i2 = mod4((i1 + 1 | 0) + mod4(unSeed(r3))(n - 1 | 0) | 0)(n);
+                                            var angle2 = readWrap(dfltPoint)(arr)(i2);
+                                            var angle1 = readWrap(dfltPoint)(arr)(i1);
+                                            return discard1(nl)(function() {
+                                              return discard1(t_("Les r\xE9els "))(function() {
+                                                return discard1(m_(angle1.exact))(function() {
+                                                  return discard1(t_(" et "))(function() {
+                                                    return discard1(m_(angle2.exact))(function() {
+                                                      return discard1(t_(" ont leurs cosinus "))(function() {
+                                                        return discard1(m_("\\underline{" + (spacex(16) + "}")))(function() {
+                                                          return discard1(t_(" et leurs sinus "))(function() {
+                                                            return discard1(m_("\\underline{" + (spacex(16) + "}.")))(function() {
                                                               return discard1(nl)(function() {
-                                                                return discard1(b_2("3."))(function() {
-                                                                  return discard1(t_(" Donner la valeur du r\xE9el "))(function() {
-                                                                    return discard1(m_("a"))(function() {
-                                                                      var r4 = map24(lcgNext)(r3);
-                                                                      var angle3 = map24(function() {
-                                                                        var $69 = readWrap(dfltPoint)(points);
-                                                                        return function($70) {
-                                                                          return $69(unSeed($70));
-                                                                        };
-                                                                      }())(r4);
-                                                                      return discard1(t_(" de l'intervalle "))(function() {
-                                                                        return discard1(m_("[0, 2\\pi["))(function() {
-                                                                          return discard1(t_(" v\xE9rifiant "))(function() {
-                                                                            return discard1(nl)(function() {
-                                                                              return discard1(m(map24(function(a2) {
-                                                                                return "\\cos(a)=" + a2.cos;
-                                                                              })(angle3)))(function() {
-                                                                                return discard1(t_(" et "))(function() {
-                                                                                  return discard1(nl)(function() {
-                                                                                    return discard1(m(map24(function(a2) {
-                                                                                      return "\\sin(a)=" + (a2.sin + ":");
-                                                                                    })(angle3)))(function() {
-                                                                                      return discard1(nl)(function() {
+                                                                return discard1(nl)(function() {
+                                                                  return discard1(b_2("3."))(function() {
+                                                                    return discard1(t_(" Donner la valeur du r\xE9el "))(function() {
+                                                                      return discard1(m_("a"))(function() {
+                                                                        var r4 = lcgNext(r3);
+                                                                        var angle3 = readWrap(dfltPoint)(points)(unSeed(r4));
+                                                                        return discard1(t_(" de l'intervalle "))(function() {
+                                                                          return discard1(m_("[0, 2\\pi["))(function() {
+                                                                            return discard1(t_(" v\xE9rifiant "))(function() {
+                                                                              return discard1(nl)(function() {
+                                                                                return discard1(m_("\\cos(a)=" + angle3.cos))(function() {
+                                                                                  return discard1(t_(" et "))(function() {
+                                                                                    return discard1(nl)(function() {
+                                                                                      return discard1(m_("\\sin(a)=" + (angle3.sin + ":")))(function() {
                                                                                         return discard1(nl)(function() {
-                                                                                          return discard1(b_2("4."))(function() {
-                                                                                            return discard1(t_(" Etant donn\xE9 que "))(function() {
-                                                                                              var r5 = map24(lcgNext)(r4);
-                                                                                              var cosa = map24(function() {
-                                                                                                var $71 = readWrap(dfltDecimal)(decimals);
-                                                                                                return function($72) {
-                                                                                                  return $71(unSeed($72));
-                                                                                                };
-                                                                                              }())(r5);
-                                                                                              return discard1(equation(map24(function(c) {
-                                                                                                return c.origin;
-                                                                                              })(cosa)))(function() {
-                                                                                                return discard1(nl)(function() {
-                                                                                                  return discard1(t_(" et sachant que "))(function() {
-                                                                                                    return discard1(m_("a\\in]-\\pi,0["))(function() {
-                                                                                                      return discard1(t_(", et que "))(function() {
-                                                                                                        return discard1(m(map24(function(c) {
-                                                                                                          return "\\cos(a)=" + c.decimal;
-                                                                                                        })(cosa)))(function() {
-                                                                                                          return discard1(t_(", d\xE9terminer la valeur exacte de "))(function() {
-                                                                                                            return discard1(m_("\\sin(a):"))(function() {
-                                                                                                              return discard1(nl)(function() {
+                                                                                          return discard1(nl)(function() {
+                                                                                            return discard1(b_2("4."))(function() {
+                                                                                              return discard1(t_(" Etant donn\xE9 que "))(function() {
+                                                                                                var r5 = lcgNext(r4);
+                                                                                                var cosa = readWrap(dfltDecimal)(decimals)(unSeed(r5));
+                                                                                                return discard1(equation_(cosa.origin))(function() {
+                                                                                                  return discard1(nl)(function() {
+                                                                                                    return discard1(t_(" et sachant que "))(function() {
+                                                                                                      return discard1(m_("a\\in]-\\pi,0["))(function() {
+                                                                                                        return discard1(t_(", et que "))(function() {
+                                                                                                          return discard1(m_("\\cos(a)=" + cosa.decimal))(function() {
+                                                                                                            return discard1(t_(", d\xE9terminer la valeur exacte de "))(function() {
+                                                                                                              return discard1(m_("\\sin(a):"))(function() {
                                                                                                                 return discard1(nl)(function() {
-                                                                                                                  return discard1(b_2("5."))(function() {
-                                                                                                                    return discard1(t_(" Convertir "))(function() {
-                                                                                                                      var r6 = map24(lcgNext)(r5);
-                                                                                                                      var deg = map24(function() {
-                                                                                                                        var $73 = readWrap(dfltDegree)(degrees);
-                                                                                                                        return function($74) {
-                                                                                                                          return $73(unSeed($74));
-                                                                                                                        };
-                                                                                                                      }())(r6);
-                                                                                                                      return discard1(m(map24(function(d2) {
-                                                                                                                        return d2.degree + "^\\circ";
-                                                                                                                      })(deg)))(function() {
-                                                                                                                        return discard1(t_(" en radians. On donnera une r\xE9ponse dans "))(function() {
-                                                                                                                          return discard1(m_("[0, 2\\pi["))(function() {
-                                                                                                                            return discard1(t_(" sous la forme exacte la plus simple possible:"))(function() {
-                                                                                                                              return discard1(nl)(function() {
+                                                                                                                  return discard1(nl)(function() {
+                                                                                                                    return discard1(b_2("5."))(function() {
+                                                                                                                      return discard1(t_(" Convertir "))(function() {
+                                                                                                                        var r6 = lcgNext(r5);
+                                                                                                                        var deg = readWrap(dfltDegree)(degrees)(unSeed(r6));
+                                                                                                                        return discard1(m_(deg.degree + "^\\circ"))(function() {
+                                                                                                                          return discard1(t_(" en radians. On donnera une r\xE9ponse dans "))(function() {
+                                                                                                                            return discard1(m_("[0, 2\\pi["))(function() {
+                                                                                                                              return discard1(t_(" sous la forme exacte la plus simple possible:"))(function() {
                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                  return discard1(b_2("6."))(function() {
-                                                                                                                                    return discard1(t_(" Convertir "))(function() {
-                                                                                                                                      var r7 = map24(lcgNext)(r6);
-                                                                                                                                      var fifth = map24(function() {
-                                                                                                                                        var $75 = readWrap(dfltDegree)(fifths);
-                                                                                                                                        return function($76) {
-                                                                                                                                          return $75(unSeed($76));
-                                                                                                                                        };
-                                                                                                                                      }())(r7);
-                                                                                                                                      return discard1(m(map24(function(v2) {
-                                                                                                                                        return v2.radian;
-                                                                                                                                      })(fifth)))(function() {
-                                                                                                                                        return discard1(t_(" en degr\xE9s. On donnera un entier positif inf\xE9rieur \xE0 "))(function() {
-                                                                                                                                          return discard1(m_("359^\\circ"))(function() {
-                                                                                                                                            return discard1(t_(":"))(function() {
-                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                    return discard1(b_2("6."))(function() {
+                                                                                                                                      return discard1(t_(" Convertir "))(function() {
+                                                                                                                                        var r7 = lcgNext(r6);
+                                                                                                                                        var fifth = readWrap(dfltDegree)(fifths)(unSeed(r7));
+                                                                                                                                        return discard1(m_(fifth.radian))(function() {
+                                                                                                                                          return discard1(t_(" en degr\xE9s. On donnera un entier positif inf\xE9rieur \xE0 "))(function() {
+                                                                                                                                            return discard1(m_("359^\\circ"))(function() {
+                                                                                                                                              return discard1(t_(":"))(function() {
                                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                                  return discard1(b_2("7."))(function() {
-                                                                                                                                                    return discard1(t_(" Soit "))(function() {
-                                                                                                                                                      return discard1(m_("M"))(function() {
-                                                                                                                                                        return discard1(t_(" le point du cercle trigonom\xE9trique v\xE9rifiant "))(function() {
-                                                                                                                                                          var r8 = map24(lcgNext)(r7);
-                                                                                                                                                          var angle4 = map24(function() {
-                                                                                                                                                            var $77 = readWrap(dfltPoint)(points);
-                                                                                                                                                            return function($78) {
-                                                                                                                                                              return $77(unSeed($78));
-                                                                                                                                                            };
-                                                                                                                                                          }())(r8);
-                                                                                                                                                          return discard1(m(map24(function(a2) {
-                                                                                                                                                            return "\\widehat{IOM} =" + a2.exact;
-                                                                                                                                                          })(angle4)))(function() {
-                                                                                                                                                            return discard1(t_(" (remarque: on \xE9crit aussi "))(function() {
-                                                                                                                                                              return discard1(m(map24(function(a2) {
-                                                                                                                                                                return "(\\overrightarrow{OI},\\overrightarrow{OM})=" + a2.exact;
-                                                                                                                                                              })(angle4)))(function() {
-                                                                                                                                                                return discard1(t_("). Donner la valeur de "))(function() {
-                                                                                                                                                                  return discard1(m_("\\widehat{IOM'} "))(function() {
-                                                                                                                                                                    return discard1(t_(" comprise entre "))(function() {
-                                                                                                                                                                      return discard1(m_("-\\pi"))(function() {
-                                                                                                                                                                        return discard1(t_(" et "))(function() {
-                                                                                                                                                                          return discard1(m_("\\pi"))(function() {
-                                                                                                                                                                            return discard1(t_(" si "))(function() {
-                                                                                                                                                                              return discard1(m_("M'"))(function() {
-                                                                                                                                                                                return discard1(t_(" est le sym\xE9trique de "))(function() {
-                                                                                                                                                                                  return discard1(m_("M"))(function() {
-                                                                                                                                                                                    return discard1(t_(" par la sym\xE9trie d'axe "))(function() {
-                                                                                                                                                                                      return discard1(m_("(OI):"))(function() {
-                                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                    return discard1(b_2("7."))(function() {
+                                                                                                                                                      return discard1(t_(" Soit "))(function() {
+                                                                                                                                                        return discard1(m_("M"))(function() {
+                                                                                                                                                          return discard1(t_(" le point du cercle trigonom\xE9trique v\xE9rifiant "))(function() {
+                                                                                                                                                            var r8 = lcgNext(r7);
+                                                                                                                                                            var angle4 = readWrap(dfltPoint)(points)(unSeed(r8));
+                                                                                                                                                            return discard1(m_("\\widehat{IOM} =" + angle4.exact))(function() {
+                                                                                                                                                              return discard1(t_(" (remarque: on \xE9crit aussi "))(function() {
+                                                                                                                                                                return discard1(m_("(\\overrightarrow{OI},\\overrightarrow{OM})=" + angle4.exact))(function() {
+                                                                                                                                                                  return discard1(t_("). Donner la valeur de "))(function() {
+                                                                                                                                                                    return discard1(m_("\\widehat{IOM'} "))(function() {
+                                                                                                                                                                      return discard1(t_(" comprise entre "))(function() {
+                                                                                                                                                                        return discard1(m_("-\\pi"))(function() {
+                                                                                                                                                                          return discard1(t_(" et "))(function() {
+                                                                                                                                                                            return discard1(m_("\\pi"))(function() {
+                                                                                                                                                                              return discard1(t_(" si "))(function() {
+                                                                                                                                                                                return discard1(m_("M'"))(function() {
+                                                                                                                                                                                  return discard1(t_(" est le sym\xE9trique de "))(function() {
+                                                                                                                                                                                    return discard1(m_("M"))(function() {
+                                                                                                                                                                                      return discard1(t_(" par la sym\xE9trie d'axe "))(function() {
+                                                                                                                                                                                        return discard1(m_("(OI):"))(function() {
                                                                                                                                                                                           return discard1(nl)(function() {
-                                                                                                                                                                                            return discard1(b_2("8."))(function() {
-                                                                                                                                                                                              return discard1(t_(" Soit "))(function() {
-                                                                                                                                                                                                return discard1(m_("M"))(function() {
-                                                                                                                                                                                                  return discard1(t_(" le point du cercle trigonom\xE9trique v\xE9rifiant "))(function() {
-                                                                                                                                                                                                    var r9 = map24(lcgNext)(r8);
-                                                                                                                                                                                                    var angle5 = map24(function() {
-                                                                                                                                                                                                      var $79 = readWrap(dfltPoint)(points);
-                                                                                                                                                                                                      return function($80) {
-                                                                                                                                                                                                        return $79(unSeed($80));
-                                                                                                                                                                                                      };
-                                                                                                                                                                                                    }())(r9);
-                                                                                                                                                                                                    return discard1(m(map24(function(a2) {
-                                                                                                                                                                                                      return "\\widehat{IOM} =" + a2.exact;
-                                                                                                                                                                                                    })(angle5)))(function() {
-                                                                                                                                                                                                      return discard1(t_(". Donner la valeur de "))(function() {
-                                                                                                                                                                                                        return discard1(m_("\\widehat{IOM'}"))(function() {
-                                                                                                                                                                                                          return discard1(t_(" comprise entre "))(function() {
-                                                                                                                                                                                                            return discard1(m_("-\\pi"))(function() {
-                                                                                                                                                                                                              return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                return discard1(m_("\\pi"))(function() {
-                                                                                                                                                                                                                  return discard1(t_(" si "))(function() {
-                                                                                                                                                                                                                    return discard1(m_("M'"))(function() {
-                                                                                                                                                                                                                      return discard1(t_(" est le sym\xE9trique de "))(function() {
-                                                                                                                                                                                                                        return discard1(m_("M"))(function() {
-                                                                                                                                                                                                                          return discard1(t_(" par la sym\xE9trie d'axe "))(function() {
-                                                                                                                                                                                                                            return discard1(m_("(OJ):"))(function() {
-                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                              return discard1(b_2("8."))(function() {
+                                                                                                                                                                                                return discard1(t_(" Soit "))(function() {
+                                                                                                                                                                                                  return discard1(m_("M"))(function() {
+                                                                                                                                                                                                    return discard1(t_(" le point du cercle trigonom\xE9trique v\xE9rifiant "))(function() {
+                                                                                                                                                                                                      var r9 = lcgNext(r8);
+                                                                                                                                                                                                      var angle5 = readWrap(dfltPoint)(points)(unSeed(r9));
+                                                                                                                                                                                                      return discard1(m_("\\widehat{IOM} =" + angle5.exact))(function() {
+                                                                                                                                                                                                        return discard1(t_(". Donner la valeur de "))(function() {
+                                                                                                                                                                                                          return discard1(m_("\\widehat{IOM'}"))(function() {
+                                                                                                                                                                                                            return discard1(t_(" comprise entre "))(function() {
+                                                                                                                                                                                                              return discard1(m_("-\\pi"))(function() {
+                                                                                                                                                                                                                return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                  return discard1(m_("\\pi"))(function() {
+                                                                                                                                                                                                                    return discard1(t_(" si "))(function() {
+                                                                                                                                                                                                                      return discard1(m_("M'"))(function() {
+                                                                                                                                                                                                                        return discard1(t_(" est le sym\xE9trique de "))(function() {
+                                                                                                                                                                                                                          return discard1(m_("M"))(function() {
+                                                                                                                                                                                                                            return discard1(t_(" par la sym\xE9trie d'axe "))(function() {
+                                                                                                                                                                                                                              return discard1(m_("(OJ):"))(function() {
                                                                                                                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                                                                                                                  return discard1(b_2("9."))(function() {
-                                                                                                                                                                                                                                    return discard1(t_(" Donner la valeur de "))(function() {
-                                                                                                                                                                                                                                      return discard1(m(map24(function(a2) {
-                                                                                                                                                                                                                                        return "\\cos(" + (a2.exact + "):");
-                                                                                                                                                                                                                                      })(angle5)))(function() {
-                                                                                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                    return discard1(b_2("9."))(function() {
+                                                                                                                                                                                                                                      return discard1(t_(" Donner la valeur de "))(function() {
+                                                                                                                                                                                                                                        return discard1(m_("\\cos(" + (angle4.exact + "):")))(function() {
                                                                                                                                                                                                                                           return discard1(nl)(function() {
-                                                                                                                                                                                                                                            return discard1(b_2("10."))(function() {
-                                                                                                                                                                                                                                              return discard1(t_(" Donner la valeur de "))(function() {
-                                                                                                                                                                                                                                                return discard1(m(map24(function(a2) {
-                                                                                                                                                                                                                                                  return "\\sin(" + (a2.exact + "):");
-                                                                                                                                                                                                                                                })(angle5)))(function() {
-                                                                                                                                                                                                                                                  return discard1(nl)(function() {
-                                                                                                                                                                                                                                                    var erep = apply4(apply4(apply4(apply4(apply4(apply4(apply4(apply4(map24(function(a0) {
-                                                                                                                                                                                                                                                      return function(a1) {
-                                                                                                                                                                                                                                                        return function(a2) {
-                                                                                                                                                                                                                                                          return function(a3) {
-                                                                                                                                                                                                                                                            return function(c) {
-                                                                                                                                                                                                                                                              return function(d2) {
-                                                                                                                                                                                                                                                                return function(f) {
-                                                                                                                                                                                                                                                                  return function(a4) {
-                                                                                                                                                                                                                                                                    return function(a5) {
-                                                                                                                                                                                                                                                                      return ["r\xE9ponses: 1)", a0.princ, "\\;2)", function() {
-                                                                                                                                                                                                                                                                        var $56 = a1.cos === a2.cos;
-                                                                                                                                                                                                                                                                        if ($56) {
-                                                                                                                                                                                                                                                                          return "\xE9gaux,";
-                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                        ;
-                                                                                                                                                                                                                                                                        return "oppos\xE9s,";
-                                                                                                                                                                                                                                                                      }() + function() {
-                                                                                                                                                                                                                                                                        var $57 = a1.sin === a2.sin;
-                                                                                                                                                                                                                                                                        if ($57) {
-                                                                                                                                                                                                                                                                          return "\xE9gaux";
-                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                        ;
-                                                                                                                                                                                                                                                                        return "oppos\xE9s";
-                                                                                                                                                                                                                                                                      }(), "\\; 3)", positive(a3.princ), "\\; 4)", c.sol, "\\; 5)", d2.radian, "\\; 6)", f.degree + "^\\circ", "\\; 7)", symx(a4.princ), "\\; 8)", symy(a5.princ), "\\; 9)", a4.cos, "\\; 10)", a5.sin];
-                                                                                                                                                                                                                                                                    };
-                                                                                                                                                                                                                                                                  };
-                                                                                                                                                                                                                                                                };
-                                                                                                                                                                                                                                                              };
-                                                                                                                                                                                                                                                            };
-                                                                                                                                                                                                                                                          };
-                                                                                                                                                                                                                                                        };
-                                                                                                                                                                                                                                                      };
-                                                                                                                                                                                                                                                    })(angle0))(angle1))(angle2))(angle3))(cosa))(deg))(fifth))(angle4))(angle5);
-                                                                                                                                                                                                                                                    return m(map24(function(v2) {
-                                                                                                                                                                                                                                                      if (v2.value0) {
-                                                                                                                                                                                                                                                        return foldr6(append7)("")(v2.value1);
-                                                                                                                                                                                                                                                      }
-                                                                                                                                                                                                                                                      ;
-                                                                                                                                                                                                                                                      return "";
-                                                                                                                                                                                                                                                    })(apply4(map24(Tuple.create)(map24(snd)(f0)))(erep)));
+                                                                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                                                                              return discard1(b_2("10."))(function() {
+                                                                                                                                                                                                                                                return discard1(t_(" Donner la valeur de "))(function() {
+                                                                                                                                                                                                                                                  return discard1(m_("\\sin(" + (angle5.exact + "):")))(function() {
+                                                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                                                      var rep = ["r\xE9ponses: 1)", angle0.princ, "\\;2)", function() {
+                                                                                                                                                                                                                                                        var $54 = angle1.cos === angle2.cos;
+                                                                                                                                                                                                                                                        if ($54) {
+                                                                                                                                                                                                                                                          return "\xE9gaux,";
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        ;
+                                                                                                                                                                                                                                                        return "oppos\xE9s,";
+                                                                                                                                                                                                                                                      }() + function() {
+                                                                                                                                                                                                                                                        var $55 = angle1.sin === angle2.sin;
+                                                                                                                                                                                                                                                        if ($55) {
+                                                                                                                                                                                                                                                          return "\xE9gaux";
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        ;
+                                                                                                                                                                                                                                                        return "oppos\xE9s";
+                                                                                                                                                                                                                                                      }(), "\\; 3)", positive(angle3.princ), "\\; 4)", cosa.sol, "\\; 5)", deg.radian, "\\; 6)", fifth.degree + "^\\circ", "\\; 7)", symx(angle4.princ), "\\; 8)", symy(angle5.princ), "\\; 9)", angle4.cos, "\\; 10)", angle5.sin];
+                                                                                                                                                                                                                                                      return m_(function() {
+                                                                                                                                                                                                                                                        if (v2.value1.value0) {
+                                                                                                                                                                                                                                                          return foldr6(append7)("")(rep);
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        ;
+                                                                                                                                                                                                                                                        return "";
+                                                                                                                                                                                                                                                      }());
+                                                                                                                                                                                                                                                    });
                                                                                                                                                                                                                                                   });
                                                                                                                                                                                                                                                 });
                                                                                                                                                                                                                                               });
@@ -9334,9 +9236,11 @@
                   });
                 });
               });
-            });
-          }))];
-        }())]);
+            }));
+          }
+          ;
+          return mempty4;
+        })])]);
       });
     }))();
   };

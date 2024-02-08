@@ -169,7 +169,7 @@
     return dict.pure;
   };
   var when = function(dictApplicative) {
-    var pure17 = pure(dictApplicative);
+    var pure18 = pure(dictApplicative);
     return function(v) {
       return function(v1) {
         if (v) {
@@ -177,7 +177,7 @@
         }
         ;
         if (!v) {
-          return pure17(unit);
+          return pure18(unit);
         }
         ;
         throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
@@ -186,10 +186,10 @@
   };
   var liftA1 = function(dictApplicative) {
     var apply5 = apply(dictApplicative.Apply0());
-    var pure17 = pure(dictApplicative);
+    var pure18 = pure(dictApplicative);
     return function(f) {
       return function(a2) {
-        return apply5(pure17(f))(a2);
+        return apply5(pure18(f))(a2);
       };
     };
   };
@@ -391,10 +391,10 @@
     }
   };
   var negate = function(dictRing) {
-    var sub12 = sub(dictRing);
-    var zero3 = zero(dictRing.Semiring0());
+    var sub1 = sub(dictRing);
+    var zero2 = zero(dictRing.Semiring0());
     return function(a2) {
-      return sub12(zero3)(a2);
+      return sub1(zero2)(a2);
     };
   };
 
@@ -452,6 +452,29 @@
       };
     };
   };
+  var signum = function(dictOrd) {
+    var lessThan1 = lessThan(dictOrd);
+    var greaterThan1 = greaterThan(dictOrd);
+    return function(dictRing) {
+      var Semiring0 = dictRing.Semiring0();
+      var zero2 = zero(Semiring0);
+      var negate1 = negate(dictRing);
+      var one2 = one(Semiring0);
+      return function(x) {
+        var $89 = lessThan1(x)(zero2);
+        if ($89) {
+          return negate1(one2);
+        }
+        ;
+        var $90 = greaterThan1(x)(zero2);
+        if ($90) {
+          return one2;
+        }
+        ;
+        return x;
+      };
+    };
+  };
   var lessThanOrEq = function(dictOrd) {
     var compare3 = compare(dictOrd);
     return function(a1) {
@@ -468,15 +491,15 @@
   var abs = function(dictOrd) {
     var greaterThanOrEq1 = greaterThanOrEq(dictOrd);
     return function(dictRing) {
-      var zero3 = zero(dictRing.Semiring0());
-      var negate12 = negate(dictRing);
+      var zero2 = zero(dictRing.Semiring0());
+      var negate1 = negate(dictRing);
       return function(x) {
-        var $99 = greaterThanOrEq1(x)(zero3);
+        var $99 = greaterThanOrEq1(x)(zero2);
         if ($99) {
           return x;
         }
         ;
-        return negate12(x);
+        return negate1(x);
       };
     };
   };
@@ -543,11 +566,11 @@
   var gcd = function(dictEq) {
     var eq4 = eq(dictEq);
     return function(dictEuclideanRing) {
-      var zero3 = zero(dictEuclideanRing.CommutativeRing0().Ring0().Semiring0());
+      var zero2 = zero(dictEuclideanRing.CommutativeRing0().Ring0().Semiring0());
       var mod1 = mod(dictEuclideanRing);
       return function(a2) {
         return function(b2) {
-          var $24 = eq4(b2)(zero3);
+          var $24 = eq4(b2)(zero2);
           if ($24) {
             return a2;
           }
@@ -567,27 +590,6 @@
   };
   var div = function(dict) {
     return dict.div;
-  };
-  var lcm = function(dictEq) {
-    var eq4 = eq(dictEq);
-    var gcd1 = gcd(dictEq);
-    return function(dictEuclideanRing) {
-      var Semiring0 = dictEuclideanRing.CommutativeRing0().Ring0().Semiring0();
-      var zero3 = zero(Semiring0);
-      var div12 = div(dictEuclideanRing);
-      var mul3 = mul(Semiring0);
-      var gcd22 = gcd1(dictEuclideanRing);
-      return function(a2) {
-        return function(b2) {
-          var $26 = eq4(a2)(zero3) || eq4(b2)(zero3);
-          if ($26) {
-            return zero3;
-          }
-          ;
-          return div12(mul3(a2)(b2))(gcd22(a2)(b2));
-        };
-      };
-    };
   };
 
   // output/Data.Semigroup/foreign.js
@@ -713,11 +715,11 @@
     return dict.mempty;
   };
   var monoidFn = function(dictMonoid) {
-    var mempty12 = mempty(dictMonoid);
+    var mempty13 = mempty(dictMonoid);
     var semigroupFn2 = semigroupFn(dictMonoid.Semigroup0());
     return {
       mempty: function(v) {
-        return mempty12;
+        return mempty13;
       },
       Semigroup0: function() {
         return semigroupFn2;
@@ -728,7 +730,7 @@
     var reflectSymbol2 = reflectSymbol(dictIsSymbol);
     var semigroupRecordCons2 = semigroupRecordCons(dictIsSymbol)();
     return function(dictMonoid) {
-      var mempty12 = mempty(dictMonoid);
+      var mempty13 = mempty(dictMonoid);
       var Semigroup0 = dictMonoid.Semigroup0();
       return function() {
         return function(dictMonoidRecord) {
@@ -739,7 +741,7 @@
               var tail3 = memptyRecord1($$Proxy.value);
               var key2 = reflectSymbol2($$Proxy.value);
               var insert5 = unsafeSet(key2);
-              return insert5(mempty12)(tail3);
+              return insert5(mempty13)(tail3);
             },
             SemigroupRecord0: function() {
               return semigroupRecordCons1;
@@ -979,12 +981,12 @@
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
     var bind7 = bind(dictMonad.Bind1());
-    var pure17 = pure(dictMonad.Applicative0());
+    var pure18 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a2) {
         return bind7(f)(function(f$prime) {
           return bind7(a2)(function(a$prime) {
-            return pure17(f$prime(a$prime));
+            return pure18(f$prime(a$prime));
           });
         });
       };
@@ -1193,11 +1195,11 @@
     var mempty5 = mempty(dictMonoid);
     var applyWriterT1 = applyWriterT(dictMonoid.Semigroup0());
     return function(dictApplicative) {
-      var pure17 = pure(dictApplicative);
+      var pure18 = pure(dictApplicative);
       var applyWriterT2 = applyWriterT1(dictApplicative.Apply0());
       return {
         pure: function(a2) {
-          return pure17(new Tuple(a2, mempty5));
+          return pure18(new Tuple(a2, mempty5));
         },
         Apply0: function() {
           return applyWriterT2;
@@ -1270,6 +1272,17 @@
   };
 
   // output/Data.Array/foreign.js
+  var rangeImpl = function(start2, end) {
+    var step2 = start2 > end ? -1 : 1;
+    var result = new Array(step2 * (end - start2) + 1);
+    var i = start2, n = 0;
+    while (i !== end) {
+      result[n++] = i;
+      i += step2;
+    }
+    result[n] = i;
+    return result;
+  };
   var replicateFill = function(count2, value13) {
     if (count2 < 1) {
       return [];
@@ -1603,11 +1616,11 @@
 
   // output/Data.Monoid.Endo/index.js
   var semigroupEndo = function(dictSemigroupoid) {
-    var compose3 = compose(dictSemigroupoid);
+    var compose2 = compose(dictSemigroupoid);
     return {
       append: function(v) {
         return function(v1) {
-          return compose3(v)(v1);
+          return compose2(v)(v1);
         };
       }
     };
@@ -1634,13 +1647,13 @@
   };
   var traverse_ = function(dictApplicative) {
     var applySecond4 = applySecond(dictApplicative.Apply0());
-    var pure17 = pure(dictApplicative);
+    var pure18 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond4(f($454));
-        })(pure17(unit));
+        })(pure18(unit));
       };
     };
   };
@@ -1790,13 +1803,13 @@
     }
     return function(apply5) {
       return function(map20) {
-        return function(pure17) {
+        return function(pure18) {
           return function(f) {
             return function(array) {
               function go2(bot, top3) {
                 switch (top3 - bot) {
                   case 0:
-                    return pure17([]);
+                    return pure18([]);
                   case 1:
                     return map20(array1)(f(array[bot]));
                   case 2:
@@ -1816,123 +1829,13 @@
     };
   }();
 
-  // output/Data.Traversable.Accum.Internal/index.js
-  var stateL = function(v) {
-    return v;
-  };
-  var functorStateL = {
-    map: function(f) {
-      return function(k) {
-        return function(s) {
-          var v = stateL(k)(s);
-          return {
-            accum: v.accum,
-            value: f(v.value)
-          };
-        };
-      };
-    }
-  };
-  var applyStateL = {
-    apply: function(f) {
-      return function(x) {
-        return function(s) {
-          var v = stateL(f)(s);
-          var v1 = stateL(x)(v.accum);
-          return {
-            accum: v1.accum,
-            value: v.value(v1.value)
-          };
-        };
-      };
-    },
-    Functor0: function() {
-      return functorStateL;
-    }
-  };
-  var applicativeStateL = {
-    pure: function(a2) {
-      return function(s) {
-        return {
-          accum: s,
-          value: a2
-        };
-      };
-    },
-    Apply0: function() {
-      return applyStateL;
-    }
-  };
-
-  // output/Data.Traversable/index.js
-  var identity5 = /* @__PURE__ */ identity(categoryFn);
-  var traverse = function(dict) {
-    return dict.traverse;
-  };
-  var sequenceDefault = function(dictTraversable) {
-    var traverse2 = traverse(dictTraversable);
-    return function(dictApplicative) {
-      return traverse2(dictApplicative)(identity5);
-    };
-  };
-  var traversableArray = {
-    traverse: function(dictApplicative) {
-      var Apply0 = dictApplicative.Apply0();
-      return traverseArrayImpl(apply(Apply0))(map(Apply0.Functor0()))(pure(dictApplicative));
-    },
-    sequence: function(dictApplicative) {
-      return sequenceDefault(traversableArray)(dictApplicative);
-    },
-    Functor0: function() {
-      return functorArray;
-    },
-    Foldable1: function() {
-      return foldableArray;
-    }
-  };
-  var mapAccumL = function(dictTraversable) {
-    var traverse2 = traverse(dictTraversable)(applicativeStateL);
-    return function(f) {
-      return function(s0) {
-        return function(xs) {
-          return stateL(traverse2(function(a2) {
-            return function(s) {
-              return f(s)(a2);
-            };
-          })(xs))(s0);
-        };
-      };
-    };
-  };
-  var scanl = function(dictTraversable) {
-    var mapAccumL1 = mapAccumL(dictTraversable);
-    return function(f) {
-      return function(b0) {
-        return function(xs) {
-          return mapAccumL1(function(b2) {
-            return function(a2) {
-              var b$prime = f(b2)(a2);
-              return {
-                accum: b$prime,
-                value: b$prime
-              };
-            };
-          })(b0)(xs).value;
-        };
-      };
-    };
-  };
-
   // output/Data.Array/index.js
   var fromJust2 = /* @__PURE__ */ fromJust();
   var append2 = /* @__PURE__ */ append(semigroupArray);
-  var replicate = /* @__PURE__ */ runFn2(replicateImpl);
+  var range2 = /* @__PURE__ */ runFn2(rangeImpl);
   var index = /* @__PURE__ */ function() {
     return runFn4(indexImpl)(Just.create)(Nothing.value);
   }();
-  var last = function(xs) {
-    return index(xs)(length(xs) - 1 | 0);
-  };
   var foldr2 = /* @__PURE__ */ foldr(foldableArray);
   var findIndex = /* @__PURE__ */ function() {
     return runFn4(findIndexImpl)(Just.create)(Nothing.value);
@@ -1965,9 +1868,291 @@
     };
   };
 
-  // output/Data.DivisionRing/index.js
-  var recip = function(dict) {
-    return dict.recip;
+  // output/Data.Ratio/index.js
+  var Ratio = /* @__PURE__ */ function() {
+    function Ratio2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    Ratio2.create = function(value0) {
+      return function(value1) {
+        return new Ratio2(value0, value1);
+      };
+    };
+    return Ratio2;
+  }();
+  var reduce = function(dictOrd) {
+    var gcd2 = gcd(dictOrd.Eq0());
+    var signum2 = signum(dictOrd);
+    var abs5 = abs(dictOrd);
+    return function(dictEuclideanRing) {
+      var gcd1 = gcd2(dictEuclideanRing);
+      var div4 = div(dictEuclideanRing);
+      var Ring0 = dictEuclideanRing.CommutativeRing0().Ring0();
+      var mul2 = mul(Ring0.Semiring0());
+      var signum1 = signum2(Ring0);
+      var abs1 = abs5(Ring0);
+      return function(n) {
+        return function(d) {
+          var g = gcd1(n)(d);
+          var d$prime = div4(d)(g);
+          return new Ratio(mul2(div4(n)(g))(signum1(d$prime)), abs1(d$prime));
+        };
+      };
+    };
+  };
+  var semiringRatio = function(dictOrd) {
+    var reduce1 = reduce(dictOrd);
+    return function(dictEuclideanRing) {
+      var Semiring0 = dictEuclideanRing.CommutativeRing0().Ring0().Semiring0();
+      var one2 = one(Semiring0);
+      var reduce22 = reduce1(dictEuclideanRing);
+      var mul2 = mul(Semiring0);
+      var add3 = add(Semiring0);
+      return {
+        one: new Ratio(one2, one2),
+        mul: function(v) {
+          return function(v1) {
+            return reduce22(mul2(v.value0)(v1.value0))(mul2(v.value1)(v1.value1));
+          };
+        },
+        zero: new Ratio(zero(Semiring0), one2),
+        add: function(v) {
+          return function(v1) {
+            return reduce22(add3(mul2(v.value0)(v1.value1))(mul2(v.value1)(v1.value0)))(mul2(v.value1)(v1.value1));
+          };
+        }
+      };
+    };
+  };
+  var ringRatio = function(dictOrd) {
+    var reduce1 = reduce(dictOrd);
+    var semiringRatio1 = semiringRatio(dictOrd);
+    return function(dictEuclideanRing) {
+      var reduce22 = reduce1(dictEuclideanRing);
+      var Ring0 = dictEuclideanRing.CommutativeRing0().Ring0();
+      var sub2 = sub(Ring0);
+      var mul2 = mul(Ring0.Semiring0());
+      var semiringRatio2 = semiringRatio1(dictEuclideanRing);
+      return {
+        sub: function(v) {
+          return function(v1) {
+            return reduce22(sub2(mul2(v.value0)(v1.value1))(mul2(v.value1)(v1.value0)))(mul2(v.value1)(v1.value1));
+          };
+        },
+        Semiring0: function() {
+          return semiringRatio2;
+        }
+      };
+    };
+  };
+  var numerator = function(v) {
+    return v.value0;
+  };
+  var denominator = function(v) {
+    return v.value1;
+  };
+  var commutativeRingRatio = function(dictOrd) {
+    var ringRatio1 = ringRatio(dictOrd);
+    return function(dictEuclideanRing) {
+      var ringRatio2 = ringRatio1(dictEuclideanRing);
+      return {
+        Ring0: function() {
+          return ringRatio2;
+        }
+      };
+    };
+  };
+  var euclideanRingRatio = function(dictOrd) {
+    var reduce1 = reduce(dictOrd);
+    var semiringRatio1 = semiringRatio(dictOrd);
+    var commutativeRingRatio1 = commutativeRingRatio(dictOrd);
+    return function(dictEuclideanRing) {
+      var reduce22 = reduce1(dictEuclideanRing);
+      var mul2 = mul(dictEuclideanRing.CommutativeRing0().Ring0().Semiring0());
+      var zero2 = zero(semiringRatio1(dictEuclideanRing));
+      var commutativeRingRatio2 = commutativeRingRatio1(dictEuclideanRing);
+      return {
+        degree: function(v) {
+          return 1;
+        },
+        div: function(v) {
+          return function(v1) {
+            return reduce22(mul2(v.value0)(v1.value1))(mul2(v.value1)(v1.value0));
+          };
+        },
+        mod: function(v) {
+          return function(v1) {
+            return zero2;
+          };
+        },
+        CommutativeRing0: function() {
+          return commutativeRingRatio2;
+        }
+      };
+    };
+  };
+
+  // output/JS.BigInt/foreign.js
+  var fromInt = (n) => BigInt(n);
+  var biAdd = (x) => (y) => x + y;
+  var biMul = (x) => (y) => x * y;
+  var biSub = (x) => (y) => x - y;
+  var biMod = (x) => (y) => {
+    if (y === 0n)
+      return 0n;
+    const yy = y < 0n ? -y : y;
+    return (x % yy + yy) % yy;
+  };
+  var biDiv = (x) => (y) => {
+    if (y === 0n)
+      return 0n;
+    return (x - biMod(x)(y)) / y;
+  };
+  var biDegree = (x) => {
+    return x < 0n ? -x : x;
+  };
+  var biZero = 0n;
+  var biOne = 1n;
+  var biEquals = (x) => (y) => x == y;
+  var biCompare = (x) => (y) => {
+    if (x === y)
+      return 0;
+    else if (x > y)
+      return 1;
+    else
+      return -1;
+  };
+  var toString = (x) => x.toString();
+
+  // output/Data.Int/foreign.js
+  var fromNumberImpl = function(just) {
+    return function(nothing) {
+      return function(n) {
+        return (n | 0) === n ? just(n) : nothing;
+      };
+    };
+  };
+  var toNumber = function(n) {
+    return n;
+  };
+
+  // output/Data.Number/foreign.js
+  var isNaNImpl = isNaN;
+  var isFiniteImpl = isFinite;
+  function fromStringImpl(str, isFinite2, just, nothing) {
+    var num = parseFloat(str);
+    if (isFinite2(num)) {
+      return just(num);
+    } else {
+      return nothing;
+    }
+  }
+  var remainder = function(n) {
+    return function(m) {
+      return n % m;
+    };
+  };
+  var round = Math.round;
+
+  // output/Data.Number/index.js
+  var fromString = function(str) {
+    return fromStringImpl(str, isFiniteImpl, Just.create, Nothing.value);
+  };
+
+  // output/Data.Int/index.js
+  var top2 = /* @__PURE__ */ top(boundedInt);
+  var bottom2 = /* @__PURE__ */ bottom(boundedInt);
+  var fromNumber = /* @__PURE__ */ function() {
+    return fromNumberImpl(Just.create)(Nothing.value);
+  }();
+  var unsafeClamp = function(x) {
+    if (!isFiniteImpl(x)) {
+      return 0;
+    }
+    ;
+    if (x >= toNumber(top2)) {
+      return top2;
+    }
+    ;
+    if (x <= toNumber(bottom2)) {
+      return bottom2;
+    }
+    ;
+    if (otherwise) {
+      return fromMaybe(0)(fromNumber(x));
+    }
+    ;
+    throw new Error("Failed pattern match at Data.Int (line 72, column 1 - line 72, column 29): " + [x.constructor.name]);
+  };
+  var round2 = function($37) {
+    return unsafeClamp(round($37));
+  };
+
+  // output/JS.BigInt/index.js
+  var showBigInt = {
+    show: toString
+  };
+  var semiringBigInt = {
+    add: biAdd,
+    zero: biZero,
+    mul: biMul,
+    one: biOne
+  };
+  var ringBigInt = {
+    sub: biSub,
+    Semiring0: function() {
+      return semiringBigInt;
+    }
+  };
+  var eqBigInt = {
+    eq: biEquals
+  };
+  var ordBigInt = {
+    compare: function(x) {
+      return function(y) {
+        var v = biCompare(x)(y);
+        if (v === 1) {
+          return GT.value;
+        }
+        ;
+        if (v === 0) {
+          return EQ.value;
+        }
+        ;
+        return LT.value;
+      };
+    },
+    Eq0: function() {
+      return eqBigInt;
+    }
+  };
+  var commutativeRingBigInt = {
+    Ring0: function() {
+      return ringBigInt;
+    }
+  };
+  var euclideanRingBigInt = {
+    degree: biDegree,
+    div: biDiv,
+    mod: biMod,
+    CommutativeRing0: function() {
+      return commutativeRingBigInt;
+    }
+  };
+
+  // output/Data.Rational/index.js
+  var reduce2 = /* @__PURE__ */ reduce(ordBigInt)(euclideanRingBigInt);
+  var euclideanRingRational = /* @__PURE__ */ euclideanRingRatio(ordBigInt)(euclideanRingBigInt);
+  var numerator2 = function(v) {
+    return numerator(v);
+  };
+  var fromInt2 = function(i) {
+    return reduce2(fromInt(i))(fromInt(1));
+  };
+  var denominator2 = function(v) {
+    return denominator(v);
   };
 
   // output/FRP.Event/foreign.js
@@ -2136,7 +2321,7 @@
   var foldableList = {
     foldr: function(f) {
       return function(b2) {
-        var rev3 = function() {
+        var rev4 = function() {
           var go2 = function($copy_v) {
             return function($copy_v1) {
               var $tco_var_v = $copy_v;
@@ -2168,7 +2353,7 @@
         }();
         var $284 = foldl(foldableList)(flip(f))(b2);
         return function($285) {
-          return $284(rev3($285));
+          return $284(rev4($285));
         };
       };
     },
@@ -2720,7 +2905,7 @@
     }
   };
   var foldSubmapBy = function(dictOrd) {
-    var lessThan12 = lessThan(dictOrd);
+    var lessThan1 = lessThan(dictOrd);
     var greaterThan1 = greaterThan(dictOrd);
     var lessThanOrEq1 = lessThanOrEq(dictOrd);
     return function(appendFn) {
@@ -2731,7 +2916,7 @@
               var tooSmall = function() {
                 if (kmin instanceof Just) {
                   return function(k) {
-                    return lessThan12(k)(kmin.value0);
+                    return lessThan1(k)(kmin.value0);
                   };
                 }
                 ;
@@ -3029,7 +3214,7 @@
   var liftST1 = /* @__PURE__ */ liftST(monadSTST);
   var append3 = /* @__PURE__ */ append(semigroupArray);
   var mempty2 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidEffectFn1(monoidUnit));
-  var identity6 = /* @__PURE__ */ identity(categoryFn);
+  var identity5 = /* @__PURE__ */ identity(categoryFn);
   var apply2 = /* @__PURE__ */ apply(applyST);
   var map1 = /* @__PURE__ */ map(functorST);
   var subscribe = function(v) {
@@ -3354,7 +3539,7 @@
   };
   var create = create_;
   var compactableEvent = {
-    compact: /* @__PURE__ */ filter3(identity6),
+    compact: /* @__PURE__ */ filter3(identity5),
     separate: function(xs) {
       return {
         left: filter3(function(v) {
@@ -3604,7 +3789,7 @@
   // output/FRP.Poll/index.js
   var pure5 = /* @__PURE__ */ pure(applicativeST);
   var map6 = /* @__PURE__ */ map(functorFn);
-  var identity7 = /* @__PURE__ */ identity(categoryFn);
+  var identity6 = /* @__PURE__ */ identity(categoryFn);
   var oneOf2 = /* @__PURE__ */ oneOf(foldableArray);
   var empty3 = /* @__PURE__ */ empty(plusMaybe);
   var $$void3 = /* @__PURE__ */ $$void(functorST);
@@ -3690,12 +3875,12 @@
     };
   };
   var functorAPoll = function(dictFunctor) {
-    var map24 = map(dictFunctor);
+    var map23 = map(dictFunctor);
     return {
       map: function(f) {
         return function(v) {
           return function(e) {
-            return v(map24(function(v1) {
+            return v(map23(function(v1) {
               return function($478) {
                 return v1(f($478));
               };
@@ -3708,13 +3893,13 @@
   var sampleBy = function(dictPollable) {
     var sample22 = sample(dictPollable);
     return function(dictFunctor) {
-      var map24 = map(functorAPoll(dictFunctor));
+      var map23 = map(functorAPoll(dictFunctor));
       return function(dictFunctor1) {
         var map32 = map(dictFunctor1);
         return function(f) {
           return function(b2) {
             return function(e) {
-              return sample22(map24(f)(b2))(map32(applyFlipped)(e));
+              return sample22(map23(f)(b2))(map32(applyFlipped)(e));
             };
           };
         };
@@ -3859,16 +4044,16 @@
     var sampleBy22 = sampleBy(dictPollable);
     return function(dictIsEvent) {
       var Functor1 = dictIsEvent.Filterable2().Functor1();
-      var map24 = map(Functor1);
+      var map23 = map(Functor1);
       var fix1 = fix(dictIsEvent);
       var sampleBy3 = sampleBy22(Functor1)(Functor1);
       var sham2 = sham(dictIsEvent);
       return function(f) {
         return poll(function(e) {
-          return map24(function(v) {
+          return map23(function(v) {
             return v.value1(v.value0);
           })(fix1(function(ee) {
-            return sampleBy3(Tuple.create)(f(sham2(map24(fst)(ee))))(e);
+            return sampleBy3(Tuple.create)(f(sham2(map23(fst)(ee))))(e);
           }));
         });
       };
@@ -3898,11 +4083,11 @@
     return function(dictCompactable) {
       var filterMap1 = filterMap2(dictCompactable)(dictPollable);
       return function(dictFunctor) {
-        var map24 = map(functorAPoll(dictFunctor));
+        var map23 = map(functorAPoll(dictFunctor));
         var filterMap22 = filterMap1(dictFunctor);
         return function(f) {
           return function(b2) {
-            var fb = map24(f)(b2);
+            var fb = map23(f)(b2);
             return {
               left: filterMap22(either(Just.create)($$const(Nothing.value)))(fb),
               right: filterMap22(either($$const(Nothing.value))(Just.create))(fb)
@@ -3917,8 +4102,8 @@
       var filterMap1 = filterMap2(dictCompactable);
       return function(dictPollable) {
         return {
-          compact: filterMap1(dictPollable)(dictFunctor)(identity7),
-          separate: partitionMap(dictPollable)(dictCompactable)(dictFunctor)(identity7)
+          compact: filterMap1(dictPollable)(dictFunctor)(identity6),
+          separate: partitionMap(dictPollable)(dictCompactable)(dictFunctor)(identity6)
         };
       };
     };
@@ -4025,18 +4210,18 @@
   var applyAPoll = function(dictApply) {
     var apply5 = apply(dictApply);
     var Functor0 = dictApply.Functor0();
-    var map24 = map(Functor0);
+    var map23 = map(Functor0);
     var voidLeft4 = voidLeft(Functor0);
     var functorAPoll1 = functorAPoll(Functor0);
     return {
       apply: function(v) {
         return function(v1) {
           return function(e) {
-            return apply5(map24(function(ff2) {
+            return apply5(map23(function(ff2) {
               return function(v2) {
                 return v2.value0(ff2(v2.value1));
               };
-            })(v(voidLeft4(e)(identity7))))(v1(map24(Tuple.create)(e)));
+            })(v(voidLeft4(e)(identity6))))(v1(map23(Tuple.create)(e)));
           };
         };
       },
@@ -4046,12 +4231,12 @@
     };
   };
   var applicativeAPoll = function(dictApply) {
-    var map24 = map(dictApply.Functor0());
+    var map23 = map(dictApply.Functor0());
     var applyAPoll1 = applyAPoll(dictApply);
     return {
       pure: function(a2) {
         return function(e) {
-          return map24(applyFlipped(a2))(e);
+          return map23(applyFlipped(a2))(e);
         };
       },
       Apply0: function() {
@@ -4353,7 +4538,7 @@
   var append22 = /* @__PURE__ */ append(semigroupArray);
   var voidLeft2 = /* @__PURE__ */ voidLeft(functorEvent);
   var once4 = /* @__PURE__ */ once(eventIsEvent);
-  var identity8 = /* @__PURE__ */ identity(categoryFn);
+  var identity7 = /* @__PURE__ */ identity(categoryFn);
   var for_3 = /* @__PURE__ */ for_(applicativeST);
   var for_1 = /* @__PURE__ */ for_3(foldableArray);
   var for_22 = /* @__PURE__ */ for_3(foldableMaybe);
@@ -4448,7 +4633,7 @@
                                 return $$void4(modify(append22([id]))(myIds));
                               };
                               return $112;
-                            }())(interpreter))(voidLeft2(once4(memoKids.event))(identity8));
+                            }())(interpreter))(voidLeft2(once4(memoKids.event))(identity7));
                             var c1 = liftST3(subscribe2(evt)(function($208) {
                               return k0(f($208));
                             }))();
@@ -4554,14 +4739,14 @@
     return behaving_(function(a2) {
       return function(b2) {
         return function(c) {
-          return iii(a2)(b2)(flip(c)(identity8));
+          return iii(a2)(b2)(flip(c)(identity7));
         };
       };
     });
   };
 
   // output/Data.Profunctor/index.js
-  var identity9 = /* @__PURE__ */ identity(categoryFn);
+  var identity8 = /* @__PURE__ */ identity(categoryFn);
   var profunctorFn = {
     dimap: function(a2b) {
       return function(c2d) {
@@ -4579,7 +4764,7 @@
   var lcmap = function(dictProfunctor) {
     var dimap1 = dimap(dictProfunctor);
     return function(a2b) {
-      return dimap1(a2b)(identity9);
+      return dimap1(a2b)(identity8);
     };
   };
 
@@ -6095,7 +6280,7 @@
   var empty7 = /* @__PURE__ */ empty(/* @__PURE__ */ plusAPoll(plusEvent));
   var pollable4 = /* @__PURE__ */ pollable(eventIsEvent);
   var sample5 = /* @__PURE__ */ sample(pollable4);
-  var identity10 = /* @__PURE__ */ identity(categoryFn);
+  var identity9 = /* @__PURE__ */ identity(categoryFn);
   var mailbox3 = /* @__PURE__ */ mailbox2(ordInt);
   var functorAPoll2 = /* @__PURE__ */ functorAPoll(functorEvent);
   var voidLeft3 = /* @__PURE__ */ voidLeft(functorAPoll2);
@@ -6219,7 +6404,7 @@
                   return function __do6() {
                     var memo = createPure2();
                     var v2 = f(memo.poll);
-                    subscribe2(sample5(__internalDekuFlatten3(v2)(i)(di))(ee))(identity10)();
+                    subscribe2(sample5(__internalDekuFlatten3(v2)(i)(di))(ee))(identity9)();
                     return subscribe2(sample_3(xs)(ee))(function(v3) {
                       return memo.push;
                     })();
@@ -6857,70 +7042,6 @@
   var hasFromCodePoint = typeof String.prototype.fromCodePoint === "function";
   var hasCodePointAt = typeof String.prototype.codePointAt === "function";
 
-  // output/Data.Int/foreign.js
-  var fromNumberImpl = function(just) {
-    return function(nothing) {
-      return function(n) {
-        return (n | 0) === n ? just(n) : nothing;
-      };
-    };
-  };
-  var toNumber = function(n) {
-    return n;
-  };
-
-  // output/Data.Number/foreign.js
-  var isNaNImpl = isNaN;
-  var isFiniteImpl = isFinite;
-  function fromStringImpl(str, isFinite2, just, nothing) {
-    var num = parseFloat(str);
-    if (isFinite2(num)) {
-      return just(num);
-    } else {
-      return nothing;
-    }
-  }
-  var remainder = function(n) {
-    return function(m) {
-      return n % m;
-    };
-  };
-  var round = Math.round;
-
-  // output/Data.Number/index.js
-  var fromString = function(str) {
-    return fromStringImpl(str, isFiniteImpl, Just.create, Nothing.value);
-  };
-
-  // output/Data.Int/index.js
-  var top2 = /* @__PURE__ */ top(boundedInt);
-  var bottom2 = /* @__PURE__ */ bottom(boundedInt);
-  var fromNumber = /* @__PURE__ */ function() {
-    return fromNumberImpl(Just.create)(Nothing.value);
-  }();
-  var unsafeClamp = function(x) {
-    if (!isFiniteImpl(x)) {
-      return 0;
-    }
-    ;
-    if (x >= toNumber(top2)) {
-      return top2;
-    }
-    ;
-    if (x <= toNumber(bottom2)) {
-      return bottom2;
-    }
-    ;
-    if (otherwise) {
-      return fromMaybe(0)(fromNumber(x));
-    }
-    ;
-    throw new Error("Failed pattern match at Data.Int (line 72, column 1 - line 72, column 29): " + [x.constructor.name]);
-  };
-  var round2 = function($37) {
-    return unsafeClamp(round($37));
-  };
-
   // output/Data.String.Utils/index.js
   var includes = function(searchString) {
     return function(s) {
@@ -6956,7 +7077,7 @@
   var applySecond3 = /* @__PURE__ */ applySecond(applyFn);
   var liftST12 = /* @__PURE__ */ liftST(monadSTST);
   var sample6 = /* @__PURE__ */ sample(/* @__PURE__ */ pollable(eventIsEvent));
-  var identity11 = /* @__PURE__ */ identity(categoryFn);
+  var identity10 = /* @__PURE__ */ identity(categoryFn);
   var for_7 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var runOnJust = function(v) {
     return function(v1) {
@@ -7095,7 +7216,7 @@
                 })(v);
                 var pump = liftST4(create)();
                 var unsubscribe = liftST4(subscribe(sample6(ohBehave)(pump.event))(executor))();
-                pump.push(identity11)();
+                pump.push(identity10)();
                 var fetchedId = liftST4(read2(myId))();
                 return for_7(fetchedId)(function($132) {
                   return executor(v.associateWithUnsubscribe(function(v1) {
@@ -7214,10 +7335,6 @@
   var render = (content3) => (elem3) => () => katex.render(content3, elem3, {
     "throwOnError": false
   });
-  var display = (content3) => (elem3) => () => katex.render(content3, elem3, {
-    "throwOnError": false,
-    "displayMode": true
-  });
   var textMode = (content3) => (elem3) => () => elem3.innerHTML = content3;
 
   // output/Dependances.Article/index.js
@@ -7256,11 +7373,6 @@
   };
   var m_ = function(str) {
     return tell2(label4([m$prime(str)])([]));
-  };
-  var equation_ = function(str) {
-    return tell2(label4([function(txt) {
-      return self_(display(txt));
-    }(str)])([]));
   };
   var b_2 = function(str) {
     return tell2(b_([text_(str)]));
@@ -7303,6 +7415,50 @@
   };
   var lcgNext = /* @__PURE__ */ lcgPerturb(lcgC);
 
+  // output/Dependances.Rand/index.js
+  var fromJust4 = /* @__PURE__ */ fromJust();
+  var mod3 = /* @__PURE__ */ mod(euclideanRingInt);
+  var difference2 = /* @__PURE__ */ difference(eqInt);
+  var unsort = function(n) {
+    return function(r) {
+      var shake = function($copy_v) {
+        return function($copy_v1) {
+          return function($copy_v2) {
+            var $tco_var_v = $copy_v;
+            var $tco_var_v1 = $copy_v1;
+            var $tco_done = false;
+            var $tco_result;
+            function $tco_loop(v, v1, v2) {
+              if (v.length === 0) {
+                $tco_done = true;
+                return v2;
+              }
+              ;
+              if (v.length === 1) {
+                $tco_done = true;
+                return cons(v[0])(v2);
+              }
+              ;
+              var r$prime$prime = lcgNext(v1);
+              var x = fromJust4(index(v)(mod3(unSeed(r$prime$prime))(length(v))));
+              $tco_var_v = difference2(v)([x]);
+              $tco_var_v1 = r$prime$prime;
+              $copy_v2 = cons(x)(v2);
+              return;
+            }
+            ;
+            while (!$tco_done) {
+              $tco_result = $tco_loop($tco_var_v, $tco_var_v1, $copy_v2);
+            }
+            ;
+            return $tco_result;
+          };
+        };
+      };
+      return shake(range2(0)(n - 1 | 0))(r)([]);
+    };
+  };
+
   // output/Web.UIEvent.KeyboardEvent/foreign.js
   function key(e) {
     return e.key;
@@ -7311,346 +7467,224 @@
     return e.code;
   }
 
-  // output/Devoir02.Main/index.js
-  var show5 = /* @__PURE__ */ show(showInt);
+  // output/Devoir10.Main/index.js
   var append7 = /* @__PURE__ */ append(semigroupString);
-  var mul2 = /* @__PURE__ */ mul(semiringInt);
-  var gcd2 = /* @__PURE__ */ gcd(eqInt)(euclideanRingInt);
-  var abs1 = /* @__PURE__ */ abs(ordInt)(ringInt);
-  var div3 = /* @__PURE__ */ div(euclideanRingInt);
-  var mod3 = /* @__PURE__ */ mod(euclideanRingInt);
+  var show5 = /* @__PURE__ */ show(showInt);
+  var eq22 = /* @__PURE__ */ eq(eqBigInt);
+  var show1 = /* @__PURE__ */ show(showBigInt);
+  var fromJust5 = /* @__PURE__ */ fromJust();
   var discard3 = /* @__PURE__ */ discard(discardUnit);
   var discard1 = /* @__PURE__ */ discard3(/* @__PURE__ */ bindWriterT(semigroupNut)(bindIdentity));
-  var tell3 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
-  var map19 = /* @__PURE__ */ map(functorArray);
-  var scanl3 = /* @__PURE__ */ scanl(traversableArray);
-  var compose2 = /* @__PURE__ */ compose(semigroupoidFn);
-  var identity12 = /* @__PURE__ */ identity(categoryFn);
-  var map110 = /* @__PURE__ */ map(functorFn);
   var foldr6 = /* @__PURE__ */ foldr(foldableArray);
-  var difference2 = /* @__PURE__ */ difference(eqInt);
-  var map23 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var map19 = /* @__PURE__ */ map(functorArray);
+  var mod4 = /* @__PURE__ */ mod(euclideanRingInt);
+  var tell3 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
+  var abs4 = /* @__PURE__ */ abs(ordInt)(ringInt);
+  var map110 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
   var pure16 = /* @__PURE__ */ pure(applicativeEffect);
   var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyAPoll(applyEvent));
-  var lcm2 = /* @__PURE__ */ lcm(eqInt)(euclideanRingInt);
-  var mempty4 = /* @__PURE__ */ mempty(monoidNut);
-  var showFraction = {
-    show: function(v) {
-      var $79 = v.den === 1;
-      if ($79) {
-        return show5(v.num);
-      }
-      ;
-      return "\\frac{" + (show5(v.num) + ("}{" + (show5(v.den) + "}")));
-    }
-  };
-  var show1 = /* @__PURE__ */ show(showFraction);
-  var semiRingFraction = {
-    add: function(v) {
-      return function(v1) {
-        var n = (v.num * v1.den | 0) + (v1.num * v.den | 0) | 0;
-        var d = v.den * v1.den | 0;
-        var g = gcd2(abs1(n))(d);
-        return {
-          num: div3(n)(g),
-          den: div3(d)(g)
-        };
-      };
-    },
-    zero: {
-      num: 0,
-      den: 1
-    },
-    mul: function(v) {
-      return function(v1) {
-        var n = v.num * v1.num | 0;
-        var d = v.den * v1.den | 0;
-        var g = gcd2(abs1(n))(d);
-        return {
-          num: div3(n)(g),
-          den: div3(d)(g)
-        };
-      };
-    },
-    one: {
-      num: 1,
-      den: 1
-    }
-  };
-  var add1 = /* @__PURE__ */ add(semiRingFraction);
-  var mul1 = /* @__PURE__ */ mul(semiRingFraction);
-  var zero2 = /* @__PURE__ */ zero(semiRingFraction);
-  var one2 = /* @__PURE__ */ one(semiRingFraction);
-  var primes = [2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 5, 5, 5, 5];
-  var lift3 = function(n) {
-    return {
-      num: n,
-      den: 1
+  var div3 = /* @__PURE__ */ div(euclideanRingInt);
+  var div1 = /* @__PURE__ */ div(euclideanRingRational);
+  var pure17 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeWriterT(monoidNut)(applicativeIdentity));
+  var mempty4 = /* @__PURE__ */ mempty(monoidUnit);
+  var mempty12 = /* @__PURE__ */ mempty(monoidNut);
+  var showInline = function(n) {
+    return function(suffix) {
+      var issue = function() {
+        if (n === 1 && suffix === "") {
+          return "+1";
+        }
+        ;
+        if (n === (-1 | 0) && suffix === "") {
+          return "-1";
+        }
+        ;
+        if (n === 1) {
+          return "+" + suffix;
+        }
+        ;
+        if (n === (-1 | 0)) {
+          return "-" + suffix;
+        }
+        ;
+        if (n < 0) {
+          return show5(n) + suffix;
+        }
+        ;
+        if (n === 0) {
+          return "";
+        }
+        ;
+        if (otherwise) {
+          return "+" + (show5(n) + suffix);
+        }
+        ;
+        throw new Error("Failed pattern match at Devoir10.Main (line 89, column 5 - line 95, column 62): " + []);
+      }();
+      return issue;
     };
   };
-  var ringFraction = {
-    sub: function(f1) {
-      return function(f2) {
-        return add1(f1)(mul1(lift3(-1 | 0))(f2));
-      };
-    },
-    Semiring0: function() {
-      return semiRingFraction;
-    }
+  var showHead = function(n) {
+    return function(suffix) {
+      var issue = function() {
+        if (n === 1) {
+          return "";
+        }
+        ;
+        if (n === (-1 | 0)) {
+          return "-";
+        }
+        ;
+        if (otherwise) {
+          return show5(n);
+        }
+        ;
+        throw new Error("Failed pattern match at Devoir10.Main (line 82, column 5 - line 84, column 31): " + []);
+      }();
+      return issue + suffix;
+    };
   };
-  var sub1 = /* @__PURE__ */ sub(ringFraction);
-  var negate1 = /* @__PURE__ */ negate(ringFraction);
-  var header = /* @__PURE__ */ discard1(/* @__PURE__ */ setTitle_("Devoir 2 : Second degr\xE9"))(function() {
+  var showFraction = function(r) {
+    var $51 = eq22(denominator2(r))(fromInt(1));
+    if ($51) {
+      return show1(numerator2(r));
+    }
+    ;
+    return "\\frac{" + (show1(numerator2(r)) + ("}{" + (show1(denominator2(r)) + "}")));
+  };
+  var showAffine = function(v) {
+    return showHead(v.m)("x") + showInline(v.p)("");
+  };
+  var rev3 = function(v) {
+    if (v.length === 3) {
+      if (v[0] === 0 && (v[1] === 1 && v[2] === 2)) {
+        return [0, 1, 2];
+      }
+      ;
+      if (v[0] === 0 && (v[1] === 2 && v[2] === 1)) {
+        return [0, 2, 1];
+      }
+      ;
+      if (v[0] === 1 && (v[1] === 0 && v[2] === 2)) {
+        return [1, 0, 2];
+      }
+      ;
+      if (v[0] === 2 && (v[1] === 1 && v[2] === 0)) {
+        return [2, 1, 0];
+      }
+      ;
+      if (v[0] === 1 && (v[1] === 2 && v[2] === 0)) {
+        return [2, 0, 1];
+      }
+      ;
+      if (v[0] === 2 && (v[1] === 0 && v[2] === 1)) {
+        return [1, 2, 0];
+      }
+      ;
+      return [v[0], v[1], v[2]];
+    }
+    ;
+    return v;
+  };
+  var nth = function(arr) {
+    return function(n) {
+      return fromJust5(index(arr)(n));
+    };
+  };
+  var showProp = function(props) {
+    return function(ord2) {
+      return div2([style_("display: grid; grid-template-columns: 1fr 1fr 1fr;")])([div_([execWriter(discard1(t_("a) "))(function() {
+        return m_(nth(props)(nth(ord2)(0)));
+      }))]), div_([execWriter(discard1(t_("b) "))(function() {
+        return m_(nth(props)(nth(ord2)(1)));
+      }))]), div_([execWriter(discard1(t_("c) "))(function() {
+        return m_(nth(props)(nth(ord2)(2)));
+      }))])]);
+    };
+  };
+  var showSol = function(reps) {
+    return function(ord2) {
+      var revOrd = rev3(ord2);
+      var showRep = function(rep) {
+        var v = nth(revOrd)(rep);
+        if (v === 0) {
+          return "a)";
+        }
+        ;
+        if (v === 1) {
+          return "b)";
+        }
+        ;
+        return "c)";
+      };
+      return foldr6(append7)("")(map19(showRep)(reps));
+    };
+  };
+  var intMax = 7;
+  var randPositive = function($copy_r) {
+    var $tco_done = false;
+    var $tco_result;
+    function $tco_loop(r) {
+      var $63 = mod4(unSeed(r))(intMax) === 0;
+      if ($63) {
+        $copy_r = lcgNext(r);
+        return;
+      }
+      ;
+      $tco_done = true;
+      return r;
+    }
+    ;
+    while (!$tco_done) {
+      $tco_result = $tco_loop($copy_r);
+    }
+    ;
+    return $tco_result;
+  };
+  var randAffine = function(r) {
+    var rm = randPositive(r);
+    var rp = lcgNext(rm);
+    var rsp = lcgNext(rp);
+    var sp = function() {
+      var $64 = mod4(unSeed(rsp))(2) === 0;
+      if ($64) {
+        return 1;
+      }
+      ;
+      return -1 | 0;
+    }();
+    return {
+      m: mod4(unSeed(rm))(intMax),
+      p: sp * mod4(unSeed(rp))(intMax) | 0,
+      r: rsp
+    };
+  };
+  var header = /* @__PURE__ */ discard1(/* @__PURE__ */ setTitle_("Devoir 10 : Suites arithm\xE9tiques / Suites g\xE9om\xE9triques / Fonctions d\xE9riv\xE9es"))(function() {
     return discard1(nl)(function() {
       return discard1(tell3(div2([style_("display: grid; grid-template-columns: 1fr 1fr 1fr;")])([label_([text_("Nom:")]), label_([text_("Pr\xE9nom:")]), label_([text_("Classe:")])])))(function() {
-        return tell3(ul_([li_([text_("5 questions : pour chacune d'elle, indiquer la bonne r\xE9ponse")]), li_([execWriter(discard1(m_("1"))(function() {
-          return t_(" point par bonne r\xE9ponse");
-        }))]), li_([text_("toute valeur num\xE9rique \xE0 donner sous forme enti\xE8re ou rationnelle irr\xE9ductible")]), li_([text_("calculatrice autoris\xE9e")])]));
+        return tell3(ul_([li_([text_("10 questions : pour chacune d'elle, indiquer la (ou les) bonne(s) r\xE9ponse(s)")]), li_([text_("1 point par question")]), li_([text_("sans document")]), li_([text_("calculatrice autoris\xE9e")])]));
       });
     });
   });
   var fromRelative = function(n) {
-    return mkSeed(abs1(n));
-  };
-  var eqFraction = {
-    eq: function(v) {
-      return function(v1) {
-        return v.num === 0 && v1.num === 0 || v.num === v1.num && v.den === v1.den;
-      };
-    }
-  };
-  var eq22 = /* @__PURE__ */ eq(eqFraction);
-  var ordFraction = {
-    compare: function(f1) {
-      return function(f2) {
-        var v = sub1(f1)(f2);
-        var issue = function() {
-          if (v.num < 0) {
-            return LT.value;
-          }
-          ;
-          if (v.num > 0) {
-            return GT.value;
-          }
-          ;
-          if (otherwise) {
-            return EQ.value;
-          }
-          ;
-          throw new Error("Failed pattern match at Devoir02.Main (line 92, column 5 - line 94, column 27): " + []);
-        }();
-        return issue;
-      };
-    },
-    Eq0: function() {
-      return eqFraction;
-    }
-  };
-  var lessThan1 = /* @__PURE__ */ lessThan(ordFraction);
-  var divisionRingFraction = {
-    recip: function(v) {
-      var $90 = v.num < 0;
-      if ($90) {
-        return {
-          num: -v.den | 0,
-          den: -v.num | 0
-        };
-      }
-      ;
-      return {
-        num: v.den,
-        den: v.num
-      };
-    },
-    Ring0: function() {
-      return ringFraction;
-    }
-  };
-  var recip2 = /* @__PURE__ */ recip(divisionRingFraction);
-  var delta = function(a2) {
-    return function(b2) {
-      return function(c) {
-        return sub1(mul1(b2)(b2))(mul1(mul1(lift3(4))(a2))(c));
-      };
-    };
-  };
-  var commutativeRingFraction = {
-    Ring0: function() {
-      return ringFraction;
-    }
-  };
-  var euclideanRingFraction = {
-    degree: /* @__PURE__ */ $$const(1),
-    div: function(f1) {
-      return function(f2) {
-        return mul1(f1)(recip2(f2));
-      };
-    },
-    mod: function(v) {
-      return function(v1) {
-        return zero2;
-      };
-    },
-    CommutativeRing0: function() {
-      return commutativeRingFraction;
-    }
-  };
-  var div1 = /* @__PURE__ */ div(euclideanRingFraction);
-  var avgNbFactors = 2;
-  var randFraction = function(r) {
-    var r0 = lcgNext(r);
-    var r1 = lcgNext(r0);
-    var prime = function(ix) {
-      return fromMaybe(1)(index(primes)(ix));
-    };
-    var nbNumFactors = 1 + mod3(unSeed(r0))(avgNbFactors) | 0;
-    var nrands = map19(function(f) {
-      return f(r1);
-    })(scanl3(compose2)(identity12)(replicate(nbNumFactors)(lcgNext)));
-    var nums = map19(map110(prime)(function(rnd) {
-      return mod3(unSeed(rnd))(length(primes));
-    }))(nrands);
-    var r2 = fromMaybe(r1)(last(nrands));
-    var nbDenFactors = 1 + mod3(unSeed(r1))(avgNbFactors) | 0;
-    var drands = map19(function(f) {
-      return f(r2);
-    })(scanl3(compose2)(identity12)(replicate(nbDenFactors)(lcgNext)));
-    var r3 = fromMaybe(r2)(last(drands));
-    var nextRand = lcgNext(r3);
-    var sign2 = (2 * mod3(unSeed(nextRand))(2) | 0) - 1 | 0;
-    var dens = map19(map110(prime)(function(rnd) {
-      return mod3(unSeed(rnd))(length(primes));
-    }))(drands);
-    var num = foldr6(mul2)(1)(difference2(nums)(dens));
-    var den = foldr6(mul2)(1)(difference2(dens)(nums));
-    var $91 = num > den;
-    if ($91) {
-      return {
-        fraction: {
-          num: sign2 * num | 0,
-          den
-        },
-        nextRand
-      };
-    }
-    ;
-    return {
-      fraction: {
-        num: sign2 * den | 0,
-        den: num
-      },
-      nextRand
-    };
-  };
-  var alpha = function(a2) {
-    return function(b2) {
-      return function(_c) {
-        return div1(div1(negate1(b2))(a2))(lift3(2));
-      };
-    };
-  };
-  var beta = function(a2) {
-    return function(b2) {
-      return function(c) {
-        var f = function(x) {
-          return add1(add1(mul1(mul1(a2)(x))(x))(mul1(b2)(x)))(c);
-        };
-        var al = alpha(a2)(b2)(c);
-        return f(al);
-      };
-    };
-  };
-  var abs4 = function(v) {
-    return {
-      num: abs1(v.num),
-      den: v.den
-    };
-  };
-  var inline = function(c) {
-    var issue = function() {
-      if (lessThan1(c)(zero2)) {
-        return "-" + show1(abs4(c));
-      }
-      ;
-      if (eq22(c)(zero2)) {
-        return "";
-      }
-      ;
-      if (otherwise) {
-        return "+" + show1(c);
-      }
-      ;
-      throw new Error("Failed pattern match at Devoir02.Main (line 68, column 3 - line 70, column 36): " + []);
-    }();
-    return issue;
-  };
-  var showTrinom = function(a2) {
-    return function(b2) {
-      return function(c) {
-        var m2 = function() {
-          var issue = function() {
-            if (eq22(a2)(negate1(one2))) {
-              return "-x^2";
-            }
-            ;
-            if (eq22(a2)(one2)) {
-              return "x^2";
-            }
-            ;
-            if (otherwise) {
-              return show1(a2) + "x^2";
-            }
-            ;
-            throw new Error("Failed pattern match at Devoir02.Main (line 55, column 9 - line 57, column 45): " + []);
-          }();
-          return issue;
-        }();
-        var m1 = function() {
-          var issue = function() {
-            if (eq22(b2)(negate1(one2))) {
-              return "-x";
-            }
-            ;
-            if (lessThan1(b2)(zero2)) {
-              return "-" + (show1(abs4(b2)) + "x");
-            }
-            ;
-            if (eq22(b2)(zero2)) {
-              return "";
-            }
-            ;
-            if (eq22(b2)(one2)) {
-              return "+x";
-            }
-            ;
-            if (otherwise) {
-              return "+" + (show1(b2) + "x");
-            }
-            ;
-            throw new Error("Failed pattern match at Devoir02.Main (line 59, column 9 - line 63, column 50): " + []);
-          }();
-          return issue;
-        }();
-        return m2 + (m1 + inline(c));
-      };
-    };
+    return mkSeed(abs4(n));
   };
   var main = function __do5() {
     runInBody(execWriter(header))();
     return runInBody(bind4(useState(""))(function(v) {
       return bind4(useState(false))(function(v1) {
-        var absoluteSeed = map23(toSeed)(v.value1);
-        var seed = map23(fromRelative)(absoluteSeed);
-        var solved = map23(function(v2) {
+        var absoluteSeed = map110(toSeed)(v.value1);
+        var seed = map110(fromRelative)(absoluteSeed);
+        var solved = map110(function(v2) {
           return v2 < 0;
         })(absoluteSeed);
         return div_([div_([label_([text_("Enonc\xE9 n\xB0 ")]), input([valueOn_(input2)(v.value0), keydown_(function(k) {
           return v1.value0(code(k) === "Enter" || key(k) === "Enter");
         }), size_("56"), self_(function(e) {
-          return maybe(pure16(unit))(function($123) {
-            return focus(toHTMLElement($123));
+          return maybe(pure16(unit))(function($92) {
+            return focus(toHTMLElement($92));
           })(fromElement(e));
-        })])([])]), div_([switcherFlipped(apply4(apply4(map23(function(a2) {
+        })])([])]), div_([switcherFlipped(apply4(apply4(map110(function(a2) {
           return function(b2) {
             return function(c) {
               return new Tuple(a2, new Tuple(b2, c));
@@ -7659,164 +7693,362 @@
         })(v1.value1))(solved))(seed))(function(v2) {
           if (v2.value0) {
             return execWriter(discard1(nl)(function() {
-              return discard1(b_2("1."))(function() {
-                return discard1(t_(" Deux nombres "))(function() {
-                  return discard1(m_("x_1"))(function() {
-                    return discard1(t_(" et "))(function() {
-                      return discard1(m_("x_2"))(function() {
-                        return discard1(t_(" v\xE9rifient "))(function() {
-                          var f1 = randFraction(v2.value1.value1);
-                          var f2 = randFraction(f1.nextRand);
-                          return discard1(m_("\\left\\{\\begin{array}{l}x_1+x_2=" + (show1(add1(f1.fraction)(f2.fraction)) + ("\\\\ x_1x_2 = " + (show1(mul1(f1.fraction)(f2.fraction)) + "\\end{array}\\right.")))))(function() {
+              return discard1(nl)(function() {
+                var rk1 = randPositive(v2.value1.value1);
+                var k1 = mod4(unSeed(rk1))(intMax);
+                return discard1(b_2("1. "))(function() {
+                  return discard1(t_("Soit "))(function() {
+                    return discard1(m_("(v_n)_{n\\in\\mathbb{N}}"))(function() {
+                      return discard1(t_(" une suite d\xE9finie par son premier terme et la relation "))(function() {
+                        return discard1(m_("v_{n+1}=\\left(" + (show5(k1) + ("+\\dfrac{v_n}{" + (show5(2 * k1 | 0) + ("}\\right)^2-\\dfrac{v_n^2}{" + (show5((4 * k1 | 0) * k1 | 0) + "}")))))))(function() {
+                          return discard1(t_(". "))(function() {
                             return discard1(nl)(function() {
-                              return discard1(t_("Donner l'ensemble des couples "))(function() {
-                                return discard1(m_("(x_1, x_2)"))(function() {
-                                  return discard1(t_(" possibles:"))(function() {
+                              return discard1(m_("(v_n)"))(function() {
+                                return discard1(t_(" est une suite :"))(function() {
+                                  var rs1 = lcgNext(lcgNext(lcgNext(rk1)));
+                                  var rep1 = [1];
+                                  var prop1 = ["\\mathrm{g\xE9om\xE9trique}\\;\\mathrm{de}\\;\\mathrm{raison}\\;" + show5(k1), "\\mathrm{arithm\xE9tique}\\;\\mathrm{de}\\;\\mathrm{raison}\\;" + show5(k1 * k1 | 0), "\\mathrm{ni}\\;\\mathrm{arithm\xE9tique}\\;\\mathrm{ni}\\;\\mathrm{g\xE9om\xE9trique}\\;"];
+                                  var ord1 = unsort(3)(rk1);
+                                  return discard1(nl)(function() {
                                     return discard1(nl)(function() {
-                                      return discard1(nl)(function() {
+                                      return discard1(tell3(showProp(prop1)(ord1)))(function() {
                                         return discard1(nl)(function() {
-                                          return discard1(b_2("2."))(function() {
-                                            return discard1(t_(" Soit "))(function() {
-                                              return discard1(m_("f"))(function() {
-                                                return discard1(t_(" la fonction polyn\xF4me du second degr\xE9 d\xE9finie par "))(function() {
-                                                  var f3 = randFraction(f2.nextRand);
-                                                  var f4 = randFraction(f3.nextRand);
-                                                  var f5 = randFraction(f4.nextRand);
-                                                  return discard1(m_("f(x)=" + showTrinom(f3.fraction)(f4.fraction)(f5.fraction)))(function() {
-                                                    return discard1(t_(" pour tout "))(function() {
-                                                      return discard1(m_("x\\in\\mathbb{R}"))(function() {
-                                                        return discard1(t_(". "))(function() {
-                                                          return discard1(nl)(function() {
-                                                            return discard1(t_("Donner la forme canonique de "))(function() {
-                                                              return discard1(m_("f"))(function() {
-                                                                return discard1(t_(" :"))(function() {
-                                                                  return discard1(nl)(function() {
+                                          return discard1(nl)(function() {
+                                            var rk2 = randPositive(rs1);
+                                            var k2 = (2 * mod4(unSeed(rk2))(intMax) | 0) + 1 | 0;
+                                            return discard1(b_2("2. "))(function() {
+                                              return discard1(t_("Soit "))(function() {
+                                                return discard1(m_("(u_n)_{n\\in\\mathbb{N}}"))(function() {
+                                                  return discard1(t_(" une suite d\xE9finie par son premier terme et la relation "))(function() {
+                                                    return discard1(m_("u_{n+1}=\\left(\\dfrac{" + (show5(k2) + ("}{2}+u_n\\right)^2-\\left(\\dfrac{" + (show5(k2 * k2 | 0) + "}{4}+u_n^2 \\right)")))))(function() {
+                                                      return discard1(t_(". "))(function() {
+                                                        return discard1(nl)(function() {
+                                                          return discard1(m_("(u_n)"))(function() {
+                                                            return discard1(t_(" est une suite :"))(function() {
+                                                              var rs2 = lcgNext(lcgNext(lcgNext(rk2)));
+                                                              var rep2 = [0];
+                                                              var prop2 = ["\\mathrm{g\xE9om\xE9trique}\\;\\mathrm{de}\\;\\mathrm{raison}\\;" + show5(k2), "\\mathrm{arithm\xE9tique}\\;\\mathrm{de}\\;\\mathrm{raison}\\;\\dfrac{" + (show5(k2) + "}{2}"), "\\mathrm{ni}\\;\\mathrm{arithm\xE9tique}\\;\\mathrm{ni}\\;\\mathrm{g\xE9om\xE9trique}\\;"];
+                                                              var ord2 = unsort(3)(rk2);
+                                                              return discard1(nl)(function() {
+                                                                return discard1(nl)(function() {
+                                                                  return discard1(tell3(showProp(prop2)(ord2)))(function() {
                                                                     return discard1(nl)(function() {
                                                                       return discard1(nl)(function() {
-                                                                        return discard1(nl)(function() {
-                                                                          return discard1(b_2("3."))(function() {
-                                                                            return discard1(t_(" Calculer le discriminant de "))(function() {
-                                                                              var f6 = randFraction(f5.nextRand);
-                                                                              var f7 = randFraction(f6.nextRand);
-                                                                              var f8 = randFraction(f7.nextRand);
-                                                                              var l3 = lcm2(f6.fraction.den)(lcm2(f7.fraction.den)(f8.fraction.den));
-                                                                              var v3 = mul1(lift3(l3))(f6.fraction);
-                                                                              var v4 = mul1(lift3(l3))(f7.fraction);
-                                                                              var v5 = mul1(lift3(l3))(f8.fraction);
-                                                                              var g3 = gcd2(abs1(v3.num))(gcd2(abs1(v4.num))(abs1(v5.num)));
-                                                                              return discard1(m_(showTrinom(div1(v3)(lift3(g3)))(div1(v4)(lift3(g3)))(div1(v5)(lift3(g3)))))(function() {
-                                                                                return discard1(t_("."))(function() {
+                                                                        var ru3 = randPositive(rs2);
+                                                                        var u3 = mod4(unSeed(ru3))(intMax);
+                                                                        var rr3 = randPositive(lcgNext(ru3));
+                                                                        var rn3 = randPositive(lcgNext(rr3));
+                                                                        var r3 = 1 + mod4(unSeed(rr3))(intMax) | 0;
+                                                                        var n3 = 15 + mod4(unSeed(rn3))(intMax) | 0;
+                                                                        return discard1(b_2("3. "))(function() {
+                                                                          return discard1(t_("La somme "))(function() {
+                                                                            return discard1(m_(show5(u3) + ("+" + (show5(u3 + r3 | 0) + ("+" + (show5(u3 + (2 * r3 | 0) | 0) + ("+\\cdots +" + show5(u3 + (n3 * r3 | 0) | 0))))))))(function() {
+                                                                              return discard1(t_(" est \xE9gale \xE0 :"))(function() {
+                                                                                return discard1(nl)(function() {
+                                                                                  var rs3 = lcgNext(lcgNext(lcgNext(rn3)));
+                                                                                  var rep3 = [0, 2];
+                                                                                  var prop3 = [show5(div3((n3 + 1 | 0) * ((u3 + u3 | 0) + (n3 * r3 | 0) | 0) | 0)(2)), show5(u3) + ("\\times\\dfrac{1-" + (show5(r3) + ("^{" + (show5(n3 + 1 | 0) + ("}}{1-" + (show5(r3) + "}")))))), show5(n3 + 1 | 0) + ("\\times\\dfrac{" + (show5(u3) + ("+" + (show5(u3 + (n3 * r3 | 0) | 0) + "}{2}"))))];
+                                                                                  var ord3 = unsort(3)(rn3);
                                                                                   return discard1(nl)(function() {
-                                                                                    return discard1(t_("En d\xE9duire le nombre de solutions r\xE9elles de l'\xE9quation "))(function() {
-                                                                                      return discard1(equation_(function() {
-                                                                                        var $105 = eq22(f6.fraction)(div1(v3)(lift3(g3)));
-                                                                                        if ($105) {
-                                                                                          return showTrinom(div1(f6.fraction)(lift3(-2 | 0)))(div1(f7.fraction)(lift3(-2 | 0)))(div1(f8.fraction)(lift3(-2 | 0)));
-                                                                                        }
-                                                                                        ;
-                                                                                        return showTrinom(f6.fraction)(f7.fraction)(f8.fraction);
-                                                                                      }() + "=0"))(function() {
-                                                                                        return discard1(t_("On donnera la valeur du discriminant "))(function() {
-                                                                                          return discard1(t_("ainsi que le nombre de solutions."))(function() {
-                                                                                            return discard1(nl)(function() {
-                                                                                              return discard1(t_("M\xEAme s'il y a des solutions, on ne demande pas de calculer leur valeur:"))(function() {
-                                                                                                return discard1(nl)(function() {
-                                                                                                  return discard1(nl)(function() {
+                                                                                    return discard1(nl)(function() {
+                                                                                      return discard1(tell3(showProp(prop3)(ord3)))(function() {
+                                                                                        return discard1(nl)(function() {
+                                                                                          return discard1(nl)(function() {
+                                                                                            var qpos = function($copy_r) {
+                                                                                              var $tco_done = false;
+                                                                                              var $tco_result;
+                                                                                              function $tco_loop(r) {
+                                                                                                var $69 = mod4(unSeed(r))(5) === 0;
+                                                                                                if ($69) {
+                                                                                                  $copy_r = lcgNext(r);
+                                                                                                  return;
+                                                                                                }
+                                                                                                ;
+                                                                                                $tco_done = true;
+                                                                                                return r;
+                                                                                              }
+                                                                                              ;
+                                                                                              while (!$tco_done) {
+                                                                                                $tco_result = $tco_loop($copy_r);
+                                                                                              }
+                                                                                              ;
+                                                                                              return $tco_result;
+                                                                                            };
+                                                                                            var rq4 = qpos(lcgNext(rs3));
+                                                                                            var rn4 = randPositive(lcgNext(rq4));
+                                                                                            var q4 = 1 + mod4(unSeed(rq4))(5) | 0;
+                                                                                            var qs = function(v3) {
+                                                                                              if (v3 === 1) {
+                                                                                                return q4;
+                                                                                              }
+                                                                                              ;
+                                                                                              return q4 * qs(v3 - 1 | 0) | 0;
+                                                                                            };
+                                                                                            var n4 = 5 + mod4(unSeed(rn4))(5) | 0;
+                                                                                            return discard1(b_2("4. "))(function() {
+                                                                                              return discard1(t_("La somme "))(function() {
+                                                                                                return discard1(m_(show5(1) + ("+" + (show5(q4) + ("+" + (show5(q4 * q4 | 0) + ("+\\cdots +" + show5(qs(n4)))))))))(function() {
+                                                                                                  return discard1(t_(" est \xE9gale \xE0 :"))(function() {
                                                                                                     return discard1(nl)(function() {
+                                                                                                      var rs4 = lcgNext(lcgNext(lcgNext(rn4)));
+                                                                                                      var rep4 = [0, 1];
+                                                                                                      var prop4 = [show5(div3(1 - qs(n4 + 1 | 0) | 0)(1 - q4 | 0)), "\\dfrac{1-" + (show5(q4) + ("^{" + (show5(n4 + 1 | 0) + ("}}{1-" + (show5(q4) + "}"))))), show5(n4 + 1 | 0) + ("\\times\\dfrac{" + (show5(1) + ("+" + (show5(qs(n4)) + "}{2}"))))];
+                                                                                                      var ord4 = unsort(3)(rn4);
                                                                                                       return discard1(nl)(function() {
-                                                                                                        return discard1(b_2("4."))(function() {
-                                                                                                          return discard1(t_(" R\xE9soudre dans "))(function() {
-                                                                                                            return discard1(m_("\\mathbb{R}:"))(function() {
-                                                                                                              var f9 = randFraction(f8.nextRand);
-                                                                                                              var f10 = randFraction(f9.nextRand);
-                                                                                                              var f11 = randFraction(f10.nextRand);
-                                                                                                              var v6 = mul1(negate1(f9.fraction))(add1(f10.fraction)(f11.fraction));
-                                                                                                              var v7 = mul1(mul1(f9.fraction)(f10.fraction))(f11.fraction);
-                                                                                                              var l4 = lcm2(f9.fraction.den)(lcm2(v6.den)(v7.den));
-                                                                                                              var v8 = mul1(lift3(l4))(f9.fraction);
-                                                                                                              var v9 = mul1(lift3(l4))(v6);
-                                                                                                              var v10 = mul1(lift3(l4))(v7);
-                                                                                                              var g4 = gcd2(abs1(v8.num))(gcd2(abs1(v9.num))(abs1(v10.num)));
-                                                                                                              return discard1(equation_(showTrinom(div1(v8)(lift3(g4)))(div1(v9)(lift3(g4)))(div1(v10)(lift3(g4))) + "=0"))(function() {
-                                                                                                                return discard1(nl)(function() {
-                                                                                                                  return discard1(nl)(function() {
+                                                                                                        return discard1(nl)(function() {
+                                                                                                          return discard1(tell3(showProp(prop4)(ord4)))(function() {
+                                                                                                            return discard1(nl)(function() {
+                                                                                                              return discard1(nl)(function() {
+                                                                                                                return discard1(b_2("5. "))(function() {
+                                                                                                                  var rden5 = randPositive(lcgNext(rs4));
+                                                                                                                  var den5 = 1 + mod4(unSeed(rden5))(intMax) | 0;
+                                                                                                                  return discard1(m_("\\lim\\limits_{n\\rightarrow + \\infty} \\left(\\dfrac{1}{" + (show5(den5) + "}\\right)^n=")))(function() {
+                                                                                                                    var rs5 = lcgNext(lcgNext(lcgNext(rden5)));
+                                                                                                                    var rep5 = [0];
+                                                                                                                    var prop5 = ["0", "+\\infty", "\\dfrac{1}{" + (show5(den5) + "}")];
+                                                                                                                    var ord5 = unsort(3)(rden5);
                                                                                                                     return discard1(nl)(function() {
                                                                                                                       return discard1(nl)(function() {
-                                                                                                                        return discard1(b_2("5."))(function() {
-                                                                                                                          return discard1(t_(" Soit "))(function() {
-                                                                                                                            return discard1(m_("f"))(function() {
-                                                                                                                              return discard1(t_(" la fonction d\xE9finie sur "))(function() {
-                                                                                                                                return discard1(m_("\\mathbb{R}"))(function() {
-                                                                                                                                  return discard1(t_(" par "))(function() {
-                                                                                                                                    var f12 = randFraction(f11.nextRand);
-                                                                                                                                    var f13 = randFraction(f12.nextRand);
-                                                                                                                                    return discard1(m_("f(x)=" + (showTrinom(f12.fraction)(f13.fraction)(zero2) + "+c")))(function() {
-                                                                                                                                      return discard1(t_(" o\xF9 "))(function() {
-                                                                                                                                        return discard1(m_("c"))(function() {
-                                                                                                                                          return discard1(t_(" est un nombre r\xE9el."))(function() {
-                                                                                                                                            return discard1(nl)(function() {
-                                                                                                                                              return discard1(t_("D\xE9terminer la valeur de "))(function() {
-                                                                                                                                                return discard1(m_("c"))(function() {
-                                                                                                                                                  return discard1(t_(" pour laquelle "))(function() {
-                                                                                                                                                    return discard1(m_("f"))(function() {
-                                                                                                                                                      return discard1(t_(' admet une unique racine (on dit aussi racine "double") '))(function() {
-                                                                                                                                                        return discard1(m_("x_0"))(function() {
-                                                                                                                                                          return discard1(t_(", puis calculer "))(function() {
-                                                                                                                                                            return discard1(m_("x_0"))(function() {
-                                                                                                                                                              return discard1(t_(":"))(function() {
-                                                                                                                                                                return discard1(nl)(function() {
-                                                                                                                                                                  return discard1(nl)(function() {
-                                                                                                                                                                    return discard1(nl)(function() {
-                                                                                                                                                                      return discard1(nl)(function() {
-                                                                                                                                                                        var sol4 = function() {
-                                                                                                                                                                          var $112 = eq22(f10.fraction)(f11.fraction);
-                                                                                                                                                                          if ($112) {
-                                                                                                                                                                            return "\\{" + (show1(f10.fraction) + "\\}");
-                                                                                                                                                                          }
-                                                                                                                                                                          ;
-                                                                                                                                                                          return "\\{" + (show1(f10.fraction) + ("," + (show1(f11.fraction) + "\\}")));
-                                                                                                                                                                        }();
-                                                                                                                                                                        var delta3 = delta(div1(v3)(lift3(g3)))(div1(v4)(lift3(g3)))(div1(v5)(lift3(g3)));
-                                                                                                                                                                        var nbsol3 = function() {
-                                                                                                                                                                          var f = function(d) {
-                                                                                                                                                                            var issue = function() {
-                                                                                                                                                                              if (lessThan1(d)(zero2)) {
-                                                                                                                                                                                return "pas\\;de\\; solution";
-                                                                                                                                                                              }
-                                                                                                                                                                              ;
-                                                                                                                                                                              if (eq22(d)(zero2)) {
-                                                                                                                                                                                return "unique\\; solution";
-                                                                                                                                                                              }
-                                                                                                                                                                              ;
-                                                                                                                                                                              if (otherwise) {
-                                                                                                                                                                                return "deux\\; solutions\\; distinctes";
-                                                                                                                                                                              }
-                                                                                                                                                                              ;
-                                                                                                                                                                              throw new Error("Failed pattern match at Devoir02.Main (line 327, column 27 - line 329, column 80): " + []);
-                                                                                                                                                                            }();
-                                                                                                                                                                            return issue;
-                                                                                                                                                                          };
-                                                                                                                                                                          return f(delta3);
-                                                                                                                                                                        }();
-                                                                                                                                                                        var beta2 = beta(f3.fraction)(f4.fraction)(f5.fraction);
-                                                                                                                                                                        var alpha2 = alpha(f3.fraction)(f4.fraction)(f5.fraction);
-                                                                                                                                                                        var rep = ["r\xE9ponses: 1)", "\\mathcal{S}=" + function() {
-                                                                                                                                                                          var $113 = eq22(f1.fraction)(f2.fraction);
-                                                                                                                                                                          if ($113) {
-                                                                                                                                                                            return "\\{(" + (show1(f1.fraction) + ("," + (show1(f2.fraction) + ")\\}")));
-                                                                                                                                                                          }
-                                                                                                                                                                          ;
-                                                                                                                                                                          return "\\{(" + (show1(f1.fraction) + ("," + (show1(f2.fraction) + ("),(" + (show1(f2.fraction) + ("," + (show1(f1.fraction) + ")\\}")))))));
-                                                                                                                                                                        }(), "\\; 2) ", "f(x)=" + (show1(f3.fraction) + ("(x" + (inline(negate1(alpha2)) + (")^2" + inline(beta2))))), "\\; 3)\\Delta =" + (show1(delta3) + (",\\; " + nbsol3)), "\\; 4)\\mathcal{S}=" + sol4, "\\; 5)", "c=", show1(div1(div1(mul1(f13.fraction)(f13.fraction))(f12.fraction))(lift3(4))), "\\; x_0=", show1(div1(div1(negate1(f13.fraction))(f12.fraction))(lift3(2)))];
-                                                                                                                                                                        return discard1(m_(function() {
-                                                                                                                                                                          if (v2.value1.value0) {
-                                                                                                                                                                            return foldr6(append7)("")(rep);
-                                                                                                                                                                          }
-                                                                                                                                                                          ;
-                                                                                                                                                                          return "";
-                                                                                                                                                                        }()))(function() {
-                                                                                                                                                                          return discard1(nl)(function() {
-                                                                                                                                                                            return nl;
+                                                                                                                        return discard1(tell3(showProp(prop5)(ord5)))(function() {
+                                                                                                                          return discard1(nl)(function() {
+                                                                                                                            return discard1(nl)(function() {
+                                                                                                                              var v3 = randAffine(rs5);
+                                                                                                                              var m6 = (2 * v3.m | 0) + 1 | 0;
+                                                                                                                              return discard1(b_2("6. "))(function() {
+                                                                                                                                return discard1(t_("Soit "))(function() {
+                                                                                                                                  return discard1(m_("f"))(function() {
+                                                                                                                                    return discard1(t_(" la fonction d\xE9finie sur "))(function() {
+                                                                                                                                      return discard1(m_(" ]" + (showFraction(div1(fromInt2(-v3.p | 0))(fromInt2(m6))) + "; + \\infty[")))(function() {
+                                                                                                                                        return discard1(t_(" par "))(function() {
+                                                                                                                                          return discard1(m_(" f(x)=\\sqrt{" + (showAffine({
+                                                                                                                                            m: m6,
+                                                                                                                                            p: v3.p
+                                                                                                                                          }) + "}")))(function() {
+                                                                                                                                            return discard1(t_("."))(function() {
+                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                return discard1(t_("Alors "))(function() {
+                                                                                                                                                  return discard1(m_("f'(x)="))(function() {
+                                                                                                                                                    var rs6 = lcgNext(lcgNext(lcgNext(v3.r)));
+                                                                                                                                                    var rep6 = [0];
+                                                                                                                                                    var prop6 = ["\\dfrac{" + (show5(m6) + ("}{2\\sqrt{" + (showAffine({
+                                                                                                                                                      m: m6,
+                                                                                                                                                      p: v3.p
+                                                                                                                                                    }) + "}}"))), "\\sqrt{" + (show5(m6) + "}"), "\\dfrac{1}{" + (showAffine({
+                                                                                                                                                      m: m6,
+                                                                                                                                                      p: v3.p
+                                                                                                                                                    }) + "}")];
+                                                                                                                                                    var ord6 = unsort(3)(v3.r);
+                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                        return discard1(tell3(showProp(prop6)(ord6)))(function() {
+                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                              var v4 = randAffine(rs6);
+                                                                                                                                                              var m7 = 1 + v4.m | 0;
+                                                                                                                                                              return discard1(b_2("7. "))(function() {
+                                                                                                                                                                return discard1(t_("Soit "))(function() {
+                                                                                                                                                                  return discard1(m_("f"))(function() {
+                                                                                                                                                                    return discard1(t_(" la fonction d\xE9finie sur "))(function() {
+                                                                                                                                                                      return discard1(m_(" ]" + (showFraction(div1(fromInt2(-v4.p | 0))(fromInt2(m7))) + "; + \\infty[")))(function() {
+                                                                                                                                                                        return discard1(t_(" par "))(function() {
+                                                                                                                                                                          return discard1(m_(" f(x)=\\dfrac{1}{" + (showAffine({
+                                                                                                                                                                            m: m7,
+                                                                                                                                                                            p: v4.p
+                                                                                                                                                                          }) + "}")))(function() {
+                                                                                                                                                                            return discard1(t_("."))(function() {
+                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                return discard1(t_("Alors "))(function() {
+                                                                                                                                                                                  return discard1(m_("f'(x)="))(function() {
+                                                                                                                                                                                    var rs7 = lcgNext(lcgNext(lcgNext(v4.r)));
+                                                                                                                                                                                    var rep7 = [0];
+                                                                                                                                                                                    var prop7 = ["\\dfrac{" + (show5(-m7 | 0) + ("}{\\left(" + (showAffine({
+                                                                                                                                                                                      m: m7,
+                                                                                                                                                                                      p: v4.p
+                                                                                                                                                                                    }) + "\\right)^2}"))), "\\dfrac{1}{\\left(" + (showAffine({
+                                                                                                                                                                                      m: m7,
+                                                                                                                                                                                      p: v4.p
+                                                                                                                                                                                    }) + "\\right)^2}"), "\\dfrac{1}{" + (show5(m7) + "}")];
+                                                                                                                                                                                    var ord7 = unsort(3)(v4.r);
+                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                        return discard1(tell3(showProp(prop7)(ord7)))(function() {
+                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                              var v5 = randAffine(rs7);
+                                                                                                                                                                                              var m8 = 1 + v5.m | 0;
+                                                                                                                                                                                              return discard1(b_2("8. "))(function() {
+                                                                                                                                                                                                return discard1(t_("Soit "))(function() {
+                                                                                                                                                                                                  return discard1(m_("f"))(function() {
+                                                                                                                                                                                                    return discard1(t_(" la fonction d\xE9finie sur "))(function() {
+                                                                                                                                                                                                      return discard1(m_("\\mathbb{R}"))(function() {
+                                                                                                                                                                                                        return discard1(t_(" par "))(function() {
+                                                                                                                                                                                                          return discard1(m_(" f(x)=\\left(" + (showAffine({
+                                                                                                                                                                                                            m: m8,
+                                                                                                                                                                                                            p: v5.p
+                                                                                                                                                                                                          }) + "\\right)^3")))(function() {
+                                                                                                                                                                                                            return discard1(t_("."))(function() {
+                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                return discard1(t_("Alors "))(function() {
+                                                                                                                                                                                                                  return discard1(m_("f'(x)="))(function() {
+                                                                                                                                                                                                                    var rs8 = lcgNext(lcgNext(lcgNext(v5.r)));
+                                                                                                                                                                                                                    var rep8 = [0];
+                                                                                                                                                                                                                    var prop8 = [show5(3 * m8 | 0) + ("\\left(" + (showAffine({
+                                                                                                                                                                                                                      m: m8,
+                                                                                                                                                                                                                      p: v5.p
+                                                                                                                                                                                                                    }) + "\\right)^2")), "3\\left(" + (showAffine({
+                                                                                                                                                                                                                      m: m8,
+                                                                                                                                                                                                                      p: v5.p
+                                                                                                                                                                                                                    }) + "\\right)^2"), show5((m8 * m8 | 0) * m8 | 0)];
+                                                                                                                                                                                                                    var ord8 = unsort(3)(v5.r);
+                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                                                        return discard1(tell3(showProp(prop8)(ord8)))(function() {
+                                                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                                                              var ra9 = randPositive(lcgNext(rs8));
+                                                                                                                                                                                                                              var rb9 = randPositive(lcgNext(ra9));
+                                                                                                                                                                                                                              var b9 = (2 * mod4(unSeed(rb9))(intMax) | 0) + 1 | 0;
+                                                                                                                                                                                                                              var a9 = 2 * mod4(unSeed(ra9))(intMax) | 0;
+                                                                                                                                                                                                                              return discard1(b_2("9. "))(function() {
+                                                                                                                                                                                                                                return discard1(t_("Soit "))(function() {
+                                                                                                                                                                                                                                  return discard1(m_("f"))(function() {
+                                                                                                                                                                                                                                    return discard1(t_(" la fonction d\xE9finie sur "))(function() {
+                                                                                                                                                                                                                                      return discard1(m_("\\mathbb{R}"))(function() {
+                                                                                                                                                                                                                                        return discard1(t_(" par "))(function() {
+                                                                                                                                                                                                                                          return discard1(m_(" f(x)=(x-" + (show5(a9) + (")(x-" + (show5(b9) + ")")))))(function() {
+                                                                                                                                                                                                                                            return discard1(t_("."))(function() {
+                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                return discard1(t_("Alors "))(function() {
+                                                                                                                                                                                                                                                  return discard1(m_("f'(x)="))(function() {
+                                                                                                                                                                                                                                                    var rs9 = lcgNext(lcgNext(lcgNext(rb9)));
+                                                                                                                                                                                                                                                    var rep9 = [0];
+                                                                                                                                                                                                                                                    var prop9 = [showAffine({
+                                                                                                                                                                                                                                                      m: 2,
+                                                                                                                                                                                                                                                      p: -(a9 + b9 | 0) | 0
+                                                                                                                                                                                                                                                    }), "1", show5(a9 + b9 | 0)];
+                                                                                                                                                                                                                                                    var ord9 = unsort(3)(rb9);
+                                                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                                                                                        return discard1(tell3(showProp(prop9)(ord9)))(function() {
+                                                                                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                                                                                              return discard1(b_2("10. "))(function() {
+                                                                                                                                                                                                                                                                return discard1(t_("Soit "))(function() {
+                                                                                                                                                                                                                                                                  return discard1(m_("f"))(function() {
+                                                                                                                                                                                                                                                                    return discard1(t_(" la fonction d\xE9finie sur "))(function() {
+                                                                                                                                                                                                                                                                      return discard1(m_("\\mathbb{R}"))(function() {
+                                                                                                                                                                                                                                                                        return discard1(t_(" par "))(function() {
+                                                                                                                                                                                                                                                                          return discard1(m_(" f(x)=(x-" + (show5(a9) + (")(x-" + (show5(b9) + ")")))))(function() {
+                                                                                                                                                                                                                                                                            return discard1(t_("."))(function() {
+                                                                                                                                                                                                                                                                              var rep10 = [0, 1];
+                                                                                                                                                                                                                                                                              var prop10 = ["f'(" + (showFraction(div1(fromInt2(a9 + b9 | 0))(fromInt2(2))) + ")=0"), "f'(" + (show5(a9 + b9 | 0) + (")=" + show5(a9 + b9 | 0))), "f'(" + (showFraction(div1(fromInt2(a9 + b9 | 0))(fromInt2(2))) + (")=" + showFraction(div1(fromInt2(a9 + b9 | 0))(fromInt2(2)))))];
+                                                                                                                                                                                                                                                                              var ord10 = unsort(3)(rs9);
+                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                  return discard1(tell3(showProp(prop10)(ord10)))(function() {
+                                                                                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                        if (v2.value1.value0) {
+                                                                                                                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                            return discard1(t_("r\xE9ponses: "))(function() {
+                                                                                                                                                                                                                                                                                              return discard1(t_(" 1. "))(function() {
+                                                                                                                                                                                                                                                                                                return discard1(t_(showSol(rep1)(ord1)))(function() {
+                                                                                                                                                                                                                                                                                                  return discard1(t_(" 2. "))(function() {
+                                                                                                                                                                                                                                                                                                    return discard1(t_(showSol(rep2)(ord2)))(function() {
+                                                                                                                                                                                                                                                                                                      return discard1(t_(" 3. "))(function() {
+                                                                                                                                                                                                                                                                                                        return discard1(t_(showSol(rep3)(ord3)))(function() {
+                                                                                                                                                                                                                                                                                                          return discard1(t_(" 4. "))(function() {
+                                                                                                                                                                                                                                                                                                            return discard1(t_(showSol(rep4)(ord4)))(function() {
+                                                                                                                                                                                                                                                                                                              return discard1(t_(" 5. "))(function() {
+                                                                                                                                                                                                                                                                                                                return discard1(t_(showSol(rep5)(ord5)))(function() {
+                                                                                                                                                                                                                                                                                                                  return discard1(t_(" 6. "))(function() {
+                                                                                                                                                                                                                                                                                                                    return discard1(t_(showSol(rep6)(ord6)))(function() {
+                                                                                                                                                                                                                                                                                                                      return discard1(t_(" 7. "))(function() {
+                                                                                                                                                                                                                                                                                                                        return discard1(t_(showSol(rep7)(ord7)))(function() {
+                                                                                                                                                                                                                                                                                                                          return discard1(t_(" 8. "))(function() {
+                                                                                                                                                                                                                                                                                                                            return discard1(t_(showSol(rep8)(ord8)))(function() {
+                                                                                                                                                                                                                                                                                                                              return discard1(t_(" 9. "))(function() {
+                                                                                                                                                                                                                                                                                                                                return discard1(t_(showSol(rep9)(ord9)))(function() {
+                                                                                                                                                                                                                                                                                                                                  return discard1(t_(" 10. "))(function() {
+                                                                                                                                                                                                                                                                                                                                    return t_(showSol(rep10)(ord10));
+                                                                                                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                        ;
+                                                                                                                                                                                                                                                                                        return pure17(mempty4);
+                                                                                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                      });
+                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                });
+                                                                                                                                                                                                              });
+                                                                                                                                                                                                            });
+                                                                                                                                                                                                          });
+                                                                                                                                                                                                        });
+                                                                                                                                                                                                      });
+                                                                                                                                                                                                    });
+                                                                                                                                                                                                  });
+                                                                                                                                                                                                });
+                                                                                                                                                                                              });
+                                                                                                                                                                                            });
+                                                                                                                                                                                          });
+                                                                                                                                                                                        });
+                                                                                                                                                                                      });
+                                                                                                                                                                                    });
+                                                                                                                                                                                  });
+                                                                                                                                                                                });
+                                                                                                                                                                              });
+                                                                                                                                                                            });
                                                                                                                                                                           });
                                                                                                                                                                         });
                                                                                                                                                                       });
@@ -7899,7 +8131,7 @@
             }));
           }
           ;
-          return mempty4;
+          return mempty12;
         })])]);
       });
     }))();

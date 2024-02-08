@@ -30,6 +30,14 @@
   var compose = function(dict) {
     return dict.compose;
   };
+  var composeFlipped = function(dictSemigroupoid) {
+    var compose1 = compose(dictSemigroupoid);
+    return function(f) {
+      return function(g2) {
+        return compose1(g2)(f);
+      };
+    };
+  };
 
   // output/Control.Category/index.js
   var identity = function(dict) {
@@ -98,10 +106,10 @@
     return map(dictFunctor)($$const(unit));
   };
   var voidLeft = function(dictFunctor) {
-    var map110 = map(dictFunctor);
+    var map111 = map(dictFunctor);
     return function(f) {
       return function(x3) {
-        return map110($$const(x3))(f);
+        return map111($$const(x3))(f);
       };
     };
   };
@@ -137,20 +145,20 @@
   };
   var applySecond = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map20 = map(dictApply.Functor0());
+    var map25 = map(dictApply.Functor0());
     return function(a2) {
       return function(b2) {
-        return apply1(map20($$const(identity2))(a2))(b2);
+        return apply1(map25($$const(identity2))(a2))(b2);
       };
     };
   };
   var lift2 = function(dictApply) {
     var apply1 = apply(dictApply);
-    var map20 = map(dictApply.Functor0());
+    var map25 = map(dictApply.Functor0());
     return function(f) {
       return function(a2) {
         return function(b2) {
-          return apply1(map20(f)(a2))(b2);
+          return apply1(map25(f)(a2))(b2);
         };
       };
     };
@@ -161,7 +169,7 @@
     return dict.pure;
   };
   var when = function(dictApplicative) {
-    var pure17 = pure(dictApplicative);
+    var pure18 = pure(dictApplicative);
     return function(v) {
       return function(v1) {
         if (v) {
@@ -169,7 +177,7 @@
         }
         ;
         if (!v) {
-          return pure17(unit);
+          return pure18(unit);
         }
         ;
         throw new Error("Failed pattern match at Control.Applicative (line 63, column 1 - line 63, column 63): " + [v.constructor.name, v1.constructor.name]);
@@ -178,10 +186,10 @@
   };
   var liftA1 = function(dictApplicative) {
     var apply5 = apply(dictApplicative.Apply0());
-    var pure17 = pure(dictApplicative);
+    var pure18 = pure(dictApplicative);
     return function(f) {
       return function(a2) {
-        return apply5(pure17(f))(a2);
+        return apply5(pure18(f))(a2);
       };
     };
   };
@@ -238,8 +246,8 @@
   };
   var join = function(dictBind) {
     var bind1 = bind(dictBind);
-    return function(m2) {
-      return bind1(m2)(identity3);
+    return function(m) {
+      return bind1(m)(identity3);
     };
   };
 
@@ -289,7 +297,7 @@
     };
   };
   var unsafeSet = function(label5) {
-    return function(value12) {
+    return function(value13) {
       return function(rec) {
         var copy = {};
         for (var key2 in rec) {
@@ -297,7 +305,7 @@
             copy[key2] = rec[key2];
           }
         }
-        copy[label5] = value12;
+        copy[label5] = value13;
         return copy;
       };
     };
@@ -730,11 +738,11 @@
             appendRecord: function(v) {
               return function(ra) {
                 return function(rb) {
-                  var tail2 = appendRecord1($$Proxy.value)(ra)(rb);
+                  var tail3 = appendRecord1($$Proxy.value)(ra)(rb);
                   var key2 = reflectSymbol2($$Proxy.value);
                   var insert6 = unsafeSet(key2);
                   var get2 = unsafeGet(key2);
-                  return insert6(append14(get2(ra))(get2(rb)))(tail2);
+                  return insert6(append14(get2(ra))(get2(rb)))(tail3);
                 };
               };
             }
@@ -801,10 +809,10 @@
           var semigroupRecordCons1 = semigroupRecordCons2(dictMonoidRecord.SemigroupRecord0())(Semigroup0);
           return {
             memptyRecord: function(v) {
-              var tail2 = memptyRecord1($$Proxy.value);
+              var tail3 = memptyRecord1($$Proxy.value);
               var key2 = reflectSymbol2($$Proxy.value);
               var insert6 = unsafeSet(key2);
-              return insert6(mempty12)(tail2);
+              return insert6(mempty12)(tail3);
             },
             SemigroupRecord0: function() {
               return semigroupRecordCons1;
@@ -831,6 +839,13 @@
   }();
   var snd = function(v) {
     return v.value1;
+  };
+  var functorTuple = {
+    map: function(f) {
+      return function(m) {
+        return new Tuple(m.value0, f(m.value1));
+      };
+    }
   };
   var fst = function(v) {
     return v.value0;
@@ -941,6 +956,36 @@
       return applyMaybe;
     }
   };
+  var applicativeMaybe = /* @__PURE__ */ function() {
+    return {
+      pure: Just.create,
+      Apply0: function() {
+        return applyMaybe;
+      }
+    };
+  }();
+  var altMaybe = {
+    alt: function(v) {
+      return function(v1) {
+        if (v instanceof Nothing) {
+          return v1;
+        }
+        ;
+        return v;
+      };
+    },
+    Functor0: function() {
+      return functorMaybe;
+    }
+  };
+  var plusMaybe = /* @__PURE__ */ function() {
+    return {
+      empty: Nothing.value,
+      Alt0: function() {
+        return altMaybe;
+      }
+    };
+  }();
 
   // output/Data.Either/index.js
   var Left = /* @__PURE__ */ function() {
@@ -1008,12 +1053,12 @@
   // output/Control.Monad/index.js
   var ap = function(dictMonad) {
     var bind7 = bind(dictMonad.Bind1());
-    var pure17 = pure(dictMonad.Applicative0());
+    var pure18 = pure(dictMonad.Applicative0());
     return function(f) {
       return function(a2) {
         return bind7(f)(function(f$prime) {
           return bind7(a2)(function(a$prime) {
-            return pure17(f$prime(a$prime));
+            return pure18(f$prime(a$prime));
           });
         });
       };
@@ -1102,8 +1147,8 @@
   };
   var functorIdentity = {
     map: function(f) {
-      return function(m2) {
-        return f(m2);
+      return function(m) {
+        return f(m);
       };
     }
   };
@@ -1160,31 +1205,31 @@
     };
   };
   var functorWriterT = function(dictFunctor) {
-    var map20 = map(dictFunctor);
+    var map25 = map(dictFunctor);
     return {
       map: function(f) {
-        return mapWriterT(map20(function(v) {
+        return mapWriterT(map25(function(v) {
           return new Tuple(f(v.value0), v.value1);
         }));
       }
     };
   };
   var applyWriterT = function(dictSemigroup) {
-    var append7 = append(dictSemigroup);
+    var append8 = append(dictSemigroup);
     return function(dictApply) {
       var apply5 = apply(dictApply);
       var Functor0 = dictApply.Functor0();
-      var map20 = map(Functor0);
+      var map25 = map(Functor0);
       var functorWriterT1 = functorWriterT(Functor0);
       return {
         apply: function(v) {
           return function(v1) {
             var k = function(v3) {
               return function(v4) {
-                return new Tuple(v3.value0(v4.value0), append7(v3.value1)(v4.value1));
+                return new Tuple(v3.value0(v4.value0), append8(v3.value1)(v4.value1));
               };
             };
-            return apply5(map20(k)(v))(v1);
+            return apply5(map25(k)(v))(v1);
           };
         },
         Functor0: function() {
@@ -1194,20 +1239,20 @@
     };
   };
   var bindWriterT = function(dictSemigroup) {
-    var append7 = append(dictSemigroup);
+    var append8 = append(dictSemigroup);
     var applyWriterT1 = applyWriterT(dictSemigroup);
     return function(dictBind) {
       var bind7 = bind(dictBind);
       var Apply0 = dictBind.Apply0();
-      var map20 = map(Apply0.Functor0());
+      var map25 = map(Apply0.Functor0());
       var applyWriterT2 = applyWriterT1(Apply0);
       return {
         bind: function(v) {
           return function(k) {
             return bind7(v)(function(v1) {
               var v2 = k(v1.value0);
-              return map20(function(v3) {
-                return new Tuple(v3.value0, append7(v1.value1)(v3.value1));
+              return map25(function(v3) {
+                return new Tuple(v3.value0, append8(v1.value1)(v3.value1));
               })(v2);
             });
           };
@@ -1219,14 +1264,14 @@
     };
   };
   var applicativeWriterT = function(dictMonoid) {
-    var mempty4 = mempty(dictMonoid);
+    var mempty5 = mempty(dictMonoid);
     var applyWriterT1 = applyWriterT(dictMonoid.Semigroup0());
     return function(dictApplicative) {
-      var pure17 = pure(dictApplicative);
+      var pure18 = pure(dictApplicative);
       var applyWriterT2 = applyWriterT1(dictApplicative.Apply0());
       return {
         pure: function(a2) {
-          return pure17(new Tuple(a2, mempty4));
+          return pure18(new Tuple(a2, mempty5));
         },
         Apply0: function() {
           return applyWriterT2;
@@ -1294,36 +1339,36 @@
   var runWriter = function($5) {
     return unwrap2(runWriterT($5));
   };
-  var execWriter = function(m2) {
-    return snd(runWriter(m2));
+  var execWriter = function(m) {
+    return snd(runWriter(m));
   };
 
   // output/Data.Array/foreign.js
-  var replicateFill = function(count2, value12) {
+  var replicateFill = function(count2, value13) {
     if (count2 < 1) {
       return [];
     }
     var result = new Array(count2);
-    return result.fill(value12);
+    return result.fill(value13);
   };
-  var replicatePolyfill = function(count2, value12) {
+  var replicatePolyfill = function(count2, value13) {
     var result = [];
     var n = 0;
     for (var i = 0; i < count2; i++) {
-      result[n++] = value12;
+      result[n++] = value13;
     }
     return result;
   };
   var replicateImpl = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
   var fromFoldableImpl = function() {
-    function Cons2(head2, tail2) {
-      this.head = head2;
-      this.tail = tail2;
+    function Cons2(head3, tail3) {
+      this.head = head3;
+      this.tail = tail3;
     }
     var emptyList = {};
-    function curryCons(head2) {
-      return function(tail2) {
-        return new Cons2(head2, tail2);
+    function curryCons(head3) {
+      return function(tail3) {
+        return new Cons2(head3, tail3);
       };
     }
     function listToArray(list) {
@@ -1655,15 +1700,21 @@
   var foldr = function(dict) {
     return dict.foldr;
   };
+  var oneOf = function(dictFoldable) {
+    var foldr22 = foldr(dictFoldable);
+    return function(dictPlus) {
+      return foldr22(alt(dictPlus.Alt0()))(empty(dictPlus));
+    };
+  };
   var traverse_ = function(dictApplicative) {
     var applySecond4 = applySecond(dictApplicative.Apply0());
-    var pure17 = pure(dictApplicative);
+    var pure18 = pure(dictApplicative);
     return function(dictFoldable) {
       var foldr22 = foldr(dictFoldable);
       return function(f) {
         return foldr22(function($454) {
           return applySecond4(f($454));
-        })(pure17(unit));
+        })(pure18(unit));
       };
     };
   };
@@ -1708,11 +1759,11 @@
       };
     },
     foldMap: function(dictMonoid) {
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       return function(v) {
         return function(v1) {
           if (v1 instanceof Nothing) {
-            return mempty4;
+            return mempty5;
           }
           ;
           if (v1 instanceof Just) {
@@ -1727,14 +1778,14 @@
   var foldMapDefaultR = function(dictFoldable) {
     var foldr22 = foldr(dictFoldable);
     return function(dictMonoid) {
-      var append7 = append(dictMonoid.Semigroup0());
-      var mempty4 = mempty(dictMonoid);
+      var append8 = append(dictMonoid.Semigroup0());
+      var mempty5 = mempty(dictMonoid);
       return function(f) {
         return foldr22(function(x3) {
           return function(acc) {
-            return append7(f(x3))(acc);
+            return append8(f(x3))(acc);
           };
-        })(mempty4);
+        })(mempty5);
       };
     };
   };
@@ -1812,23 +1863,23 @@
       };
     }
     return function(apply5) {
-      return function(map20) {
-        return function(pure17) {
+      return function(map25) {
+        return function(pure18) {
           return function(f) {
             return function(array) {
               function go2(bot, top3) {
                 switch (top3 - bot) {
                   case 0:
-                    return pure17([]);
+                    return pure18([]);
                   case 1:
-                    return map20(array1)(f(array[bot]));
+                    return map25(array1)(f(array[bot]));
                   case 2:
-                    return apply5(map20(array2)(f(array[bot])))(f(array[bot + 1]));
+                    return apply5(map25(array2)(f(array[bot])))(f(array[bot + 1]));
                   case 3:
-                    return apply5(apply5(map20(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                    return apply5(apply5(map25(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                   default:
                     var pivot = bot + Math.floor((top3 - bot) / 4) * 2;
-                    return apply5(map20(concat2)(go2(bot, pivot)))(go2(pivot, top3));
+                    return apply5(map25(concat2)(go2(bot, pivot)))(go2(pivot, top3));
                 }
               }
               return go2(0, array.length);
@@ -1954,14 +2005,14 @@
           return function(f) {
             return function(b2) {
               var result = [];
-              var value12 = b2;
+              var value13 = b2;
               while (true) {
-                var maybe2 = f(value12);
+                var maybe2 = f(value13);
                 if (isNothing2(maybe2))
                   return result;
                 var tuple = fromJust7(maybe2);
                 result.push(fst2(tuple));
-                value12 = snd2(tuple);
+                value13 = snd2(tuple);
               }
             };
           };
@@ -1978,14 +2029,14 @@
           return function(f) {
             return function(b2) {
               var result = [];
-              var value12 = b2;
+              var value13 = b2;
               while (true) {
-                var tuple = f(value12);
+                var tuple = f(value13);
                 result.push(fst2(tuple));
                 var maybe2 = snd2(tuple);
                 if (isNothing2(maybe2))
                   return result;
-                value12 = fromJust7(maybe2);
+                value13 = fromJust7(maybe2);
               }
             };
           };
@@ -2072,8 +2123,8 @@
   };
   var cos = Math.cos;
   var remainder = function(n) {
-    return function(m2) {
-      return n % m2;
+    return function(m) {
+      return n % m;
     };
   };
   var round = Math.round;
@@ -2288,14 +2339,14 @@
     },
     foldMap: function(dictMonoid) {
       var append23 = append(dictMonoid.Semigroup0());
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       return function(f) {
         return foldl(foldableList)(function(acc) {
           var $286 = append23(acc);
           return function($287) {
             return $286(f($287));
           };
-        })(mempty4);
+        })(mempty5);
       };
     }
   };
@@ -2708,31 +2759,31 @@
     };
   }();
   var $lazy_unsafeSplit = /* @__PURE__ */ $runtime_lazy3("unsafeSplit", "Data.Map.Internal", function() {
-    return function(comp, k, m2) {
-      if (m2 instanceof Leaf) {
+    return function(comp, k, m) {
+      if (m instanceof Leaf) {
         return new Split(Nothing.value, Leaf.value, Leaf.value);
       }
       ;
-      if (m2 instanceof Node) {
-        var v = comp(k)(m2.value2);
+      if (m instanceof Node) {
+        var v = comp(k)(m.value2);
         if (v instanceof LT) {
-          var v1 = $lazy_unsafeSplit(771)(comp, k, m2.value4);
-          return new Split(v1.value0, v1.value1, unsafeBalancedNode(m2.value2, m2.value3, v1.value2, m2.value5));
+          var v1 = $lazy_unsafeSplit(771)(comp, k, m.value4);
+          return new Split(v1.value0, v1.value1, unsafeBalancedNode(m.value2, m.value3, v1.value2, m.value5));
         }
         ;
         if (v instanceof GT) {
-          var v1 = $lazy_unsafeSplit(774)(comp, k, m2.value5);
-          return new Split(v1.value0, unsafeBalancedNode(m2.value2, m2.value3, m2.value4, v1.value1), v1.value2);
+          var v1 = $lazy_unsafeSplit(774)(comp, k, m.value5);
+          return new Split(v1.value0, unsafeBalancedNode(m.value2, m.value3, m.value4, v1.value1), v1.value2);
         }
         ;
         if (v instanceof EQ) {
-          return new Split(new Just(m2.value3), m2.value4, m2.value5);
+          return new Split(new Just(m.value3), m.value4, m.value5);
         }
         ;
         throw new Error("Failed pattern match at Data.Map.Internal (line 769, column 5 - line 777, column 30): " + [v.constructor.name]);
       }
       ;
-      throw new Error("Failed pattern match at Data.Map.Internal (line 765, column 34 - line 777, column 30): " + [m2.constructor.name]);
+      throw new Error("Failed pattern match at Data.Map.Internal (line 765, column 34 - line 777, column 30): " + [m.constructor.name]);
     };
   });
   var unsafeSplit = /* @__PURE__ */ $lazy_unsafeSplit(764);
@@ -2977,8 +3028,8 @@
           };
         });
         var go2 = $lazy_go(167);
-        return function(m2) {
-          return go2(m2, z);
+        return function(m) {
+          return go2(m, z);
         };
       };
     },
@@ -2998,18 +3049,18 @@
           };
         });
         var go2 = $lazy_go(173);
-        return function(m2) {
-          return go2(z, m2);
+        return function(m) {
+          return go2(z, m);
         };
       };
     },
     foldMap: function(dictMonoid) {
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       var append14 = append(dictMonoid.Semigroup0());
       return function(f) {
         var go2 = function(v) {
           if (v instanceof Leaf) {
-            return mempty4;
+            return mempty5;
           }
           ;
           if (v instanceof Node) {
@@ -3039,8 +3090,8 @@
           };
         });
         var go2 = $lazy_go(187);
-        return function(m2) {
-          return go2(m2, z);
+        return function(m) {
+          return go2(m, z);
         };
       };
     },
@@ -3060,18 +3111,18 @@
           };
         });
         var go2 = $lazy_go(193);
-        return function(m2) {
-          return go2(z, m2);
+        return function(m) {
+          return go2(z, m);
         };
       };
     },
     foldMapWithIndex: function(dictMonoid) {
-      var mempty4 = mempty(dictMonoid);
+      var mempty5 = mempty(dictMonoid);
       var append14 = append(dictMonoid.Semigroup0());
       return function(f) {
         var go2 = function(v) {
           if (v instanceof Leaf) {
-            return mempty4;
+            return mempty5;
           }
           ;
           if (v instanceof Node) {
@@ -3258,8 +3309,8 @@
     var compare3 = compare(dictOrd);
     return function(f) {
       return function(k) {
-        return function(m2) {
-          var v = unsafeSplit(compare3, k, m2);
+        return function(m) {
+          var v = unsafeSplit(compare3, k, m);
           var v2 = f(v.value0);
           if (v2 instanceof Nothing) {
             return unsafeJoinNodes(v.value1, v.value2);
@@ -3706,12 +3757,12 @@
   };
   var abs1 = /* @__PURE__ */ abs3(basedPoint);
   var abs22 = /* @__PURE__ */ abs3(basedVector);
-  var line = function(m2) {
+  var line = function(m) {
     return function(n) {
       return {
-        a: ord2(m2) - ord2(n),
-        b: abs1(n) - abs1(m2),
-        c: abs1(m2) * ord2(n) - ord2(m2) * abs1(n)
+        a: ord2(m) - ord2(n),
+        b: abs1(n) - abs1(m),
+        c: abs1(m) * ord2(n) - ord2(m) * abs1(n)
       };
     };
   };
@@ -3747,6 +3798,11 @@
       as[i]();
     }
   };
+  var fastForeachE = (as, f) => {
+    for (var i = 0, l = as.length; i < l; i++) {
+      f(as[i]);
+    }
+  };
   var objHack = () => {
     return { r: false, q: [], m: [{}] };
   };
@@ -3754,8 +3810,8 @@
     o.m[o.m.length - 1][k] = v;
   };
   var deleteObjHack = (k, o) => {
-    for (const m2 of o.m) {
-      if (delete m2[k]) {
+    for (const m of o.m) {
+      if (delete m[k]) {
         return true;
       }
     }
@@ -3822,9 +3878,34 @@
     };
   };
 
+  // output/Data.Compactable/index.js
+  var compact = function(dict) {
+    return dict.compact;
+  };
+
   // output/Data.Filterable/index.js
+  var maybeBool = function(p) {
+    return function(x3) {
+      var $66 = p(x3);
+      if ($66) {
+        return new Just(x3);
+      }
+      ;
+      return Nothing.value;
+    };
+  };
   var filterMap = function(dict) {
     return dict.filterMap;
+  };
+  var eitherBool = function(p) {
+    return function(x3) {
+      var $84 = p(x3);
+      if ($84) {
+        return new Right(x3);
+      }
+      ;
+      return new Left(x3);
+    };
   };
 
   // output/Effect.Uncurried/foreign.js
@@ -3843,23 +3924,23 @@
 
   // output/Effect.Uncurried/index.js
   var semigroupEffectFn1 = function(dictSemigroup) {
-    var append7 = append(semigroupEffect(dictSemigroup));
+    var append8 = append(semigroupEffect(dictSemigroup));
     return {
       append: function(f1) {
         return function(f2) {
           return mkEffectFn1(function(a2) {
-            return append7(runEffectFn1(f1)(a2))(runEffectFn1(f2)(a2));
+            return append8(runEffectFn1(f1)(a2))(runEffectFn1(f2)(a2));
           });
         };
       }
     };
   };
   var monoidEffectFn1 = function(dictMonoid) {
-    var mempty4 = mempty(monoidEffect(dictMonoid));
+    var mempty5 = mempty(monoidEffect(dictMonoid));
     var semigroupEffectFn11 = semigroupEffectFn1(dictMonoid.Semigroup0());
     return {
       mempty: mkEffectFn1(function(v) {
-        return mempty4;
+        return mempty5;
       }),
       Semigroup0: function() {
         return semigroupEffectFn11;
@@ -3868,15 +3949,17 @@
   };
 
   // output/FRP.Event.Class/index.js
+  var map5 = /* @__PURE__ */ map(functorTuple);
+  var pure3 = /* @__PURE__ */ pure(applicativeMaybe);
   var sampleOnRight = function(dict) {
     return dict.sampleOnRight;
   };
   var sampleOnRightOp = function(dictIsEvent) {
     var sampleOnRight1 = sampleOnRight(dictIsEvent);
-    var map110 = map(dictIsEvent.Filterable2().Functor1());
+    var map111 = map(dictIsEvent.Filterable2().Functor1());
     return function(ef) {
       return function(ea) {
-        return sampleOnRight1(ef)(map110(applyFlipped)(ea));
+        return sampleOnRight1(ef)(map111(applyFlipped)(ea));
       };
     };
   };
@@ -3886,15 +3969,65 @@
   var once = function(dict) {
     return dict.once;
   };
+  var keepLatest = function(dict) {
+    return dict.keepLatest;
+  };
+  var fix = function(dict) {
+    return dict.fix;
+  };
+  var fold2 = function(dictIsEvent) {
+    var fix1 = fix(dictIsEvent);
+    var sampleOnRight1 = sampleOnRight(dictIsEvent);
+    var alt6 = alt(dictIsEvent.Alt1());
+    var Functor1 = dictIsEvent.Filterable2().Functor1();
+    var voidLeft4 = voidLeft(Functor1);
+    var once12 = once(dictIsEvent);
+    var map111 = map(Functor1);
+    return function(f) {
+      return function(b2) {
+        return function(e) {
+          return fix1(function(i) {
+            return sampleOnRight1(alt6(i)(voidLeft4(once12(e))(b2)))(map111(flip(f))(e));
+          });
+        };
+      };
+    };
+  };
+  var mapAccum = function(dictIsEvent) {
+    var filterMap4 = filterMap(dictIsEvent.Filterable2());
+    var fold12 = fold2(dictIsEvent);
+    return function(f) {
+      return function(acc) {
+        return function(xs) {
+          return filterMap4(snd)(fold12(function(v) {
+            return function(b2) {
+              return map5(pure3)(f(v.value0)(b2));
+            };
+          })(new Tuple(acc, Nothing.value))(xs));
+        };
+      };
+    };
+  };
+
+  // output/Unsafe.Reference/foreign.js
+  function reallyUnsafeRefEq(a2) {
+    return function(b2) {
+      return a2 === b2;
+    };
+  }
+
+  // output/Unsafe.Reference/index.js
+  var unsafeRefEq = reallyUnsafeRefEq;
 
   // output/FRP.Event/index.js
   var $$void2 = /* @__PURE__ */ $$void(functorEffect);
   var liftST2 = /* @__PURE__ */ liftST(monadSTEffect);
   var for_2 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
-  var pure3 = /* @__PURE__ */ pure(applicativeST);
+  var pure4 = /* @__PURE__ */ pure(applicativeST);
   var void1 = /* @__PURE__ */ $$void(functorST);
   var join2 = /* @__PURE__ */ join(bindST);
   var liftST1 = /* @__PURE__ */ liftST(monadSTST);
+  var append3 = /* @__PURE__ */ append(semigroupArray);
   var mempty2 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidEffectFn1(monoidUnit));
   var identity6 = /* @__PURE__ */ identity(categoryFn);
   var apply3 = /* @__PURE__ */ apply(applyST);
@@ -3921,7 +4054,7 @@
             };
           })();
         });
-        return function __do5() {
+        return function __do6() {
           c1();
           return c2();
         };
@@ -3943,7 +4076,7 @@
         var c2 = v1(b2, function(f) {
           return liftST2(void1(write2(new Just(f))(latest)))();
         });
-        return function __do5() {
+        return function __do6() {
           c1();
           return c2();
         };
@@ -3953,7 +4086,7 @@
   var once2 = function(v) {
     return function(b2, k) {
       var latest = newSTRef(Nothing.value)();
-      var u = newSTRef(pure3(unit))();
+      var u = newSTRef(pure4(unit))();
       var c = v(b2, function(a2) {
         var o2 = liftST2(read2(latest))();
         if (o2 instanceof Nothing) {
@@ -3986,12 +4119,12 @@
         var a2 = newSTArray();
         foreachE(f)(function(x3) {
           var v = f0(x3);
-          return function __do5() {
+          return function __do6() {
             var u = v(tf, k);
             return void1(liftST1(push(u)(a2)))();
           };
         })();
-        return function __do5() {
+        return function __do6() {
           var o = liftST1(freeze(a2))();
           return fastForeachThunk(o);
         };
@@ -4002,12 +4135,12 @@
     return function(tf, k) {
       var a2 = newSTArray();
       foreachE(f)(function(v) {
-        return function __do5() {
+        return function __do6() {
           var u = v(tf, k);
           return void1(liftST1(push(u)(a2)))();
         };
       })();
-      return function __do5() {
+      return function __do6() {
         var o = liftST1(freeze(a2))();
         return fastForeachThunk(o);
       };
@@ -4029,18 +4162,81 @@
       })();
     };
   };
+  var mailbox$prime = function(dictOrd) {
+    var alter3 = alter(dictOrd);
+    var lookup4 = lookup(dictOrd);
+    return function __do6() {
+      var r = newSTRef(empty2)();
+      return {
+        event: function(a2) {
+          return function(v, k2) {
+            void1(modify(alter3(function(v1) {
+              if (v1 instanceof Nothing) {
+                return new Just([k2]);
+              }
+              ;
+              if (v1 instanceof Just) {
+                return new Just(append3(v1.value0)([k2]));
+              }
+              ;
+              throw new Error("Failed pattern match at FRP.Event (line 547, column 17 - line 549, column 51): " + [v1.constructor.name]);
+            })(a2))(r))();
+            return void1(modify(alter3(function(v1) {
+              if (v1 instanceof Nothing) {
+                return Nothing.value;
+              }
+              ;
+              if (v1 instanceof Just) {
+                return new Just(deleteBy(unsafeRefEq)(k2)(v1.value0));
+              }
+              ;
+              throw new Error("Failed pattern match at FRP.Event (line 556, column 17 - line 558, column 65): " + [v1.constructor.name]);
+            })(a2))(r));
+          };
+        },
+        push: function(v) {
+          var o = liftST2(read2(r))();
+          var v1 = lookup4(v.address)(o);
+          if (v1 instanceof Nothing) {
+            return unit;
+          }
+          ;
+          if (v1 instanceof Just) {
+            return fastForeachE(v1.value0, function(i) {
+              return i(v.payload);
+            });
+          }
+          ;
+          throw new Error("Failed pattern match at FRP.Event (line 565, column 9 - line 567, column 95): " + [v1.constructor.name]);
+        }
+      };
+    };
+  };
+  var mailbox = function(dictOrd) {
+    return function __do6() {
+      var v = mailbox$prime(dictOrd)();
+      return {
+        push: function(ap2) {
+          return function() {
+            return v.push(ap2);
+          };
+        },
+        event: v.event
+      };
+    };
+  };
   var keepLatest2 = function(v) {
     return function(tf, k) {
-      var cancelInner = newSTRef(pure3(unit))();
+      var cancelInner = newSTRef(pure4(unit))();
       var cancelOuter = v(tf, function(v1) {
-        return liftST2(function __do5() {
+        return liftST2(function __do6() {
           var ci = read2(cancelInner)();
           ci();
           var c = v1(tf, k);
           return void1(liftST1(write2(c)(cancelInner)))();
         })();
       });
-      return function __do5() {
+      return function __do6() {
         var ci = read2(cancelInner)();
         ci();
         return cancelOuter();
@@ -4102,7 +4298,7 @@
         void1(modify(function(v1) {
           return v1 + 1 | 0;
         })(idx))();
-        return function __do5() {
+        return function __do6() {
           void1(write2(mempty2)(rk))();
           deleteObjHack(ix, subscribers);
           return unit;
@@ -4130,7 +4326,7 @@
         void1(modify(function(v1) {
           return v1 + 1 | 0;
         })(idx))();
-        return function __do5() {
+        return function __do6() {
           void1(write2(mempty2)(rk))();
           deleteObjHack(ix, subscribers);
           return unit;
@@ -4150,7 +4346,7 @@
       var v1 = f(v.event);
       var c2 = v.event(tf, k);
       var c1 = v1(tf, v.push);
-      return function __do5() {
+      return function __do6() {
         c1();
         return c2();
       };
@@ -4244,7 +4440,7 @@
             };
           })();
         });
-        return function __do5() {
+        return function __do6() {
           c1();
           return c2();
         };
@@ -4267,7 +4463,7 @@
         return function(tf, k) {
           return apply3(map1(function(v2) {
             return function(v3) {
-              return function __do5() {
+              return function __do6() {
                 v2();
                 return v3();
               };
@@ -4286,7 +4482,7 @@
   };
   var plusEvent = {
     empty: function(v, v1) {
-      return pure3(unit);
+      return pure4(unit);
     },
     Alt0: function() {
       return altEvent;
@@ -4315,19 +4511,19 @@
   };
 
   // output/Web.Internal.FFI/foreign.js
-  function _unsafeReadProtoTagged(nothing, just, name15, value12) {
+  function _unsafeReadProtoTagged(nothing, just, name15, value13) {
     if (typeof window !== "undefined") {
       var ty = window[name15];
-      if (ty != null && value12 instanceof ty) {
-        return just(value12);
+      if (ty != null && value13 instanceof ty) {
+        return just(value13);
       }
     }
-    var obj = value12;
+    var obj = value13;
     while (obj != null) {
       var proto = Object.getPrototypeOf(obj);
       var constructorName = proto.constructor.name;
       if (constructorName === name15) {
-        return just(value12);
+        return just(value13);
       } else if (constructorName === "Object") {
         return nothing;
       }
@@ -4338,8 +4534,8 @@
 
   // output/Web.Internal.FFI/index.js
   var unsafeReadProtoTagged = function(name15) {
-    return function(value12) {
-      return _unsafeReadProtoTagged(Nothing.value, Just.create, name15, value12);
+    return function(value13) {
+      return _unsafeReadProtoTagged(Nothing.value, Just.create, name15, value13);
     };
   };
 
@@ -4359,9 +4555,9 @@
   }
 
   // output/Web.HTML.HTMLDocument/index.js
-  var map5 = /* @__PURE__ */ map(functorEffect);
+  var map6 = /* @__PURE__ */ map(functorEffect);
   var body = function(doc) {
-    return map5(toMaybe)(function() {
+    return map6(toMaybe)(function() {
       return _body(doc);
     });
   };
@@ -4491,16 +4687,44 @@
   }
 
   // output/FRP.Poll/index.js
-  var pure4 = /* @__PURE__ */ pure(applicativeST);
+  var pure5 = /* @__PURE__ */ pure(applicativeST);
+  var map7 = /* @__PURE__ */ map(functorFn);
   var identity7 = /* @__PURE__ */ identity(categoryFn);
+  var oneOf2 = /* @__PURE__ */ oneOf(foldableArray);
+  var empty3 = /* @__PURE__ */ empty(plusMaybe);
   var $$void3 = /* @__PURE__ */ $$void(functorST);
   var join3 = /* @__PURE__ */ join(bindST);
   var when2 = /* @__PURE__ */ when(applicativeST);
   var once1 = /* @__PURE__ */ once(eventIsEvent);
   var sampleOnRightOp2 = /* @__PURE__ */ sampleOnRightOp(eventIsEvent);
+  var composeFlipped2 = /* @__PURE__ */ composeFlipped(semigroupoidFn);
+  var map12 = /* @__PURE__ */ map(functorMaybe);
   var APoll = function(x3) {
     return x3;
   };
+  var KeepLatestStart = /* @__PURE__ */ function() {
+    function KeepLatestStart2(value0, value1) {
+      this.value0 = value0;
+      this.value1 = value1;
+    }
+    ;
+    KeepLatestStart2.create = function(value0) {
+      return function(value1) {
+        return new KeepLatestStart2(value0, value1);
+      };
+    };
+    return KeepLatestStart2;
+  }();
+  var KeepLatestLast = /* @__PURE__ */ function() {
+    function KeepLatestLast2(value0) {
+      this.value0 = value0;
+    }
+    ;
+    KeepLatestLast2.create = function(value0) {
+      return new KeepLatestLast2(value0);
+    };
+    return KeepLatestLast2;
+  }();
   var pollable = function(dictIsEvent) {
     return {
       sample: function(v) {
@@ -4525,18 +4749,38 @@
     };
   };
   var sham1 = /* @__PURE__ */ sham(eventIsEvent);
+  var once3 = function(dictPollable) {
+    var sample22 = sample(dictPollable);
+    return function(dictIsEvent) {
+      var once22 = once(dictIsEvent);
+      return function(a2) {
+        return poll(function(e) {
+          return once22(sample22(a2)(e));
+        });
+      };
+    };
+  };
   var merge2 = function(a2) {
     return function(e) {
       return mergeMap(flip(sample1)(e))(a2);
     };
   };
+  var mailbox2 = function(dictOrd) {
+    return function __do6() {
+      var v = mailbox(dictOrd)();
+      return {
+        poll: map7(sham1)(v.event),
+        push: v.push
+      };
+    };
+  };
   var functorAPoll = function(dictFunctor) {
-    var map24 = map(dictFunctor);
+    var map25 = map(dictFunctor);
     return {
       map: function(f) {
         return function(v) {
           return function(e) {
-            return v(map24(function(v1) {
+            return v(map25(function(v1) {
               return function($478) {
                 return v1(f($478));
               };
@@ -4549,14 +4793,50 @@
   var sampleBy = function(dictPollable) {
     var sample22 = sample(dictPollable);
     return function(dictFunctor) {
-      var map24 = map(functorAPoll(dictFunctor));
+      var map25 = map(functorAPoll(dictFunctor));
       return function(dictFunctor1) {
         var map33 = map(dictFunctor1);
         return function(f) {
           return function(b2) {
             return function(e) {
-              return sample22(map24(f)(b2))(map33(applyFlipped)(e));
+              return sample22(map25(f)(b2))(map33(applyFlipped)(e));
             };
+          };
+        };
+      };
+    };
+  };
+  var keepLatest3 = function(dictFilterable) {
+    var filterMap1 = filterMap(dictFilterable);
+    var Functor1 = dictFilterable.Functor1();
+    return function(dictIsEvent) {
+      var fix1 = fix(dictIsEvent);
+      var oneOf1 = oneOf2(dictIsEvent.Plus0());
+      var keepLatest1 = keepLatest(dictIsEvent);
+      var once22 = once(dictIsEvent);
+      return function(dictPollable) {
+        var sampleBy22 = sampleBy(dictPollable)(Functor1)(Functor1);
+        return function(a2) {
+          return function(e) {
+            return filterMap1(function(v) {
+              if (v instanceof KeepLatestLast) {
+                return new Just(v.value0);
+              }
+              ;
+              return Nothing.value;
+            })(fix1(function(ie) {
+              return oneOf1([sampleBy22(KeepLatestStart.create)(a2)(e), keepLatest1(flip(filterMap1)(ie)(function(v) {
+                if (v instanceof KeepLatestStart) {
+                  return new Just(sampleBy22(function(bb) {
+                    return function(v1) {
+                      return new KeepLatestLast(v.value1(bb));
+                    };
+                  })(v.value0)(once22(ie)));
+                }
+                ;
+                return empty3;
+              }))]);
+            }));
           };
         };
       };
@@ -4573,18 +4853,18 @@
   };
   var sample_1 = /* @__PURE__ */ sample_(pollable1)(functorEvent)(functorEvent);
   var rant = function(a2) {
-    return function __do5() {
+    return function __do6() {
       var ep = createPure();
       var started = newSTRef(false)();
-      var unsub = newSTRef(pure4(unit))();
+      var unsub = newSTRef(pure5(unit))();
       return {
         unsubscribe: join3(read2(unsub)),
         poll: poll(function(e) {
           return makeLemmingEvent(function(s) {
             return function(k) {
-              return function __do6() {
+              return function __do7() {
                 var st = read2(started)();
-                when2(!st)(function __do7() {
+                when2(!st)(function __do8() {
                   var unsubscribe = s(sample_1(a2)(once1(e)))(ep.push)();
                   $$void3(write2(true)(started))();
                   return $$void3(flip(write2)(unsub)(unsubscribe))();
@@ -4595,6 +4875,40 @@
             };
           });
         })
+      };
+    };
+  };
+  var sampleOnLeft3 = function(dictPollable) {
+    var sample_22 = sample_(dictPollable);
+    var sampleBy22 = sampleBy(dictPollable);
+    return function(dictIsEvent) {
+      var sampleOnLeft1 = sampleOnLeft(dictIsEvent);
+      var Functor1 = dictIsEvent.Filterable2().Functor1();
+      var sample_32 = sample_22(Functor1)(Functor1);
+      var sampleBy3 = sampleBy22(Functor1)(Functor1);
+      return function(a2) {
+        return function(b2) {
+          return poll(function(e) {
+            return sampleOnLeft1(sample_32(a2)(e))(sampleBy3(composeFlipped2)(b2)(e));
+          });
+        };
+      };
+    };
+  };
+  var sampleOnRight3 = function(dictPollable) {
+    var sample_22 = sample_(dictPollable);
+    var sampleBy22 = sampleBy(dictPollable);
+    return function(dictIsEvent) {
+      var sampleOnRight1 = sampleOnRight(dictIsEvent);
+      var Functor1 = dictIsEvent.Filterable2().Functor1();
+      var sample_32 = sample_22(Functor1)(Functor1);
+      var sampleBy3 = sampleBy22(Functor1)(Functor1);
+      return function(a2) {
+        return function(b2) {
+          return poll(function(e) {
+            return sampleOnRight1(sample_32(a2)(e))(sampleBy3(composeFlipped2)(b2)(e));
+          });
+        };
       };
     };
   };
@@ -4626,7 +4940,166 @@
       }
     };
   };
-  var create4 = function __do3() {
+  var fix3 = function(dictPollable) {
+    var sampleBy22 = sampleBy(dictPollable);
+    return function(dictIsEvent) {
+      var Functor1 = dictIsEvent.Filterable2().Functor1();
+      var map25 = map(Functor1);
+      var fix1 = fix(dictIsEvent);
+      var sampleBy3 = sampleBy22(Functor1)(Functor1);
+      var sham2 = sham(dictIsEvent);
+      return function(f) {
+        return poll(function(e) {
+          return map25(function(v) {
+            return v.value1(v.value0);
+          })(fix1(function(ee) {
+            return sampleBy3(Tuple.create)(f(sham2(map25(fst)(ee))))(e);
+          }));
+        });
+      };
+    };
+  };
+  var filterMap2 = function(dictCompactable) {
+    var compact2 = compact(dictCompactable);
+    return function(dictPollable) {
+      var sampleBy22 = sampleBy(dictPollable);
+      return function(dictFunctor) {
+        var sampleBy3 = sampleBy22(dictFunctor)(dictFunctor);
+        return function(f) {
+          return function(b2) {
+            return poll(function(e) {
+              return compact2(sampleBy3(function(a2) {
+                return function(ff2) {
+                  return map12(ff2)(f(a2));
+                };
+              })(b2)(e));
+            });
+          };
+        };
+      };
+    };
+  };
+  var partitionMap = function(dictPollable) {
+    return function(dictCompactable) {
+      var filterMap1 = filterMap2(dictCompactable)(dictPollable);
+      return function(dictFunctor) {
+        var map25 = map(functorAPoll(dictFunctor));
+        var filterMap22 = filterMap1(dictFunctor);
+        return function(f) {
+          return function(b2) {
+            var fb = map25(f)(b2);
+            return {
+              left: filterMap22(either(Just.create)($$const(Nothing.value)))(fb),
+              right: filterMap22(either($$const(Nothing.value))(Just.create))(fb)
+            };
+          };
+        };
+      };
+    };
+  };
+  var compactableAPoll = function(dictFunctor) {
+    return function(dictCompactable) {
+      var filterMap1 = filterMap2(dictCompactable);
+      return function(dictPollable) {
+        return {
+          compact: filterMap1(dictPollable)(dictFunctor)(identity7),
+          separate: partitionMap(dictPollable)(dictCompactable)(dictFunctor)(identity7)
+        };
+      };
+    };
+  };
+  var filterableAPoll = function(dictFunctor) {
+    var compactableAPoll1 = compactableAPoll(dictFunctor);
+    var functorAPoll1 = functorAPoll(dictFunctor);
+    return function(dictCompactable) {
+      var filterMap1 = filterMap2(dictCompactable);
+      var compactableAPoll2 = compactableAPoll1(dictCompactable);
+      return function(dictPollable) {
+        var filterMap22 = filterMap1(dictPollable)(dictFunctor);
+        var partitionMap1 = partitionMap(dictPollable)(dictCompactable)(dictFunctor);
+        var compactableAPoll3 = compactableAPoll2(dictPollable);
+        return {
+          filterMap: filterMap22,
+          filter: function($479) {
+            return filterMap22(maybeBool($479));
+          },
+          partitionMap: partitionMap1,
+          partition: function(p) {
+            return function(xs) {
+              var o = partitionMap1(eitherBool(p))(xs);
+              return {
+                no: o.left,
+                yes: o.right
+              };
+            };
+          },
+          Compactable0: function() {
+            return compactableAPoll3;
+          },
+          Functor1: function() {
+            return functorAPoll1;
+          }
+        };
+      };
+    };
+  };
+  var isEventAPoll = function(dictIsEvent) {
+    var Filterable2 = dictIsEvent.Filterable2();
+    var keepLatest1 = keepLatest3(Filterable2)(dictIsEvent);
+    var plusAPoll1 = plusAPoll(dictIsEvent.Plus0());
+    var altAPoll1 = altAPoll(dictIsEvent.Alt1());
+    var filterableAPoll1 = filterableAPoll(Filterable2.Functor1())(Filterable2.Compactable0());
+    return function(dictPlus) {
+      return function(dictPollable) {
+        var filterableAPoll2 = filterableAPoll1(dictPollable);
+        return {
+          sampleOnRight: sampleOnRight3(dictPollable)(dictIsEvent),
+          sampleOnLeft: sampleOnLeft3(dictPollable)(dictIsEvent),
+          keepLatest: keepLatest1(dictPollable),
+          fix: fix3(dictPollable)(dictIsEvent),
+          once: once3(dictPollable)(dictIsEvent),
+          Plus0: function() {
+            return plusAPoll1;
+          },
+          Alt1: function() {
+            return altAPoll1;
+          },
+          Filterable2: function() {
+            return filterableAPoll2;
+          }
+        };
+      };
+    };
+  };
+  var functorWithIndexAPoll = function(dictIsEvent) {
+    var isEventAPoll1 = isEventAPoll(dictIsEvent)(dictIsEvent.Plus0());
+    var functorAPoll1 = functorAPoll(dictIsEvent.Filterable2().Functor1());
+    return function(dictPollable) {
+      var mapAccum2 = mapAccum(isEventAPoll1(dictPollable));
+      return {
+        mapWithIndex: function(f) {
+          return function(e) {
+            return mapAccum2(function(a2) {
+              return function(b2) {
+                return new Tuple(a2 + 1 | 0, f(a2)(b2));
+              };
+            })(0)(e);
+          };
+        },
+        Functor0: function() {
+          return functorAPoll1;
+        }
+      };
+    };
+  };
+  var createPure2 = function __do3() {
+    var v = createPure();
+    return {
+      poll: sham1(v.event),
+      push: v.push
+    };
+  };
+  var create4 = function __do4() {
     var v = create();
     var v1 = rant(sham1(v.event))();
     return {
@@ -4637,18 +5110,18 @@
   var applyAPoll = function(dictApply) {
     var apply5 = apply(dictApply);
     var Functor0 = dictApply.Functor0();
-    var map24 = map(Functor0);
-    var voidLeft3 = voidLeft(Functor0);
+    var map25 = map(Functor0);
+    var voidLeft4 = voidLeft(Functor0);
     var functorAPoll1 = functorAPoll(Functor0);
     return {
       apply: function(v) {
         return function(v1) {
           return function(e) {
-            return apply5(map24(function(ff2) {
+            return apply5(map25(function(ff2) {
               return function(v2) {
                 return v2.value0(ff2(v2.value1));
               };
-            })(v(voidLeft3(e)(identity7))))(v1(map24(Tuple.create)(e)));
+            })(v(voidLeft4(e)(identity7))))(v1(map25(Tuple.create)(e)));
           };
         };
       },
@@ -4658,12 +5131,12 @@
     };
   };
   var applicativeAPoll = function(dictApply) {
-    var map24 = map(dictApply.Functor0());
+    var map25 = map(dictApply.Functor0());
     var applyAPoll1 = applyAPoll(dictApply);
     return {
       pure: function(a2) {
         return function(e) {
-          return map24(applyFlipped(a2))(e);
+          return map25(applyFlipped(a2))(e);
         };
       },
       Apply0: function() {
@@ -4755,6 +5228,9 @@
   var fixed = function(a2) {
     return new FixedChildren$prime(a2);
   };
+  var dyn = function(a2) {
+    return new DynamicChildren$prime(a2);
+  };
 
   // output/Data.Array.NonEmpty.Internal/foreign.js
   var traverse1Impl = function() {
@@ -4762,12 +5238,12 @@
       this.fn = fn;
     }
     var emptyList = {};
-    var ConsCell = function(head2, tail2) {
-      this.head = head2;
-      this.tail = tail2;
+    var ConsCell = function(head3, tail3) {
+      this.head = head3;
+      this.tail = tail3;
     };
-    function finalCell(head2) {
-      return new ConsCell(head2, emptyList);
+    function finalCell(head3) {
+      return new ConsCell(head3, emptyList);
     }
     function consList(x3) {
       return function(xs) {
@@ -4783,9 +5259,9 @@
       }
       return arr;
     }
-    return function(apply5, map20, f) {
+    return function(apply5, map25, f) {
       var buildFrom = function(x3, ys) {
-        return apply5(map20(consList)(f(x3)))(ys);
+        return apply5(map25(consList)(f(x3)))(ys);
       };
       var go2 = function(acc, currentLen, xs) {
         if (currentLen === 0) {
@@ -4799,44 +5275,44 @@
         }
       };
       return function(array) {
-        var acc = map20(finalCell)(f(array[array.length - 1]));
+        var acc = map25(finalCell)(f(array[array.length - 1]));
         var result = go2(acc, array.length - 1, array);
         while (result instanceof Cont) {
           result = result.fn();
         }
-        return map20(listToArray)(result);
+        return map25(listToArray)(result);
       };
     };
   }();
 
   // output/Foreign.Object/foreign.js
-  function _copyST(m2) {
+  function _copyST(m) {
     return function() {
       var r = {};
-      for (var k in m2) {
-        if (hasOwnProperty.call(m2, k)) {
-          r[k] = m2[k];
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r[k] = m[k];
         }
       }
       return r;
     };
   }
-  var empty3 = {};
+  var empty4 = {};
   function runST(f) {
     return f();
   }
   function _foldM(bind7) {
     return function(f) {
       return function(mz) {
-        return function(m2) {
+        return function(m) {
           var acc = mz;
           function g2(k2) {
             return function(z) {
-              return f(z)(k2)(m2[k2]);
+              return f(z)(k2)(m[k2]);
             };
           }
-          for (var k in m2) {
-            if (hasOwnProperty.call(m2, k)) {
+          for (var k in m) {
+            if (hasOwnProperty.call(m, k)) {
               acc = bind7(acc)(g2(k));
             }
           }
@@ -4846,11 +5322,11 @@
     };
   }
   function toArrayWithKey(f) {
-    return function(m2) {
+    return function(m) {
       var r = [];
-      for (var k in m2) {
-        if (hasOwnProperty.call(m2, k)) {
-          r.push(f(k)(m2[k]));
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k)) {
+          r.push(f(k)(m[k]));
         }
       }
       return r;
@@ -4865,19 +5341,19 @@
   // output/Foreign.Object.ST/foreign.js
   function poke2(k) {
     return function(v) {
-      return function(m2) {
+      return function(m) {
         return function() {
-          m2[k] = v;
-          return m2;
+          m[k] = v;
+          return m;
         };
       };
     };
   }
   var deleteImpl = function(k) {
-    return function(m2) {
+    return function(m) {
       return function() {
-        delete m2[k];
-        return m2;
+        delete m[k];
+        return m;
       };
     };
   };
@@ -4891,9 +5367,9 @@
   });
   var thawST = _copyST;
   var mutate = function(f) {
-    return function(m2) {
-      return runST(function __do5() {
-        var s = thawST(m2)();
+    return function(m) {
+      return runST(function __do6() {
+        var s = thawST(m)();
         f(s)();
         return s;
       });
@@ -4907,7 +5383,7 @@
   var fold3 = /* @__PURE__ */ _foldM(applyFlipped);
   var foldMap2 = function(dictMonoid) {
     var append14 = append(dictMonoid.Semigroup0());
-    var mempty4 = mempty(dictMonoid);
+    var mempty5 = mempty(dictMonoid);
     return function(f) {
       return fold3(function(acc) {
         return function(k) {
@@ -4915,7 +5391,7 @@
             return append14(acc)(f(k)(v));
           };
         };
-      })(mempty4);
+      })(mempty5);
     };
   };
   var foldableObject = {
@@ -4928,8 +5404,8 @@
     },
     foldr: function(f) {
       return function(z) {
-        return function(m2) {
-          return foldr6(f)(z)(values(m2));
+        return function(m) {
+          return foldr6(f)(z)(values(m));
         };
       };
     },
@@ -4945,23 +5421,23 @@
   };
 
   // output/Bolson.Control/index.js
-  var map6 = /* @__PURE__ */ map(functorArray);
+  var map8 = /* @__PURE__ */ map(functorArray);
   var pollable2 = /* @__PURE__ */ pollable(eventIsEvent);
   var sample2 = /* @__PURE__ */ sample(pollable2);
   var bind2 = /* @__PURE__ */ bind(bindST);
-  var pure5 = /* @__PURE__ */ pure(applicativeST);
+  var pure6 = /* @__PURE__ */ pure(applicativeST);
   var liftST3 = /* @__PURE__ */ liftST(monadSTST);
   var sample_2 = /* @__PURE__ */ sample_(pollable2)(functorEvent)(functorEvent);
   var $$void4 = /* @__PURE__ */ $$void(functorST);
   var applySecond2 = /* @__PURE__ */ applySecond(applyST);
-  var map12 = /* @__PURE__ */ map(functorST);
+  var map13 = /* @__PURE__ */ map(functorST);
   var show2 = /* @__PURE__ */ show(showInt);
-  var append3 = /* @__PURE__ */ append(/* @__PURE__ */ semigroupFn(semigroupString));
+  var append4 = /* @__PURE__ */ append(/* @__PURE__ */ semigroupFn(semigroupString));
   var pure1 = /* @__PURE__ */ pure(applicativeFn);
   var append12 = /* @__PURE__ */ append(semigroupList);
   var append22 = /* @__PURE__ */ append(semigroupArray);
   var voidLeft2 = /* @__PURE__ */ voidLeft(functorEvent);
-  var once3 = /* @__PURE__ */ once(eventIsEvent);
+  var once4 = /* @__PURE__ */ once(eventIsEvent);
   var identity8 = /* @__PURE__ */ identity(categoryFn);
   var for_3 = /* @__PURE__ */ for_(applicativeST);
   var for_1 = /* @__PURE__ */ for_3(foldableArray);
@@ -4991,7 +5467,7 @@
           };
           if (etty instanceof FixedChildren$prime) {
             return poll(function(e) {
-              return merge(map6(function(ex) {
+              return merge(map8(function(ex) {
                 return sample2(flatten(v)(ex)(psr)(interpreter))(e);
               })(etty.value0));
             });
@@ -5005,11 +5481,11 @@
             return poll(function(e0) {
               return makeLemmingEvent(function(subscribe2) {
                 return function(k0) {
-                  return function __do5() {
-                    var urf = newSTRef(pure5(unit))();
-                    var cancelInner = liftST3(newSTRef(empty3))();
+                  return function __do6() {
+                    var urf = newSTRef(pure6(unit))();
+                    var cancelInner = liftST3(newSTRef(empty4))();
                     var ugh = subscribe2(e0)(function(f) {
-                      return function __do6() {
+                      return function __do7() {
                         var fireId1 = liftST3(v.ids(interpreter))();
                         k0(f(v.deferPayload(interpreter)(psr.deferralPath)(v.forcePayload(interpreter)(snoc(psr.deferralPath)(fireId1)))))();
                         var eepp = createPure();
@@ -5022,20 +5498,20 @@
                           return applySecond2(v1)(memoKids.unsubscribe);
                         })(urf))();
                         var cancelOuter = subscribe2(memoKids.event)(function(inner) {
-                          return function __do7() {
+                          return function __do8() {
                             var fireId2 = liftST3(v.ids(interpreter))();
                             var myUnsubId = liftST3(v.ids(interpreter))();
-                            var myUnsub = liftST3(newSTRef(pure5(unit)))();
+                            var myUnsub = liftST3(newSTRef(pure6(unit)))();
                             var eltsUnsubId = liftST3(v.ids(interpreter))();
-                            var eltsUnsub = liftST3(newSTRef(pure5(unit)))();
+                            var eltsUnsub = liftST3(newSTRef(pure6(unit)))();
                             var myIds = liftST3(newSTRef([]))();
-                            var myScope = liftST3(map12(Local.create)(function() {
+                            var myScope = liftST3(map13(Local.create)(function() {
                               if (psr.scope instanceof Global) {
-                                return map12(show2)(v.ids(interpreter));
+                                return map13(show2)(v.ids(interpreter));
                               }
                               ;
                               if (psr.scope instanceof Local) {
-                                return map12(append3(pure1(psr.scope.value0))(append3(pure1("!"))(show2)))(v.ids(interpreter));
+                                return map13(append4(pure1(psr.scope.value0))(append4(pure1("!"))(show2)))(v.ids(interpreter));
                               }
                               ;
                               throw new Error("Failed pattern match at Bolson.Control (line 733, column 15 - line 735, column 74): " + [psr.scope.constructor.name]);
@@ -5057,14 +5533,14 @@
                                 return $$void4(modify(append22([id]))(myIds));
                               };
                               return $112;
-                            }())(interpreter))(voidLeft2(once3(memoKids.event))(identity8));
+                            }())(interpreter))(voidLeft2(once4(memoKids.event))(identity8));
                             var c1 = liftST3(subscribe2(evt)(function($208) {
                               return k0(f($208));
                             }))();
                             $$void4(liftST3(modify(insert4(show2(eltsUnsubId))(c1))(cancelInner)))();
                             $$void4(liftST3(write2(c1)(eltsUnsub)))();
-                            var c0 = liftST3(subscribe2(sample_2(fst(inner))(once3(memoKids.event)))(function(kid$prime) {
-                              return function __do8() {
+                            var c0 = liftST3(subscribe2(sample_2(fst(inner))(once4(memoKids.event)))(function(kid$prime) {
+                              return function __do9() {
                                 var stage = liftST3(read2(stageRef))();
                                 if (kid$prime instanceof Logic && stage instanceof Listening) {
                                   var cid = liftST3(read2(myIds))();
@@ -5109,10 +5585,10 @@
                         })(urf))();
                       };
                     })();
-                    return function __do6() {
+                    return function __do7() {
                       liftST3(join4(read2(urf)))();
                       ugh();
-                      return bind2(read2(cancelInner))(foldl2(applySecond2)(pure5(unit)))();
+                      return bind2(read2(cancelInner))(foldl2(applySecond2)(pure6(unit)))();
                     };
                   };
                 };
@@ -5129,14 +5605,14 @@
     return poll(function(e) {
       return makeLemmingEvent(function(subscribe2) {
         return function(kx) {
-          return function __do5() {
-            var urf = newSTRef(pure5(unit))();
+          return function __do6() {
+            var urf = newSTRef(pure6(unit))();
             var ugh = subscribe2(e)(function(f) {
               return iii(f)(e)(function($211) {
                 return kx(f($211));
               })(function(z) {
                 return function(fkx) {
-                  return function __do6() {
+                  return function __do7() {
                     var acsu = subscribe2(z)(fkx(kx))();
                     return $$void4(modify(function(v) {
                       return applySecond2(v)(acsu);
@@ -5145,7 +5621,7 @@
                 };
               });
             })();
-            return function __do6() {
+            return function __do7() {
               liftST3(join4(read2(urf)))();
               return ugh();
             };
@@ -5245,12 +5721,16 @@
   var lcmap2 = /* @__PURE__ */ lcmap(profunctorFn);
   var eq3 = /* @__PURE__ */ eq(eqScope);
   var show3 = /* @__PURE__ */ show(showInt);
-  var pure6 = /* @__PURE__ */ pure(applicativeST);
+  var pure7 = /* @__PURE__ */ pure(applicativeST);
   var sample3 = /* @__PURE__ */ sample(/* @__PURE__ */ pollable(eventIsEvent));
   var for_4 = /* @__PURE__ */ for_(applicativeST)(foldableArray);
-  var append4 = /* @__PURE__ */ append(semigroupArray);
-  var map13 = /* @__PURE__ */ map(functorArray);
-  var empty4 = /* @__PURE__ */ empty(plusEvent);
+  var append5 = /* @__PURE__ */ append(semigroupArray);
+  var map9 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var map14 = /* @__PURE__ */ map(functorArray);
+  var empty5 = /* @__PURE__ */ empty(plusEvent);
+  var Child = function(x3) {
+    return x3;
+  };
   var unsafeSetPos$prime = function(i) {
     return function(v) {
       var g2 = function(v1) {
@@ -5279,6 +5759,12 @@
   var unsafeSetPos = function($95) {
     return unsafeSetPos$prime(Just.create($95));
   };
+  var sendToPos = function(i) {
+    return new Logic(i);
+  };
+  var remove = /* @__PURE__ */ function() {
+    return Remove.value;
+  }();
   var flattenArgs = {
     doLogic: function(pos) {
       return function(v) {
@@ -5335,7 +5821,7 @@
             return behaving(function(e) {
               return function(kx) {
                 return function(subscribe2) {
-                  return function __do5() {
+                  return function __do6() {
                     var me = v1.ids();
                     v.raiseId(show3(me))();
                     var v2 = function() {
@@ -5363,13 +5849,13 @@
                       scope: v.scope,
                       ez: false,
                       raiseId: function(v3) {
-                        return pure6(unit);
+                        return pure7(unit);
                       },
                       deferralPath: v.deferralPath,
                       pos: Nothing.value,
                       dynFamily: new Just(show3(me))
                     })(v1))(e);
-                    for_4(append4(v2.value0)([v1.makeDynBeacon({
+                    for_4(append5(v2.value0)([v1.makeDynBeacon({
                       id: show3(me),
                       parent: new Just(v2.value1),
                       scope: v.scope,
@@ -5406,14 +5892,30 @@
       }(dfun(es)));
     };
   };
+  var dyn2 = /* @__PURE__ */ function() {
+    var myDyn$prime = function(x3) {
+      return dyn(x3);
+    };
+    var bolsonify = function(v) {
+      return new Tuple(map9(function(v1) {
+        return v1;
+      })(v.value0), function(v1) {
+        return v1;
+      }(v.value1));
+    };
+    var myDyn = function(e) {
+      return myDyn$prime(map9(bolsonify)(e));
+    };
+    return dynify(myDyn);
+  }();
   var fixed2 = /* @__PURE__ */ function() {
     var myFixed$prime = function(x3) {
-      return fixed(map13(function(v) {
+      return fixed(map14(function(v) {
         return v;
       })(x3));
     };
     var myFixed = function(e) {
-      return myFixed$prime(map13(function(v) {
+      return myFixed$prime(map14(function(v) {
         return v;
       })(e));
     };
@@ -5431,7 +5933,7 @@
       mempty: new Element$prime(function(v) {
         return function(v1) {
           return poll(function(v2) {
-            return empty4;
+            return empty5;
           });
         };
       }),
@@ -5447,15 +5949,15 @@
   var for_12 = /* @__PURE__ */ for_5(foldableMaybe);
   var pollable3 = /* @__PURE__ */ pollable(eventIsEvent);
   var sampleBy2 = /* @__PURE__ */ sampleBy(pollable3)(functorEvent)(functorEvent);
-  var pure7 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var pure8 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
   var for_23 = /* @__PURE__ */ for_5(foldableArray);
   var pure12 = /* @__PURE__ */ pure(applicativeList);
   var sample4 = /* @__PURE__ */ sample(pollable3);
   var pure22 = /* @__PURE__ */ pure(applicativeST);
-  var empty5 = /* @__PURE__ */ empty(/* @__PURE__ */ plusAPoll(plusEvent));
+  var empty6 = /* @__PURE__ */ empty(/* @__PURE__ */ plusAPoll(plusEvent));
   var coerce3 = /* @__PURE__ */ coerce();
   var mapWithIndex3 = /* @__PURE__ */ mapWithIndex(functorWithIndexArray);
-  var map7 = /* @__PURE__ */ map(functorFn);
+  var map10 = /* @__PURE__ */ map(functorFn);
   var unsafeSetText = function(v) {
     return function(id) {
       return function(txt) {
@@ -5504,7 +6006,7 @@
         return behaving(function(e) {
           return function(kx) {
             return function(subscribe2) {
-              return function __do5() {
+              return function __do6() {
                 var me = v1.ids();
                 v.raiseId(show4(me))();
                 kx(v1.makeText({
@@ -5541,7 +6043,7 @@
     return go$prime;
   };
   var text_ = function(s) {
-    return text5(pure7(s));
+    return text5(pure8(s));
   };
   var __internalDekuFlatten2 = function(v) {
     return function(a2) {
@@ -5557,7 +6059,7 @@
           return behaving(function(ee) {
             return function(kx) {
               return function(subscribe2) {
-                return function __do5() {
+                return function __do6() {
                   var headRedecorator = v1.ids();
                   kx(v1.makeRoot({
                     id: "deku-root",
@@ -5600,7 +6102,7 @@
               return behaving(function(ee) {
                 return function(kx) {
                   return function(subscribe2) {
-                    return function __do5() {
+                    return function __do6() {
                       var me = v1.ids();
                       v.raiseId(show4(me))();
                       kx(v1.makeElement({
@@ -5657,7 +6159,7 @@
         return function(kids) {
           var aa = function(v) {
             if (v.length === 0) {
-              return empty5;
+              return empty6;
             }
             ;
             if (v.length === 1) {
@@ -5669,7 +6171,7 @@
           var step1 = function(arr) {
             return new Element$prime(elementify(ns)(en)(aa(attributes))(fixed(coerce3(arr))));
           };
-          return step1(mapWithIndex3(map7(map7(function(v) {
+          return step1(mapWithIndex3(map10(map10(function(v) {
             return v;
           }))(unsafeSetPos))(kids));
         };
@@ -5719,9 +6221,9 @@
   var b_ = /* @__PURE__ */ b([]);
 
   // output/Deku.DOM.Self/index.js
-  var map8 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
-  var pure8 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
-  var self = /* @__PURE__ */ map8(function($51) {
+  var map11 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var pure9 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var self = /* @__PURE__ */ map11(function($51) {
     return unsafeAttribute(function(v) {
       return {
         key: "@self@",
@@ -5730,7 +6232,7 @@
     }(cb$prime(cb($51))));
   });
   var self_ = function($52) {
-    return self(pure8($52));
+    return self(pure9($52));
   };
 
   // output/Effect.Aff/foreign.js
@@ -6246,8 +6748,8 @@
       var root = EMPTY;
       function kill(error2, par2, cb3) {
         var step2 = par2;
-        var head2 = null;
-        var tail2 = null;
+        var head3 = null;
+        var tail3 = null;
         var count2 = 0;
         var kills2 = {};
         var tmp, kid;
@@ -6267,15 +6769,15 @@
                     };
                   });
                 }
-                if (head2 === null) {
+                if (head3 === null) {
                   break loop;
                 }
-                step2 = head2._2;
-                if (tail2 === null) {
-                  head2 = null;
+                step2 = head3._2;
+                if (tail3 === null) {
+                  head3 = null;
                 } else {
-                  head2 = tail2._1;
-                  tail2 = tail2._2;
+                  head3 = tail3._1;
+                  tail3 = tail3._2;
                 }
                 break;
               case MAP:
@@ -6283,10 +6785,10 @@
                 break;
               case APPLY:
               case ALT:
-                if (head2) {
-                  tail2 = new Aff2(CONS, head2, tail2);
+                if (head3) {
+                  tail3 = new Aff2(CONS, head3, tail3);
                 }
-                head2 = step2;
+                head3 = step2;
                 step2 = step2._1;
                 break;
             }
@@ -6302,7 +6804,7 @@
         }
         return kills2;
       }
-      function join6(result, head2, tail2) {
+      function join6(result, head3, tail3) {
         var fail, step2, lhs, rhs, tmp, kid;
         if (util.isLeft(result)) {
           fail = result;
@@ -6320,38 +6822,38 @@
             if (interrupt !== null) {
               return;
             }
-            if (head2 === null) {
+            if (head3 === null) {
               cb2(fail || step2)();
               return;
             }
-            if (head2._3 !== EMPTY) {
+            if (head3._3 !== EMPTY) {
               return;
             }
-            switch (head2.tag) {
+            switch (head3.tag) {
               case MAP:
                 if (fail === null) {
-                  head2._3 = util.right(head2._1(util.fromRight(step2)));
-                  step2 = head2._3;
+                  head3._3 = util.right(head3._1(util.fromRight(step2)));
+                  step2 = head3._3;
                 } else {
-                  head2._3 = fail;
+                  head3._3 = fail;
                 }
                 break;
               case APPLY:
-                lhs = head2._1._3;
-                rhs = head2._2._3;
+                lhs = head3._1._3;
+                rhs = head3._2._3;
                 if (fail) {
-                  head2._3 = fail;
+                  head3._3 = fail;
                   tmp = true;
                   kid = killId++;
-                  kills[kid] = kill(early, fail === lhs ? head2._2 : head2._1, function() {
+                  kills[kid] = kill(early, fail === lhs ? head3._2 : head3._1, function() {
                     return function() {
                       delete kills[kid];
                       if (tmp) {
                         tmp = false;
-                      } else if (tail2 === null) {
+                      } else if (tail3 === null) {
                         join6(fail, null, null);
                       } else {
-                        join6(fail, tail2._1, tail2._2);
+                        join6(fail, tail3._1, tail3._2);
                       }
                     };
                   });
@@ -6363,32 +6865,32 @@
                   return;
                 } else {
                   step2 = util.right(util.fromRight(lhs)(util.fromRight(rhs)));
-                  head2._3 = step2;
+                  head3._3 = step2;
                 }
                 break;
               case ALT:
-                lhs = head2._1._3;
-                rhs = head2._2._3;
+                lhs = head3._1._3;
+                rhs = head3._2._3;
                 if (lhs === EMPTY && util.isLeft(rhs) || rhs === EMPTY && util.isLeft(lhs)) {
                   return;
                 }
                 if (lhs !== EMPTY && util.isLeft(lhs) && rhs !== EMPTY && util.isLeft(rhs)) {
                   fail = step2 === lhs ? rhs : lhs;
                   step2 = null;
-                  head2._3 = fail;
+                  head3._3 = fail;
                 } else {
-                  head2._3 = step2;
+                  head3._3 = step2;
                   tmp = true;
                   kid = killId++;
-                  kills[kid] = kill(early, step2 === lhs ? head2._2 : head2._1, function() {
+                  kills[kid] = kill(early, step2 === lhs ? head3._2 : head3._1, function() {
                     return function() {
                       delete kills[kid];
                       if (tmp) {
                         tmp = false;
-                      } else if (tail2 === null) {
+                      } else if (tail3 === null) {
                         join6(step2, null, null);
                       } else {
-                        join6(step2, tail2._1, tail2._2);
+                        join6(step2, tail3._1, tail3._2);
                       }
                     };
                   });
@@ -6399,11 +6901,11 @@
                 }
                 break;
             }
-            if (tail2 === null) {
-              head2 = null;
+            if (tail3 === null) {
+              head3 = null;
             } else {
-              head2 = tail2._1;
-              tail2 = tail2._2;
+              head3 = tail3._1;
+              tail3 = tail3._2;
             }
           }
       }
@@ -6419,8 +6921,8 @@
       function run3() {
         var status = CONTINUE;
         var step2 = par;
-        var head2 = null;
-        var tail2 = null;
+        var head3 = null;
+        var tail3 = null;
         var tmp, fid;
         loop:
           while (true) {
@@ -6430,31 +6932,31 @@
               case CONTINUE:
                 switch (step2.tag) {
                   case MAP:
-                    if (head2) {
-                      tail2 = new Aff2(CONS, head2, tail2);
+                    if (head3) {
+                      tail3 = new Aff2(CONS, head3, tail3);
                     }
-                    head2 = new Aff2(MAP, step2._1, EMPTY, EMPTY);
+                    head3 = new Aff2(MAP, step2._1, EMPTY, EMPTY);
                     step2 = step2._2;
                     break;
                   case APPLY:
-                    if (head2) {
-                      tail2 = new Aff2(CONS, head2, tail2);
+                    if (head3) {
+                      tail3 = new Aff2(CONS, head3, tail3);
                     }
-                    head2 = new Aff2(APPLY, EMPTY, step2._2, EMPTY);
+                    head3 = new Aff2(APPLY, EMPTY, step2._2, EMPTY);
                     step2 = step2._1;
                     break;
                   case ALT:
-                    if (head2) {
-                      tail2 = new Aff2(CONS, head2, tail2);
+                    if (head3) {
+                      tail3 = new Aff2(CONS, head3, tail3);
                     }
-                    head2 = new Aff2(ALT, EMPTY, step2._2, EMPTY);
+                    head3 = new Aff2(ALT, EMPTY, step2._2, EMPTY);
                     step2 = step2._1;
                     break;
                   default:
                     fid = fiberId++;
                     status = RETURN;
                     tmp = step2;
-                    step2 = new Aff2(FORKED, fid, new Aff2(CONS, head2, tail2), EMPTY);
+                    step2 = new Aff2(FORKED, fid, new Aff2(CONS, head3, tail3), EMPTY);
                     tmp = Fiber(util, supervisor, tmp);
                     tmp.onComplete({
                       rethrow: false,
@@ -6467,22 +6969,22 @@
                 }
                 break;
               case RETURN:
-                if (head2 === null) {
+                if (head3 === null) {
                   break loop;
                 }
-                if (head2._1 === EMPTY) {
-                  head2._1 = step2;
+                if (head3._1 === EMPTY) {
+                  head3._1 = step2;
                   status = CONTINUE;
-                  step2 = head2._2;
-                  head2._2 = EMPTY;
+                  step2 = head3._2;
+                  head3._2 = EMPTY;
                 } else {
-                  head2._2 = step2;
-                  step2 = head2;
-                  if (tail2 === null) {
-                    head2 = null;
+                  head3._2 = step2;
+                  step2 = head3;
+                  if (tail3 === null) {
+                    head3 = null;
                   } else {
-                    head2 = tail2._1;
-                    tail2 = tail2._2;
+                    head3 = tail3._1;
+                    tail3 = tail3._2;
                   }
                 }
             }
@@ -6600,15 +7102,15 @@
   };
 
   // output/Deku.DOM.Combinators/index.js
-  var map9 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var map15 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
   var for_6 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var bind3 = /* @__PURE__ */ bind(bindMaybe);
   var composeKleisli2 = /* @__PURE__ */ composeKleisli(bindEffect);
-  var pure9 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
   var valueOn = function(listener) {
-    var $17 = map9(function(push2) {
+    var $17 = map15(function(push2) {
       return function(e) {
-        return function __do5() {
+        return function __do6() {
           for_6(bind3(target5(e))(fromEventTarget))(composeKleisli2(value3)(push2))();
           return for_6(bind3(target5(e))(fromEventTarget2))(composeKleisli2(value11)(push2))();
         };
@@ -6621,14 +7123,14 @@
   var valueOn_ = function(listener) {
     var $19 = valueOn(listener);
     return function($20) {
-      return $19(pure9($20));
+      return $19(pure10($20));
     };
   };
 
   // output/Deku.DOM.Attributes/index.js
-  var map10 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
-  var pure10 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
-  var style = /* @__PURE__ */ map10(function($280) {
+  var map16 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var style = /* @__PURE__ */ map16(function($280) {
     return unsafeAttribute(function(v) {
       return {
         key: "style",
@@ -6637,9 +7139,9 @@
     }(prop$prime($280)));
   });
   var style_ = function($281) {
-    return style(pure10($281));
+    return style(pure11($281));
   };
-  var size4 = /* @__PURE__ */ map10(function($304) {
+  var size4 = /* @__PURE__ */ map16(function($304) {
     return unsafeAttribute(function(v) {
       return {
         key: "size",
@@ -6648,13 +7150,13 @@
     }(prop$prime($304)));
   });
   var size_ = function($305) {
-    return size4(pure10($305));
+    return size4(pure11($305));
   };
 
   // output/Deku.DOM.Listeners/index.js
-  var map11 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
-  var pure11 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
-  var keydown = /* @__PURE__ */ map11(function($291) {
+  var map17 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var pure13 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var keydown = /* @__PURE__ */ map17(function($291) {
     return unsafeAttribute(function(v) {
       return {
         key: "keydown",
@@ -6663,9 +7165,9 @@
     }(cb$prime(cb($291))));
   });
   var keydown_ = function($292) {
-    return keydown(pure11($292));
+    return keydown(pure13($292));
   };
-  var input2 = /* @__PURE__ */ map11(function($295) {
+  var input2 = /* @__PURE__ */ map17(function($295) {
     return unsafeAttribute(function(v) {
       return {
         key: "input",
@@ -6693,9 +7195,9 @@
   var g_ = /* @__PURE__ */ g([]);
 
   // output/Deku.DOM.SVG.Attributes/index.js
-  var map14 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
-  var pure13 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
-  var y2 = /* @__PURE__ */ map14(function($217) {
+  var map18 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var pure14 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var y2 = /* @__PURE__ */ map18(function($217) {
     return unsafeAttribute(function(v) {
       return {
         key: "y2",
@@ -6704,9 +7206,9 @@
     }(prop$prime($217)));
   });
   var y2_ = function($218) {
-    return y2(pure13($218));
+    return y2(pure14($218));
   };
-  var y1 = /* @__PURE__ */ map14(function($219) {
+  var y1 = /* @__PURE__ */ map18(function($219) {
     return unsafeAttribute(function(v) {
       return {
         key: "y1",
@@ -6715,9 +7217,9 @@
     }(prop$prime($219)));
   });
   var y1_ = function($220) {
-    return y1(pure13($220));
+    return y1(pure14($220));
   };
-  var y = /* @__PURE__ */ map14(function($221) {
+  var y = /* @__PURE__ */ map18(function($221) {
     return unsafeAttribute(function(v) {
       return {
         key: "y",
@@ -6726,9 +7228,9 @@
     }(prop$prime($221)));
   });
   var y_ = function($222) {
-    return y(pure13($222));
+    return y(pure14($222));
   };
-  var x2 = /* @__PURE__ */ map14(function($235) {
+  var x2 = /* @__PURE__ */ map18(function($235) {
     return unsafeAttribute(function(v) {
       return {
         key: "x2",
@@ -6737,9 +7239,9 @@
     }(prop$prime($235)));
   });
   var x2_ = function($236) {
-    return x2(pure13($236));
+    return x2(pure14($236));
   };
-  var x1 = /* @__PURE__ */ map14(function($237) {
+  var x1 = /* @__PURE__ */ map18(function($237) {
     return unsafeAttribute(function(v) {
       return {
         key: "x1",
@@ -6748,9 +7250,9 @@
     }(prop$prime($237)));
   });
   var x1_ = function($238) {
-    return x1(pure13($238));
+    return x1(pure14($238));
   };
-  var x = /* @__PURE__ */ map14(function($239) {
+  var x = /* @__PURE__ */ map18(function($239) {
     return unsafeAttribute(function(v) {
       return {
         key: "x",
@@ -6759,9 +7261,9 @@
     }(prop$prime($239)));
   });
   var x_ = function($240) {
-    return x(pure13($240));
+    return x(pure14($240));
   };
-  var width8 = /* @__PURE__ */ map14(function($245) {
+  var width8 = /* @__PURE__ */ map18(function($245) {
     return unsafeAttribute(function(v) {
       return {
         key: "width",
@@ -6770,9 +7272,9 @@
     }(prop$prime($245)));
   });
   var width_ = function($246) {
-    return width8(pure13($246));
+    return width8(pure14($246));
   };
-  var strokeWidth = /* @__PURE__ */ map14(function($289) {
+  var strokeWidth = /* @__PURE__ */ map18(function($289) {
     return unsafeAttribute(function(v) {
       return {
         key: "stroke-width",
@@ -6781,9 +7283,9 @@
     }(prop$prime($289)));
   });
   var strokeWidth_ = function($290) {
-    return strokeWidth(pure13($290));
+    return strokeWidth(pure14($290));
   };
-  var stroke = /* @__PURE__ */ map14(function($323) {
+  var stroke = /* @__PURE__ */ map18(function($323) {
     return unsafeAttribute(function(v) {
       return {
         key: "stroke",
@@ -6792,9 +7294,9 @@
     }(prop$prime($323)));
   });
   var stroke_ = function($324) {
-    return stroke(pure13($324));
+    return stroke(pure14($324));
   };
-  var height8 = /* @__PURE__ */ map14(function($505) {
+  var height8 = /* @__PURE__ */ map18(function($505) {
     return unsafeAttribute(function(v) {
       return {
         key: "height",
@@ -6803,9 +7305,9 @@
     }(prop$prime($505)));
   });
   var height_ = function($506) {
-    return height8(pure13($506));
+    return height8(pure14($506));
   };
-  var fontStyle = /* @__PURE__ */ map14(function($523) {
+  var fontStyle = /* @__PURE__ */ map18(function($523) {
     return unsafeAttribute(function(v) {
       return {
         key: "font-style",
@@ -6814,9 +7316,9 @@
     }(prop$prime($523)));
   });
   var fontStyle_ = function($524) {
-    return fontStyle(pure13($524));
+    return fontStyle(pure14($524));
   };
-  var fillColor = /* @__PURE__ */ map14(function($557) {
+  var fillColor = /* @__PURE__ */ map18(function($557) {
     return unsafeAttribute(function(v) {
       return {
         key: "fill-color",
@@ -6825,9 +7327,9 @@
     }(prop$prime($557)));
   });
   var fillColor_ = function($558) {
-    return fillColor(pure13($558));
+    return fillColor(pure14($558));
   };
-  var fill = /* @__PURE__ */ map14(function($561) {
+  var fill = /* @__PURE__ */ map18(function($561) {
     return unsafeAttribute(function(v) {
       return {
         key: "fill",
@@ -6836,9 +7338,9 @@
     }(prop$prime($561)));
   });
   var fill_ = function($562) {
-    return fill(pure13($562));
+    return fill(pure14($562));
   };
-  var d = /* @__PURE__ */ map14(function($587) {
+  var d = /* @__PURE__ */ map18(function($587) {
     return unsafeAttribute(function(v) {
       return {
         key: "d",
@@ -6847,7 +7349,7 @@
     }(prop$prime($587)));
   });
   var d_ = function($588) {
-    return d(pure13($588));
+    return d(pure14($588));
   };
 
   // output/Deku.Do/index.js
@@ -6859,10 +7361,19 @@
 
   // output/Deku.Hooks/index.js
   var eq4 = /* @__PURE__ */ eq(eqScope);
+  var empty7 = /* @__PURE__ */ empty(/* @__PURE__ */ plusAPoll(plusEvent));
   var pollable4 = /* @__PURE__ */ pollable(eventIsEvent);
   var sample5 = /* @__PURE__ */ sample(pollable4);
+  var identity10 = /* @__PURE__ */ identity(categoryFn);
+  var mailbox3 = /* @__PURE__ */ mailbox2(ordInt);
+  var functorAPoll2 = /* @__PURE__ */ functorAPoll(functorEvent);
+  var voidLeft3 = /* @__PURE__ */ voidLeft(functorAPoll2);
+  var map19 = /* @__PURE__ */ map(functorAPoll2);
+  var mapWithIndex4 = /* @__PURE__ */ mapWithIndex(/* @__PURE__ */ functorWithIndexAPoll(eventIsEvent)(pollable4));
+  var sample_3 = /* @__PURE__ */ sample_(pollable4)(functorEvent)(functorEvent);
+  var filterMap3 = /* @__PURE__ */ filterMap(/* @__PURE__ */ filterableAPoll(functorEvent)(compactableEvent)(pollable4));
   var alt5 = /* @__PURE__ */ alt(/* @__PURE__ */ altAPoll(altEvent));
-  var pure14 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
+  var pure15 = /* @__PURE__ */ pure(/* @__PURE__ */ applicativeAPoll(applyEvent));
   var flattenArgs2 = {
     doLogic: function(pos) {
       return function(v) {
@@ -6902,11 +7413,120 @@
       return v;
     }
   };
+  var dynOptions = {
+    sendTo: function(v) {
+      return empty7;
+    },
+    remove: function(v) {
+      return empty7;
+    }
+  };
   var __internalDekuFlatten3 = function(v) {
     return function(a2) {
       return function(b2) {
         return flatten(flattenArgs2)(v)(a2)(b2);
       };
+    };
+  };
+  var useDynWith = function(e) {
+    return function(opts) {
+      return function(f) {
+        var go2 = function(i) {
+          return function(di) {
+            return behaving(function(ee) {
+              return function(v) {
+                return function(subscribe2) {
+                  return function __do6() {
+                    var c1 = mailbox3();
+                    var mc = function(ix) {
+                      return function(v12) {
+                        return new Tuple(merge2([voidLeft3(opts.remove(v12.value1))(Remove.value), map19(function($149) {
+                          return Child(Logic.create($149));
+                        })(opts.sendTo(v12.value1)), c1.poll(ix)]), unsafeSetPos(v12.value0)(f({
+                          value: v12.value1,
+                          remove: c1.push({
+                            address: ix,
+                            payload: remove
+                          }),
+                          sendTo: function($150) {
+                            return c1.push(function(v3) {
+                              return {
+                                address: ix,
+                                payload: v3
+                              };
+                            }(sendToPos($150)));
+                          }
+                        })));
+                      };
+                    };
+                    var v1 = dyn2(mapWithIndex4(mc)(e));
+                    return subscribe2(sample5(__internalDekuFlatten3(v1)(i)(di))(ee))();
+                  };
+                };
+              };
+            });
+          };
+        };
+        var go$prime = new Element$prime(go2);
+        return go$prime;
+      };
+    };
+  };
+  var useDynAtBeginningWith = function(e) {
+    return useDynWith(map19(function(v) {
+      return new Tuple(0, v);
+    })(e));
+  };
+  var useMemoized = function(xs) {
+    return function(f) {
+      var go2 = function(i) {
+        return function(di) {
+          return behaving$prime(function(v) {
+            return function(ee) {
+              return function(v1) {
+                return function(subscribe2) {
+                  return function __do6() {
+                    var memo = createPure2();
+                    var v2 = f(memo.poll);
+                    subscribe2(sample5(__internalDekuFlatten3(v2)(i)(di))(ee))(identity10)();
+                    return subscribe2(sample_3(xs)(ee))(function(v3) {
+                      return memo.push;
+                    })();
+                  };
+                };
+              };
+            };
+          });
+        };
+      };
+      var go$prime = new Element$prime(go2);
+      return go$prime;
+    };
+  };
+  var switcher = function(f) {
+    return function(poll2) {
+      return bind4(useMemoized(mapWithIndex4(Tuple.create)(poll2)))(function(ctr) {
+        return bind4(useDynAtBeginningWith(ctr)({
+          sendTo: dynOptions.sendTo,
+          remove: function(v1) {
+            return filterMap3(function(v2) {
+              var $117 = v2.value0 === (v1.value0 + 1 | 0);
+              if ($117) {
+                return new Just(unit);
+              }
+              ;
+              return Nothing.value;
+            })(ctr);
+          }
+        }))(function(v) {
+          return f(snd(v.value));
+        });
+      });
+    };
+  };
+  var switcherFlipped = function(a2) {
+    return function(b2) {
+      return switcher(b2)(a2);
     };
   };
   var useState$prime = function(f) {
@@ -6915,7 +7535,7 @@
         return behaving(function(ee) {
           return function(v) {
             return function(subscribe2) {
-              return function __do5() {
+              return function __do6() {
                 var v1 = create4();
                 var v2 = f(new Tuple(v1.push, v1.poll));
                 return subscribe2(sample5(__internalDekuFlatten3(v2)(i)(di))(ee))();
@@ -6931,7 +7551,7 @@
   var useState = function(a2) {
     return function(f) {
       return bind4(useState$prime)(function(v) {
-        return f(new Tuple(v.value0, alt5(pure14(a2))(v.value1)));
+        return f(new Tuple(v.value0, alt5(pure15(a2))(v.value1)));
       });
     };
   };
@@ -7616,8 +8236,8 @@
 
   // output/Deku.Interpret/index.js
   var $$void5 = /* @__PURE__ */ $$void(functorST);
-  var append5 = /* @__PURE__ */ append(semigroupArray);
-  var pure15 = /* @__PURE__ */ pure(applicativeEffect);
+  var append6 = /* @__PURE__ */ append(semigroupArray);
+  var pure16 = /* @__PURE__ */ pure(applicativeEffect);
   var mempty3 = /* @__PURE__ */ mempty(/* @__PURE__ */ monoidFn(/* @__PURE__ */ monoidST(monoidUnit)));
   var mempty1 = /* @__PURE__ */ mempty(monoidNut);
   var coerce4 = /* @__PURE__ */ coerce();
@@ -7642,7 +8262,7 @@
   var applySecond3 = /* @__PURE__ */ applySecond(applyFn);
   var liftST12 = /* @__PURE__ */ liftST(monadSTST);
   var sample6 = /* @__PURE__ */ sample(/* @__PURE__ */ pollable(eventIsEvent));
-  var identity10 = /* @__PURE__ */ identity(categoryFn);
+  var identity11 = /* @__PURE__ */ identity(categoryFn);
   var for_7 = /* @__PURE__ */ for_(applicativeEffect)(foldableMaybe);
   var runOnJust = function(v) {
     return function(v1) {
@@ -7650,12 +8270,12 @@
         return v1(v.value0);
       }
       ;
-      return pure15(false);
+      return pure16(false);
     };
   };
   var sendToPos2 = function(a2) {
     return function(state3) {
-      return function __do5() {
+      return function __do6() {
         var scope2 = getScope(a2.id)(state3)();
         var parent2 = getParent(a2.id)(state3)();
         var dynFamily = getDynFamily(a2.id)(state3)();
@@ -7690,18 +8310,18 @@
           return function(l) {
             var fn = function(v) {
               return bind22(liftST22(read2(deferredCache)))(function(o) {
-                var tail2 = function(v12) {
+                var tail3 = function(v12) {
                   if (v12 instanceof Cons && v12.value1 instanceof Nil) {
                     return new Cons(v12.value0 + 1 | 0, Nil.value);
                   }
                   ;
                   if (v12 instanceof Cons) {
-                    return new Cons(v12.value0, tail2(v12.value1));
+                    return new Cons(v12.value0, tail3(v12.value1));
                   }
                   ;
                   return v12;
                 };
-                var rightBound = new Just(tail2(l));
+                var rightBound = new Just(tail3(l));
                 var leftBound = new Just(l);
                 var v1 = flip(foldSubmap2(leftBound)(rightBound))(o)(function(k) {
                   return function(v2) {
@@ -7737,7 +8357,7 @@
                 }
                 ;
                 if (v1 instanceof Just) {
-                  return new Just(append5(v1.value0)([p]));
+                  return new Just(append6(v1.value0)([p]));
                 }
                 ;
                 throw new Error("Failed pattern match at Deku.Interpret (line 395, column 24 - line 397, column 36): " + [v1.constructor.name]);
@@ -7762,7 +8382,7 @@
         return function(roj) {
           return function(gnp) {
             return function(ffi) {
-              var needsFreshNut = function __do5() {
+              var needsFreshNut = function __do6() {
                 var myId = liftST4(newSTRef(Nothing.value))();
                 var newRaiseId = applySecond3(gnp.raiseId)(function() {
                   var $130 = flip(write2)(myId);
@@ -7781,7 +8401,7 @@
                 })(v);
                 var pump = liftST4(create)();
                 var unsubscribe = liftST4(subscribe(sample6(ohBehave)(pump.event))(executor))();
-                pump.push(identity10)();
+                pump.push(identity11)();
                 var fetchedId = liftST4(read2(myId))();
                 return for_7(fetchedId)(function($132) {
                   return executor(v.associateWithUnsubscribe(function(v1) {
@@ -7793,7 +8413,7 @@
                 })();
               };
               var hasIdAndInScope = giveNewParent_(just)(roj)(gnp)(ffi);
-              return function __do5() {
+              return function __do6() {
                 var hasId = stateHasKey(gnp.id)(ffi)();
                 if (hasId) {
                   var scope2 = getScope(gnp.id)(ffi)();
@@ -7825,7 +8445,7 @@
     return function(deferredCache) {
       return function(executor) {
         var l = {
-          ids: function __do5() {
+          ids: function __do6() {
             var s = read2(seed)();
             $$void5(modify(add3(1))(seed))();
             return s;
@@ -7859,14 +8479,14 @@
   // output/Deku.Toplevel/index.js
   var bind5 = /* @__PURE__ */ bind(bindEffect);
   var liftST5 = /* @__PURE__ */ liftST(monadSTEffect);
-  var sample_3 = /* @__PURE__ */ sample_(/* @__PURE__ */ pollable(eventIsEvent))(functorEvent)(functorEvent);
+  var sample_4 = /* @__PURE__ */ sample_(/* @__PURE__ */ pollable(eventIsEvent))(functorEvent)(functorEvent);
   var for_8 = /* @__PURE__ */ for_(applicativeEffect)(foldableMap);
   var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
-  var map15 = /* @__PURE__ */ map(functorMaybe);
+  var map20 = /* @__PURE__ */ map(functorMaybe);
   var $$void6 = /* @__PURE__ */ $$void(functorEffect);
   var runInElement$prime = function(elt) {
     return function(eee) {
-      return function __do5() {
+      return function __do6() {
         var ffi = makeFFIDOMSnapshot();
         var seed = liftST5(newSTRef(0))();
         var cache = liftST5(newSTRef(empty2))();
@@ -7875,9 +8495,9 @@
         };
         var bhv = deku(elt)(eee)(fullDOMInterpret(seed)(cache)(executor));
         var bang = liftST5(create)();
-        var u = liftST5(subscribe(sample_3(bhv)(bang.event))(executor))();
+        var u = liftST5(subscribe(sample_4(bhv)(bang.event))(executor))();
         bang.push(unit)();
-        return function __do6() {
+        return function __do7() {
           var o = liftST5(read2(cache))();
           for_8(o)(traverse_2(executor))();
           liftST5(u)();
@@ -7887,9 +8507,9 @@
     };
   };
   var runInBody$prime = function(eee) {
-    return function __do5() {
+    return function __do6() {
       var b$prime = bind5(bind5(windowImpl)(document2))(body)();
-      return maybe(throwException(error("Could not find element")))(flip(runInElement$prime)(eee))(map15(toElement)(b$prime))();
+      return maybe(throwException(error("Could not find element")))(flip(runInElement$prime)(eee))(map20(toElement)(b$prime))();
     };
   };
   var runInBody = function(a2) {
@@ -7906,64 +8526,9 @@
   });
   var textMode = (content3) => (elem3) => () => elem3.innerHTML = content3;
 
-  // output/Dependances.Article/index.js
-  var bind6 = /* @__PURE__ */ bind(bindMaybe);
-  var tell2 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
-  var map16 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
-  var validateInput = function(inp) {
-    return bind6(bind6(inp)(fromString))(function(x3) {
-      var $11 = isNaNImpl(x3);
-      if ($11) {
-        return Nothing.value;
-      }
-      ;
-      return new Just(round2(x3));
-    });
-  };
-  var toSeed = function(txt) {
-    var v = validateInput(new Just(txt));
-    if (v instanceof Just) {
-      return v.value0;
-    }
-    ;
-    return 0;
-  };
-  var t$prime = function(txt) {
-    return self_(textMode(txt));
-  };
-  var t_ = function(str) {
-    return tell2(label4([t$prime(str)])([]));
-  };
-  var setTitle_ = function(str) {
-    return tell2(h1_([text_(str)]));
-  };
-  var section_ = function(str) {
-    return tell2(h2_([text_(str)]));
-  };
-  var nl = /* @__PURE__ */ tell2(/* @__PURE__ */ br_([]));
-  var m$prime = function(txt) {
-    return self_(render(txt));
-  };
-  var m_ = function(str) {
-    return tell2(label4([m$prime(str)])([]));
-  };
-  var m = function(p) {
-    return tell2(label4([self(map16(render)(p))])([]));
-  };
-  var equation = function(p) {
-    return tell2(label4([self(map16(display)(p))])([]));
-  };
-  var em_2 = function(str) {
-    return tell2(em_([text_(str)]));
-  };
-  var b_2 = function(str) {
-    return tell2(b_([text_(str)]));
-  };
-
   // output/Dependances.GeometryRender/index.js
-  var show5 = /* @__PURE__ */ show(showInt);
-  var map17 = /* @__PURE__ */ map(functorArray);
-  var show1 = /* @__PURE__ */ show(showNumber);
+  var show5 = /* @__PURE__ */ show(showNumber);
+  var map21 = /* @__PURE__ */ map(functorArray);
   var abs4 = /* @__PURE__ */ abs3(basedPoint);
   var ord3 = /* @__PURE__ */ ord(basedPoint);
   var length8 = /* @__PURE__ */ length2(measurableVector);
@@ -7979,7 +8544,7 @@
       return function(color) {
         return function(fontStyle2) {
           return function(str) {
-            return text6([x_(show5(round2(x3))), y_(show5(round2(y3))), fillColor_(color), fontStyle_(fontStyle2)])([text_(str)]);
+            return text6([x_(show5(x3)), y_(show5(y3)), fillColor_(color), fontStyle_(fontStyle2)])([text_(str)]);
           };
         };
       };
@@ -7993,19 +8558,19 @@
     return {
       "render'": function(ctx) {
         return function(arr) {
-          return g_(map17(render$prime2(ctx))(arr));
+          return g_(map21(render$prime2(ctx))(arr));
         };
       }
     };
   };
   var pathCoord = function(p) {
-    return " " + (show1(abs4(p)) + (" " + (show1(ord3(p)) + " ")));
+    return " " + (show5(abs4(p)) + (" " + (show5(ord3(p)) + " ")));
   };
   var path2 = function(stroke2) {
     return function(strokeWidth2) {
       return function(fill2) {
         return function(content3) {
-          return path([d_(content3), stroke_(stroke2), strokeWidth_(show5(round2(strokeWidth2)) + "px"), fill_(fill2)])([]);
+          return path([d_(content3), stroke_(stroke2), strokeWidth_(show5(strokeWidth2) + "px"), fill_(fill2)])([]);
         };
       };
     };
@@ -8016,7 +8581,7 @@
         return function(y22) {
           return function(color) {
             return function(size5) {
-              return line2([x1_(show5(round2(x12))), x2_(show5(round2(x22))), y1_(show5(round2(y12))), y2_(show5(round2(y22))), stroke_(color), strokeWidth_(show5(round2(size5)))])([]);
+              return line2([x1_(show5(x12)), x2_(show5(x22)), y1_(show5(y12)), y2_(show5(y22)), stroke_(color), strokeWidth_(show5(size5))])([]);
             };
           };
         };
@@ -8055,14 +8620,14 @@
   var renderSegment = {
     "render'": function(v) {
       return function(v1) {
-        var m2 = middle("")(v1);
+        var m = middle("")(v1);
         return g_(append13([line3(abs4(v1.origin))(ord3(v1.origin))(abs4(v1.extremity))(ord3(v1.extremity))(v.stroke)(v.strokeWidth)])(append13(maybe([])(function(v2) {
           var v3 = arrowTip(v1);
           return [path2(v.stroke)(v.strokeWidth)(v.stroke)("M" + (pathCoord(v3.at1) + ("L" + (pathCoord(v1.extremity) + ("L" + (pathCoord(v3.at2) + "Z"))))))];
         })(v1.asOriented))(maybe([])(function(str) {
-          return [text7(abs4(m2) + 10)(ord3(m2) - 10)(v.textFill)(v.fontStyle)(str), text7(abs4(m2) + 10)(ord3(m2) - 23)(v.textFill)(v.fontStyle)(function() {
-            var $106 = str === "";
-            if ($106) {
+          return [text7(abs4(m) + 10)(ord3(m) - 10)(v.textFill)(v.fontStyle)(str), text7(abs4(m) + 10)(ord3(m) - 23)(v.textFill)(v.fontStyle)(function() {
+            var $105 = str === "";
+            if ($105) {
               return "";
             }
             ;
@@ -8071,6 +8636,58 @@
         })(v1.asOriented))));
       };
     }
+  };
+
+  // output/Dependances.Article/index.js
+  var bind6 = /* @__PURE__ */ bind(bindMaybe);
+  var tell2 = /* @__PURE__ */ tell(/* @__PURE__ */ monadTellWriterT(monoidNut)(monadIdentity));
+  var validateInput = function(inp) {
+    return bind6(bind6(inp)(fromString))(function(x3) {
+      var $11 = isNaNImpl(x3);
+      if ($11) {
+        return Nothing.value;
+      }
+      ;
+      return new Just(round2(x3));
+    });
+  };
+  var toSeed = function(txt) {
+    var v = validateInput(new Just(txt));
+    if (v instanceof Just) {
+      return v.value0;
+    }
+    ;
+    return 0;
+  };
+  var t$prime = function(txt) {
+    return self_(textMode(txt));
+  };
+  var t_ = function(str) {
+    return tell2(label4([t$prime(str)])([]));
+  };
+  var setTitle_ = function(str) {
+    return tell2(h1_([text_(str)]));
+  };
+  var section_ = function(str) {
+    return tell2(h2_([text_(str)]));
+  };
+  var nl = /* @__PURE__ */ tell2(/* @__PURE__ */ br_([]));
+  var m$prime = function(txt) {
+    return self_(render(txt));
+  };
+  var m_ = function(str) {
+    return tell2(label4([m$prime(str)])([]));
+  };
+  var equation_ = function(str) {
+    return tell2(label4([function(txt) {
+      return self_(display(txt));
+    }(str)])([]));
+  };
+  var em_2 = function(str) {
+    return tell2(em_([text_(str)]));
+  };
+  var b_2 = function(str) {
+    return tell2(b_([text_(str)]));
   };
 
   // output/Random.LCG/index.js
@@ -8129,11 +8746,11 @@
     return e.code;
   }
 
-  // output/Devoir3.Main/index.js
+  // output/Devoir03.Main/index.js
   var eq5 = /* @__PURE__ */ eq(eqBigInt);
   var show6 = /* @__PURE__ */ show(showBigInt);
-  var append6 = /* @__PURE__ */ append(semigroupString);
-  var map18 = /* @__PURE__ */ map(functorArray);
+  var append7 = /* @__PURE__ */ append(semigroupString);
+  var map23 = /* @__PURE__ */ map(functorArray);
   var negate2 = /* @__PURE__ */ negate(ringRational);
   var discard3 = /* @__PURE__ */ discard(discardUnit);
   var discard1 = /* @__PURE__ */ discard3(/* @__PURE__ */ bindWriterT(semigroupNut)(bindIdentity));
@@ -8144,32 +8761,33 @@
   var mod4 = /* @__PURE__ */ mod(euclideanRingInt);
   var scanl3 = /* @__PURE__ */ scanl(traversableArray);
   var compose2 = /* @__PURE__ */ compose(semigroupoidFn);
-  var identity11 = /* @__PURE__ */ identity(categoryFn);
-  var map19 = /* @__PURE__ */ map(functorFn);
+  var identity12 = /* @__PURE__ */ identity(categoryFn);
+  var map110 = /* @__PURE__ */ map(functorFn);
   var mul22 = /* @__PURE__ */ mul(semiringInt);
   var foldr7 = /* @__PURE__ */ foldr(foldableArray);
   var difference2 = /* @__PURE__ */ difference(eqInt);
   var div1 = /* @__PURE__ */ div(euclideanRingRational);
-  var pure16 = /* @__PURE__ */ pure(applicativeEffect);
-  var map23 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var map24 = /* @__PURE__ */ map(/* @__PURE__ */ functorAPoll(functorEvent));
+  var pure17 = /* @__PURE__ */ pure(applicativeEffect);
+  var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyAPoll(applyEvent));
   var meets2 = /* @__PURE__ */ meets(interLineLine);
   var renderSequence2 = /* @__PURE__ */ renderSequence(renderPoint);
   var renderSequence1 = /* @__PURE__ */ renderSequence(renderSegment);
-  var show12 = /* @__PURE__ */ show(showInt);
-  var apply4 = /* @__PURE__ */ apply(/* @__PURE__ */ applyAPoll(applyEvent));
+  var show1 = /* @__PURE__ */ show(showInt);
   var div22 = /* @__PURE__ */ div(euclideanRingInt);
+  var mempty4 = /* @__PURE__ */ mempty(monoidNut);
   var Triple = function(x3) {
     return x3;
   };
   var showFraction = function(f) {
-    var $89 = eq5(denominator2(f))(fromInt(1));
-    if ($89) {
+    var $88 = eq5(denominator2(f))(fromInt(1));
+    if ($88) {
       return show6(numerator2(f));
     }
     ;
     return "\\frac{" + (show6(numerator2(f)) + ("}{" + (show6(denominator2(f)) + "}")));
   };
-  var pythagoreanTriples = /* @__PURE__ */ map18(Triple)([{
+  var pythagoreanTriples = /* @__PURE__ */ map23(Triple)([{
     a: 3,
     b: 4,
     c: 5
@@ -8297,143 +8915,134 @@
       return nth1(primes)(ix);
     };
     var nbNumFactors = 1 + mod4(unSeed(r0))(avgNbFactors) | 0;
-    var nrands = map18(function(f) {
+    var nrands = map23(function(f) {
       return f(r1);
-    })(scanl3(compose2)(identity11)(replicate(nbNumFactors)(lcgNext)));
-    var nums = map18(map19(prime)(function(rnd) {
+    })(scanl3(compose2)(identity12)(replicate(nbNumFactors)(lcgNext)));
+    var nums = map23(map110(prime)(function(rnd) {
       return mod4(unSeed(rnd))(length(primes));
     }))(nrands);
     var r2 = fromMaybe(r1)(last(nrands));
     var nbDenFactors = 1 + mod4(unSeed(r1))(avgNbFactors) | 0;
-    var drands = map18(function(f) {
+    var drands = map23(function(f) {
       return f(r2);
-    })(scanl3(compose2)(identity11)(replicate(nbDenFactors)(lcgNext)));
+    })(scanl3(compose2)(identity12)(replicate(nbDenFactors)(lcgNext)));
     var r3 = fromMaybe(r2)(last(drands));
     var r4 = lcgNext(r3);
     var sign2 = (2 * mod4(unSeed(r4))(2) | 0) - 1 | 0;
-    var dens = map18(map19(prime)(function(rnd) {
+    var dens = map23(map110(prime)(function(rnd) {
       return mod4(unSeed(rnd))(length(primes));
     }))(drands);
     var num = foldr7(mul22)(1)(difference2(nums)(dens));
     var den = foldr7(mul22)(1)(difference2(dens)(nums));
-    var $93 = num > den;
-    if ($93) {
+    var $92 = num > den;
+    if ($92) {
       return div1(fromInt2(sign2 * num | 0))(fromInt2(den));
     }
     ;
     return div1(fromInt2(sign2 * den | 0))(fromInt2(num));
   };
-  var main = function __do4() {
+  var main = function __do5() {
     runInBody(execWriter(header))();
     return runInBody(bind4(useState(""))(function(v) {
       return bind4(useState(false))(function(v1) {
+        var absoluteSeed = map24(toSeed)(v.value1);
+        var seed = map24(fromRelative)(absoluteSeed);
+        var solved = map24(function(v2) {
+          return v2 < 0;
+        })(absoluteSeed);
         return div_([div_([label_([text_("Enonc\xE9 n\xB0 ")]), input([valueOn_(input2)(v.value0), keydown_(function(k) {
           return v1.value0(code(k) === "Enter" || key(k) === "Enter");
         }), size_("56"), self_(function(e) {
-          return maybe(pure16(unit))(function($108) {
-            return focus(toHTMLElement($108));
+          return maybe(pure17(unit))(function($107) {
+            return focus(toHTMLElement($107));
           })(fromElement(e));
-        })])([])]), div2([style(map23(function(v2) {
-          if (v2) {
-            return "display: block;";
-          }
-          ;
-          return "display: none;";
-        })(v1.value1))])(function() {
-          var f0 = map23(function(x3) {
-            return new Tuple(fromRelative(x3), x3 < 0);
-          })(map23(toSeed)(v.value1));
-          var r0 = map23(fst)(f0);
-          return [execWriter(discard1(nl)(function() {
-            return discard1(nl)(function() {
-              return discard1(section_("Exercice 1"))(function() {
-                var r1 = map23(lcgNext)(r0);
-                var etriple = map23(function(r) {
-                  return nth2(pythagoreanTriples)(mod4(unSeed(r))(length(pythagoreanTriples)));
-                })(r1);
-                var ad = map23(function(v2) {
-                  return v2.a;
-                })(etriple);
-                var ab = map23(function(v2) {
-                  return v2.b;
-                })(etriple);
-                return discard1(tell3(div2([style_("display: grid; grid-template-columns : 2fr 4fr;")])([svg([width_("400"), height_("310")])(function() {
-                  var pA = point("A")(150 - 2 * 55)(90 + 55);
-                  var pB = point("B")(150 + 2 * 55)(90 + 55);
-                  var pM = middle("")(segment(pA)(pB)(Nothing.value));
-                  var pC = point("C")(150 + 2 * 55)(90 - 55);
-                  var pJ = middle("")(segment(pB)(pC)(Nothing.value));
-                  var pD = point("D")(150 - 2 * 55)(90 - 55);
-                  var pI = middle("")(segment(pA)(pD)(Nothing.value));
-                  var pP = middle("")(segment(pC)(pD)(Nothing.value));
-                  var pE = point("")(150 - 2 * 55 + 25)(90 + 55 - 25);
-                  var pF = point("")(150 + 2 * 55 - 25)(90 + 55 - 25);
-                  var pG = point("")(150 + 2 * 55 - 25)(90 - 55 + 25);
-                  var pH = point("")(150 - 2 * 55 + 25)(90 - 55 + 25);
-                  var pO = point("O")(150)(90);
-                  var pK = function(v2) {
-                    return nth3(v2)(0);
-                  }(meets2(line(pO)(pI))(line(pE)(pH)));
-                  var pL = function(v2) {
-                    return nth3(v2)(0);
-                  }(meets2(line(pO)(pJ))(line(pF)(pG)));
-                  var pN = function(v2) {
-                    return nth3(v2)(0);
-                  }(meets2(line(pO)(pM))(line(pE)(pF)));
-                  var pQ = function(v2) {
-                    return nth3(v2)(0);
-                  }(meets2(line(pO)(pP))(line(pG)(pH)));
-                  var ctx = {
-                    strokeWidth: 1,
-                    fill: defaultContext.fill,
-                    fontStyle: defaultContext.fontStyle,
-                    stroke: defaultContext.stroke,
-                    textFill: defaultContext.textFill
-                  };
-                  var dt1 = function(dictRender) {
-                    return render$prime(dictRender)(ctx);
-                  };
-                  var dt11 = dt1(renderSequence2);
-                  var dt12 = dt1(renderSequence1);
-                  var dt13 = dt1(renderSegment);
-                  return [dt11([pO, pA, pB, pC, pD]), dt12([segment(pA)(pB)(Nothing.value), segment(pB)(pC)(Nothing.value), segment(pC)(pD)(Nothing.value), segment(pD)(pA)(Nothing.value)]), dt12([segment(pE)(pF)(Nothing.value), segment(pF)(pG)(Nothing.value), segment(pG)(pH)(Nothing.value), segment(pH)(pE)(Nothing.value)]), dt11([rename("\u{1D465}")(pI), pK]), dt13(segment(pI)(pK)(Nothing.value)), dt11([rename("\u{1D465}")(pL), pJ]), dt13(segment(pJ)(pL)(Nothing.value)), dt11([rename("\u{1D465}")(pM), pN]), dt13(segment(pM)(pN)(Nothing.value)), dt11([rename("\u{1D465}")(pQ), pP]), dt13(segment(pQ)(pP)(Nothing.value))];
-                }()), div_([execWriter(discard1(t_("Soit "))(function() {
-                  return discard1(m_("ABCD"))(function() {
-                    return discard1(t_(" un rectangle de centre "))(function() {
-                      return discard1(m_("O"))(function() {
-                        return discard1(t_("."))(function() {
-                          return discard1(nl)(function() {
-                            return discard1(t_("On construit un autre rectangle de centre "))(function() {
-                              return discard1(m_("O"))(function() {
-                                return discard1(t_(" \xE0 l'int\xE9rieur de "))(function() {
-                                  return discard1(m_("ABCD"))(function() {
-                                    return discard1(t_(" de mani\xE8re \xE0 laisser entre les deux rectangles "))(function() {
-                                      return discard1(t_("une bande de largeur constante "))(function() {
-                                        return discard1(m_("x"))(function() {
-                                          return discard1(t_("."))(function() {
-                                            return discard1(nl)(function() {
+        })])([])]), div_([switcherFlipped(apply4(apply4(map24(function(a2) {
+          return function(b2) {
+            return function(c) {
+              return new Tuple(a2, new Tuple(b2, c));
+            };
+          };
+        })(v1.value1))(solved))(seed))(function(v2) {
+          if (v2.value0) {
+            return execWriter(discard1(nl)(function() {
+              return discard1(nl)(function() {
+                return discard1(section_("Exercice 1"))(function() {
+                  var r1 = lcgNext(v2.value1.value1);
+                  var v3 = nth2(pythagoreanTriples)(mod4(unSeed(r1))(length(pythagoreanTriples)));
+                  return discard1(tell3(div2([style_("display: grid; grid-template-columns : 2fr 4fr;")])([svg([width_("400"), height_("310")])(function() {
+                    var pA = point("A")(150 - 2 * 55)(90 + 55);
+                    var pB = point("B")(150 + 2 * 55)(90 + 55);
+                    var pM = middle("")(segment(pA)(pB)(Nothing.value));
+                    var pC = point("C")(150 + 2 * 55)(90 - 55);
+                    var pJ = middle("")(segment(pB)(pC)(Nothing.value));
+                    var pD = point("D")(150 - 2 * 55)(90 - 55);
+                    var pI = middle("")(segment(pA)(pD)(Nothing.value));
+                    var pP = middle("")(segment(pC)(pD)(Nothing.value));
+                    var pE = point("")(150 - 2 * 55 + 25)(90 + 55 - 25);
+                    var pF = point("")(150 + 2 * 55 - 25)(90 + 55 - 25);
+                    var pG = point("")(150 + 2 * 55 - 25)(90 - 55 + 25);
+                    var pH = point("")(150 - 2 * 55 + 25)(90 - 55 + 25);
+                    var pO = point("O")(150)(90);
+                    var pK = function(v4) {
+                      return nth3(v4)(0);
+                    }(meets2(line(pO)(pI))(line(pE)(pH)));
+                    var pL = function(v4) {
+                      return nth3(v4)(0);
+                    }(meets2(line(pO)(pJ))(line(pF)(pG)));
+                    var pN = function(v4) {
+                      return nth3(v4)(0);
+                    }(meets2(line(pO)(pM))(line(pE)(pF)));
+                    var pQ = function(v4) {
+                      return nth3(v4)(0);
+                    }(meets2(line(pO)(pP))(line(pG)(pH)));
+                    var ctx = {
+                      strokeWidth: 1,
+                      fill: defaultContext.fill,
+                      fontStyle: defaultContext.fontStyle,
+                      stroke: defaultContext.stroke,
+                      textFill: defaultContext.textFill
+                    };
+                    var dt1 = function(dictRender) {
+                      return render$prime(dictRender)(ctx);
+                    };
+                    var dt11 = dt1(renderSequence2);
+                    var dt12 = dt1(renderSequence1);
+                    var dt13 = dt1(renderSegment);
+                    return [dt11([pO, pA, pB, pC, pD]), dt12([segment(pA)(pB)(Nothing.value), segment(pB)(pC)(Nothing.value), segment(pC)(pD)(Nothing.value), segment(pD)(pA)(Nothing.value)]), dt12([segment(pE)(pF)(Nothing.value), segment(pF)(pG)(Nothing.value), segment(pG)(pH)(Nothing.value), segment(pH)(pE)(Nothing.value)]), dt11([rename("\u{1D465}")(pI), pK]), dt13(segment(pI)(pK)(Nothing.value)), dt11([rename("\u{1D465}")(pL), pJ]), dt13(segment(pJ)(pL)(Nothing.value)), dt11([rename("\u{1D465}")(pM), pN]), dt13(segment(pM)(pN)(Nothing.value)), dt11([rename("\u{1D465}")(pQ), pP]), dt13(segment(pQ)(pP)(Nothing.value))];
+                  }()), div_([execWriter(discard1(t_("Soit "))(function() {
+                    return discard1(m_("ABCD"))(function() {
+                      return discard1(t_(" un rectangle de centre "))(function() {
+                        return discard1(m_("O"))(function() {
+                          return discard1(t_("."))(function() {
+                            return discard1(nl)(function() {
+                              return discard1(t_("On construit un autre rectangle de centre "))(function() {
+                                return discard1(m_("O"))(function() {
+                                  return discard1(t_(" \xE0 l'int\xE9rieur de "))(function() {
+                                    return discard1(m_("ABCD"))(function() {
+                                      return discard1(t_(" de mani\xE8re \xE0 laisser entre les deux rectangles "))(function() {
+                                        return discard1(t_("une bande de largeur constante "))(function() {
+                                          return discard1(m_("x"))(function() {
+                                            return discard1(t_("."))(function() {
                                               return discard1(nl)(function() {
-                                                return discard1(t_("Le but de l'exercice est de trouver la valeur de "))(function() {
-                                                  return discard1(m_("x"))(function() {
-                                                    return discard1(t_(" pour laquelle "))(function() {
-                                                      return discard1(t_(" l'aire du rectangle int\xE9rieur est \xE9gale \xE0 la "))(function() {
-                                                        return discard1(em_2("moiti\xE9"))(function() {
-                                                          return discard1(t_(" de l'aire de "))(function() {
-                                                            return discard1(m_("ABCD"))(function() {
-                                                              return discard1(t_("."))(function() {
-                                                                return discard1(nl)(function() {
+                                                return discard1(nl)(function() {
+                                                  return discard1(t_("Le but de l'exercice est de trouver la valeur de "))(function() {
+                                                    return discard1(m_("x"))(function() {
+                                                      return discard1(t_(" pour laquelle "))(function() {
+                                                        return discard1(t_(" l'aire du rectangle int\xE9rieur est \xE9gale \xE0 la "))(function() {
+                                                          return discard1(em_2("moiti\xE9"))(function() {
+                                                            return discard1(t_(" de l'aire de "))(function() {
+                                                              return discard1(m_("ABCD"))(function() {
+                                                                return discard1(t_("."))(function() {
                                                                   return discard1(nl)(function() {
-                                                                    return discard1(t_("On donne "))(function() {
-                                                                      return discard1(m(map23(function(x3) {
-                                                                        return " AB=" + show12(x3);
-                                                                      })(ab)))(function() {
-                                                                        return discard1(t_(" et "))(function() {
-                                                                          return discard1(m(map23(function(x3) {
-                                                                            return "AD=" + show12(x3);
-                                                                          })(ad)))(function() {
-                                                                            return discard1(t_(" (la figure n'est pas \xE0 l'\xE9chelle)."))(function() {
-                                                                              return discard1(nl)(function() {
-                                                                                return nl;
+                                                                    return discard1(nl)(function() {
+                                                                      return discard1(t_("On donne "))(function() {
+                                                                        return discard1(m_(" AB=" + show1(v3.b)))(function() {
+                                                                          return discard1(t_(" et "))(function() {
+                                                                            return discard1(m_("AD=" + show1(v3.a)))(function() {
+                                                                              return discard1(t_(" (la figure n'est pas \xE0 l'\xE9chelle)."))(function() {
+                                                                                return discard1(nl)(function() {
+                                                                                  return nl;
+                                                                                });
                                                                               });
                                                                             });
                                                                           });
@@ -8464,256 +9073,230 @@
                         });
                       });
                     });
-                  });
-                }))])])))(function() {
-                  return discard1(b_2("1\u25E6"))(function() {
-                    return discard1(t_(" Expliquer bri\xE8vement pourquoi le rectangle int\xE9rieur a pour longeur "))(function() {
-                      return discard1(m(map23(function(x3) {
-                        return show12(x3) + "-2x";
-                      })(ab)))(function() {
-                        return discard1(t_(" et pour hauteur "))(function() {
-                          return discard1(m(map23(function(x3) {
-                            return show12(x3) + "-2x";
-                          })(ad)))(function() {
-                            return discard1(t_("."))(function() {
-                              return discard1(nl)(function() {
-                                return discard1(t_("Ceci implique que "))(function() {
-                                  return discard1(m_("x"))(function() {
-                                    return discard1(t_(" ne peut d\xE9passer une valeur maximale. Laquelle ? Expliquer bri\xE8vement."))(function() {
-                                      return discard1(nl)(function() {
+                  }))])])))(function() {
+                    return discard1(b_2("1\u25E6"))(function() {
+                      return discard1(t_(" Expliquer bri\xE8vement pourquoi le rectangle int\xE9rieur a pour longeur "))(function() {
+                        return discard1(m_(show1(v3.b) + "-2x"))(function() {
+                          return discard1(t_(" et pour hauteur "))(function() {
+                            return discard1(m_(show1(v3.a) + "-2x"))(function() {
+                              return discard1(t_("."))(function() {
+                                return discard1(nl)(function() {
+                                  return discard1(t_("Ceci implique que "))(function() {
+                                    return discard1(m_("x"))(function() {
+                                      return discard1(t_(" ne peut d\xE9passer une valeur maximale. Laquelle ? Expliquer bri\xE8vement."))(function() {
                                         return discard1(nl)(function() {
-                                          return discard1(b_2("2\u2022\u25E6"))(function() {
-                                            return discard1(t_(" Donner l'aire de "))(function() {
-                                              return discard1(m_("ABCD."))(function() {
-                                                return discard1(nl)(function() {
-                                                  return discard1(t_("Montrer que l'aire du rectangle int\xE9rieur est "))(function() {
-                                                    return discard1(m(apply4(map23(function(x3) {
-                                                      return function(y3) {
-                                                        return "4x^2 -" + (show12(2 * (x3 + y3 | 0) | 0) + ("x+" + show12(x3 * y3 | 0)));
-                                                      };
-                                                    })(ab))(ad)))(function() {
-                                                      return discard1(t_("."))(function() {
-                                                        return discard1(nl)(function() {
-                                                          return discard1(t_("En d\xE9duire que l'\xE9quation que doit v\xE9rifier "))(function() {
-                                                            return discard1(m_("x"))(function() {
-                                                              return discard1(t_(" est"))(function() {
-                                                                return discard1(equation(apply4(map23(function(x3) {
-                                                                  return function(y3) {
-                                                                    return "4x^2 -" + (show12(2 * (x3 + y3 | 0) | 0) + ("x+" + (show12(div22(x3 * y3 | 0)(2)) + "=0")));
-                                                                  };
-                                                                })(ab))(ad)))(function() {
-                                                                  return discard1(b_2("3\u2022\u2022\u25E6"))(function() {
-                                                                    return discard1(t_(" R\xE9soudre cette \xE9quation dans "))(function() {
-                                                                      return discard1(m_("\\mathbb{R}"))(function() {
-                                                                        return discard1(t_("."))(function() {
-                                                                          return discard1(nl)(function() {
+                                          return discard1(nl)(function() {
+                                            return discard1(b_2("2\u2022\u25E6"))(function() {
+                                              return discard1(t_(" Donner l'aire de "))(function() {
+                                                return discard1(m_("ABCD."))(function() {
+                                                  return discard1(nl)(function() {
+                                                    return discard1(t_("Montrer que l'aire du rectangle int\xE9rieur est "))(function() {
+                                                      return discard1(m_("4x^2 -" + (show1(2 * (v3.b + v3.a | 0) | 0) + ("x+" + show1(v3.b * v3.a | 0)))))(function() {
+                                                        return discard1(t_("."))(function() {
+                                                          return discard1(nl)(function() {
+                                                            return discard1(t_("En d\xE9duire que l'\xE9quation que doit v\xE9rifier "))(function() {
+                                                              return discard1(m_("x"))(function() {
+                                                                return discard1(t_(" est"))(function() {
+                                                                  return discard1(equation_("4x^2 -" + (show1(2 * (v3.b + v3.a | 0) | 0) + ("x+" + (show1(div22(v3.b * v3.a | 0)(2)) + "=0")))))(function() {
+                                                                    return discard1(b_2("3\u2022\u2022\u25E6"))(function() {
+                                                                      return discard1(t_(" R\xE9soudre cette \xE9quation dans "))(function() {
+                                                                        return discard1(m_("\\mathbb{R}"))(function() {
+                                                                          return discard1(t_("."))(function() {
                                                                             return discard1(nl)(function() {
-                                                                              return discard1(b_2("4\u25E6"))(function() {
-                                                                                return discard1(t_(" En prenant en compte les contraintes sur "))(function() {
-                                                                                  return discard1(m_("x"))(function() {
-                                                                                    return discard1(t_(" \xE9tablies \xE0 la question 1, donner "))(function() {
-                                                                                      return discard1(em_2("la"))(function() {
-                                                                                        return discard1(t_(" valeur de "))(function() {
-                                                                                          return discard1(m_("x"))(function() {
-                                                                                            return discard1(t_(" r\xE9pondant au probl\xE8me."))(function() {
-                                                                                              return discard1(nl)(function() {
+                                                                              return discard1(nl)(function() {
+                                                                                return discard1(b_2("4\u25E6"))(function() {
+                                                                                  return discard1(t_(" En prenant en compte les contraintes sur "))(function() {
+                                                                                    return discard1(m_("x"))(function() {
+                                                                                      return discard1(t_(" \xE9tablies \xE0 la question 1, donner "))(function() {
+                                                                                        return discard1(em_2("la"))(function() {
+                                                                                          return discard1(t_(" valeur de "))(function() {
+                                                                                            return discard1(m_("x"))(function() {
+                                                                                              return discard1(t_(" r\xE9pondant au probl\xE8me."))(function() {
                                                                                                 return discard1(nl)(function() {
-                                                                                                  return discard1(section_("Exercice 2"))(function() {
-                                                                                                    return discard1(t_("Dans un rep\xE8re orthonorm\xE9, soient "))(function() {
-                                                                                                      return discard1(nl)(function() {
-                                                                                                        return discard1(m_("J"))(function() {
-                                                                                                          return discard1(t_(" le point de coordonn\xE9es "))(function() {
-                                                                                                            return discard1(m_("(0;1)"))(function() {
-                                                                                                              return discard1(t_(", "))(function() {
-                                                                                                                return discard1(nl)(function() {
-                                                                                                                  return discard1(m_("K"))(function() {
-                                                                                                                    return discard1(t_(" le point de coordonn\xE9es "))(function() {
-                                                                                                                      return discard1(m_("\\left(\\cos(\\frac{ -5\\pi}{6}); \\sin(\\frac{ -5\\pi}{6})\\right)"))(function() {
-                                                                                                                        return discard1(t_(" et "))(function() {
-                                                                                                                          return discard1(nl)(function() {
-                                                                                                                            return discard1(m_("L"))(function() {
-                                                                                                                              return discard1(t_(" le point de coordonn\xE9es "))(function() {
-                                                                                                                                return discard1(m_("\\left(\\cos(\\frac{ -\\pi}{6}); \\sin(\\frac{ -\\pi}{6})\\right)"))(function() {
-                                                                                                                                  return discard1(t_("."))(function() {
-                                                                                                                                    return discard1(nl)(function() {
+                                                                                                  return discard1(nl)(function() {
+                                                                                                    return discard1(section_("Exercice 2"))(function() {
+                                                                                                      return discard1(t_("Dans un rep\xE8re orthonorm\xE9, soient "))(function() {
+                                                                                                        return discard1(nl)(function() {
+                                                                                                          return discard1(m_("J"))(function() {
+                                                                                                            return discard1(t_(" le point de coordonn\xE9es "))(function() {
+                                                                                                              return discard1(m_("(0;1)"))(function() {
+                                                                                                                return discard1(t_(", "))(function() {
+                                                                                                                  return discard1(nl)(function() {
+                                                                                                                    return discard1(m_("K"))(function() {
+                                                                                                                      return discard1(t_(" le point de coordonn\xE9es "))(function() {
+                                                                                                                        return discard1(m_("\\left(\\cos(\\frac{ -5\\pi}{6}); \\sin(\\frac{ -5\\pi}{6})\\right)"))(function() {
+                                                                                                                          return discard1(t_(" et "))(function() {
+                                                                                                                            return discard1(nl)(function() {
+                                                                                                                              return discard1(m_("L"))(function() {
+                                                                                                                                return discard1(t_(" le point de coordonn\xE9es "))(function() {
+                                                                                                                                  return discard1(m_("\\left(\\cos(\\frac{ -\\pi}{6}); \\sin(\\frac{ -\\pi}{6})\\right)"))(function() {
+                                                                                                                                    return discard1(t_("."))(function() {
                                                                                                                                       return discard1(nl)(function() {
-                                                                                                                                        return discard1(b_2("1\u2022\u2022\u2022\u25E6"))(function() {
-                                                                                                                                          return discard1(t_(" Calculer les distances "))(function() {
-                                                                                                                                            return discard1(m_("JK"))(function() {
-                                                                                                                                              return discard1(t_(", "))(function() {
-                                                                                                                                                return discard1(m_("KL"))(function() {
-                                                                                                                                                  return discard1(t_(" et "))(function() {
-                                                                                                                                                    return discard1(m_("LJ"))(function() {
-                                                                                                                                                      return discard1(t_("."))(function() {
-                                                                                                                                                        return discard1(nl)(function() {
-                                                                                                                                                          return discard1(t_("Pour rappel, la distance entre "))(function() {
-                                                                                                                                                            return discard1(m_("A"))(function() {
-                                                                                                                                                              return discard1(t_(" et "))(function() {
-                                                                                                                                                                return discard1(m_("B"))(function() {
-                                                                                                                                                                  return discard1(t_(" est "))(function() {
-                                                                                                                                                                    return discard1(m_("\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2}"))(function() {
-                                                                                                                                                                      return discard1(t_(" dans un rep\xE8re orthonorm\xE9."))(function() {
-                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                          return discard1(b_2("1\u2022\u2022\u2022\u25E6"))(function() {
+                                                                                                                                            return discard1(t_(" Calculer les distances "))(function() {
+                                                                                                                                              return discard1(m_("JK"))(function() {
+                                                                                                                                                return discard1(t_(", "))(function() {
+                                                                                                                                                  return discard1(m_("KL"))(function() {
+                                                                                                                                                    return discard1(t_(" et "))(function() {
+                                                                                                                                                      return discard1(m_("LJ"))(function() {
+                                                                                                                                                        return discard1(t_("."))(function() {
+                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                            return discard1(t_("Pour rappel, la distance entre "))(function() {
+                                                                                                                                                              return discard1(m_("A"))(function() {
+                                                                                                                                                                return discard1(t_(" et "))(function() {
+                                                                                                                                                                  return discard1(m_("B"))(function() {
+                                                                                                                                                                    return discard1(t_(" est "))(function() {
+                                                                                                                                                                      return discard1(m_("\\sqrt{(x_B-x_A)^2+(y_B-y_A)^2}"))(function() {
+                                                                                                                                                                        return discard1(t_(" dans un rep\xE8re orthonorm\xE9."))(function() {
                                                                                                                                                                           return discard1(nl)(function() {
-                                                                                                                                                                            return discard1(b_2("2\u2022\u25E6"))(function() {
-                                                                                                                                                                              return discard1(t_(" En d\xE9duire la nature du triangle "))(function() {
-                                                                                                                                                                                return discard1(m_("JKL"))(function() {
-                                                                                                                                                                                  return discard1(t_(","))(function() {
-                                                                                                                                                                                    return discard1(nl)(function() {
-                                                                                                                                                                                      return discard1(t_(" puis une mesure "))(function() {
-                                                                                                                                                                                        return discard1(em_2("en radians"))(function() {
-                                                                                                                                                                                          return discard1(t_(" de l'angle "))(function() {
-                                                                                                                                                                                            return discard1(m_("\\widehat{JKL}"))(function() {
-                                                                                                                                                                                              return discard1(t_("."))(function() {
-                                                                                                                                                                                                return discard1(nl)(function() {
+                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                              return discard1(b_2("2\u2022\u25E6"))(function() {
+                                                                                                                                                                                return discard1(t_(" En d\xE9duire la nature du triangle "))(function() {
+                                                                                                                                                                                  return discard1(m_("JKL"))(function() {
+                                                                                                                                                                                    return discard1(t_(","))(function() {
+                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                        return discard1(t_(" puis une mesure "))(function() {
+                                                                                                                                                                                          return discard1(em_2("en radians"))(function() {
+                                                                                                                                                                                            return discard1(t_(" de l'angle "))(function() {
+                                                                                                                                                                                              return discard1(m_("\\widehat{JKL}"))(function() {
+                                                                                                                                                                                                return discard1(t_("."))(function() {
                                                                                                                                                                                                   return discard1(nl)(function() {
-                                                                                                                                                                                                    return discard1(section_("Exercice 3"))(function() {
-                                                                                                                                                                                                      return discard1(t_("Le but de cet exercice est de r\xE9soudre le syst\xE8me en "))(function() {
-                                                                                                                                                                                                        return discard1(m_("x"))(function() {
-                                                                                                                                                                                                          return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                            return discard1(m_("y"))(function() {
-                                                                                                                                                                                                              return discard1(t_(" suivant "))(function() {
-                                                                                                                                                                                                                var r2 = map23(consume(10))(r1);
-                                                                                                                                                                                                                var f1 = map23(randFraction)(r1);
-                                                                                                                                                                                                                var f2 = map23(randFraction)(r2);
-                                                                                                                                                                                                                return discard1(nl)(function() {
+                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                      return discard1(section_("Exercice 3"))(function() {
+                                                                                                                                                                                                        return discard1(t_("Le but de cet exercice est de r\xE9soudre le syst\xE8me en "))(function() {
+                                                                                                                                                                                                          return discard1(m_("x"))(function() {
+                                                                                                                                                                                                            return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                              return discard1(m_("y"))(function() {
+                                                                                                                                                                                                                return discard1(t_(" suivant "))(function() {
+                                                                                                                                                                                                                  var r2 = consume(10)(r1);
+                                                                                                                                                                                                                  var f1 = randFraction(r1);
+                                                                                                                                                                                                                  var f2 = randFraction(r2);
                                                                                                                                                                                                                   return discard1(nl)(function() {
-                                                                                                                                                                                                                    return discard1(equation(apply4(map23(function(x3) {
-                                                                                                                                                                                                                      return function(y3) {
-                                                                                                                                                                                                                        return "\\left\\{\\begin{array}{l}x-y=" + (showFraction(sub3(x3)(y3)) + ("\\\\ xy = " + (showFraction(mul1(x3)(y3)) + "\\end{array}\\right.")));
-                                                                                                                                                                                                                      };
-                                                                                                                                                                                                                    })(f1))(f2)))(function() {
-                                                                                                                                                                                                                      return discard1(nl)(function() {
-                                                                                                                                                                                                                        return discard1(b_2("1\u25E6"))(function() {
-                                                                                                                                                                                                                          return discard1(t_(" En effectuant les changements de variables "))(function() {
-                                                                                                                                                                                                                            return discard1(m_("X=x"))(function() {
-                                                                                                                                                                                                                              return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                return discard1(m_("Y=-y"))(function() {
-                                                                                                                                                                                                                                  return discard1(t_(", montrer que le syst\xE8me initial devient"))(function() {
-                                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                      return discard1(equation_("\\left\\{\\begin{array}{l}x-y=" + (showFraction(sub3(f1)(f2)) + ("\\\\ xy = " + (showFraction(mul1(f1)(f2)) + "\\end{array}\\right.")))))(function() {
+                                                                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                                                                                                          return discard1(b_2("1\u25E6"))(function() {
+                                                                                                                                                                                                                            return discard1(t_(" En effectuant les changements de variables "))(function() {
+                                                                                                                                                                                                                              return discard1(m_("X=x"))(function() {
+                                                                                                                                                                                                                                return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                  return discard1(m_("Y=-y"))(function() {
+                                                                                                                                                                                                                                    return discard1(t_(", montrer que le syst\xE8me initial devient"))(function() {
                                                                                                                                                                                                                                       return discard1(nl)(function() {
-                                                                                                                                                                                                                                        return discard1(equation(apply4(map23(function(x3) {
-                                                                                                                                                                                                                                          return function(y3) {
-                                                                                                                                                                                                                                            return "\\left\\{\\begin{array}{l}X+Y=" + (showFraction(sub3(x3)(y3)) + ("\\\\ XY = " + (showFraction(mul1(negate2(x3))(y3)) + "\\end{array}\\right.")));
-                                                                                                                                                                                                                                          };
-                                                                                                                                                                                                                                        })(f1))(f2)))(function() {
-                                                                                                                                                                                                                                          return discard1(b_2("2\u2022\u2022\u2022\u25E6"))(function() {
-                                                                                                                                                                                                                                            return discard1(t_(" R\xE9soudre le syst\xE8me de la question 1, c'est-\xE0-dire "))(function() {
-                                                                                                                                                                                                                                              return discard1(nl)(function() {
-                                                                                                                                                                                                                                                return discard1(t_("trouver tous les couples "))(function() {
-                                                                                                                                                                                                                                                  return discard1(m_("(X;Y)"))(function() {
-                                                                                                                                                                                                                                                    return discard1(t_(" solutions du syst\xE8me avec la m\xE9thode du cours."))(function() {
-                                                                                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                                                                                                                          return discard1(equation_("\\left\\{\\begin{array}{l}X+Y=" + (showFraction(sub3(f1)(f2)) + ("\\\\ XY = " + (showFraction(mul1(negate2(f1))(f2)) + "\\end{array}\\right.")))))(function() {
+                                                                                                                                                                                                                                            return discard1(b_2("2\u2022\u2022\u2022\u25E6"))(function() {
+                                                                                                                                                                                                                                              return discard1(t_(" R\xE9soudre le syst\xE8me de la question 1, c'est-\xE0-dire "))(function() {
+                                                                                                                                                                                                                                                return discard1(nl)(function() {
+                                                                                                                                                                                                                                                  return discard1(t_("trouver tous les couples "))(function() {
+                                                                                                                                                                                                                                                    return discard1(m_("(X;Y)"))(function() {
+                                                                                                                                                                                                                                                      return discard1(t_(" solutions du syst\xE8me avec la m\xE9thode du cours."))(function() {
                                                                                                                                                                                                                                                         return discard1(nl)(function() {
-                                                                                                                                                                                                                                                          return discard1(b_2("3\u2022"))(function() {
-                                                                                                                                                                                                                                                            return discard1(t_(" En d\xE9duire l'ensemble des couples "))(function() {
-                                                                                                                                                                                                                                                              return discard1(m_("(x;y)"))(function() {
-                                                                                                                                                                                                                                                                return discard1(t_(" solutions du syst\xE8me initial en utilisant \xE0 nouveau les changements de variables."))(function() {
-                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                                                                                            return discard1(b_2("3\u2022"))(function() {
+                                                                                                                                                                                                                                                              return discard1(t_(" En d\xE9duire l'ensemble des couples "))(function() {
+                                                                                                                                                                                                                                                                return discard1(m_("(x;y)"))(function() {
+                                                                                                                                                                                                                                                                  return discard1(t_(" solutions du syst\xE8me initial en utilisant \xE0 nouveau les changements de variables."))(function() {
                                                                                                                                                                                                                                                                     return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                      return discard1(section_("Exercice 4"))(function() {
-                                                                                                                                                                                                                                                                        return discard1(t_("Dire si chacune des affirmations suivantes est vraie ou fausse."))(function() {
-                                                                                                                                                                                                                                                                          return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                            return discard1(t_("Si elle est vraie, justifier bri\xE8vement pourquoi par une propri\xE9t\xE9 du cours, ou un argument g\xE9om\xE9trique."))(function() {
-                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                return discard1(t_("Sinon, donner un contre-exemple."))(function() {
-                                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                    return discard1(t_("Toutes les questions sont ind\xE9pendantes les unes des autres."))(function() {
-                                                                                                                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                      return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                        return discard1(section_("Exercice 4"))(function() {
+                                                                                                                                                                                                                                                                          return discard1(t_("Dire si chacune des affirmations suivantes est vraie ou fausse."))(function() {
+                                                                                                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                              return discard1(t_("Si elle est vraie, justifier bri\xE8vement pourquoi par une propri\xE9t\xE9 du cours, ou un argument g\xE9om\xE9trique."))(function() {
+                                                                                                                                                                                                                                                                                return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                  return discard1(t_("Sinon, donner un contre-exemple."))(function() {
+                                                                                                                                                                                                                                                                                    return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                      return discard1(t_("Toutes les questions sont ind\xE9pendantes les unes des autres."))(function() {
                                                                                                                                                                                                                                                                                         return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                          return discard1(b_2("1\u2022\u25E6"))(function() {
-                                                                                                                                                                                                                                                                                            return discard1(t_(" Soient "))(function() {
-                                                                                                                                                                                                                                                                                              return discard1(m_("S"))(function() {
-                                                                                                                                                                                                                                                                                                return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                  return discard1(m_("P"))(function() {
-                                                                                                                                                                                                                                                                                                    return discard1(t_(" deux nombres r\xE9els. Il est toujours possible de trouver "))(function() {
-                                                                                                                                                                                                                                                                                                      return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                        return discard1(t_("deux nombres r\xE9els "))(function() {
-                                                                                                                                                                                                                                                                                                          return discard1(m_("x_1"))(function() {
-                                                                                                                                                                                                                                                                                                            return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                              return discard1(m_("x_2"))(function() {
-                                                                                                                                                                                                                                                                                                                return discard1(t_(" tels que "))(function() {
-                                                                                                                                                                                                                                                                                                                  return discard1(m_("x_1+x_2=S"))(function() {
-                                                                                                                                                                                                                                                                                                                    return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                                      return discard1(m_("x_1x_2=P"))(function() {
-                                                                                                                                                                                                                                                                                                                        return discard1(t_("."))(function() {
-                                                                                                                                                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                          return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                            return discard1(b_2("1\u2022\u25E6"))(function() {
+                                                                                                                                                                                                                                                                                              return discard1(t_(" Soient "))(function() {
+                                                                                                                                                                                                                                                                                                return discard1(m_("S"))(function() {
+                                                                                                                                                                                                                                                                                                  return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                    return discard1(m_("P"))(function() {
+                                                                                                                                                                                                                                                                                                      return discard1(t_(" deux nombres r\xE9els. Il est toujours possible de trouver "))(function() {
+                                                                                                                                                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                          return discard1(t_("deux nombres r\xE9els "))(function() {
+                                                                                                                                                                                                                                                                                                            return discard1(m_("x_1"))(function() {
+                                                                                                                                                                                                                                                                                                              return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                                return discard1(m_("x_2"))(function() {
+                                                                                                                                                                                                                                                                                                                  return discard1(t_(" tels que "))(function() {
+                                                                                                                                                                                                                                                                                                                    return discard1(m_("x_1+x_2=S"))(function() {
+                                                                                                                                                                                                                                                                                                                      return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                                        return discard1(m_("x_1x_2=P"))(function() {
+                                                                                                                                                                                                                                                                                                                          return discard1(t_("."))(function() {
                                                                                                                                                                                                                                                                                                                             return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                              return discard1(b_2("2\u25E6"))(function() {
-                                                                                                                                                                                                                                                                                                                                return discard1(t_(" Quelque soient "))(function() {
-                                                                                                                                                                                                                                                                                                                                  return discard1(m_("x"))(function() {
-                                                                                                                                                                                                                                                                                                                                    return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                                                      return discard1(m_("y"))(function() {
-                                                                                                                                                                                                                                                                                                                                        return discard1(t_(", "))(function() {
-                                                                                                                                                                                                                                                                                                                                          return discard1(m_("\\cos(x)+\\sin(y)=\\cos(y)+\\sin(x)"))(function() {
-                                                                                                                                                                                                                                                                                                                                            return discard1(t_("."))(function() {
-                                                                                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                return discard1(b_2("2\u25E6"))(function() {
+                                                                                                                                                                                                                                                                                                                                  return discard1(t_(" Quelque soient "))(function() {
+                                                                                                                                                                                                                                                                                                                                    return discard1(m_("x"))(function() {
+                                                                                                                                                                                                                                                                                                                                      return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                                                        return discard1(m_("y"))(function() {
+                                                                                                                                                                                                                                                                                                                                          return discard1(t_(", "))(function() {
+                                                                                                                                                                                                                                                                                                                                            return discard1(m_("\\cos(x)+\\sin(y)=\\cos(y)+\\sin(x)"))(function() {
+                                                                                                                                                                                                                                                                                                                                              return discard1(t_("."))(function() {
                                                                                                                                                                                                                                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                  return discard1(b_2("3\u2022\u25E6"))(function() {
-                                                                                                                                                                                                                                                                                                                                                    return discard1(t_(" Soit "))(function() {
-                                                                                                                                                                                                                                                                                                                                                      return discard1(m_("f"))(function() {
-                                                                                                                                                                                                                                                                                                                                                        return discard1(t_(" la fonction d\xE9finie par "))(function() {
-                                                                                                                                                                                                                                                                                                                                                          return discard1(m_("f(x)=a(x-\\alpha)^2+\\beta"))(function() {
-                                                                                                                                                                                                                                                                                                                                                            return discard1(t_("."))(function() {
-                                                                                                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                                return discard1(t_("Si "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                  return discard1(m_("a"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                    return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                      return discard1(m_("\\beta"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                        return discard1(t_(" sont de signes contraires, alors "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                          return discard1(m_("f"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                            return discard1(t_(" admet deux racines r\xE9elles distinctes."))(function() {
-                                                                                                                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                    return discard1(b_2("3\u2022\u25E6"))(function() {
+                                                                                                                                                                                                                                                                                                                                                      return discard1(t_(" Soit "))(function() {
+                                                                                                                                                                                                                                                                                                                                                        return discard1(m_("f"))(function() {
+                                                                                                                                                                                                                                                                                                                                                          return discard1(t_(" la fonction d\xE9finie par "))(function() {
+                                                                                                                                                                                                                                                                                                                                                            return discard1(m_("f(x)=a(x-\\alpha)^2+\\beta"))(function() {
+                                                                                                                                                                                                                                                                                                                                                              return discard1(t_("."))(function() {
+                                                                                                                                                                                                                                                                                                                                                                return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                  return discard1(t_("Si "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                    return discard1(m_("a"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                      return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                        return discard1(m_("\\beta"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                          return discard1(t_(" sont de signes contraires, alors "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                            return discard1(m_("f"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                              return discard1(t_(" admet deux racines r\xE9elles distinctes."))(function() {
                                                                                                                                                                                                                                                                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                                                  return discard1(b_2("4\u25E6"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                    return discard1(t_(" Quelque soit "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                      return discard1(m_("x"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                        return discard1(t_(", "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                          return discard1(m_("\\cos^2(x)-\\sin^2(x)=1"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                            return discard1(t_("."))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                    return discard1(b_2("4\u25E6"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                      return discard1(t_(" Quelque soit "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                        return discard1(m_("x"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                          return discard1(t_(", "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                            return discard1(m_("\\cos^2(x)-\\sin^2(x)=1"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                              return discard1(t_("."))(function() {
                                                                                                                                                                                                                                                                                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(b_2("5\u25E6"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                    return discard1(t_(" Soit "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                      return discard1(m_("f"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(t_(" une fonction polyn\xF4me du second degr\xE9. "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                          return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                            return discard1(t_("Si "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                              return discard1(m_("f"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                return discard1(t_(" poss\xE8de la racine "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(m_("x_1"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                    return discard1(t_(", alors elle poss\xE8de aussi la racine "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                      return discard1(m_("x_2"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                          return discard1(m_("x_2\\not = x_1"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                            return discard1(t_("."))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                              return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                    return discard1(b_2("5\u25E6"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                      return discard1(t_(" Soit "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(m_("f"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                          return discard1(t_(" une fonction polyn\xF4me du second degr\xE9. "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                            return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                              return discard1(t_("Si "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                return discard1(m_("f"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(t_(" poss\xE8de la racine "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                    return discard1(m_("x_1"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                      return discard1(t_(", alors elle poss\xE8de aussi la racine "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(m_("x_2"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                          return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                            return discard1(m_("x_2\\not = x_1"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                              return discard1(t_("."))(function() {
                                                                                                                                                                                                                                                                                                                                                                                                                                 return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(b_2("6\u25E6"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                    return discard1(t_(" Quelque soient "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                      return discard1(m_("x"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(t_(" et "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                          return discard1(m_("y"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                            return discard1(t_(", "))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                              return discard1(m_("\\cos(x)\\sin(y)=\\cos(y)\\sin(x)"))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                return discard1(t_("."))(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                    return discard1(b_2("6\u25E6"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                      return discard1(t_(" Quelque soient "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(m_("x"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                          return discard1(t_(" et "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                            return discard1(m_("y"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                              return discard1(t_(", "))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                return discard1(m_("\\cos(x)\\sin(y)=\\cos(y)\\sin(x)"))(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  return discard1(t_("."))(function() {
                                                                                                                                                                                                                                                                                                                                                                                                                                                     return discard1(nl)(function() {
                                                                                                                                                                                                                                                                                                                                                                                                                                                       return discard1(nl)(function() {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        var erep = apply4(apply4(map23(function(v2) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          return function(p) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            return function(q) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                              return ["r\xE9ponses: ", "\\; 1)1\u25E6 \\; 0<x<" + showFraction(div1(fromInt2(v2.a))(fromInt2(2))), "\\; 1)2\u2022\u25E6 \\;", "AB AD = " + show12(v2.a * v2.b | 0), "\\; 1)3\u2022\u2022\u25E6 \\;", "\\mathcal{S}=\\{" + (showFraction(div1(fromInt2((v2.b + v2.a | 0) - v2.c | 0))(fromInt2(4))) + ("," + (showFraction(div1(fromInt2((v2.b + v2.a | 0) + v2.c | 0))(fromInt2(4))) + "\\} "))), "\\; 1)4\u25E6", "\\; 2)1\u2022\u2022\u2022\u25E6 \\;JK=KL=LJ=\\sqrt{3}", "\\; 2)2\u2022\u25E6 \\;\\widehat{JKL}=\\frac{\\pi}{3}", "\\; 3)1\u25E6", "\\; 3)2\u2022\u2022\u2022\u25E6 \\;\\mathcal{S}=\\{(" + (showFraction(p) + ("," + (showFraction(negate2(q)) + ("),(" + (showFraction(negate2(q)) + ("," + (showFraction(p) + ")\\}"))))))), "\\; 3)3\u2022\\; \\mathcal{S}=\\{(" + (showFraction(p) + ("," + (showFraction(q) + ("),(" + (showFraction(negate2(q)) + ("," + (showFraction(negate2(p)) + ")\\}"))))))), "\\; 4)1\u2022\u25E6", "\\; 4)2\u25E6", "\\; 4)3\u2022\u25E6", "\\; 4)4\u25E6", "\\; 4)5\u25E6", "\\; 4)6\u25E6"];
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        })(etriple))(f1))(f2);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        return m(map23(function(v2) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          if (v2.value0) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            return foldr7(append6)("")(v2.value1);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          ;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          return "";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        })(apply4(map23(Tuple.create)(map23(snd)(f0)))(erep)));
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        return discard1(nl)(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          var rep = ["r\xE9ponses: ", "\\; 1)1\u25E6 \\; 0<x<" + showFraction(div1(fromInt2(v3.a))(fromInt2(2))), "\\; 1)2\u2022\u25E6 \\;", "AB AD = " + show1(v3.a * v3.b | 0), "\\; 1)3\u2022\u2022\u25E6 \\;", "\\mathcal{S}=\\{" + (showFraction(div1(fromInt2((v3.b + v3.a | 0) - v3.c | 0))(fromInt2(4))) + ("," + (showFraction(div1(fromInt2((v3.b + v3.a | 0) + v3.c | 0))(fromInt2(4))) + "\\} "))), "\\; 1)4\u25E6", "\\; 2)1\u2022\u2022\u2022\u25E6 \\;JK=KL=LJ=\\sqrt{3}", "\\; 2)2\u2022\u25E6 \\;\\widehat{JKL}=\\frac{\\pi}{3}", "\\; 3)1\u25E6", "\\; 3)2\u2022\u2022\u2022\u25E6 \\;\\mathcal{S}=\\{(" + (showFraction(f1) + ("," + (showFraction(negate2(f2)) + ("),(" + (showFraction(negate2(f2)) + ("," + (showFraction(f1) + ")\\}"))))))), "\\; 3)3\u2022\\; \\mathcal{S}=\\{(" + (showFraction(f1) + ("," + (showFraction(f2) + ("),(" + (showFraction(negate2(f2)) + ("," + (showFraction(negate2(f1)) + ")\\}"))))))), "\\; 4)1\u2022\u25E6", "\\; 4)2\u25E6", "\\; 4)3\u2022\u25E6", "\\; 4)4\u25E6", "\\; 4)5\u25E6", "\\; 4)6\u25E6"];
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          return m_(function() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (v2.value1.value0) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              return foldr7(append7)("")(rep);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            ;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            return "";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                          }());
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        });
                                                                                                                                                                                                                                                                                                                                                                                                                                                       });
                                                                                                                                                                                                                                                                                                                                                                                                                                                     });
                                                                                                                                                                                                                                                                                                                                                                                                                                                   });
@@ -8927,9 +9510,11 @@
                   });
                 });
               });
-            });
-          }))];
-        }())]);
+            }));
+          }
+          ;
+          return mempty4;
+        })])]);
       });
     }))();
   };
