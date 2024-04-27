@@ -307,7 +307,7 @@ main = runWidgetInDom "main"
                   <|> (D.node' "pre" [D.text
                     $ (show $ k) <> "\n"
                           <> (show $ m)<> "\n"
-                          <> (show $ applyQuadratic k p1)<> "\n"
+                          <> (show $ applyQuadratic k p1) <> "\n"
                           <> (show $ applyQuadratic m p1) <> "\n"
                           <> (show $ i12) <> "\n"
                           <> (show $ transpose n1 * n1) <> "\n"

@@ -6,7 +6,7 @@ import Affjax (get) as AX
 import Affjax.ResponseFormat (json) as ResponseFormat
 import Data.Time.Duration (Milliseconds(..))
 import Data.Argonaut.Core as J
-import Data.Argonaut.Decode(class DecodeJson, (.:), decodeJson)
+import Data.Argonaut.Decode (class DecodeJson, (.:), decodeJson)
 import Data.Array (singleton)
 import Data.Either (Either(..), either)
 import Data.Traversable (traverse)

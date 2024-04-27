@@ -1,0 +1,15 @@
+package:
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - strings
+    - transformers
+  name: comonadask
+  test:
+    dependencies: []
+    main: Test.Main
+workspace:
+  extra_packages: {}
+  package_set:
+    registry: 43.5.1
