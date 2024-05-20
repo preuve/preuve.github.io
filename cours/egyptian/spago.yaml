@@ -1,0 +1,17 @@
+package:
+  dependencies:
+    - arrays
+    - console
+    - effect
+    - maybe
+    - prelude
+    - rationals
+    - js-bigints
+
+  name: egyptian
+  test:
+    dependencies: []
+    main: Test.Main
+workspace:
+  package_set:
+    registry: 50.19.0
