@@ -2,8 +2,8 @@ module Main where
 
 import Prelude
 
-import Data.Array ((:), filter, all, (..), zip, nub, length, sort)
-import Data.Foldable (minimumBy)
+import Data.Array ((:), filter, all, (..), zip)
+--import Data.Foldable (minimumBy)
 import Data.Maybe (Maybe(..))
 import Data.Rational (Rational, numerator, denominator, (%))
 import Data.Tuple.Nested ((/\), type (/\))
@@ -49,18 +49,20 @@ import JS.BigInt (BigInt, fromInt, toInt)
 
 type InProgress = Array BigInt
 type PartialSum = Rational
+type LastInserted = BigInt
 type ProdOfDs = BigInt
 type ProdOfDeltas = BigInt
 
-type Step = InProgress /\ PartialSum /\ ProdOfDeltas /\ ProdOfDs
+type Step = InProgress /\ LastInserted /\ PartialSum /\ ProdOfDeltas /\ ProdOfDs
 
 initial :: BigInt -> Int -> Array Step
 initial q n =
   let 
-    delta1 = range (fromInt 1) (fromInt n * q)
+    delta1 = range (fromInt 1) (fromInt (n - 1) * q)
     d1 = (q + _) <$> delta1
   in 
     zip ((_ : []) <$> d1) 
+      $ zip d1
       $ (zip ((fromInt 1 % _ ) <$> d1) 
       $ zip delta1 ((_ * q) <$> d1))
 
@@ -84,40 +86,42 @@ range a b
 -- | given that the sum has n terms and should exceed r 
 limit :: Rational -> BigInt -> Int -> BigInt 
 limit r p n 
-  | r <= fromInt 0 % fromInt 1 = p
-  | otherwise = go p where 
+  | r <= fromInt 0 % fromInt 1 = p - fromInt 1
+  | otherwise = go (p - fromInt 1) where 
     go i = 
       if bound (i + fromInt 1) n >= r
         then go (i + fromInt 1)
         else i
 
 steps :: BigInt -> Int -> Array Step -> Array Step
-steps _ 2 xs = xs
+steps _ 1 xs = xs
 steps d n xs = 
   steps d (n-1) $ xs >>= step d n
 
 step :: BigInt -> Int -> Step -> Array Step
-step q n (ds /\ s /\ pdelta /\ pd) =
+step q n (ds /\ x /\ s /\ pdelta /\ pd) =
   let
-    dmin = pd / pdelta + fromInt 1
-    dmax = limit (fromInt 1 % q - s) dmin (n-1)
+    dmin = max (x + fromInt 1) $ pd / pdelta + fromInt 1
+    dmax = limit (fromInt 1 % q - s) dmin n
     d = range dmin dmax
-    pd' = (_ * pd) <$> d
+    pd' = (_ * pdelta) <$> (_ * pd) <$> d
     delta = ((_ - pd) <<< (_ * pdelta)) <$> d
     pdelta' = (_ * pdelta) <$> delta
   in zip ((_ : ds) <$> d) 
+    $ zip d
     $ zip (((_ + s) <<< (fromInt 1 % _ )) <$> d) 
     $ zip pdelta' pd'
 
 final :: BigInt -> Array Step -> Array InProgress
 final q s' =
   let
-    f (ds /\ s /\ _ /\ _) =
+    f (ds /\ y /\ s /\ _ /\ _) =
       let 
         residue = fromInt 1 % q - s
+        z = denominator residue
       in 
-        if numerator residue == fromInt 1
-           then denominator residue : ds
+        if numerator residue == fromInt 1 && y < z
+           then z : ds
            else []
   in f <$> s'
 
@@ -134,21 +138,17 @@ egyptian u d n
         ) 
   | u == fromInt 1 && n == 1 = [[d]]
   | otherwise =
-      nub $ filter ((_ == n) <<< length) 
-        $ (nub <<< sort) <$> 
-          (
-            filter (_ /= []) 
-                $ final d 
-                  $ steps d n $ initial d (n) 
-          )
+      filter (_ /= []) 
+          $ final d 
+            $ steps d (n-1) $ initial d n 
 
 main :: Effect Unit
 main = do
   log $ show $ 
     let 
-      --  f [a,_,_,_,_,b] [c,_,_,_,_,d] =  if b-a<d-c then LT else GT
+      --  f [a,_,_,_,_,b] [c,_,_,_,_,d] =  if b-a<d-c then GT else LT
       --  f _ _ = EQ
-        g [_,_,_,_,_,b] = 
+        g [b,_,_,_,_,_] = 
           b `mod` fromInt 2 == fromInt 1
           && b `mod` fromInt 5 /= fromInt 0
           && b `mod` fromInt 7 /= fromInt 0
