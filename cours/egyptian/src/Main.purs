@@ -3,7 +3,7 @@ module Main where
 import Prelude
 
 import Data.Array ((:), filter, all, (..), zip)
---import Data.Foldable (minimumBy)
+-- import Data.Foldable (minimumBy, sum)
 import Data.Maybe (Maybe(..))
 import Data.Rational (Rational, numerator, denominator, (%))
 import Data.Tuple.Nested ((/\), type (/\))
@@ -141,6 +141,11 @@ egyptian u d n
       filter (_ /= []) 
           $ final d 
             $ steps d (n-1) $ initial d n 
+
+-- | There are (tau(n^2)-1)/2 distinct ways to express 1/n as a sum of two distinct reciprocals.
+
+--tau :: Int -> Int
+--tau n = sum ((\i -> if n `mod` i == 0 then 1 else 0) <$> (1..n))
 
 main :: Effect Unit
 main = do
