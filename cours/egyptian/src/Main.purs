@@ -2,15 +2,17 @@ module Main where
 
 import Prelude
 
-import Data.Array ((:), filter, all, (..), zip)
--- import Data.Foldable (minimumBy, sum)
-import Data.Maybe (Maybe(..))
+import Data.Array ((:), filter, all, (..), zip, group, sort,uncons, length, (\\), unzip)
+import Data.Foldable (minimumBy, sum, lookup, minimum, maximum)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Rational (Rational, numerator, denominator, (%))
+import Data.Tuple (fst)
 import Data.Tuple.Nested ((/\), type (/\))
 
 import Effect (Effect)
 import Effect.Console (log)
 import JS.BigInt (BigInt, fromInt, toInt)
+import Data.Array.NonEmpty (toArray) as NonEmpty
 
 -- | Algorithm for the decomposition of 1/q:
 -- | --------------------------------------
@@ -128,31 +130,104 @@ final q s' =
 -- | Egyptian sums of n distinct reciprocals equal to u/d with u <= d:
 -- | The algorithm searches for the solutions summing to 1/d,
 -- | then filters those that are divisible by u. 
-egyptian :: BigInt -> BigInt -> Int -> Array (Array BigInt)
-egyptian u d n 
-  | u > fromInt 1 && n == 1 = []
-  | u > fromInt 1 =
-    (\qs -> (_ / u) <$> qs) 
-      <$> filter (\qs -> all (_ == fromInt 0) $ (_ `mod` u) <$> qs) 
-        (egyptian (fromInt 1) d n
-        ) 
-  | u == fromInt 1 && n == 1 = [[d]]
-  | otherwise =
-      filter (_ /= []) 
-          $ final d 
-            $ steps d (n-1) $ initial d n 
+egyptian :: Rational -> Int -> Array (Array BigInt)
+egyptian f n = go u' d'
+  where
+    u' = numerator f
+    d' = denominator f
+    go u d
+      | u > fromInt 1 && n == 1 = []
+      | u > fromInt 1 =
+        (\qs -> (_ / u) <$> qs) 
+          <$> filter (\qs -> all (_ == fromInt 0) $ (_ `mod` u) <$> qs) 
+            (go (fromInt 1) d) 
+      | u == fromInt 1 && n == 1 = [[d]]
+      | otherwise =
+          filter (_ /= []) 
+              $ final d 
+                $ steps d (n-1) $ initial d n 
 
--- | There are (tau(n^2)-1)/2 distinct ways to express 1/n as a sum of two distinct reciprocals.
+-- | There are (tau(n^2)-1)/2 distinct ways to express 1/n as a sum of _two_ distinct reciprocals.
 
---tau :: Int -> Int
---tau n = sum ((\i -> if n `mod` i == 0 then 1 else 0) <$> (1..n))
+tau :: Int -> Int
+tau n = sum ((\i -> if n `mod` i == 0 then 1 else 0) <$> (1..n))
 
+histogram :: Array Int -> Array (Int /\ Int)
+histogram = 
+  let defaultHead xs =
+        case uncons xs of
+             Just { head, tail: _ } -> head
+             _ -> 0
+  in map (\x -> defaultHead x /\ length x) <<< map NonEmpty.toArray <<< group <<< sort
+ 
+rmod :: Rational -> Rational -> Rational
+rmod p q = 
+  let k = numerator p * denominator q / (numerator q * denominator p) 
+  in p - (k % fromInt 1) * q
+
+alias :: forall a b
+  . Eq a
+  => Ord a
+  => Eq b
+  => EuclideanRing a
+  => Array (a /\ b) 
+  -> Array ((a /\ Maybe b) /\ (a /\ Maybe b))
+alias zs = go xs'
+  where
+    xs' = (\(a /\ b) -> a /\ Just b) <$> zs
+    go xs =
+      if allEqual nums 
+          then map (\(x /\ s) -> ((x /\ s) /\ (zero /\ Nothing))) xs
+          else entry : go (((maxi - comp) /\ smaxi) : ys)
+      where
+        n = sum $ const one <$> xs
+        nums = fst $ unzip xs
+        moy = (_ / n) $ sum nums
+        extr f = m /\ symbol
+          where
+            m = fromMaybe zero $ f nums
+            symbol = join $ lookup m xs
+        one@(mini /\ _) = extr minimum
+        two@(maxi /\ smaxi) = extr maximum
+        comp = moy - mini
+        entry 
+          | mini < comp = one /\ (comp /\ smaxi) 
+          | otherwise = (comp /\ smaxi) /\ one
+        allEqual bs =
+          case uncons bs of
+            Just { head: b, tail: cs } ->
+                case uncons cs of
+                  Just { head: c, tail: _ } ->
+                      b == c && allEqual cs
+                  _ -> true
+            _ -> true  
+        ys = xs \\ [one, two]
+
+distribution =
+  [ 1%7 /\ 8    
+  , 1%8 /\ 6
+  , 1%9 /\ 5
+  , 1%10 /\ 4     
+  , 1%11 /\ 3 
+  , 1%15 /\ 2 
+  , 1%18 /\ 1 
+  , 1%20 /\ 0 
+  , 1%21 /\ (-1) 
+  , 1%22 /\ (-2) 
+  , 1%24 /\ (-3) 
+  , 1%28 /\ (-4) 
+  , 1%30 /\ (-5) 
+  , 1%33 /\ (-6)
+  , 1%42 /\ (-8)
+  ] :: Array (Rational /\ Int)
+
+        
 main :: Effect Unit
 main = do
   log $ show $ 
     let 
-      --  f [a,_,_,_,_,b] [c,_,_,_,_,d] =  if b-a<d-c then GT else LT
-      --  f _ _ = EQ
+        f [a,_,_,_,b] [c,_,_,_,d] =  if a-b<c-d then LT else GT
+        f _ _ = EQ
         g [b,_,_,_,_,_] = 
           b `mod` fromInt 2 == fromInt 1
           && b `mod` fromInt 5 /= fromInt 0
@@ -162,5 +237,5 @@ main = do
           && b `mod` fromInt 17 /= fromInt 0
           && b `mod` fromInt 19 /= fromInt 0
         g _ = false
-   -- in minimumBy f $ egyptian (fromInt 1) (fromInt 1) 6
-    in filter g $ egyptian (fromInt 1) (fromInt 1) 6
+    in (minimumBy f $ egyptian (fromInt 1 % fromInt 1) 5)
+    /\ (filter g $ egyptian (fromInt 1 % fromInt 1) 6)

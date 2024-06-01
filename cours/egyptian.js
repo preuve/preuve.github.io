@@ -116,14 +116,14 @@
   };
   var replicateImpl = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
   var fromFoldableImpl = function() {
-    function Cons(head, tail) {
-      this.head = head;
-      this.tail = tail;
+    function Cons(head2, tail2) {
+      this.head = head2;
+      this.tail = tail2;
     }
     var emptyList = {};
-    function curryCons(head) {
-      return function(tail) {
-        return new Cons(head, tail);
+    function curryCons(head2) {
+      return function(tail2) {
+        return new Cons(head2, tail2);
       };
     }
     function listToArray(list) {
@@ -265,10 +265,10 @@
     };
   };
   var notEq = function(dictEq) {
-    var eq32 = eq(dictEq);
+    var eq3 = eq(dictEq);
     return function(x) {
       return function(y) {
-        return eq2(eq32(x)(y))(false);
+        return eq2(eq3(x)(y))(false);
       };
     };
   };
@@ -295,6 +295,25 @@
     EQ2.value = new EQ2();
     return EQ2;
   }();
+  var eqOrdering = {
+    eq: function(v) {
+      return function(v1) {
+        if (v instanceof LT && v1 instanceof LT) {
+          return true;
+        }
+        ;
+        if (v instanceof GT && v1 instanceof GT) {
+          return true;
+        }
+        ;
+        if (v instanceof EQ && v1 instanceof EQ) {
+          return true;
+        }
+        ;
+        return false;
+      };
+    }
+  };
 
   // output/Data.Semiring/index.js
   var zero = function(dict) {
@@ -315,10 +334,10 @@
     return dict.sub;
   };
   var negate = function(dictRing) {
-    var sub12 = sub(dictRing);
+    var sub1 = sub(dictRing);
     var zero2 = zero(dictRing.Semiring0());
     return function(a) {
-      return sub12(zero2)(a);
+      return sub1(zero2)(a);
     };
   };
 
@@ -477,30 +496,51 @@
     };
     return Just2;
   }();
+  var showMaybe = function(dictShow) {
+    var show2 = show(dictShow);
+    return {
+      show: function(v) {
+        if (v instanceof Just) {
+          return "(Just " + (show2(v.value0) + ")");
+        }
+        ;
+        if (v instanceof Nothing) {
+          return "Nothing";
+        }
+        ;
+        throw new Error("Failed pattern match at Data.Maybe (line 223, column 1 - line 225, column 28): " + [v.constructor.name]);
+      }
+    };
+  };
 
   // output/Data.EuclideanRing/index.js
   var mod = function(dict) {
     return dict.mod;
   };
   var gcd = function(dictEq) {
-    var eq4 = eq(dictEq);
+    var eq3 = eq(dictEq);
     return function(dictEuclideanRing) {
       var zero2 = zero(dictEuclideanRing.CommutativeRing0().Ring0().Semiring0());
-      var mod1 = mod(dictEuclideanRing);
+      var mod12 = mod(dictEuclideanRing);
       return function(a) {
         return function(b) {
-          var $24 = eq4(b)(zero2);
+          var $24 = eq3(b)(zero2);
           if ($24) {
             return a;
           }
           ;
-          return gcd(dictEq)(dictEuclideanRing)(b)(mod1(a)(b));
+          return gcd(dictEq)(dictEuclideanRing)(b)(mod12(a)(b));
         };
       };
     };
   };
   var div = function(dict) {
     return dict.div;
+  };
+
+  // output/Data.Monoid/index.js
+  var mempty = function(dict) {
+    return dict.mempty;
   };
 
   // output/Data.Array.ST/foreign.js
@@ -548,6 +588,32 @@
     };
   }();
 
+  // output/Data.Foldable/foreign.js
+  var foldrArray = function(f) {
+    return function(init2) {
+      return function(xs) {
+        var acc = init2;
+        var len = xs.length;
+        for (var i = len - 1; i >= 0; i--) {
+          acc = f(xs[i])(acc);
+        }
+        return acc;
+      };
+    };
+  };
+  var foldlArray = function(f) {
+    return function(init2) {
+      return function(xs) {
+        var acc = init2;
+        var len = xs.length;
+        for (var i = 0; i < len; i++) {
+          acc = f(acc)(xs[i]);
+        }
+        return acc;
+      };
+    };
+  };
+
   // output/Data.Tuple/index.js
   var Tuple = /* @__PURE__ */ function() {
     function Tuple2(value0, value1) {
@@ -562,6 +628,73 @@
     };
     return Tuple2;
   }();
+  var showTuple = function(dictShow) {
+    var show2 = show(dictShow);
+    return function(dictShow1) {
+      var show1 = show(dictShow1);
+      return {
+        show: function(v) {
+          return "(Tuple " + (show2(v.value0) + (" " + (show1(v.value1) + ")")));
+        }
+      };
+    };
+  };
+
+  // output/Data.Foldable/index.js
+  var eq12 = /* @__PURE__ */ eq(eqOrdering);
+  var foldr = function(dict) {
+    return dict.foldr;
+  };
+  var foldl = function(dict) {
+    return dict.foldl;
+  };
+  var minimumBy = function(dictFoldable) {
+    var foldl2 = foldl(dictFoldable);
+    return function(cmp) {
+      var min$prime = function(v) {
+        return function(v1) {
+          if (v instanceof Nothing) {
+            return new Just(v1);
+          }
+          ;
+          if (v instanceof Just) {
+            return new Just(function() {
+              var $307 = eq12(cmp(v.value0)(v1))(LT.value);
+              if ($307) {
+                return v.value0;
+              }
+              ;
+              return v1;
+            }());
+          }
+          ;
+          throw new Error("Failed pattern match at Data.Foldable (line 454, column 3 - line 454, column 27): " + [v.constructor.name, v1.constructor.name]);
+        };
+      };
+      return foldl2(min$prime)(Nothing.value);
+    };
+  };
+  var foldMapDefaultR = function(dictFoldable) {
+    var foldr2 = foldr(dictFoldable);
+    return function(dictMonoid) {
+      var append3 = append(dictMonoid.Semigroup0());
+      var mempty2 = mempty(dictMonoid);
+      return function(f) {
+        return foldr2(function(x) {
+          return function(acc) {
+            return append3(f(x))(acc);
+          };
+        })(mempty2);
+      };
+    };
+  };
+  var foldableArray = {
+    foldr: foldrArray,
+    foldl: foldlArray,
+    foldMap: function(dictMonoid) {
+      return foldMapDefaultR(foldableArray)(dictMonoid);
+    }
+  };
 
   // output/Data.Function.Uncurried/foreign.js
   var runFn2 = function(fn) {
@@ -646,6 +779,59 @@
   };
   var all2 = /* @__PURE__ */ runFn2(allImpl);
 
+  // output/Data.Array.NonEmpty.Internal/foreign.js
+  var traverse1Impl = function() {
+    function Cont(fn) {
+      this.fn = fn;
+    }
+    var emptyList = {};
+    var ConsCell = function(head2, tail2) {
+      this.head = head2;
+      this.tail = tail2;
+    };
+    function finalCell(head2) {
+      return new ConsCell(head2, emptyList);
+    }
+    function consList(x) {
+      return function(xs) {
+        return new ConsCell(x, xs);
+      };
+    }
+    function listToArray(list) {
+      var arr = [];
+      var xs = list;
+      while (xs !== emptyList) {
+        arr.push(xs.head);
+        xs = xs.tail;
+      }
+      return arr;
+    }
+    return function(apply2, map3, f) {
+      var buildFrom = function(x, ys) {
+        return apply2(map3(consList)(f(x)))(ys);
+      };
+      var go = function(acc, currentLen, xs) {
+        if (currentLen === 0) {
+          return acc;
+        } else {
+          var last2 = xs[currentLen - 1];
+          return new Cont(function() {
+            var built = go(buildFrom(last2, acc), currentLen - 1, xs);
+            return built;
+          });
+        }
+      };
+      return function(array) {
+        var acc = map3(finalCell)(f(array[array.length - 1]));
+        var result = go(acc, array.length - 1, array);
+        while (result instanceof Cont) {
+          result = result.fn();
+        }
+        return map3(listToArray)(result);
+      };
+    };
+  }();
+
   // output/Data.Ratio/index.js
   var Ratio = /* @__PURE__ */ function() {
     function Ratio2(value0, value1) {
@@ -729,11 +915,11 @@
     return v.value0;
   };
   var eqRatio = function(dictEq) {
-    var eq4 = eq(dictEq);
+    var eq3 = eq(dictEq);
     return {
       eq: function(v) {
         return function(v1) {
-          return eq4(v.value0)(v1.value0) && eq4(v.value1)(v1.value1);
+          return eq3(v.value0)(v1.value0) && eq3(v.value1)(v1.value1);
         };
       }
     };
@@ -741,7 +927,7 @@
   var ordRatio = function(dictOrd) {
     var ringRatio1 = ringRatio(dictOrd);
     var Eq0 = dictOrd.Eq0();
-    var eq4 = eq(Eq0);
+    var eq3 = eq(Eq0);
     var greaterThan3 = greaterThan(dictOrd);
     var eqRatio1 = eqRatio(Eq0);
     return function(dictEuclideanRing) {
@@ -751,7 +937,7 @@
         compare: function(x) {
           return function(y) {
             var v = sub3(x)(y);
-            var $130 = eq4(v.value0)(zero2);
+            var $130 = eq3(v.value0)(zero2);
             if ($130) {
               return EQ.value;
             }
@@ -911,24 +1097,25 @@
   };
 
   // output/Main/index.js
-  var greaterThan2 = /* @__PURE__ */ greaterThan(ordBigInt);
-  var eq3 = /* @__PURE__ */ eq(eqBigInt);
   var map2 = /* @__PURE__ */ map(functorArray);
+  var div2 = /* @__PURE__ */ div(euclideanRingBigInt);
   var mul2 = /* @__PURE__ */ mul(semiringBigInt);
-  var add2 = /* @__PURE__ */ add(semiringBigInt);
+  var sub2 = /* @__PURE__ */ sub(ringRational);
   var toRational2 = /* @__PURE__ */ toRational(toRationalBigInt);
-  var sub1 = /* @__PURE__ */ sub(ringRational);
+  var greaterThan2 = /* @__PURE__ */ greaterThan(ordBigInt);
+  var eq13 = /* @__PURE__ */ eq(eqBigInt);
+  var add2 = /* @__PURE__ */ add(semiringBigInt);
   var lessThan2 = /* @__PURE__ */ lessThan(ordBigInt);
   var add1 = /* @__PURE__ */ add(semiringRational);
   var lessThanOrEq2 = /* @__PURE__ */ lessThanOrEq(ordRational);
-  var sub2 = /* @__PURE__ */ sub(ringBigInt);
+  var sub22 = /* @__PURE__ */ sub(ringBigInt);
   var greaterThanOrEq2 = /* @__PURE__ */ greaterThanOrEq(ordRational);
   var max3 = /* @__PURE__ */ max(ordBigInt);
-  var div2 = /* @__PURE__ */ div(euclideanRingBigInt);
   var map1 = /* @__PURE__ */ map(functorFn);
   var bind2 = /* @__PURE__ */ bind(bindArray);
-  var mod2 = /* @__PURE__ */ mod(euclideanRingBigInt);
+  var mod1 = /* @__PURE__ */ mod(euclideanRingBigInt);
   var notEq2 = /* @__PURE__ */ notEq(/* @__PURE__ */ eqArray(eqBigInt));
+  var showArray2 = /* @__PURE__ */ showArray(showBigInt);
   var notEq1 = /* @__PURE__ */ notEq(eqBigInt);
   var range3 = function(a) {
     return function(b) {
@@ -936,7 +1123,7 @@
         return [];
       }
       ;
-      if (eq3(a)(b)) {
+      if (eq13(a)(b)) {
         return [a];
       }
       ;
@@ -950,7 +1137,7 @@
         return [];
       }
       ;
-      throw new Error("Failed pattern match at Main (line 76, column 1 - line 76, column 42): " + [a.constructor.name, b.constructor.name]);
+      throw new Error("Failed pattern match at Main (line 78, column 1 - line 78, column 42): " + [a.constructor.name, b.constructor.name]);
     };
   };
   var initial = function(q) {
@@ -971,10 +1158,10 @@
   var $$final = function(q) {
     return function(s$prime) {
       var f = function(v) {
-        var residue = sub1(toRational2(fromInt(1))(q))(v.value1.value1.value0);
+        var residue = sub2(toRational2(fromInt(1))(q))(v.value1.value1.value0);
         var z = denominator2(residue);
-        var $58 = eq3(numerator2(residue))(fromInt(1)) && lessThan2(v.value1.value0)(z);
-        if ($58) {
+        var $110 = eq13(numerator2(residue))(fromInt(1)) && lessThan2(v.value1.value0)(z);
+        if ($110) {
           return cons(z)(v.value0);
         }
         ;
@@ -993,14 +1180,14 @@
         return add1(toRational2(fromInt(1))(from))(bound(add2(from)(fromInt(1)))(n - 1 | 0));
       }
       ;
-      throw new Error("Failed pattern match at Main (line 70, column 1 - line 70, column 35): " + [from.constructor.name, n.constructor.name]);
+      throw new Error("Failed pattern match at Main (line 72, column 1 - line 72, column 35): " + [from.constructor.name, n.constructor.name]);
     };
   };
   var limit = function(r) {
     return function(p) {
       return function(n) {
         if (lessThanOrEq2(r)(toRational2(fromInt(0))(fromInt(1)))) {
-          return sub2(p)(fromInt(1));
+          return sub22(p)(fromInt(1));
         }
         ;
         if (otherwise) {
@@ -1008,8 +1195,8 @@
             var $tco_done = false;
             var $tco_result;
             function $tco_loop(i) {
-              var $72 = greaterThanOrEq2(bound(add2(i)(fromInt(1)))(n))(r);
-              if ($72) {
+              var $124 = greaterThanOrEq2(bound(add2(i)(fromInt(1)))(n))(r);
+              if ($124) {
                 $copy_i = add2(i)(fromInt(1));
                 return;
               }
@@ -1024,10 +1211,10 @@
             ;
             return $tco_result;
           };
-          return go(sub2(p)(fromInt(1)));
+          return go(sub22(p)(fromInt(1)));
         }
         ;
-        throw new Error("Failed pattern match at Main (line 87, column 1 - line 87, column 45): " + [r.constructor.name, p.constructor.name, n.constructor.name]);
+        throw new Error("Failed pattern match at Main (line 89, column 1 - line 89, column 45): " + [r.constructor.name, p.constructor.name, n.constructor.name]);
       };
     };
   };
@@ -1035,14 +1222,14 @@
     return function(n) {
       return function(v) {
         var dmin = max3(add2(v.value1.value0)(fromInt(1)))(add2(div2(v.value1.value1.value1.value1)(v.value1.value1.value1.value0))(fromInt(1)));
-        var dmax = limit(sub1(toRational2(fromInt(1))(q))(v.value1.value1.value0))(dmin)(n);
+        var dmax = limit(sub2(toRational2(fromInt(1))(q))(v.value1.value1.value0))(dmin)(n);
         var d = range3(dmin)(dmax);
-        var delta = map2(function($97) {
+        var delta = map2(function($187) {
           return function(v1) {
-            return sub2(v1)(v.value1.value1.value1.value1);
+            return sub22(v1)(v.value1.value1.value1.value1);
           }(function(v1) {
             return mul2(v1)(v.value1.value1.value1.value0);
-          }($97));
+          }($187));
         })(d);
         var pdelta$prime = map2(function(v1) {
           return mul2(v1)(v.value1.value1.value1.value0);
@@ -1054,12 +1241,12 @@
         }))(d);
         return zip(map2(function(v1) {
           return cons(v1)(v.value0);
-        })(d))(zip(d)(zip(map2(function($98) {
+        })(d))(zip(d)(zip(map2(function($188) {
           return function(v1) {
             return add1(v1)(v.value1.value1.value0);
           }(function(v1) {
             return toRational2(fromInt(1))(v1);
-          }($98));
+          }($188));
         })(d))(zip(pdelta$prime)(pd$prime))));
       };
     };
@@ -1091,50 +1278,69 @@
       };
     };
   };
-  var egyptian = function(u) {
-    return function(d) {
-      return function(n) {
-        if (greaterThan2(u)(fromInt(1)) && n === 1) {
-          return [];
-        }
-        ;
-        if (greaterThan2(u)(fromInt(1))) {
-          return map2(function(qs) {
-            return map2(function(v) {
-              return div2(v)(u);
-            })(qs);
-          })(filter(function(qs) {
-            return all2(function(v) {
-              return eq3(v)(fromInt(0));
-            })(map2(function(v) {
-              return mod2(v)(u);
-            })(qs));
-          })(egyptian(fromInt(1))(d)(n)));
-        }
-        ;
-        if (eq3(u)(fromInt(1)) && n === 1) {
-          return [[d]];
-        }
-        ;
-        if (otherwise) {
-          return filter(function(v) {
-            return notEq2(v)([]);
-          })($$final(d)(steps(d)(n - 1 | 0)(initial(d)(n))));
-        }
-        ;
-        throw new Error("Failed pattern match at Main (line 131, column 1 - line 131, column 60): " + [u.constructor.name, d.constructor.name, n.constructor.name]);
+  var egyptian = function(f) {
+    return function(n) {
+      var u$prime = numerator2(f);
+      var go = function(u) {
+        return function(d) {
+          if (greaterThan2(u)(fromInt(1)) && n === 1) {
+            return [];
+          }
+          ;
+          if (greaterThan2(u)(fromInt(1))) {
+            return map2(function(qs) {
+              return map2(function(v) {
+                return div2(v)(u);
+              })(qs);
+            })(filter(function(qs) {
+              return all2(function(v) {
+                return eq13(v)(fromInt(0));
+              })(map2(function(v) {
+                return mod1(v)(u);
+              })(qs));
+            })(go(fromInt(1))(d)));
+          }
+          ;
+          if (eq13(u)(fromInt(1)) && n === 1) {
+            return [[d]];
+          }
+          ;
+          if (otherwise) {
+            return filter(function(v) {
+              return notEq2(v)([]);
+            })($$final(d)(steps(d)(n - 1 | 0)(initial(d)(n))));
+          }
+          ;
+          throw new Error("Failed pattern match at Main (line 138, column 5 - line 148, column 46): " + [u.constructor.name, d.constructor.name]);
+        };
       };
+      var d$prime = denominator2(f);
+      return go(u$prime)(d$prime);
     };
   };
-  var main = /* @__PURE__ */ log2(/* @__PURE__ */ show(/* @__PURE__ */ showArray(/* @__PURE__ */ showArray(showBigInt)))(/* @__PURE__ */ function() {
+  var main = /* @__PURE__ */ log2(/* @__PURE__ */ show(/* @__PURE__ */ showTuple(/* @__PURE__ */ showMaybe(showArray2))(/* @__PURE__ */ showArray(showArray2)))(/* @__PURE__ */ function() {
     var g = function(v) {
       if (v.length === 6) {
-        return eq3(mod2(v[0])(fromInt(2)))(fromInt(1)) && (notEq1(mod2(v[0])(fromInt(5)))(fromInt(0)) && (notEq1(mod2(v[0])(fromInt(7)))(fromInt(0)) && (notEq1(mod2(v[0])(fromInt(11)))(fromInt(0)) && (notEq1(mod2(v[0])(fromInt(13)))(fromInt(0)) && (notEq1(mod2(v[0])(fromInt(17)))(fromInt(0)) && notEq1(mod2(v[0])(fromInt(19)))(fromInt(0)))))));
+        return eq13(mod1(v[0])(fromInt(2)))(fromInt(1)) && (notEq1(mod1(v[0])(fromInt(5)))(fromInt(0)) && (notEq1(mod1(v[0])(fromInt(7)))(fromInt(0)) && (notEq1(mod1(v[0])(fromInt(11)))(fromInt(0)) && (notEq1(mod1(v[0])(fromInt(13)))(fromInt(0)) && (notEq1(mod1(v[0])(fromInt(17)))(fromInt(0)) && notEq1(mod1(v[0])(fromInt(19)))(fromInt(0)))))));
       }
       ;
       return false;
     };
-    return filter(g)(egyptian(fromInt(1))(fromInt(1))(6));
+    var f = function(v) {
+      return function(v1) {
+        if (v.length === 5 && v1.length === 5) {
+          var $150 = lessThan2(sub22(v[0])(v[4]))(sub22(v1[0])(v1[4]));
+          if ($150) {
+            return LT.value;
+          }
+          ;
+          return GT.value;
+        }
+        ;
+        return EQ.value;
+      };
+    };
+    return new Tuple(minimumBy(foldableArray)(f)(egyptian(toRational2(fromInt(1))(fromInt(1)))(5)), filter(g)(egyptian(toRational2(fromInt(1))(fromInt(1)))(6)));
   }()));
 
   // <stdin>
