@@ -46,11 +46,11 @@ avec p(a)=ra^2+sa+t=f(a), p(b)=rb^2+sb+t=f(b) et p((a+b)/2) = r(a+b)^2/4+s(a+b)/
 son integrale est donc approximee par [rx^3/3+sx^2/2+tx]_a^b
 soit rb^3/3+sb^2/2+tb-(ra^3/3+sa^2/2+ta)
 =r(b^3-a^3)/3+s(b^2-a^2)/2+t(b-a)
-=[2r(b^2+ab+a^2)+3s(b+a)+6t]/(b-a)/6
-=[rb^2+rb^2+ra^2+ra^2+2rab+sb+sa+2s(b+a)+t+t+4t]/(b-a)/6
-=[(ra^2+sa+t)+(rb^2+sb+t)+r(b^2+a^2+2ab)+2s(b+a)+4t]/(b-a)/6
-=[f(a)+f(b)+r((a+b)^2)+2s(b+a)+4t]/(b-a)/6
-=[f(a)+f(b)+4f((a+b)/2)]/(b-a)/6
+=[2r(b^2+ab+a^2)+3s(b+a)+6t](b-a)/6
+=[rb^2+rb^2+ra^2+ra^2+2rab+sb+sa+2s(b+a)+t+t+4t](b-a)/6
+=[(ra^2+sa+t)+(rb^2+sb+t)+r(b^2+a^2+2ab)+2s(b+a)+4t](b-a)/6
+=[f(a)+f(b)+r((a+b)^2)+2s(b+a)+4t](b-a)/6
+=[f(a)+f(b)+4f((a+b)/2)](b-a)/6
 
 -}
 

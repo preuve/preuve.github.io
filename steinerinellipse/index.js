@@ -70,12 +70,13 @@ function drag(evt) {
         "transform", 
         "rotate(" + degrees(sub(fs[0],zS)) + "," + zS.re + "," + zS.im + ")"
         );
-    var sc = sub(affix(ptC),zS);
     var ab = sub(affix(ptB),affix(ptA));
-    var m = (sqmod(sc)+sqmod(ab)/3.0)/4.0;
-    var n = Math.abs(sc.re*ab.im-sc.im*ab.re)/4.0/Math.sqrt(3.0);
-    var a = (Math.sqrt(m+2.0*n)+Math.sqrt(m-2.0*n))/2.0;
-	var b = (Math.sqrt(m+2.0*n)-Math.sqrt(m-2.0*n))/2.0;
+    var bc = sub(affix(ptC),affix(ptB));
+    var ca = sub(affix(ptA),affix(ptC));
+    var m = (sqmod(ab) + sqmod(bc) + sqmod(ca)) / 2.0;
+    var n = Math.abs(ab.re*bc.im-ab.im*bc.re) * Math.sqrt(3.0);
+    var a = (Math.sqrt(m+n)+Math.sqrt(m-n))/6.0;
+	var b = (Math.sqrt(m+n)-Math.sqrt(m-n))/6.0;
 	e.setAttributeNS(null, "rx", a);
     e.setAttributeNS(null, "ry", b);
     
